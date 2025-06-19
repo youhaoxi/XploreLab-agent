@@ -29,7 +29,7 @@ async def main():
     data = load_data()
     for i, item in enumerate(data):
         result = await agent.run(item["Question"])
-        print(f"{i+1: 03d}. Question: {item['Question']}")
+        print(f"{i+1:03d}. Question: {item['Question']}")
         print(f"Answer: {item['Answer']}")
         print(f"Result: {result.final_output}")
         print()
