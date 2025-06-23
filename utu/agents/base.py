@@ -8,7 +8,10 @@ class UTUAgentBase:
     _input_items: list[TResponseInputItem] = []
 
     def __init__(self):
-        raise NotImplementedError()
+        pass
+
+    def set_agent(self, agent: Agent):
+        self._current_agent = agent
 
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem]) -> RunResult:
