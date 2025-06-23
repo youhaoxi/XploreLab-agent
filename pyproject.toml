@@ -10,9 +10,32 @@ dependencies = [
     "openai-agents>=0.0.19",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
+]
+
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["utu"]
+
+
+[tool.pytest.ini_options]
+pythonpath = "."
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+addopts = "-v -s"
+log_cli = true
+log_cli_level = "INFO"
+
+[tool.uv]
+index-url = "https://pypi.org/simple"
+extra-index-url = [
+    "https://mirrors.tencent.com/repository/pypi/tencent_pypi/simple",
+]
