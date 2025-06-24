@@ -6,12 +6,14 @@ import requests
 
 from .base import AsyncBaseToolkit
 from ..utils import oneline_object, async_file_cache
+from ..config import ToolkitConfig
 
 logger = logging.getLogger("utu")
 
 
 class SearchToolkit(AsyncBaseToolkit):
-    def __init__(self):
+    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None):
+        super().__init__(config, activated_tools)
         self.jina_url_template = r"https://r.jina.ai/{url}"
         self.jina_header = {
             "Authorization": f"Bearer {os.getenv('JINA_API_KEY')}"
