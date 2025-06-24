@@ -5,7 +5,7 @@ from typing import Callable
 import requests
 
 from .base import AsyncBaseToolkit
-from ..utils import oneline_object
+from ..utils import oneline_object, async_file_cache
 
 logger = logging.getLogger("utu")
 
@@ -22,6 +22,7 @@ class SearchToolkit(AsyncBaseToolkit):
             'Content-Type': 'application/json'
         }
 
+    @async_file_cache(expire_time=None)
     async def search_google_api(self, query: str, num_results: int = 20) -> str:
         """Search the query via Google api, the query should be a search query like humans search in Google, concrete and not vague or super long. More the single most important items.
         
@@ -42,6 +43,7 @@ class SearchToolkit(AsyncBaseToolkit):
         logger.info(oneline_object(msg))
         return msg
 
+    @async_file_cache(expire_time=None)
     async def get_content(self, url: str) -> str:
         """Get the content of the url
         
