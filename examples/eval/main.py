@@ -7,6 +7,7 @@ import pathlib
 import copy
 import json
 from agents import Agent, Tool, ItemHelpers
+from agents.models.chatcmpl_converter import Converter
 
 from utu.agents.base import UTUAgentBase
 from utu.utils import AgentsUtils, get_package_path
@@ -52,7 +53,7 @@ async def rollout(agent: UTUAgentBase, data: dict) -> dict:
 
     output = copy.deepcopy(data)
     output["Answer Predicted"] = predicted
-    output["trajectory"] = ItemHelpers.input_to_new_input_list(result.to_input_list())
+    output["trajectory"] = Converter.items_to_messages(result.to_input_list())
     await writeout_datapoint(output)
     return output
 
