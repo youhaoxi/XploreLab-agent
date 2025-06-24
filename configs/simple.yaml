@@ -1,5 +1,5 @@
 agent:
-    name: utu-default
+    name: utu-simple
     instructions: "You are a helpful assistant."
 
 model:

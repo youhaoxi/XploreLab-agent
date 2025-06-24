@@ -1,22 +1,47 @@
-from agents import Agent, Runner, TResponseInputItem, RunResult, RunResultStreaming, TContext
+from agents import (
+    Agent, Runner, RunConfig, RunResult, RunResultStreaming, 
+    TResponseInputItem
+)
 
-from utu.utils import AgentsUtils
+from ..utils import AgentsUtils
+from ..config import load_config_by_name, Config
 
 
 class UTUAgentBase:
+    config: Config = None
+    
     _current_agent: Agent = None
     _input_items: list[TResponseInputItem] = []
 
-    def __init__(self):
-        raise NotImplementedError()
+    @property
+    def name(self):
+        return self.config.agent.name
+
+    def __init__(
+        self,
+        config_name: str = "default",
+    ):
+        self._load_config(config_name)
+
+    def _load_config(self, config_name: str):
+        self.config = load_config_by_name(config_name)
+
+    def _get_run_config(self) -> RunConfig:
+        return RunConfig(
+            workflow_name=self.name,
+        )
+
+    def set_agent(self, agent: Agent):
+        """ Set the current agent """
+        self._current_agent = agent
 
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem]) -> RunResult:
         # TODO: setup other runner options as @property
-        return await Runner.run(self._current_agent, input)
+        return await Runner.run(self._current_agent, input, run_config=self._get_run_config())
 
     def run_streamed(self, input: str | list[TResponseInputItem]) -> RunResultStreaming:
-        return Runner.run_streamed(self._current_agent, input)
+        return Runner.run_streamed(self._current_agent, input, run_config=self._get_run_config())
 
     # util apis
     async def chat(self, input: str):
