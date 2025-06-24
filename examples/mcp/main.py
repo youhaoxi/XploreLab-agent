@@ -6,13 +6,13 @@ from agents import Agent
 from agents.mcp import MCPServerStdio, MCPServer
 
 from utu.agents.base import UTUAgentBase
-from utu.utils import AgentsUtils, get_package_path
+from utu.utils import AgentsUtils, DIR_ROOT
 from utu.config import load_config
 
 
 class MCPAgent(UTUAgentBase):
     def __init__(self, mcp_servers: list[MCPServer]) -> None:
-        config = load_config(get_package_path() / "configs" / "default.yaml")
+        config = load_config(DIR_ROOT / "configs" / "default.yaml")
         model = AgentsUtils.get_agents_model(config.model.model, config.model.api_key, config.model.base_url)
         agent = Agent(
             name="mcp-agent",

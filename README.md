@@ -16,3 +16,20 @@ python examples/mcp/main.py
 python examples/eval/main.py
 ```
 
+# TODO
+> see full in [qqdoc](https://doc.weixin.qq.com/smartsheet/s3_AcMATAZtAPIuFWU7og0T16lnjNLwZ?scode=AJEAIQdfAAojkV21HAAcMATAZtAPI&tab=q979lj&viewId=vukaF8)
+
+- features
+    - [x] basic wrapper of @openai-agents @2025-06-20
+    - [x] eval workflow (rollout) @2025-06-23
+    - [ ] logging/tracing system
+    - [x] #tool cache (reduce the cost of Google API)
+- agents | baseline
+    - [ ] #single-agent #tool-search (search)
+- eval
+    - [ ] #dataset GIAI
+    - [ ] #dataset BrowseCamp
+- tools
+    - [x] search (google_api)
+    - [ ] integration the workflow of tool-maker (MCP) @yigeng
+

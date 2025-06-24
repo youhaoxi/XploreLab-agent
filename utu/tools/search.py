@@ -1,10 +1,13 @@
 import os
+import logging
 from typing import Callable
 
 import requests
 
 from .base import AsyncBaseToolkit
-from ..utils import logger
+from ..utils import oneline_object, async_file_cache
+
+logger = logging.getLogger("utu")
 
 
 class SearchToolkit(AsyncBaseToolkit):
@@ -19,6 +22,7 @@ class SearchToolkit(AsyncBaseToolkit):
             'Content-Type': 'application/json'
         }
 
+    @async_file_cache(expire_time=None)
     async def search_google_api(self, query: str, num_results: int = 20) -> str:
         """Search the query via Google api, the query should be a search query like humans search in Google, concrete and not vague or super long. More the single most important items.
         
@@ -26,7 +30,7 @@ class SearchToolkit(AsyncBaseToolkit):
             query (str): The query to search for.
             num_results (int, optional): The number of results to return. Defaults to 20.
         """
-        logger.info(f"[tool] search_google_api: {query}")
+        logger.info(f"[tool] search_google_api: {oneline_object(query)}")
         params = {
             'q': query,
             'gl': 'cn',
@@ -36,18 +40,19 @@ class SearchToolkit(AsyncBaseToolkit):
         response = requests.request("POST", self.serper_url, headers=self.serper_header, json=params)
         results = response.json()["organic"]
         msg = f'🔍  Results for query "{query}": {results}'
-        logger.info(msg)
+        logger.info(oneline_object(msg))
         return msg
 
+    @async_file_cache(expire_time=None)
     async def get_content(self, url: str) -> str:
         """Get the content of the url
         
         Args:
             url (str): The url to get content from.
         """
-        logger.info(f"[tool] get_content: {url}")
+        logger.info(f"[tool] get_content: {oneline_object(url)}")
         response = requests.get(self.jina_url_template.format(url=url), headers=self.jina_header)
-        logger.info(f"[tool] get_content: {response.text[:100]}...")
+        logger.info(f"[tool] get_content: {oneline_object(response.text)}...")
         return response.text
         
 

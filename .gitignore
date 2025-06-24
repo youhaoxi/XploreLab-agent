@@ -12,4 +12,6 @@ wheels/
 # Misc
 uv.lock
 .env
+.vscode
 *.log
+.cache/
