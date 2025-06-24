@@ -44,4 +44,3 @@ def oneline_object(obj: object, limit: int = 100) -> str:
         s = json.dumps(str(obj), ensure_ascii=False)
     return f"{s[:limit]}..." if len(s) > limit else s
 
-setup_logging()
