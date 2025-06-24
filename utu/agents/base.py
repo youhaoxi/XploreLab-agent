@@ -1,4 +1,7 @@
-from agents import Agent, Runner, TResponseInputItem, RunResult, RunResultStreaming, TContext
+from agents import (
+    Agent, Runner, RunConfig, RunResult, RunResultStreaming, 
+    TResponseInputItem
+)
 
 from utu.utils import AgentsUtils
 
@@ -6,9 +9,19 @@ from utu.utils import AgentsUtils
 class UTUAgentBase:
     _current_agent: Agent = None
     _input_items: list[TResponseInputItem] = []
+    name: str = "default"
 
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        name: str | None = None,
+    ):
+        if name is not None:
+            self.name = name
+
+    def _get_run_config(self) -> RunConfig:
+        return RunConfig(
+            workflow_name=self.name,
+        )
 
     def set_agent(self, agent: Agent):
         self._current_agent = agent
@@ -16,10 +29,10 @@ class UTUAgentBase:
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem]) -> RunResult:
         # TODO: setup other runner options as @property
-        return await Runner.run(self._current_agent, input)
+        return await Runner.run(self._current_agent, input, run_config=self._get_run_config())
 
     def run_streamed(self, input: str | list[TResponseInputItem]) -> RunResultStreaming:
-        return Runner.run_streamed(self._current_agent, input)
+        return Runner.run_streamed(self._current_agent, input, run_config=self._get_run_config())
 
     # util apis
     async def chat(self, input: str):

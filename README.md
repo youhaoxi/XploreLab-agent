@@ -22,7 +22,7 @@ python examples/eval/main.py
 - features
     - [x] basic wrapper of @openai-agents @2025-06-20
     - [x] eval workflow (rollout) @2025-06-23
-    - [ ] logging/tracing system @phoenix @2025-06-24
+    - [x] logging/tracing system @phoenix @2025-06-24
     - [x] #tool cache (reduce the cost of Google API)
 - agents | baseline
     - [ ] #single-agent #tool-search (search)
