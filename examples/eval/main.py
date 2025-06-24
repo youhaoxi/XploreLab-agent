@@ -6,13 +6,9 @@ import asyncio
 import pathlib
 import copy
 import json
-from agents import Agent, Tool, ItemHelpers
 from agents.models.chatcmpl_converter import Converter
 
-from utu.agents.base import UTUAgentBase
-from utu.utils import AgentsUtils, DIR_ROOT
-from utu.config import load_config
-from utu.tools.search import SearchToolkit
+from utu.agents import UTUSimpleAgent
 
 flock = asyncio.Lock()
 ofn = pathlib.Path(__file__).parent / "eval_result.jsonl"
@@ -30,24 +26,13 @@ async def writeout_datapoint(data: dict):
             line = json.dumps(data, ensure_ascii=False)
             f.write(line + "\n")
 
-async def get_tools() -> list[Tool]:
-    toolkit = SearchToolkit()
-    return await toolkit.get_tools_in_agents()
-
-async def build_agent() -> UTUAgentBase:
-    agent = UTUAgentBase()
-    config = load_config(DIR_ROOT / "configs" / "default.yaml")
-    model = AgentsUtils.get_agents_model(config.model.model, config.model.api_key, config.model.base_url)
-    current_agent = Agent(
-        name="eval-agent",
-        instructions="You are a helpful assistant.",
-        model=model,
-        tools=await get_tools(),
-    )
-    agent.set_agent(current_agent)
+async def build_agent() -> UTUSimpleAgent:
+    # load the builtin simple agent
+    agent = UTUSimpleAgent(config_name="simple")
+    await agent.build()
     return agent
 
-async def rollout(agent: UTUAgentBase, data: dict) -> dict:
+async def rollout(agent: UTUSimpleAgent, data: dict) -> dict:
     result = await agent.run(data["Question"])
     predicted = result.final_output
 

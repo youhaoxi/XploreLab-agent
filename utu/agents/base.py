@@ -3,20 +3,28 @@ from agents import (
     TResponseInputItem
 )
 
-from utu.utils import AgentsUtils
+from ..utils import AgentsUtils
+from ..config import load_config_by_name, Config
 
 
 class UTUAgentBase:
+    config: Config = None
+    
     _current_agent: Agent = None
     _input_items: list[TResponseInputItem] = []
-    name: str = "default"
+
+    @property
+    def name(self):
+        return self.config.agent.name
 
     def __init__(
         self,
-        name: str | None = None,
+        config_name: str = "default",
     ):
-        if name is not None:
-            self.name = name
+        self._load_config(config_name)
+
+    def _load_config(self, config_name: str):
+        self.config = load_config_by_name(config_name)
 
     def _get_run_config(self) -> RunConfig:
         return RunConfig(
@@ -24,6 +32,7 @@ class UTUAgentBase:
         )
 
     def set_agent(self, agent: Agent):
+        """ Set the current agent """
         self._current_agent = agent
 
     # wrap `Runner` apis in @openai-agents
