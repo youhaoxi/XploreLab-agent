@@ -9,7 +9,7 @@ import json
 from agents import Agent, Tool, ItemHelpers
 
 from utu.agents.base import UTUAgentBase
-from utu.utils import AgentsUtils, get_package_path
+from utu.utils import AgentsUtils, DIR_ROOT
 from utu.config import load_config
 from utu.tools.search import SearchToolkit
 
@@ -35,7 +35,7 @@ async def get_tools() -> list[Tool]:
 
 async def build_agent() -> UTUAgentBase:
     agent = UTUAgentBase()
-    config = load_config(get_package_path() / "configs" / "default.yaml")
+    config = load_config(DIR_ROOT / "configs" / "default.yaml")
     model = AgentsUtils.get_agents_model(config.model.model, config.model.api_key, config.model.base_url)
     current_agent = Agent(
         name="eval-agent",
