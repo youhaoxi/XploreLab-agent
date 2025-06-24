@@ -1,3 +1,7 @@
+""" 
+open-inference: https://github.com/Arize-ai/openinference
+"""
+
 from phoenix.otel import register, TracerProvider
 
 def setup_phoenix_tracing() -> TracerProvider:
