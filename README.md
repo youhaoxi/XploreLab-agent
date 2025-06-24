@@ -25,7 +25,9 @@ python examples/eval/main.py
     - [x] logging/tracing system @phoenix @2025-06-24
     - [x] #tool cache (reduce the cost of Google API)
 - agents | baseline
-    - [ ] #single-agent #tool-search (search)
+    - [x] #single-agent tools (search)
+    - [ ] #single-agent tools + (search_tool)
+    - [ ] #agent-pattern routing
 - eval
     - [ ] #dataset GIAI
     - [ ] #dataset BrowseCamp
