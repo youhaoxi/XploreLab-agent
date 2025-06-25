@@ -26,12 +26,12 @@ def setup_logging() -> None:
     logger = logging.getLogger("utu")
     logger.setLevel(LOGGING_LEVEL)
 
-    for handler in logger.handlers[:]:
-        logger.removeHandler(handler)
+    # for handler in logger.handlers[:]:
+    #     logger.removeHandler(handler)
 
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    stdout_handler.setFormatter(logging.Formatter(log_format))
-    logger.addHandler(stdout_handler)
+    # stdout_handler = logging.StreamHandler(sys.stdout)
+    # stdout_handler.setFormatter(logging.Formatter(log_format))
+    # logger.addHandler(stdout_handler)
 
     file_handler = logging.FileHandler(DIR_LOGS / "utu.log")
     file_handler.setFormatter(logging.Formatter(log_format))
