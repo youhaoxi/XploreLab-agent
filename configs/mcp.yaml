@@ -21,5 +21,5 @@ toolkits:
         command: npx
         args: ["-y", "@modelcontextprotocol/server-memory"]
         env:
-            MEMORY_FILE_PATH: ${oc.env:MEMORY_FILE_PATH}
+            MEMORY_FILE_PATH: ${oc.env:UTU_EXAMPLE_MEMORY_FILE_PATH}
 

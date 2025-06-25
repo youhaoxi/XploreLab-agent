@@ -5,7 +5,6 @@ Simple agent with built-in tools
 import logging
 from typing import Callable
 from contextlib import AsyncExitStack
-import asyncio
 from agents import Agent, Tool
 from agents.mcp import MCPServerStdio, MCPServer, MCPUtil
 
@@ -44,23 +43,18 @@ class UTUSimpleAgent(UTUAgentBase):
     async def build(self):
         """ Build the agent """
         model = AgentsUtils.get_agents_model(**self.config.model.model_dump())
+        tools = await self.load_tools()
         self._current_agent = Agent(
             name=self.name,
             instructions=await self.build_instructions(),
             model=model,
-            tools=await self.load_tools(),
+            tools=tools,
+            # mcp_servers  # manually setup mcp servers & tools
         )
     
     async def cleanup(self):
         """ Cleanup """
-        # for server in self._mcp_servers:
-        #     try:
-        #         await server.cleanup()
-        #     except asyncio.CancelledError:
-        #         # Swallow cancellation during cleanup; avoids noisy stack traces when main task is cancelled
-        #         logger.debug("Server cleanup cancelled; ignoring.")
-        #     except Exception as e:
-        #         logger.error(f"Error during server cleanup: {e}")
+        logger.info("Cleaning up... (MCP servers)")
         await self._exit_stack.aclose()
         self._mcp_servers = []
 
