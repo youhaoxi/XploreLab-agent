@@ -1,0 +1,25 @@
+agent:
+    name: utu-simple-mcp
+    instructions: "You are a helpful assistant."
+
+model:
+    api_key: ${oc.env:UTU_API_KEY}
+    base_url: ${oc.env:UTU_BASE_URL}
+    model: ${oc.env:UTU_MODEL}
+
+toolkits:
+    - name: time
+      mode: mcp
+      activated_tools: null
+      config:
+        command: uvx
+        args: ["mcp-server-time", "--local-timezone=Asia/Shanghai"]
+    - name: memory
+      mode: mcp
+      activated_tools: null
+      config:
+        command: npx
+        args: ["-y", "@modelcontextprotocol/server-memory"]
+        env:
+            MEMORY_FILE_PATH: ${oc.env:MEMORY_FILE_PATH}
+
