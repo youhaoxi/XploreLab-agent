@@ -14,6 +14,8 @@ cp .env.example .env
 python examples/mcp/main.py
 # 2. eval
 python examples/eval/main.py
+# 3. tool maker
+python examples/tool_maker/main.py
 ```
 
 # TODO

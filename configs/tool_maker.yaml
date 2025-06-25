@@ -1,0 +1,8 @@
+agent:
+    name: utu-tool-maker
+    instructions: "You are a helpful assistant."
+
+model:
+    api_key: ${oc.env:UTU_API_KEY}
+    base_url: ${oc.env:UTU_BASE_URL}
+    model: ${oc.env:UTU_MODEL}
