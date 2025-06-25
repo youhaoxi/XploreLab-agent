@@ -1,6 +1,5 @@
 """ 
-Simple agent with built-in tools
-- [ ] MCP
+Simple agent with tools -- built-in toolkits, MCPs
 """
 import logging
 from typing import Callable
@@ -44,13 +43,14 @@ class UTUSimpleAgent(UTUAgentBase):
         """ Build the agent """
         model = AgentsUtils.get_agents_model(**self.config.model.model_dump())
         tools = await self.load_tools()
-        self._current_agent = Agent(
+        agent = Agent[self.context](
             name=self.name,
             instructions=await self.build_instructions(),
             model=model,
             tools=tools,
             # mcp_servers  # manually setup mcp servers & tools
         )
+        self.set_agent(agent)
     
     async def cleanup(self):
         """ Cleanup """
