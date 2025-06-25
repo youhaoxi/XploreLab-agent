@@ -28,7 +28,11 @@ async def writeout_datapoint(data: dict):
 
 async def build_agent() -> UTUSimpleAgent:
     # load the builtin simple agent
-    agent = UTUSimpleAgent(config_name="simple")
+    agent = UTUSimpleAgent(
+        config_name="simple",
+        name="eval-agent",
+        instructions="You should answer the question with the tools provided."
+    )
     await agent.build()
     return agent
 
