@@ -17,7 +17,8 @@ from agents import (
     ToolCallOutputItem,
 )
 from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEvent, RunItemStreamEvent
-from utu.utils.print_utils import PrintUtils
+
+from .print_utils import PrintUtils
 
 
 class AgentsUtils:

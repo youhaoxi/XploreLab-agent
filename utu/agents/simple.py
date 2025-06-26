@@ -21,7 +21,7 @@ class UTUSimpleAgent(UTUAgentBase):
     
     def __init__(
         self,
-        config_name: str = "simple",
+        config_name: str = "default",
         name: str = None,
         instructions: str = None,
         *args, **kwargs
@@ -61,7 +61,7 @@ class UTUSimpleAgent(UTUAgentBase):
     async def load_tools(self) -> list[Tool]:
         """ Load tools from config. You can override this method to load tools from other sources. """
         tools_list: list[Tool] = []
-        for toolkit_config in self.config.toolkits:
+        for toolkit_name, toolkit_config in self.config.toolkits.items():
             # TODO: handle duplicate tool names
             if toolkit_config.mode == "mcp":
                 await self._load_mcp_server(toolkit_config)

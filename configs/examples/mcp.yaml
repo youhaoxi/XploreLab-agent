@@ -1,0 +1,11 @@
+# @package _global_
+defaults:
+  - /model/base@model
+  # toolkits: 
+  - /tools/time@toolkits.time
+  - /tools/memory@toolkits.memory
+  - _self_
+
+agent:
+    name: utu-simple-mcp
+    instructions: "You are a helpful assistant."

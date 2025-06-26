@@ -1,0 +1,6 @@
+name: time
+mode: mcp
+activated_tools: null
+config:
+  command: uvx
+  args: ["mcp-server-time", "--local-timezone=Asia/Shanghai"]

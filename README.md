@@ -35,5 +35,6 @@ python examples/tool_maker/main.py
     - [ ] #dataset BrowseCamp
 - tools
     - [x] search (google_api)
+    - [x] web_qa @2025-06-26
     - [ ] integration the workflow of tool-maker (MCP) @yigeng
 
