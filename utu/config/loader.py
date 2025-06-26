@@ -1,11 +1,9 @@
 from typing import TypeVar, Type, Literal, Callable
 
 from pydantic import BaseModel
-from dotenv import load_dotenv
 from omegaconf import OmegaConf, DictConfig
 from hydra import compose, initialize
 
-load_dotenv()
 TConfig = TypeVar("TConfig", bound=BaseModel)
 
 
