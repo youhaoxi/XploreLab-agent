@@ -1,0 +1,7 @@
+name: search
+mode: builtin
+activated_tools: null
+config: {
+  "llm": {"model": "${oc.env:UTU_TOOL_MODEL}", "api_key": "${oc.env:UTU_API_KEY}", "base_url": "${oc.env:UTU_BASE_URL}"},
+  "summary_token_limit": 10_000,
+}

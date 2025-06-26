@@ -13,7 +13,7 @@ queries = [
 
 async def main():
     async with UTUSimpleAgent(
-        config_name="mcp",
+        config_name="examples/mcp",
         name="example-mcp-agent",
     ) as agent:
         for query in queries:

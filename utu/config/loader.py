@@ -2,9 +2,8 @@ from typing import TypeVar, Type, Literal, Callable
 
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from omegaconf import OmegaConf
-
-from ..utils import DIR_ROOT
+from omegaconf import OmegaConf, DictConfig
+from hydra import compose, initialize
 
 load_dotenv()
 TConfig = TypeVar("TConfig", bound=BaseModel)
@@ -28,16 +27,32 @@ class ToolkitConfig(BaseModel):
 class Config(BaseModel):
     model: ModelConfig
     agent: AgentConfig
-    toolkits: list[ToolkitConfig] = []
+    toolkits: dict[str, ToolkitConfig] = {}
 
 
-def load_config(config_path: str, config_type: Type[TConfig] = Config) -> TConfig:
-    config = OmegaConf.load(config_path)
-    config = OmegaConf.to_container(config, resolve=True)
-    structed_config = config_type(**config)
-    return structed_config
+class ConfigLoader:
+    config_path = "../../configs"
+    version_base = "1.3"
 
-def load_config_by_name(name: str = "default") -> Config:
-    if name.endswith(".yaml"): name = name[:-5]
-    config_path = DIR_ROOT / "configs" / f"{name}.yaml"
-    return load_config(config_path)
+    @classmethod
+    def _load_config_to_dict(cls, name: str = "default") -> DictConfig:
+        with initialize(config_path=cls.config_path, version_base=cls.version_base):
+            cfg = compose(config_name=name)
+            OmegaConf.resolve(cfg)
+        return cfg
+
+    @classmethod
+    def _load_config_to_cls(cls, name: str, config_type: Type[TConfig] = None) -> TConfig:
+        # TESTING
+        cfg = cls._load_config_to_dict(name)
+        return config_type(**cfg)
+
+    @classmethod
+    def load_config(cls, name: str = "default") -> Config:
+        cfg = cls._load_config_to_dict(name)
+        return Config(**cfg)
+
+    @classmethod
+    def load_toolkit_config(cls, name: str = "default") -> ToolkitConfig:
+        cfg = cls._load_config_to_dict(name)
+        return ToolkitConfig(**cfg)

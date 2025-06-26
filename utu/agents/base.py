@@ -6,7 +6,7 @@ from agents import (
 )
 
 from ..utils import AgentsUtils
-from ..config import load_config_by_name, Config
+from ..config import ConfigLoader, Config
 from .context import UTUContext
 
 
@@ -28,7 +28,7 @@ class UTUAgentBase:
         self._build_context()
 
     def _load_config(self, config_name: str):
-        self.config = load_config_by_name(config_name)
+        self.config = ConfigLoader.load_config(config_name)
     def _build_context(self):
         self.context = UTUContext(config=self.config)
 
