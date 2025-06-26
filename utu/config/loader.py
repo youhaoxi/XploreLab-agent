@@ -35,8 +35,9 @@ class ConfigLoader:
     version_base = "1.3"
 
     @classmethod
-    def _load_config_to_dict(cls, name: str = "default") -> DictConfig:
-        with initialize(config_path=cls.config_path, version_base=cls.version_base):
+    def _load_config_to_dict(cls, name: str = "default", config_path: str = None) -> DictConfig:
+        config_path = config_path or cls.config_path
+        with initialize(config_path=config_path, version_base=cls.version_base):
             cfg = compose(config_name=name)
             OmegaConf.resolve(cfg)
         return cfg
@@ -53,6 +54,6 @@ class ConfigLoader:
         return Config(**cfg)
 
     @classmethod
-    def load_toolkit_config(cls, name: str = "default") -> ToolkitConfig:
-        cfg = cls._load_config_to_dict(name)
+    def load_toolkit_config(cls, name: str = "search") -> ToolkitConfig:
+        cfg = cls._load_config_to_dict(name, config_path="../../configs/tools")
         return ToolkitConfig(**cfg)
