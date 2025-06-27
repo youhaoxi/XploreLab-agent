@@ -55,3 +55,8 @@ class ConfigLoader:
     def load_toolkit_config(cls, name: str = "search") -> ToolkitConfig:
         cfg = cls._load_config_to_dict(name, config_path="../../configs/tools")
         return ToolkitConfig(**cfg)
+
+    @classmethod
+    def load_model_config(cls, name: str = "base") -> ModelConfig:
+        cfg = cls._load_config_to_dict(name, config_path="../../configs/model")
+        return ModelConfig(**cfg)

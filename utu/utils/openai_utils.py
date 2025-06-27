@@ -1,3 +1,4 @@
+import os
 from typing import Iterator
 
 import openai
@@ -108,6 +109,10 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
                 default_config[k] = v
             else:
                 openai_client_kwargs[k] = v
+        api_key = api_key or os.getenv("UTU_API_KEY")
+        base_url = base_url or os.getenv("UTU_BASE_URL")
+        default_config["model"] = default_config.get("model", os.getenv("UTU_MODEL"))
+        
         super().__init__(api_key=api_key, base_url=base_url, **openai_client_kwargs)
         self._default_config = OPENAI_DEFAULT_CONFIG.copy()
         self._default_config.update(default_config)
@@ -117,3 +122,7 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
         kwargs = OpenAIUtils.process_chat_completion_params(kwargs, self._default_config)
         chat_completion: ChatCompletion = await self.chat.completions.create(**kwargs)
         return chat_completion.choices[0].message.content
+
+    async def chat_completion(self, **kwargs) -> ChatCompletion:
+        kwargs = OpenAIUtils.process_chat_completion_params(kwargs, self._default_config)
+        return await self.chat.completions.create(**kwargs)
