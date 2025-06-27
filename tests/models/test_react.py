@@ -1,4 +1,0 @@
-""" 
-Test ReAct mode (Converter)
-
-"""
