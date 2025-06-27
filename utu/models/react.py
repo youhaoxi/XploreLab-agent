@@ -1,10 +1,11 @@
 """ 
 doc: https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNRgjuRgV7TQ2phu2p?scode=AJEAIQdfAAoS38Jv0GAcMATAZtAPI
 """
-
 import logging
 from typing import AsyncIterator
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict
+
+from openai import AsyncOpenAI
 from openai.types.responses.response_prompt_param import ResponsePromptParam
 from openai.types.responses import (
     # Response, 
@@ -21,51 +22,11 @@ from agents import (
 )
 from agents.items import TResponseStreamEvent
 
+from .react_converter import ReactConverter, ConverterPreprocessInput
+
 logger = logging.getLogger("utu")
 
 
-class ConverterPreprocessInput(dataclass):
-    system_instructions: str | None
-    input: str | list[TResponseInputItem]
-    tools: list[Tool] = field(default_factory=list)
-    output_schema: AgentOutputSchema | None = None
-    handoffs: list[Handoff] = field(default_factory=list)
-
-
-class ReactConverter:
-    def __init__(self) -> None:
-        # TODO: add configs?
-        pass
-
-    def preprocess(self, input: ConverterPreprocessInput) -> ConverterPreprocessInput:
-        """Preprocess input for ReAct mode
-        - convert SP+tools+handoffs -> new SP
-        - process input
-        - output_schema: TODO:
-        """
-        sp = self._handle_sp(input.system_instructions, input.tools, input.handoffs)
-        messages = self._handle_input(input.input)
-        return ConverterPreprocessInput(system_instructions=sp, input=messages)
-
-    def _handle_sp(self, system_instructions: str | None, tools: list[Tool], handoffs: list[Handoff]) -> str | None:
-        return system_instructions
-
-    def _handle_input(self, input: str | list[TResponseInputItem]) -> str | list[TResponseInputItem]:
-        return input
-
-    def postprocess(self, items: list[ResponseOutputItem]) -> list[ResponseOutputItem]:
-        """Parse FCs from text output"""
-        text_output = ""
-        for item in items:
-            if not isinstance(item, ResponseOutputMessage):
-                logger.warning(f">> Unknown item type: {item.__class__.__name__}")
-            else:
-                assert len(item.content) == 1 and item.content[0].type == "output_text"
-                text_output += item.content[0].text
-        return self._parse_react_output(text_output)
-        
-    def _parse_react_output(self, text_output: str) -> list[ResponseOutputItem]:
-        """Parse output text into list of ResponseOutputMessage|ResponseFunctionToolCall"""
 
 converter = ReactConverter()
 
@@ -83,6 +44,7 @@ class ReactModel(OpenAIChatCompletionsModel):
     #     )
     #     self._context = context
     #     self._preprocessors = preprocessors
+    
     async def get_response(
         self,
         system_instructions: str | None,
@@ -95,11 +57,16 @@ class ReactModel(OpenAIChatCompletionsModel):
         previous_response_id: str | None,
         prompt: ResponsePromptParam | None = None,
     ) -> ModelResponse:
-        preprocess_input = ConverterPreprocessInput(system_instructions, input, tools, output_schema, handoffs)
+        preprocess_input = ConverterPreprocessInput(system_instructions, input, tools, output_schema, handoffs, model_settings)
         preprocess_input = converter.preprocess(preprocess_input)
         model_response = await super().get_response(
-            model_settings=model_settings, tracing=tracing, previous_response_id=previous_response_id, prompt=prompt,
-            **asdict(preprocess_input)
+            tracing=tracing, previous_response_id=previous_response_id, prompt=prompt,
+            system_instructions=preprocess_input.system_instructions,
+            input=preprocess_input.input,
+            tools=preprocess_input.tools,
+            output_schema=preprocess_input.output_schema,
+            handoffs=preprocess_input.handoffs,
+            model_settings=preprocess_input.model_settings,
         )
         model_response.output = converter.postprocess(model_response.output)
         return model_response
@@ -122,13 +89,18 @@ class ReactModel(OpenAIChatCompletionsModel):
             2. ResponseCompletedEvent: used in AgentRunner._run_single_turn_streamed()
         Here, we only yield the final event
         """
-        preprocess_input = ConverterPreprocessInput(system_instructions, input, tools, output_schema, handoffs)
+        preprocess_input = ConverterPreprocessInput(system_instructions, input, tools, output_schema, handoffs, model_settings)
         preprocess_input = converter.preprocess(preprocess_input)
         content = ""
         final_event: ResponseCompletedEvent | None = None
         async for event in super().stream_response(
-            model_settings=model_settings, tracing=tracing, previous_response_id=previous_response_id, prompt=prompt,
-            **asdict(preprocess_input)
+            tracing=tracing, previous_response_id=previous_response_id, prompt=prompt,
+            system_instructions=preprocess_input.system_instructions,
+            input=preprocess_input.input,
+            tools=preprocess_input.tools,
+            output_schema=preprocess_input.output_schema,
+            handoffs=preprocess_input.handoffs,
+            model_settings=preprocess_input.model_settings,
         ):
             if isinstance(event, ResponseOutputItemDoneEvent):
                 item = event.item
@@ -150,5 +122,6 @@ class ReactModel(OpenAIChatCompletionsModel):
         yield final_event
 
 
-
-
+def get_react_model(model: str, api_key: str, base_url: str) -> ReactModel:
+    openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+    return ReactModel(model=model, openai_client=openai_client)

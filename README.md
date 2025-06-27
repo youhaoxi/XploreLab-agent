@@ -26,6 +26,7 @@ python examples/tool_maker/main.py
     - [x] eval workflow (rollout) @2025-06-23
     - [x] logging/tracing system @phoenix @2025-06-24
     - [x] #tool cache (reduce the cost of Google API)
+    - [x] non-fc model support (ReAct mode) @2025-06-27
 - agents | baseline
     - [x] #single-agent tools (search)
     - [ ] #single-agent tools + (search_tool)
