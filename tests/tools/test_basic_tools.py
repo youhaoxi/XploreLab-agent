@@ -3,6 +3,7 @@ import pytest
 from utu.tools.github_toolkit import GitHubToolkit
 from utu.tools.arxiv_toolkit import ArxivToolkit
 from utu.tools.file_edit_toolkit import FileEditToolkit
+from utu.tools.wikipedia_toolkit import WikipediaSearchTool
 
 
 @pytest.fixture
@@ -19,6 +20,15 @@ def file_edit_toolkit():
         "work_dir": "/tmp/",
         "backup_enabled": True,
         "default_encoding": "utf-8",
+    })
+
+@pytest.fixture
+async def wikipedia_toolkit():
+    return WikipediaSearchTool(config={
+        "user_agent": "uTu-agent",
+        "language": "en",
+        "content_type": "text",
+        "extract_format": "WIKI",
     })
 
 async def test_get_repo_info(github_toolkit: GitHubToolkit):
@@ -43,3 +53,8 @@ async def test_edit_file(file_edit_toolkit: FileEditToolkit):
         diff
     )
     print(result)
+
+async def test_wikipedia_search(wikipedia_toolkit: WikipediaSearchTool):
+    result = await wikipedia_toolkit.wikipedia_search("Python_(programming_language)")
+    print(result)
+    
