@@ -1,11 +1,9 @@
 import abc
-from typing import Callable
+from typing import Callable, Any
 
 from agents import FunctionTool, function_tool
 from agents.models.chatcmpl_converter import Converter
 import mcp.types as types
-
-from ..config import ToolkitConfig
 
 
 class MCPConverter:
@@ -19,12 +17,12 @@ class MCPConverter:
 
 
 class AsyncBaseToolkit(abc.ABC):
-    config: ToolkitConfig
+    config: dict[str, Any]
     activated_tools: list[str]
     tools_map: dict[str, Callable] = None
     
-    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None):
-        self.config = config.config if config else {}
+    def __init__(self, config: dict[str, Any] = None, activated_tools: list[str] = None):
+        self.config = config
         self.activated_tools = activated_tools
     
     @abc.abstractmethod
