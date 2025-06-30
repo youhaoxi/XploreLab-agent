@@ -23,7 +23,7 @@ pathlib.Path(DIR_EVAL_OUT).mkdir(parents=True, exist_ok=True)   # 创建输出�
 
 async def build_agent(name: str, instructions: str) -> UTUSimpleAgent:
     # load the builtin simple agent
-    agent = UTUSimpleAgent(name=name, instructions=instructions)
+    agent = UTUSimpleAgent(config_name="examples/eval", name=name, instructions=instructions)
     await agent.build()
     return agent
 
