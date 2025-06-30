@@ -57,7 +57,7 @@ async def main(config: EvalConfig):
         if config.dataset in BUILTIN_BENCHMARKS:
             # load builtin benchmark
             dataset_info = BUILTIN_BENCHMARKS[config.dataset]
-            data_path = dataset_info["data_path"]
+            data_path = str(dataset_info["data_path"])
             processer_name = dataset_info["processer"]
             evaluator_name = dataset_info["evaluator"]
         else:
@@ -75,7 +75,7 @@ async def main(config: EvalConfig):
         evaluator_name = config.eval_method
     # 1.2 load the data
     samples = await load_data(data_path, processer_name, config)
-    # samples = samples[:10]
+    samples = samples[:1]
     print(f"Loaded {len(samples)} samples from '{config.dataset}' using processer '{processer_name}'.")
 
     # 2. get the agents and evaluators
