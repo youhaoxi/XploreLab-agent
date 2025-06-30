@@ -22,6 +22,37 @@ class ToolkitConfig(BaseModel):
     activated_tools: list[str] | None = None
     config: dict | None = None
 
+class EvalConfig(BaseModel):
+    """
+    dataset: str   # 可以是内置数据集 (GAIA, BrowseCamp) 或者自定义数据文件路径
+    output_file: str = "eval_result.jsonl"  # 输出形式, 可以是其他格式
+    metrics_file: str = "metrics.json"  # 评估指标文件
+    concurrency: int = 16  # rollout parallelism
+    judge_concurrency: int = 16  # judgement parallelism
+    max_turns: int = 10    # limit of #actions
+    """
+    # dataset config
+    dataset: str
+    type: Literal["single", "mixed"]  # 数据集里只包含单独的benchmark数据，还是包含多个benchmarks  
+    question_field: str
+    gt_field: str
+    # output config
+    output_file: str
+    metrics_file: str
+    judge_output_file: str
+    # concurrency config
+    thread_pool_size: int
+    concurrency: int
+    max_turns: int
+    # below for judgement
+    judge_model: str
+    judge_api_key: str
+    judge_model_base_url: str
+    judge_concurrency: int
+    judge_max_tokens: int
+
+    eval_method: str = None # 使用什么benchmark的评估方法（"GAIA", "BrowseCamp", ...)
+
 class Config(BaseModel):
     model: ModelConfig
     agent: AgentConfig
@@ -60,3 +91,8 @@ class ConfigLoader:
     def load_model_config(cls, name: str = "base") -> ModelConfig:
         cfg = cls._load_config_to_dict(name, config_path="../../configs/model")
         return ModelConfig(**cfg)
+    
+    @classmethod
+    def load_eval_config(cls, name: str = "default") -> EvalConfig:
+        cfg = cls._load_config_to_dict(name, config_path="../../configs/eval")
+        return EvalConfig(**cfg)
