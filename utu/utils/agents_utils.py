@@ -86,7 +86,7 @@ class AgentsUtils:
                 elif item.type == "tool_call_item":
                     PrintUtils.print_bot(f"<{item.agent.name}> [tool_call] {item.raw_item.name}({item.raw_item.arguments})")
                 elif item.type == "tool_call_output_item":
-                    PrintUtils.print_tool(f"<{item.agent.name}> [tool_output] {item.raw_item.output}")  # item.output may not by str!
+                    PrintUtils.print_tool(f"<{item.agent.name}> [tool_output] {item.output}")  # item.raw_item
                 else:
                     assert event.type in ("reasoning_item", "mcp_list_tools_item", "mcp_approval_request_item", "mcp_approval_response_item")
                     PrintUtils.print_info(f"  >>> Skipping item: {item.__class__.__name__}")

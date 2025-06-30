@@ -24,7 +24,7 @@ class AsyncBaseToolkit(abc.ABC):
     tools_map: dict[str, Callable] = None
     
     def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None):
-        self.config = config or {}
+        self.config = config.config if config else {}
         self.activated_tools = activated_tools
     
     @abc.abstractmethod
