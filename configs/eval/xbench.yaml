@@ -1,0 +1,18 @@
+dataset: "XBench"
+type: "single"
+question_field: "question"
+gt_field: "answer"
+
+output_file: "xbench_predict.jsonl"
+metrics_file : "xbench_metrics.json"
+judge_output_file: "xbench_judge.jsonl"
+
+thread_pool_size: 8
+concurrency: 8
+max_turns: 12
+
+judge_model: ${oc.env:JUDGE_MODEL}
+judge_api_key: ${oc.env:JUDGE_API_KEY}
+judge_model_base_url: ${oc.env:JUDGE_MODEL_BASE_URL}
+judge_concurrency: 8
+judge_max_tokens: 4096

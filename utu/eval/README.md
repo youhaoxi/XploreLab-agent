@@ -7,7 +7,7 @@
 - add some built-in benchmarks dataset in the folder `data`.
 
 ## run evaluation
-**1. configure your evaluation config in `configs/eval/eval.yaml`.**
+**1. configure your evaluation config in `configs/eval`.**
 ```
 dataset: [the dataset to be evaluated, maybe bulit-in benchmark name or file path for your own dataset.]
 eval_method: [you can speicify the evaluation method as benchmark name, or ignore this field to use default evaluation method.]
@@ -36,5 +36,5 @@ in the main folder, run
 cp .env.example .env
 # ... setup env, invluding env for LLM-based judgement.
 
-bash utu/eval/run_eval.sh
+bash utu/eval/run_eval.sh --config_name [your_config_name]
 ```

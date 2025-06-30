@@ -187,7 +187,7 @@ if __name__ == "__main__":
     from utu.config import ConfigLoader
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_name", type=str, default="eval", help="Configuration name for evaluation.")
+    parser.add_argument("--config_name", type=str, default="default", help="Configuration name for evaluation.")
     args = parser.parse_args()
 
     # Load the configuration
