@@ -75,7 +75,7 @@ async def main(config: EvalConfig):
         evaluator_name = config.eval_method
     # 1.2 load the data
     samples = await load_data(data_path, processer_name, config)
-    samples = samples[:1]
+    # samples = samples[:10]
     print(f"Loaded {len(samples)} samples from '{config.dataset}' using processer '{processer_name}'.")
 
     # 2. get the agents and evaluators
