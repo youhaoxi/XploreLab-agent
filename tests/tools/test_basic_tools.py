@@ -1,7 +1,7 @@
 import pytest
 
-from utu.tools.github import GitHubToolkit
-from utu.tools.arxiv import ArxivToolkit
+from utu.tools.github_toolkit import GitHubToolkit
+from utu.tools.arxiv_toolkit import ArxivToolkit
 from utu.tools.file_edit_toolkit import FileEditToolkit
 
 

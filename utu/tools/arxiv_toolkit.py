@@ -1,6 +1,7 @@
 """ 
 camel/toolkits/arxiv_toolkit.py
 https://info.arxiv.org/help/api/index.html
+https://github.com/lukasschwab/arxiv.py
 """
 
 import logging
