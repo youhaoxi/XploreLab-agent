@@ -162,10 +162,15 @@ class BaseLLMJudgeEval(BaseEval):
         """
         # 1. calculate level metrics
         level_bin = {}
+        invalid_count = 0
         for item in judged_data:
             level = item.level
             if level not in level_bin:
-                level_bin[level] = {"correct": 0, "wrong": 0}
+                level_bin[level] = {"correct": 0, "wrong": 0, "unknown": 0}
+            if item.judged_response == "invalid":
+                level_bin[level]["unknown"] += 1
+                invalid_count += 1
+                continue
             if item.correct:
                 level_bin[level]["correct"] += 1
             else:
@@ -180,13 +185,14 @@ class BaseLLMJudgeEval(BaseEval):
         # 2. calculate overall accuracy
         total = len(judged_data)
         correct_count = sum(item.correct for item in judged_data)
-        incorrect_count = total - correct_count
+        incorrect_count = total - correct_count - invalid_count
 
         return {
             "Accuracy (%)": round(correct_count / total * 100, 4),
             "Details": {
                 "correct": correct_count,
                 "wrong": incorrect_count,
+                "unknown": invalid_count,
                 "total": total,
                 "level_metrics": level_bin
             },
@@ -199,6 +205,13 @@ class BaseLLMJudgeEval(BaseEval):
         question = data.raw_question
         response = data.response
         correct_answer = data.correct_answer or "unknown"
+
+        if correct_answer == "unknown":
+            # if correct answer is unknown, we cannot judge
+            return_data = copy.deepcopy(data)
+            return_data.update(judged_response="invalid",
+                               correct=False)
+            return return_data
 
         # if exact match, return directly(maybe extract exact answer from response first)
         if self._extract_exact_answer(response) == correct_answer:

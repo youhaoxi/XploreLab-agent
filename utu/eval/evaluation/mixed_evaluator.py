@@ -62,25 +62,29 @@ class MixedEval:
         for result in results:
             for level, metric_info in result.metrics.get("Details", {}).get("level_metrics", {}).items():
                 if level not in level_bin:
-                    level_bin[level] = {"correct": 0, "wrong": 0}
+                    level_bin[level] = {"correct": 0, "wrong": 0, "unknown": 0}
                 level_bin[level]["correct"] += metric_info.get("correct", 0)
                 level_bin[level]["wrong"] += metric_info.get("wrong", 0)
-        total = 0
+                level_bin[level]["unknown"] += metric_info.get("unknown", 0)
+        total, total_valid = 0, 0
         for level, counts in level_bin.items():
-            level_total = counts["correct"] + counts["wrong"]
+            level_total_valid = counts["correct"] + counts["wrong"]
+            level_total = level_total_valid + counts["unknown"]
             total += level_total
-            if level_total > 0:
-                counts["accuracy"] = round(counts["correct"] / level_total * 100, 4)
+            total_valid += level_total_valid
+            if level_total_valid > 0:
+                counts["accuracy"] = round(counts["correct"] / level_total_valid * 100, 4)
             else:
                 counts["accuracy"] = 0.0
         # 2. calculate overall accuracy
         correct_count = sum(result.metrics.get("Details", {}).get("correct", 0) for result in results)
-        incorrect_count = total - correct_count
+        incorrect_count = total_valid - correct_count
         overall_metrics = {
             "Accuracy (%)": round(correct_count / total * 100, 4),
             "Details": {
                 "correct": correct_count,
                 "wrong": incorrect_count,
+                "unknown": total - total_valid,
                 "total": total,
                 "level_metrics": level_bin,
                 "benchmarks": [result.as_dict() for result in results],

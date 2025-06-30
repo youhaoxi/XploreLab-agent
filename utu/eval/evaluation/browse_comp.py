@@ -38,10 +38,15 @@ confidence: The extracted confidence score between 0|\%| and 100|\%| from [respo
         """
         # 1. calculate level metrics
         level_bin = {}
+        invalid_count = 0
         for item in judged_data:
             level = item.level
             if level not in level_bin:
-                level_bin[level] = {"correct": 0, "wrong": 0}
+                level_bin[level] = {"correct": 0, "wrong": 0, "unknown": 0}
+            if item.judged_response == "invalid":
+                level_bin[level]["unknown"] += 1
+                invalid_count += 1
+                continue
             if item.correct:
                 level_bin[level]["correct"] += 1
             else:
@@ -56,13 +61,13 @@ confidence: The extracted confidence score between 0|\%| and 100|\%| from [respo
         # 2. calculate overall accuracy
         total = len(judged_data)
         correct_count = sum(item.correct for item in judged_data)
-        incorrect_count = total - correct_count
+        incorrect_count = total - correct_count - invalid_count
         
         # 2. Calculate confidence metrics
         for item in judged_data:
             if item.confidence is None:
                 item.confidence = 100 if item.judged_response == "Exact match" else 0
-        confidence_scores = [item.confidence for item in judged_data]
+        confidence_scores = [item.confidence for item in judged_data if item.judged_response != "invalid"]
         
         return {
             "Accuracy (%)": round(correct_count / total * 100, 2),
@@ -70,6 +75,7 @@ confidence: The extracted confidence score between 0|\%| and 100|\%| from [respo
             "Details": {
                 "correct": correct_count,
                 "wrong": incorrect_count,
+                "unknown": invalid_count,
                 "total": total,
                 "level_metrics": level_bin,
             } 

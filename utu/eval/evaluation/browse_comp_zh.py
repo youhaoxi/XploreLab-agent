@@ -48,10 +48,15 @@ confidence: 从[response]中提取的置信度分数，介于0% 到100% 之间�
         """
         # 1. calculate level metrics
         level_bin = {}
+        invalid_count = 0
         for item in judged_data:
             level = item.level
             if level not in level_bin:
-                level_bin[level] = {"correct": 0, "wrong": 0}
+                level_bin[level] = {"correct": 0, "wrong": 0, "unknown": 0}
+            if item.judged_response == "invalid":
+                level_bin[level]["unknown"] += 1
+                invalid_count += 1
+                continue
             if item.correct:
                 level_bin[level]["correct"] += 1
             else:
@@ -66,11 +71,13 @@ confidence: 从[response]中提取的置信度分数，介于0% 到100% 之间�
         # 2. calculate overall accuracy
         total = len(judged_data)
         correct_count = sum(item.correct for item in judged_data)
-        incorrect_count = total - correct_count
+        incorrect_count = total - correct_count - invalid_count
 
         # 3. Calculate calibration statistics
         calibration = [{'samples':0, 'correct':0, 'conf_sum':0} for _ in self.CONFIDENCE_BINS]
         for record in judged_data:
+            if record.judged_response == "invalid":
+                continue
             confidence = record.confidence
             bin_idx = min(confidence // 20, len(self.CONFIDENCE_BINS) - 1)
             bin_stats = calibration[bin_idx]
@@ -86,6 +93,7 @@ confidence: 从[response]中提取的置信度分数，介于0% 到100% 之间�
             "Details": {
                 "correct": correct_count,
                 "wrong": incorrect_count,
+                "unknown": invalid_count,
                 "total": total,
                 "level_metrics": level_bin
             } 
