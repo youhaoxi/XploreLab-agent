@@ -142,12 +142,12 @@ Here is the task:
 """.strip()
     name = "GAIA"
 
-    def _load_data(self, data_path) -> list[dict]:
+    async def _load_data(self, data_path) -> list[dict]:
         """
         Load data and formulize the file name to absolute path.
         """
         dataset_dir = pathlib.Path(data_path).parent
-        data_dict = super()._load_data(data_path)
+        data_dict = await super()._load_data(data_path)
         for item in data_dict:
             if 'file_name' in item and item['file_name'] is not None:
                 item['file_name'] = str(dataset_dir / item['file_name'])

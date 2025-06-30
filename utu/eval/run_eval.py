@@ -50,6 +50,16 @@ async def save_results(results: List[EvaluationSample], save_path: str):
                 await f.write(json.dumps(result.as_dict(), ensure_ascii=False) + "\n")
 
 
+def log_time_cost(tokens: int, time_cost: float, file_name: str):
+    """
+    Log the time cost and tokens processed.
+    """
+    print(f"Processed {tokens} tokens in {time_cost:.2f} seconds.")
+    print(f"The average inference speed is {tokens / time_cost:.2f} tokens/second.")
+    with open(DIR_EVAL_OUT / f"{file_name}_time_cost.txt", "a+") as f:
+        f.write(f"total tokens: {tokens}, time cost: {time_cost:.2f}, avg_speed: {tokens / time_cost:.2f}\n")
+
+
 async def main(config: EvalConfig):
     # 1. load and prepare the data
     # 1.1 get the dataset path and corresponding processer
@@ -102,7 +112,6 @@ async def main(config: EvalConfig):
         """
         Run the agent on the given query and return the result.
         """
-        # print(f"Running agent '{agent.name}' on query '{query}'...")
         # run the agent
         try:
             result = asyncio.run(agent.run(query))
@@ -172,8 +181,7 @@ async def main(config: EvalConfig):
         return
     finally:
         overall_end_time = time.time()
-        print(f"Rolling out {total_tokens} tokens in {overall_end_time - overall_start_time:.2f} seconds.")
-        print(f"The average inference speed is {total_tokens / (overall_end_time - overall_start_time):.2f} tokens/second.")
+        log_time_cost(total_tokens, overall_end_time - overall_start_time, config.dataset)
     print(f"Rolled out {len(rollout_samples)} samples.")
     rollout_samples.extend(existing_samples)  # Combine the rolled out samples with existing ones
 
