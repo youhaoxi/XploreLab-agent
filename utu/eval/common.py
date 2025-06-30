@@ -6,7 +6,9 @@ import concurrent.futures
 from queue import Queue, Empty
 from tqdm import tqdm
 from pathlib import Path
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+from agents import RunResult, ModelResponse
+from agents.models.chatcmpl_converter import Converter
 
 from utu.utils import DIR_ROOT
 
@@ -217,6 +219,29 @@ async def process_with_threading(
         final_results = continuous_results
     
     return final_results
+
+
+def get_trajectory_from_agent_result(agent_result: RunResult) -> list[dict]:
+    messages = Converter.items_to_messages(agent_result.to_input_list())
+    trajectory = [dict(message) for message in messages]
+    model_responses = agent_result.raw_responses
+    usage_list = []
+    for model_response in model_responses:
+        usage_list.append(asdict(model_response.usage))
+    # 添加模型响应的使用情况
+    usage_idx = 0
+    for i, message in enumerate(trajectory):
+        if message.get("role") == "assistant":
+            if usage_idx < len(usage_list):
+                curr_usage = usage_list[usage_idx]
+                message["usage"] = {"input_tokens": curr_usage["input_tokens"],
+                                    "output_tokens": curr_usage["output_tokens"],
+                                    "total_tokens": curr_usage["total_tokens"],
+                                    "requests": curr_usage["requests"]}
+                usage_idx += 1
+            else:
+                message["usage"] = {}
+    return trajectory
 
 
 # 内置benchmarks

@@ -12,7 +12,7 @@ from utu.config import EvalConfig
 from utu.agents import UTUSimpleAgent
 from utu.eval import BaseProcesser, DATA_PROCESSER_FACTORY, MixedProcesser
 from utu.eval import BaseEval, EVAL_FACTORY, MixedEval
-from utu.eval.common import limit_concurrency, limit_concurrency_thread, async_to_sync, process_with_threading
+from utu.eval.common import limit_concurrency, limit_concurrency_thread, process_with_threading, get_trajectory_from_agent_result
 from utu.eval.common import BUILTIN_BENCHMARKS, EvaluationSample, EvaluationResult
 
 
@@ -94,6 +94,8 @@ async def main(config: EvalConfig):
         agents[name] = await build_agent(name=f"{name}-agent", instructions=instructions)
     
     # 3. rollout with thread pool
+    total_tokens = 0
+    overall_start_time = time.time()
     # 3.1 define the thread function
     @limit_concurrency_thread(CONCURRENCY)
     def run_agent(agent: UTUSimpleAgent, query: str) -> RunResult:
@@ -130,11 +132,15 @@ async def main(config: EvalConfig):
         predicted_answer = result.final_output
 
         # Update the sample with the predicted answer and trajectory
+        trajectory = get_trajectory_from_agent_result(result)
         sample.update(
             response=predicted_answer,
             time_cost=end_time - start_time,
-            trajectory=Converter.items_to_messages(result.to_input_list())
+            trajectory=trajectory
         )
+        # update the total tokens
+        nonlocal total_tokens
+        total_tokens += sum([step.get("usage", {}).get("total_tokens", 0) for step in trajectory])
         return index, sample
     
     # 3.2 sync the thread function and put it into the thread pool
@@ -152,14 +158,22 @@ async def main(config: EvalConfig):
         samples_to_rollout = [sample for sample in samples if sample.raw_question not in existing_questions]
         print(f"Resumed {len(existing_samples)} existing samples. Remaining samples to rollout: {len(samples_to_rollout)}.")
     print(f"Rolling out {len(samples_to_rollout)} samples with {THREAD_POOL_SIZE} threads...")
-    rollout_samples = await process_with_threading(
-        thread_func=rollout,
-        save_func=save_results,
-        samples=samples_to_rollout,
-        thread_size=THREAD_POOL_SIZE,
-        save_freq=5,  # Save every 10 samples
-        save_path=output_file   # Save the output to the output file
-    )
+    try:
+        rollout_samples = await process_with_threading(
+            thread_func=rollout,
+            save_func=save_results,
+            samples=samples_to_rollout,
+            thread_size=THREAD_POOL_SIZE,
+            save_freq=5,  # Save every 10 samples
+            save_path=output_file   # Save the output to the output file
+        )
+    except Exception as e:
+        print(f"Error during rollout: {e}")
+        return
+    finally:
+        overall_end_time = time.time()
+        print(f"Rolling out {total_tokens} tokens in {overall_end_time - overall_start_time:.2f} seconds.")
+        print(f"The average inference speed is {total_tokens / (overall_end_time - overall_start_time):.2f} tokens/second.")
     print(f"Rolled out {len(rollout_samples)} samples.")
     rollout_samples.extend(existing_samples)  # Combine the rolled out samples with existing ones
 
