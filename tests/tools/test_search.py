@@ -12,7 +12,7 @@ def config() -> ToolkitConfig:
 
 @pytest.fixture
 def search_toolkit(config: ToolkitConfig) -> SearchToolkit:
-    return SearchToolkit(config=config)
+    return SearchToolkit(config=config.config)
 
 
 test_query = "test"
