@@ -21,6 +21,7 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
         cache_dir (str|pathlib.Path): Directory to store cache files
         expire_time (Optional[int]): Cache expiration time in seconds, None means no expiration
     """
+    # TODO: only cache successful results!
     cache_path = pathlib.Path(cache_dir)
     cache_path.mkdir(exist_ok=True, parents=True)
     

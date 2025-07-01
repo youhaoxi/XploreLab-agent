@@ -18,8 +18,8 @@ from ..config import ToolkitConfig
 
 logger = logging.getLogger("utu")
 
-SP_DESCRIPTION = """You are an image analysis expert. Provide a 
-detailed description including text if present."""
+# ref @camel
+SP_DESCRIPTION = """You are an image analysis expert. Provide a detailed description including text if present."""
 
 SP_INSTRUCTION = """Answer questions about images by:
 1. Careful visual inspection
@@ -33,7 +33,6 @@ class ImageToolkit(AsyncBaseToolkit):
         super().__init__(config, activated_tools)
         llm_config = self.config.get("llm", {})
         self.llm = SimplifiedAsyncOpenAI(**llm_config)
-        print(f"config: {config}")
 
     def _load_image(self, image_path: str) -> str:
         parsed = urlparse(image_path)
@@ -68,7 +67,7 @@ class ImageToolkit(AsyncBaseToolkit):
         """Generate textual description or answer questions about attached image.
         
         Args:
-            image_path (str): Local path or URL to an image file.
+            image_path (str): Local path or URL to an image.
             question (str, optional): The question to answer. If not provided, a description of the image will be generated.
         """
         image_str = self._load_image(image_path)
