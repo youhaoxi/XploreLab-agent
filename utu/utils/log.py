@@ -18,7 +18,7 @@ def set_log_level(level: str | int) -> None:
     logger.setLevel(level)
 
 def setup_logging() -> None:
-    log_format = "%(asctime)s - %(name)s - %(pathname)s:%(lineno)d - %(levelname)s - %(message)s"
+    log_format = "%(asctime)s - %(name)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s"
     logging.basicConfig(
         format=log_format,
     )

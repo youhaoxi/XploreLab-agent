@@ -97,7 +97,7 @@ class UTUSimpleAgent(UTUAgentBase):
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config.config}")
         assert toolkit_config.name in TOOLKIT_MAP, f"Unknown toolkit name: {toolkit_config.name}"
         toolkit = TOOLKIT_MAP[toolkit_config.name](
-            config=toolkit_config,
+            config=toolkit_config.config,
             activated_tools=toolkit_config.activated_tools,
         )
         self._toolkits.append(toolkit)
