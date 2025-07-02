@@ -10,7 +10,7 @@ from agents.mcp import MCPServerStdio, MCPServer, MCPUtil
 from .base import UTUAgentBase
 from ..utils import AgentsUtils
 from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
-from ..config import ToolkitConfig
+from ..config import ToolkitConfig, AgentConfig
 
 logger = logging.getLogger("utu")
 
@@ -19,17 +19,17 @@ class UTUSimpleAgent(UTUAgentBase):
     _mcp_servers: list[MCPServer] = []
     _toolkits: list[AsyncBaseToolkit] = []
     
-    def __init__(
-        self,
-        config_name: str = "default",
-        name: str = None,
-        instructions: str = None,
-        *args, **kwargs
-    ):
-        super().__init__(config_name, *args, **kwargs)
+    def __init__(self, config: AgentConfig|str, *args, **kwargs):
+        super().__init__(config)
         # override config
-        if name: self.config.agent.name = name
-        if instructions: self.config.agent.instructions = instructions
+        if "name" in kwargs: 
+            self.config.agent.name = kwargs["name"]
+            del kwargs["name"]
+        if "instructions" in kwargs: 
+            self.config.agent.instructions = kwargs["instructions"]
+            del kwargs["instructions"]
+        if args or kwargs:
+            logger.warning(f"UTUSimpleAgent.__init__ received unexpected args: {args}, {kwargs}")
         self._exit_stack = AsyncExitStack()
 
     async def __aenter__(self):

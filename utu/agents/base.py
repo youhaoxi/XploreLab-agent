@@ -6,12 +6,12 @@ from agents import (
 )
 
 from ..utils import AgentsUtils
-from ..config import ConfigLoader, Config
+from ..config import ConfigLoader, AgentConfig
 from .context import UTUContext
 
 
 class UTUAgentBase:
-    config: Config = None
+    config: AgentConfig = None
     context: UTUContext = None
     
     _run_hooks: RunHooks = None
@@ -20,15 +20,14 @@ class UTUAgentBase:
     def name(self) -> str:
         return self.config.agent.name
 
-    def __init__(
-        self,
-        config_name: str = "default",
-    ):
-        self._load_config(config_name)
+    def __init__(self, config: AgentConfig|str):
+        self._load_config(config)
         self._build_context()
 
-    def _load_config(self, config_name: str):
-        self.config = ConfigLoader.load_config(config_name)
+    def _load_config(self, config: str|AgentConfig):
+        if isinstance(config, str):
+            config = ConfigLoader.load_agent_config(config)
+        self.config = config
     def _build_context(self):
         self.context = UTUContext(config=self.config)
 

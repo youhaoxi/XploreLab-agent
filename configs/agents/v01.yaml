@@ -1,6 +1,7 @@
 # --------------------------------
 # Agent Config v0.1
 # --------------------------------
+type: simple
 model:
   api_key: ${oc.env:UTU_API_KEY}
   base_url: ${oc.env:UTU_BASE_URL}

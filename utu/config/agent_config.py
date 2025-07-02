@@ -1,4 +1,5 @@
-from typing import Callable, Literal, Optional
+from typing import Callable, Optional
+from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
@@ -20,6 +21,7 @@ class ToolkitConfig(BaseModel):
     config: dict | None = None
 
 class AgentConfig(BaseModel):
+    type: Literal["simple"] = "simple"
     model: ModelConfig
     agent: ProfileConfig = Field(default_factory=ProfileConfig)
     toolkits: dict[str, ToolkitConfig] = Field(default_factory=dict)
