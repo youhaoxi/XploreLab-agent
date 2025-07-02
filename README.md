@@ -1,4 +1,4 @@
-
+## Setup
 
 ```sh
 # setup env
@@ -8,7 +8,12 @@ source .venv/bin/activate
 # config
 cp .env.example .env
 # ... setup env
+```
 
+
+## Run example
+
+```sh
 # run example
 # 1. mcp
 python examples/mcp/main.py
@@ -18,24 +23,14 @@ python examples/eval/main.py
 python examples/tool_maker/main.py
 ```
 
-# TODO
-> see full in [qqdoc](https://doc.weixin.qq.com/smartsheet/s3_AcMATAZtAPIuFWU7og0T16lnjNLwZ?scode=AJEAIQdfAAojkV21HAAcMATAZtAPI&tab=q979lj&viewId=vukaF8)
 
-- features
-    - [x] basic wrapper of @openai-agents @2025-06-20
-    - [x] eval workflow (rollout) @2025-06-23
-    - [x] logging/tracing system @phoenix @2025-06-24
-    - [x] #tool cache (reduce the cost of Google API)
-    - [x] non-fc model support (ReAct mode) @2025-06-27
-- agents | baseline
-    - [x] #single-agent tools (search)
-    - [ ] #single-agent tools + (search_tool)
-    - [ ] #agent-pattern routing
-- eval
-    - [ ] #dataset GIAI
-    - [ ] #dataset BrowseCamp
-- tools
-    - [x] search (google_api)
-    - [x] web_qa @2025-06-26
-    - [ ] integration the workflow of tool-maker (MCP) @yigeng
+## Run exp
 
+```sh
+# ... setup env
+# ... see config file `configs/eval/v01.yaml` for more details
+python scripts/run_eval.py --config_name v01 --exp_id "v0.1_dsv3"
+
+# dump output (set --clear_records if you want to clear records)
+python scripts/dump_db.py --exp_id "v0.1_dsv3" --clear_records
+```

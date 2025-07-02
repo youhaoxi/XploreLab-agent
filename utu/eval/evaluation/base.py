@@ -18,14 +18,12 @@ class BaseEval:
     JUDGE_TEMPLATE: str = None
 
     concurrency_limit: int = None
-    thread_size: int = None
     name: str = None
 
     def __init__(self, config: EvalConfig) -> None:
         """
         Initialize the evaluation with concurrency and thread size.
         """
-        self.thread_size = config.thread_pool_size
         self.concurrency_limit = config.judge_concurrency
 
     async def eval(self, predict_data: list[EvaluationSample]) -> tuple[list[EvaluationSample], EvaluationResult]:
