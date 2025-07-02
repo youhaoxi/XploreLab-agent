@@ -1,32 +1,13 @@
-from typing import TypeVar, Type, Literal, Callable
+from typing import TypeVar, Type
 
 from pydantic import BaseModel
 from omegaconf import OmegaConf, DictConfig
 from hydra import compose, initialize
 
+from .agent_config import Config, ModelConfig, ToolkitConfig
+from .eval_config import EvalConfig
+
 TConfig = TypeVar("TConfig", bound=BaseModel)
-
-
-class ModelConfig(BaseModel):
-    api_key: str
-    base_url: str
-    model: str
-
-class AgentConfig(BaseModel):
-    name: str
-    instructions: str | Callable
-
-class ToolkitConfig(BaseModel):
-    mode: Literal["builtin", "mcp"] = "builtin"
-    name: str
-    activated_tools: list[str] | None = None
-    config: dict | None = None
-
-class Config(BaseModel):
-    model: ModelConfig
-    agent: AgentConfig
-    toolkits: dict[str, ToolkitConfig] = {}
-
 
 class ConfigLoader:
     config_path = "../../configs"
@@ -60,3 +41,8 @@ class ConfigLoader:
     def load_model_config(cls, name: str = "base") -> ModelConfig:
         cfg = cls._load_config_to_dict(name, config_path="../../configs/model")
         return ModelConfig(**cfg)
+
+    @classmethod
+    def load_eval_config(cls, name: str = "default") -> EvalConfig:
+        cfg = cls._load_config_to_dict(name, config_path="../../configs/eval")
+        return EvalConfig(**cfg)
