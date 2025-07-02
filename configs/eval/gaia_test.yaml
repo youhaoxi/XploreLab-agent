@@ -1,0 +1,18 @@
+dataset: "GAIA_test"
+type: "single"
+question_field: "Question"
+gt_field: "Final answer"
+
+output_file: "gaia_test_predict.jsonl"
+metrics_file : "gaia_test_metrics.json"
+judge_output_file: "gaia_test_judge.jsonl"
+
+thread_pool_size: 8
+concurrency: 8
+max_turns: 12
+
+judge_model: ${oc.env:JUDGE_MODEL}
+judge_api_key: ${oc.env:JUDGE_API_KEY}
+judge_model_base_url: ${oc.env:JUDGE_MODEL_BASE_URL}
+judge_concurrency: 8
+judge_max_tokens: 4096
