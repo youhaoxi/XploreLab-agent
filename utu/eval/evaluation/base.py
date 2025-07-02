@@ -1,6 +1,5 @@
 import re, string
 import abc
-import copy
 import asyncio
 from tqdm import tqdm
 from openai import AsyncOpenAI
@@ -200,17 +199,15 @@ class BaseLLMJudgeEval(BaseEval):
 
         if correct_answer == "unknown":
             # if correct answer is unknown, we cannot judge
-            return_data = copy.deepcopy(data)
-            return_data.update(judged_response="invalid",
+            data.update(judged_response="invalid",
                                correct=False)
-            return return_data
+            return data
 
         # if exact match, return directly(maybe extract exact answer from response first)
         if self._extract_exact_answer(response) == correct_answer:
-            return_data = copy.deepcopy(data)
-            return_data.update(judged_response="Exact match",
+            data.update(judged_response="Exact match",
                                correct=True)
-            return return_data
+            return data
         
         messages = self._get_judge_messages(
             question=question,
@@ -235,11 +232,10 @@ class BaseLLMJudgeEval(BaseEval):
         else:
             raise RuntimeError("Failed to judge after multiple retries.")
 
-        return_data = copy.deepcopy(data)
-        return_data.judged_response = content
+        data.judged_response = content
         # update the return data with parsed content
-        return_data.update(**parsed_content)
-        return return_data
+        data.update(**parsed_content)
+        return data
     
     def _get_judge_messages(self, question: str, response: str, correct_answer: str) -> list:
         """
@@ -304,7 +300,6 @@ class BaseMatchEval(BaseEval):
         """
         Judge a single sample.
         """
-        result_data = copy.deepcopy(data)
 
         question = data.raw_question
         response = data.response
@@ -325,8 +320,8 @@ class BaseMatchEval(BaseEval):
 
             # check length is the same
             if len(gt_elems) != len(ma_elems):
-                result_data.update(correct=False)
-                return result_data
+                data.update(correct=False)
+                return data
 
             # compare each element as float or str
             comparisons = []
@@ -346,8 +341,8 @@ class BaseMatchEval(BaseEval):
         else:
             if_correct = self._normalize_str(response) == self._normalize_str(correct_answer)
 
-        result_data.update(correct=if_correct)
-        return result_data
+        data.update(correct=if_correct)
+        return data
 
     def _is_float(self, s: str) -> bool:
         """
