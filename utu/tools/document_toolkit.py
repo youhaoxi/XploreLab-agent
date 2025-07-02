@@ -28,10 +28,10 @@ class DocumentToolkit(AsyncBaseToolkit):
         super().__init__(config, activated_tools)
         self.chunkr = Chunkr(api_key=os.getenv("CHUNKR_API_KEY"))
         self.chunkr.config = Configuration(
-            high_resolution=self.config.get("high_resolution", True),
+            high_resolution=self.config.config.get("high_resolution", True),
         )
-        self.llm = SimplifiedAsyncOpenAI(**self.config.get("llm", {}))
-        self.text_limit = self.config.get("text_limit", 100_000)
+        self.text_limit = self.config.config.get("text_limit", 100_000)
+        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
     
     @async_file_cache(expire_time=None)
     async def parse_document(self, document_path: str) -> str:

@@ -1,16 +1,13 @@
 import pytest
 
-from utu.tools.image_toolkit import ImageToolkit
-from utu.config import ConfigLoader, ToolkitConfig
+from utu.tools import ImageToolkit
+from utu.config import ConfigLoader
+
 
 @pytest.fixture
-def config() -> ToolkitConfig: 
+def image_toolkit() -> ImageToolkit:
     config = ConfigLoader.load_toolkit_config("image")
-    return config
-
-@pytest.fixture
-def image_toolkit(config: ToolkitConfig) -> ImageToolkit:
-    return ImageToolkit(config=config.config)
+    return ImageToolkit(config=config)
 
 image_url1 = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
 tasks = (

@@ -18,10 +18,10 @@ logger = logging.getLogger("utu")
 class FileEditToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
         super().__init__(config, activated_tools)
-        self.work_dir = Path(self.config.get("work_dir", "./")).resolve()
+        self.work_dir = Path(self.config.config.get("work_dir", "./")).resolve()
         self.work_dir.mkdir(parents=True, exist_ok=True)
-        self.default_encoding = self.config.get("default_encoding", "utf-8")
-        self.backup_enabled = self.config.get("backup_enabled", True)
+        self.default_encoding = self.config.config.get("default_encoding", "utf-8")
+        self.backup_enabled = self.config.config.get("backup_enabled", True)
         logger.info(
             f"FileEditToolkit initialized with output directory"
             f": {self.work_dir}, encoding: {self.default_encoding}"

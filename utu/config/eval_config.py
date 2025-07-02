@@ -1,11 +1,10 @@
 from typing import Literal
 
-from pydantic import BaseModel
-
 from .agent_config import AgentConfig
+from .base_config import ConfigBaseModel
 
 
-class EvalConfig(BaseModel):
+class EvalConfig(ConfigBaseModel):
     exp_id: str = "default"
     
     # input

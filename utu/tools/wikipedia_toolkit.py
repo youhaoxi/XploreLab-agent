@@ -21,7 +21,7 @@ class WikipediaSearchTool(AsyncBaseToolkit):
         extract_format (str): Defines the output format. Can be `"WIKI"` or `"HTML"`.
     """
 
-    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
+    def __init__(self, config: ToolkitConfig|dict = None, activated_tools: list[str] = None) -> None:
         super().__init__(config, activated_tools)
         try:
             import wikipediaapi
@@ -35,10 +35,10 @@ class WikipediaSearchTool(AsyncBaseToolkit):
             "WIKI": wikipediaapi.ExtractFormat.WIKI,
             "HTML": wikipediaapi.ExtractFormat.HTML,
         }
-        self.user_agent = self.config.get("user_agent", "uTu-agent")
-        self.language = self.config.get("language", "en")
-        self.content_type = self.config.get("content_type", "text")
-        extract_format = self.config.get("extract_format", "WIKI")
+        self.user_agent = self.config.config.get("user_agent", "uTu-agent")
+        self.language = self.config.config.get("language", "en")
+        self.content_type = self.config.config.get("content_type", "text")
+        extract_format = self.config.config.get("extract_format", "WIKI")
         if extract_format not in extract_format_map:
             raise ValueError("Invalid extract_format. Choose between 'WIKI' or 'HTML'.")
         self.extract_format = extract_format_map[extract_format]

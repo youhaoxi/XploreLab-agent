@@ -1,9 +1,7 @@
 import pytest
 
-from utu.tools.github_toolkit import GitHubToolkit
-from utu.tools.arxiv_toolkit import ArxivToolkit
-from utu.tools.file_edit_toolkit import FileEditToolkit
-from utu.tools.wikipedia_toolkit import WikipediaSearchTool
+from utu.config import ConfigLoader
+from utu.tools import GitHubToolkit, ArxivToolkit, FileEditToolkit, WikipediaSearchTool
 
 
 @pytest.fixture

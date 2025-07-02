@@ -41,9 +41,8 @@ class SearchToolkit(AsyncBaseToolkit):
             'Content-Type': 'application/json'
         }
         # config
-        llm_config = self.config.get("llm", {})
-        self.llm = SimplifiedAsyncOpenAI(**llm_config)
-        self.summary_token_limit = self.config.get("summary_token_limit", 10_000)
+        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
+        self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
     @async_file_cache(expire_time=None)
     async def search_google_api(self, query: str, num_results: int = 20) -> str:

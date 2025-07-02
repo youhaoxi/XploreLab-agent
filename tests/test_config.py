@@ -1,7 +1,7 @@
 from utu.config import ConfigLoader
 
 def test_load_subconfig():
-    config = ConfigLoader._load_config_to_dict("agents/model/base")
+    config = ConfigLoader._load_config_to_dict("agents/tools/memory")
     print(config)
 
 def test_load_model_config():

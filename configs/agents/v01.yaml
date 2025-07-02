@@ -12,7 +12,7 @@ toolkits:
     mode: builtin
     activated_tools: null
     config: {
-      "llm": {"model": "${oc.env:UTU_TOOL_MODEL}", "api_key": "${oc.env:UTU_API_KEY}", "base_url": "${oc.env:UTU_BASE_URL}"},
       "summary_token_limit": 1_000,
     }
+    config_llm: {"model": "${oc.env:UTU_TOOL_MODEL}", "api_key": "${oc.env:UTU_API_KEY}", "base_url": "${oc.env:UTU_BASE_URL}"}
 # agent: # will be overwritten during rollout
