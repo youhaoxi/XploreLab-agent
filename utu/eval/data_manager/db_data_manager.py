@@ -31,7 +31,6 @@ class DBDataManager(FileDataManager):
         # check if exp_id exists
         if self._check_exp_id():
             logger.warning(f"exp_id {self.config.exp_id} already exists in db")
-            return await self.get_samples()
         else:
             # if not, load and save samples to db -> state: init
             _samples = await self.load_dataset()
@@ -39,7 +38,7 @@ class DBDataManager(FileDataManager):
                 sample.exp_id = self.config.exp_id  # setup exp_id!
             samples_sql = [EvaluationSampleSQL(**sample.as_dict()) for sample in _samples]
             await self.update_samples(samples_sql)
-            return samples_sql
+        return await self.get_samples()
 
     def _check_exp_id(self) -> bool:
         # check if any record has the same exp_id
