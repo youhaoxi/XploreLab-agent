@@ -65,3 +65,29 @@ class EvaluationSample:
     def as_dict(self) -> dict:
         # only contain fields that are not None
         return {k: v for k, v in self.__dict__.items() if v is not None}
+
+
+@dataclass
+class EvaluationResult:
+    """
+    A data class to represent the result of an evaluation.
+    """
+    benchmark: str
+    metrics: dict
+
+    def update(self, **kwargs):
+        """
+        Update the evaluation result with the given keyword arguments.
+        """
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def as_dict(self):
+        """
+        Convert the evaluation result to a dictionary.
+        """
+        return {
+            "benchmark": self.benchmark,
+            "metrics": self.metrics
+        }
