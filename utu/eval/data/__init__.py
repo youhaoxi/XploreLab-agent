@@ -1,46 +1,9 @@
-from dataclasses import dataclass
+# from dataclasses import dataclass
+from pydantic import BaseModel, Field
+from typing import Optional, Literal
 
 
-@dataclass
-class EvaluationSample:
-    """
-    A data class to represent a single evaluation sample.
-    """
-    source: str  # source benchmark
-    raw_question: str
-    level: int  # hardness level of the question, if applicable
-    augmented_question: str
-    correct_answer: str
-    file_name: str  # for GAIA
-    response: str
-    # below for judgement
-    extracted_final_answer: str
-    judged_response: str
-    reasoning: str
-    correct: bool
-    confidence: int
-    # tracing
-    time_cost: float = None  # time cost in seconds
-    trajectory: list = None  # the agent's reasoning process, a list of messages
-
-    def __init__(self, **kwargs):
-        """
-        Initialize the EvaluationSample with keyword arguments.
-        """
-        self.source = kwargs.get('source', '')
-        self.raw_question = kwargs.get('raw_question', '')
-        self.level = kwargs.get('level', 0)
-        self.augmented_question = kwargs.get('augmented_question', '')
-        self.correct_answer = kwargs.get('correct_answer', '')
-        self.file_name = kwargs.get('file_name', '')
-        self.response = kwargs.get('response', None)
-        self.extracted_final_answer = kwargs.get('extracted_final_answer', None)
-        self.judged_response = kwargs.get('judged_response', None)
-        self.reasoning = kwargs.get('reasoning', None)
-        self.correct = kwargs.get('correct', None)
-        self.confidence = kwargs.get('confidence', None)
-        self.trajectory = kwargs.get('trajectory', None)
-
+class UTUBaseModel(BaseModel):
     def update(self, **kwargs):
         """
         Update the evaluation sample with the given keyword arguments.
@@ -54,40 +17,58 @@ class EvaluationSample:
         Get the value of the specified key, or return default if not found.
         """
         return getattr(self, key, default)
-    
+
     @classmethod
     def from_dict(cls, data: dict):
         """
         Create an EvaluationSample from a dictionary.
         """
         return cls(**data)
-    
+
     def as_dict(self) -> dict:
         # only contain fields that are not None
-        return {k: v for k, v in self.__dict__.items() if v is not None}
+        return {k: v for k, v in self.model_dump().items() if v is not None}
 
 
-@dataclass
-class EvaluationResult:
+# @dataclass
+class EvaluationSample(UTUBaseModel):
+    """
+    A data class to represent a single evaluation sample.
+    """
+    # 1) base info
+    source: str = ""  # dataset name
+    raw_question: str = ""
+    level: Optional[int] = 0  # hardness level of the question, if applicable
+    augmented_question: Optional[str] = ""
+    correct_answer: Optional[str] = ""
+    file_name: Optional[str] = ""  # for GAIA
+    stage: str = "init"  # Literal["init", "rollout", "judged]
+    # 2) rollout
+    response: Optional[str] = Field(default=None)
+    time_cost: Optional[float] = Field(default=None)  # time cost in seconds
+    trajectory: Optional[str] = Field(default=None)  # the agent's reasoning process, a list of messages
+    # 3) judgement
+    extracted_final_answer: Optional[str] = Field(default=None)
+    judged_response: Optional[str] = Field(default=None)
+    reasoning: Optional[str] = Field(default=None)
+    correct: Optional[bool] = Field(default=None)
+    confidence: Optional[int] = Field(default=None)
+    # id
+    exp_id: str = Field(default="default")
+
+    def model_dump(self, *args, **kwargs):
+        keys = [
+            "source", "raw_question", "level", "augmented_question", "correct_answer", "file_name", "stage", "response",
+            "time_cost", "trajectory", "extracted_final_answer", "judged_response", "reasoning", "correct", "confidence",
+            "exp_id"
+        ]
+        return {
+            k: getattr(self, k) for k in keys if getattr(self, k) is not None
+        }
+
+class EvaluationResult(UTUBaseModel):
     """
     A data class to represent the result of an evaluation.
     """
     benchmark: str
     metrics: dict
-
-    def update(self, **kwargs):
-        """
-        Update the evaluation result with the given keyword arguments.
-        """
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-
-    def as_dict(self):
-        """
-        Convert the evaluation result to a dictionary.
-        """
-        return {
-            "benchmark": self.benchmark,
-            "metrics": self.metrics
-        }

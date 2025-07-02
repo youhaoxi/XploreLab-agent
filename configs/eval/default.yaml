@@ -1,3 +1,5 @@
+exp_id: "default"
+
 dataset: "data/utu_test/agent_test.jsonl"
 # eval_method: "BrowseComp"
 type: "mixed"
