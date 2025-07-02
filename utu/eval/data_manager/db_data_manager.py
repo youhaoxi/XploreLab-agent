@@ -71,3 +71,15 @@ class DBDataManager(FileDataManager):
             with Session(self.engine) as session:
                 session.add(samples)
                 session.commit()
+
+    async def delete_samples(self, samples: list[EvaluationSampleSQL]|EvaluationSampleSQL) -> None:
+        """Delete sample(s) from db."""
+        if isinstance(samples, list):
+            with Session(self.engine) as session:
+                for sample in samples:
+                    session.delete(sample)
+                session.commit()
+        else:
+            with Session(self.engine) as session:
+                session.delete(samples)
+                session.commit()
