@@ -7,6 +7,8 @@ from dataclasses import dataclass, asdict
 from agents import RunResult
 from agents.models.chatcmpl_converter import Converter
 
+from .data import EvaluationSample
+
 
 # 限制并发数量的装饰器
 def limit_concurrency(max_concurrent: int):

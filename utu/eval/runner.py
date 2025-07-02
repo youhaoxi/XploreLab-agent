@@ -14,8 +14,8 @@ from typing import List
 from tqdm import tqdm
 from agents import RunResult, AgentsException
 
-from ..config import EvalConfig, ConfigLoader
-from ..agents import UTUSimpleAgent
+from ..config import EvalConfig, ConfigLoader, AgentConfig
+from ..agents import UTUSimpleAgent, build_agent
 from ..utils import set_log_level
 from ..eval import  EVAL_FACTORY, MixedEval, BaseEval
 from ..eval.common import get_trajectory_from_agent_result
@@ -75,18 +75,15 @@ class ExpRunner:
         # 2.3 build the agents
         agents = {}
         for name, instructions in agent_instructions.items():
-            agents[name] = await self.build_agent(name=f"{name}-agent", instructions=instructions)
+            agents[name] = await self.build_agent(config.agent, name=f"{name}-agent", instructions=instructions)
         
         self.agents = agents
         self.evaluator = evaluator
 
-
-    async def build_agent(self, name: str, instructions: str) -> UTUSimpleAgent:
-        # load the builtin simple agent
-        agent = UTUSimpleAgent(config_name="examples/eval", name=name, instructions=instructions)
+    async def build_agent(self, config: AgentConfig|str, name: str, instructions: str) -> UTUSimpleAgent:
+        agent = build_agent(config, name=name, instructions=instructions)
         await agent.build()
         return agent
-
 
     async def rollout(self, samples: List[EvaluationSampleSQL]) -> list[EvaluationSampleSQL]:
         semaphore = asyncio.Semaphore(self.config.concurrency)
@@ -104,8 +101,8 @@ class ExpRunner:
             if isinstance(result, dict) and "error" in result:
                 logger.error(result)
             else:
+                await self.data_manager.update_samples(result)
                 results.append(result)
-        await self.data_manager.update_samples(results)
         print(f"Rollout {len(results)} samples. Updated to db.")
         return results
 
@@ -125,7 +122,7 @@ class ExpRunner:
             response=predicted_answer,
             time_cost=end_time - start_time,
             trajectory=json.dumps(trajectory, ensure_ascii=False),
-            stage="rollout"
+            stage="rollout"  # update stage to rollout!
         )
         # update the total tokens
         self.total_tokens += sum([step.get("usage", {}).get("total_tokens", 0) for step in trajectory])
