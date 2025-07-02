@@ -39,6 +39,7 @@ class ExpRunner:
     async def main(self):
         # 1. load and prepare the data
         # 2. get the agents and evaluators
+        print(f"> Running with config: {self.config.model_dump()}")
         await self.init(self.config)
         # 3. rollout
         data_to_rollout = await self.data_manager.get_samples(stage="init")
