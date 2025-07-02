@@ -1,6 +1,6 @@
 defaults:
   - model: base
-  - toolkits: basic
+  - tools/search@toolkits.search
   - _self_
 
 agent:

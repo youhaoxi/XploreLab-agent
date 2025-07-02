@@ -1,16 +1,17 @@
-from typing import Callable, Literal
+from typing import Callable, Literal, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
 
 class ModelConfig(BaseModel):
     api_key: str
     base_url: str
     model: str
 
-class AgentConfig(BaseModel):
-    name: str
-    instructions: str | Callable
+class ProfileConfig(BaseModel):
+    name: Optional[str] = "default"
+    instructions: Optional[str | Callable] = DEFAULT_INSTRUCTIONS
 
 class ToolkitConfig(BaseModel):
     mode: Literal["builtin", "mcp"] = "builtin"
@@ -18,7 +19,8 @@ class ToolkitConfig(BaseModel):
     activated_tools: list[str] | None = None
     config: dict | None = None
 
-class Config(BaseModel):
+class AgentConfig(BaseModel):
     model: ModelConfig
-    agent: AgentConfig
-    toolkits: dict[str, ToolkitConfig] = {}
+    agent: ProfileConfig = Field(default_factory=ProfileConfig)
+    toolkits: dict[str, ToolkitConfig] = Field(default_factory=dict)
+    
