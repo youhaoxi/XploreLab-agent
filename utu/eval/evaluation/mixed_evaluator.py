@@ -16,10 +16,39 @@ class MixedEval:
             if source not in self._evaluators:
                 self._evaluators[source] = EVAL_FACTORY.get(source, config or EvalConfig())
     
-    async def eval(self, predict_data: list[EvaluationSample]) -> tuple[list[EvaluationSample], EvaluationResult]:
+    async def eval(self, predict_data: list[EvaluationSample]) -> list[EvaluationSample]:
         """
         Evaluate the predictions.
         """
+        data_by_benchmark = self._group_data_by_benchmark(predict_data)
+        # evaluate each benchmark
+        overall_judged_data = []
+        for benchmark, data in data_by_benchmark.items():
+            evaluator = self._evaluators.get(benchmark)
+            judged_data = await evaluator.eval(data)
+            overall_judged_data.extend(judged_data)
+        return overall_judged_data
+
+    async def stat(self, judged_data: list[EvaluationSample]) -> EvaluationResult:
+        # TODO: wrap the data like @verl / @torch
+        # TODO: unify mixed & single mode
+        # TODO: log to wandb
+        data_by_benchmark = self._group_data_by_benchmark(judged_data)
+        overall_results = []
+        for benchmark, data in data_by_benchmark.items():
+            evaluator = self._evaluators.get(benchmark)
+            result = await evaluator.stat(data)
+            result.update(benchmark=benchmark)
+            overall_results.append(result)
+        
+        overall_metrics = self._calculate_overall_metrics(overall_results, len(judged_data))
+        eval_result = EvaluationResult(
+            benchmark="mixed",
+            metrics=overall_metrics
+        )
+        return eval_result
+    
+    def _group_data_by_benchmark(self, predict_data: list[EvaluationSample]) -> dict[str, list[EvaluationSample]]:
         # group data by benchmark
         data_by_benchmark = {}
         for data in predict_data:
@@ -28,23 +57,8 @@ class MixedEval:
                 data_by_benchmark[benchmark] = []
             
             data_by_benchmark[benchmark].append(data)
-        
-        # evaluate each benchmark
-        overall_judged_data, overall_results = [], []
-        for benchmark, data in data_by_benchmark.items():
-            evaluator = self._evaluators.get(benchmark)
-            judged_data, result = await evaluator.eval(data)
-            overall_judged_data.extend(judged_data)
-            result.update(benchmark=benchmark)
-            overall_results.append(result)
-        
-        overall_metrics = self._calculate_overall_metrics(overall_results, len(predict_data))
-        eval_result = EvaluationResult(
-            benchmark="mixed",
-            metrics=overall_metrics
-        )
-        return overall_judged_data, eval_result
-    
+        return data_by_benchmark
+
     def get_instructions(self) -> dict[str, str]:
         """
         Get the instructions for each benchmark.

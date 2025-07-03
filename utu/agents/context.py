@@ -5,14 +5,14 @@ from pydantic import BaseModel, ConfigDict, Field
 from agents import TResponseInputItem, Agent
 from agents.mcp import MCPServer
 
-from ..config import Config
+from ..config import AgentConfig
 
 
 class UTUContext(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     # tools
-    config: Config
+    config: AgentConfig
     current_agent: Any = None
     input_items: list[TResponseInputItem] = Field(default_factory=list)
     exit_stack: AsyncExitStack = Field(default_factory=AsyncExitStack)

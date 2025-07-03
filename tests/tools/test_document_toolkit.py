@@ -1,15 +1,12 @@
 import pytest
 
-from utu.tools.document_toolkit import DocumentToolkit
-from utu.config import ConfigLoader, ToolkitConfig
+from utu.tools import DocumentToolkit
+from utu.config import ConfigLoader
+
 
 @pytest.fixture
-def config() -> ToolkitConfig: 
+def document_toolkit() -> DocumentToolkit:
     config = ConfigLoader.load_toolkit_config("document")
-    return config
-
-@pytest.fixture
-def document_toolkit(config: ToolkitConfig) -> DocumentToolkit:
     return DocumentToolkit(config=config.config)
 
 document_url1 = "https://arxiv.org/pdf/2107.14339"

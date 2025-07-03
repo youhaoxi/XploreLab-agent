@@ -31,8 +31,7 @@ SP_INSTRUCTION = """Answer questions about images by:
 class ImageToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
         super().__init__(config, activated_tools)
-        llm_config = self.config.get("llm", {})
-        self.llm = SimplifiedAsyncOpenAI(**llm_config)
+        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
 
     def _load_image(self, image_path: str) -> str:
         parsed = urlparse(image_path)

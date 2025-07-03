@@ -18,30 +18,30 @@ class BaseEval:
     JUDGE_TEMPLATE: str = None
 
     concurrency_limit: int = None
-    thread_size: int = None
     name: str = None
 
     def __init__(self, config: EvalConfig) -> None:
         """
         Initialize the evaluation with concurrency and thread size.
         """
-        self.thread_size = config.thread_pool_size
         self.concurrency_limit = config.judge_concurrency
 
-    async def eval(self, predict_data: list[EvaluationSample]) -> tuple[list[EvaluationSample], EvaluationResult]:
+    async def eval(self, predict_data: list[EvaluationSample]) -> list[EvaluationSample]:
         """
         Evaluate the agent on the predict data.
         """
         # 1. judge if each prediction is correct or not
         judged_data = await self.judge_with_asyncio(predict_data)
+        return judged_data
+    
+    async def stat(self, judged_data: list[EvaluationSample]) -> EvaluationResult:
         # 2. calculate metrics based on judged results 
         metrics = self.calculate_metrics(judged_data)
         eval_result = EvaluationResult(
             benchmark=self.name,
             metrics=metrics
         )
-        # 3. return the results
-        return judged_data, eval_result
+        return eval_result
 
     async def judge_with_asyncio(self, predict_data: list[EvaluationSample]) -> list[EvaluationSample]:
         semaphore = asyncio.Semaphore(self.concurrency_limit)

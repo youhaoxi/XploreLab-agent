@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from omegaconf import OmegaConf, DictConfig
 from hydra import compose, initialize
 
-from .agent_config import Config, ModelConfig, ToolkitConfig
+from .agent_config import AgentConfig, ModelConfig, ToolkitConfig
 from .eval_config import EvalConfig
 
 TConfig = TypeVar("TConfig", bound=BaseModel)
@@ -21,28 +21,30 @@ class ConfigLoader:
             OmegaConf.resolve(cfg)
         return cfg
 
-    @classmethod
-    def _load_config_to_cls(cls, name: str, config_type: Type[TConfig] = None) -> TConfig:
-        # TESTING
-        cfg = cls._load_config_to_dict(name)
-        return config_type(**cfg)
+    # @classmethod
+    # def _load_config_to_cls(cls, name: str, config_type: Type[TConfig] = None) -> TConfig:
+    #     # TESTING
+    #     cfg = cls._load_config_to_dict(name)
+    #     return config_type(**cfg)
 
     @classmethod
-    def load_config(cls, name: str = "default") -> Config:
-        cfg = cls._load_config_to_dict(name)
-        return Config(**cfg)
+    def load_agent_config(cls, name: str = "default") -> AgentConfig:
+        cfg = cls._load_config_to_dict(name, config_path="../../configs/agents")
+        return AgentConfig(**cfg)
 
     @classmethod
     def load_toolkit_config(cls, name: str = "search") -> ToolkitConfig:
-        cfg = cls._load_config_to_dict(name, config_path="../../configs/tools")
+        cfg = cls._load_config_to_dict(name, config_path="../../configs/agents/tools")
         return ToolkitConfig(**cfg)
 
     @classmethod
     def load_model_config(cls, name: str = "base") -> ModelConfig:
-        cfg = cls._load_config_to_dict(name, config_path="../../configs/model")
+        cfg = cls._load_config_to_dict(name, config_path="../../configs/agents/model")
         return ModelConfig(**cfg)
 
     @classmethod
     def load_eval_config(cls, name: str = "default") -> EvalConfig:
-        cfg = cls._load_config_to_dict(name, config_path="../../configs/eval")
+        if not name.startswith("eval/"):
+            name = "eval/" + name
+        cfg = cls._load_config_to_dict(name, config_path="../../configs")
         return EvalConfig(**cfg)

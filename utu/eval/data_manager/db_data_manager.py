@@ -50,7 +50,7 @@ class DBDataManager(FileDataManager):
             ).first()
         return has_exp_id is not None
 
-    async def get_samples(self, stage: Literal["init", "rollout", "judgement"] = None) -> list[EvaluationSampleSQL]:
+    async def get_samples(self, stage: Literal["init", "rollout", "judged"] = None) -> list[EvaluationSampleSQL]:
         """Get samples from exp_id with specified stage."""
         with Session(self.engine) as session:
             samples = session.exec(
@@ -70,4 +70,16 @@ class DBDataManager(FileDataManager):
         else:
             with Session(self.engine) as session:
                 session.add(samples)
+                session.commit()
+
+    async def delete_samples(self, samples: list[EvaluationSampleSQL]|EvaluationSampleSQL) -> None:
+        """Delete sample(s) from db."""
+        if isinstance(samples, list):
+            with Session(self.engine) as session:
+                for sample in samples:
+                    session.delete(sample)
+                session.commit()
+        else:
+            with Session(self.engine) as session:
+                session.delete(samples)
                 session.commit()
