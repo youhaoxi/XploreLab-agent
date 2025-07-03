@@ -65,13 +65,14 @@ class UTUAgentBase:
         )
 
     # util apis
-    async def chat(self, input: str):
+    async def chat(self, input: str) -> RunResult:
         # TODO: support multi-modal input -- `def add_input(...)`
         self.context.input_items.append({"content": input, "role": "user"})
         run_result = await self.run(self.context.input_items)
         AgentsUtils.print_new_items(run_result.new_items)
         self.context.input_items = run_result.to_input_list()
         self.context.current_agent = run_result.last_agent
+        return run_result
     
     async def chat_streamed(self, input: str):
         self.context.input_items.append({"content": input, "role": "user"})
