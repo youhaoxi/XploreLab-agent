@@ -39,7 +39,7 @@ class ExpRunner:
     async def main(self):
         # 1. load and prepare the data
         # 2. get the agents and evaluators
-        print(f"> Running with config: {self.config.model_dump()}")
+        print(f"> Running with config: {self.config}")
         await self.init(self.config)
         # 3. rollout
         data_to_rollout = await self.data_manager.get_samples(stage="init")
@@ -51,12 +51,15 @@ class ExpRunner:
         print((f"total tokens: {tokens}, time cost: {time_cost:.2f}, avg_speed: {tokens / time_cost:.2f}\n"))
         # 4. evaluate the results
         all_samples = await self.data_manager.get_samples(stage="rollout")
-        judged_data, eval_result = await self.evaluator.eval(all_samples)
+        judged_data = await self.evaluator.eval(all_samples)
         for data in judged_data:
             data.update(stage="judged")
         await self.data_manager.update_samples(judged_data)
         print(f"Evaluated {len(judged_data)} samples.")
-        print(f"Evaluation result:")
+        # 5. Stat the results
+        judged_samples = await self.data_manager.get_samples(stage="judged")
+        eval_result = await self.evaluator.stat(judged_samples)
+        print(f"Stat from {len(judged_samples)} samples:")
         print(json.dumps(eval_result.as_dict(), indent=4, ensure_ascii=False))
 
 
