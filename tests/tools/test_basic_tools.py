@@ -1,7 +1,7 @@
 import pytest
 
 from utu.config import ConfigLoader
-from utu.tools import GitHubToolkit, ArxivToolkit, FileEditToolkit, WikipediaSearchTool
+from utu.tools import GitHubToolkit, ArxivToolkit, FileEditToolkit, WikipediaSearchTool, CodesnipToolkit
 
 
 @pytest.fixture
@@ -55,4 +55,13 @@ async def test_edit_file(file_edit_toolkit: FileEditToolkit):
 async def test_wikipedia_search(wikipedia_toolkit: WikipediaSearchTool):
     result = await wikipedia_toolkit.wikipedia_search("Python_(programming_language)")
     print(result)
-    
+
+
+@pytest.fixture
+def codesnip_toolkit() -> CodesnipToolkit:
+    config = ConfigLoader.load_toolkit_config("codesnip")
+    return CodesnipToolkit(config=config)
+
+async def test_run_code(codesnip_toolkit: CodesnipToolkit):
+    result = await codesnip_toolkit.run_code("print('hello world')", "python")
+    print(result)
