@@ -65,13 +65,10 @@ class BashTool(AsyncBaseToolkit):
             run_command(self.child, self.custom_prompt, f"cd {self.workspace_root}")
 
     async def run_bash(self, command: str) -> str:
-        """Execute a bash command and return its output.
+        """Execute a bash command in your workspace and return its output.
 
         Args:
-            tool_input: Dictionary containing the command to execute
-
-        Returns:
-            ToolImplOutput containing the command output
+            command: The command to execute
         """
         # 1) filter: change command before execution. E.g. used in SSH or Docker.
         # original_command = command
