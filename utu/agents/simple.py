@@ -94,10 +94,10 @@ class UTUSimpleAgent(UTUAgentBase):
         return server
 
     async def _load_builtin_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
-        logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config.config}")
+        logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
         assert toolkit_config.name in TOOLKIT_MAP, f"Unknown toolkit name: {toolkit_config.name}"
         toolkit = TOOLKIT_MAP[toolkit_config.name](
-            config=toolkit_config.config,
+            config=toolkit_config,
             activated_tools=toolkit_config.activated_tools,
         )
         self._toolkits.append(toolkit)

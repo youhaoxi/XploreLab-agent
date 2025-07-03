@@ -50,7 +50,7 @@ class DBDataManager(FileDataManager):
             ).first()
         return has_exp_id is not None
 
-    async def get_samples(self, stage: Literal["init", "rollout", "judgement"] = None) -> list[EvaluationSampleSQL]:
+    async def get_samples(self, stage: Literal["init", "rollout", "judged"] = None) -> list[EvaluationSampleSQL]:
         """Get samples from exp_id with specified stage."""
         with Session(self.engine) as session:
             samples = session.exec(
