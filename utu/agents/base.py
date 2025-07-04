@@ -1,6 +1,6 @@
 
 from agents import (
-    Agent, Runner, RunConfig, 
+    Agent, Runner, RunConfig,
     RunResult, RunResultStreaming, RunHooks,
     TResponseInputItem
 )
@@ -32,9 +32,11 @@ class UTUAgentBase:
         self.context = UTUContext(config=self.config)
 
     def _get_run_config(self) -> RunConfig:
-        return RunConfig(
+        run_config = RunConfig(
             workflow_name=self.name,
+            model_settings=self.config.model_settings,
         )
+        return run_config
 
     def set_agent(self, agent: Agent):
         """ Set the current agent """
