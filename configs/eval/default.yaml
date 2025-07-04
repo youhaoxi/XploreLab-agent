@@ -1,3 +1,8 @@
+# @package _global_
+defaults:
+  - /agents/v01@agent
+  - _self_
+
 exp_id: "default"
 
 dataset: "data/utu_test/agent_test.jsonl"
@@ -10,7 +15,6 @@ output_file: "predict_results.jsonl"
 metrics_file : "eval_metrics.json"
 judge_output_file: "judge_results.jsonl"
 
-thread_pool_size: 8
 concurrency: 8
 max_turns: 12
 

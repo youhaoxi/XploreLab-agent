@@ -6,6 +6,8 @@ model:
   api_key: ${oc.env:UTU_API_KEY}
   base_url: ${oc.env:UTU_BASE_URL}
   model: ${oc.env:UTU_MODEL_AGENT}
+# model_settings:
+#   parallel_tool_calls: false
 toolkits:
   search: 
     name: search

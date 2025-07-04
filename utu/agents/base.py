@@ -1,6 +1,6 @@
 
 from agents import (
-    Agent, Runner, RunConfig, 
+    Agent, Runner, RunConfig,
     RunResult, RunResultStreaming, RunHooks,
     TResponseInputItem
 )
@@ -32,9 +32,11 @@ class UTUAgentBase:
         self.context = UTUContext(config=self.config)
 
     def _get_run_config(self) -> RunConfig:
-        return RunConfig(
+        run_config = RunConfig(
             workflow_name=self.name,
+            model_settings=self.config.model_settings,
         )
+        return run_config
 
     def set_agent(self, agent: Agent):
         """ Set the current agent """
@@ -65,7 +67,7 @@ class UTUAgentBase:
         )
 
     # util apis
-    async def chat(self, input: str):
+    async def chat(self, input: str) -> RunResult:
         # TODO: support multi-modal input -- `def add_input(...)`
         # TODO: set "session-level" tracing for multi-turn chat
         self.context.input_items.append({"content": input, "role": "user"})
@@ -73,6 +75,7 @@ class UTUAgentBase:
         AgentsUtils.print_new_items(run_result.new_items)
         self.context.input_items = run_result.to_input_list()
         self.context.current_agent = run_result.last_agent
+        return run_result
     
     async def chat_streamed(self, input: str):
         self.context.input_items.append({"content": input, "role": "user"})

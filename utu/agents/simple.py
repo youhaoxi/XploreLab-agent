@@ -29,7 +29,7 @@ class UTUSimpleAgent(UTUAgentBase):
             self.config.agent.instructions = kwargs["instructions"]
             del kwargs["instructions"]
         if args or kwargs:
-            logger.warning(f"UTUSimpleAgent.__init__ received unexpected args: {args}, {kwargs}")
+            logger.warning(f"init received unexpected args: {args}, {kwargs}")
         self._exit_stack = AsyncExitStack()
 
     async def __aenter__(self):
