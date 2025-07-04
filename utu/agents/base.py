@@ -67,6 +67,7 @@ class UTUAgentBase:
     # util apis
     async def chat(self, input: str):
         # TODO: support multi-modal input -- `def add_input(...)`
+        # TODO: set "session-level" tracing for multi-turn chat
         self.context.input_items.append({"content": input, "role": "user"})
         run_result = await self.run(self.context.input_items)
         AgentsUtils.print_new_items(run_result.new_items)

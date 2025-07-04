@@ -19,7 +19,7 @@ class EvalConfig(ConfigBaseModel):
     judge_output_file: str
     
     # rollout
-    max_turns: int
+    max_turns: int  # FIXME: this is not used now!
     concurrency: int             # rollout parallelism
     
     # judgement

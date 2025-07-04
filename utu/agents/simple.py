@@ -72,7 +72,9 @@ class UTUSimpleAgent(UTUAgentBase):
                 raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
         # use `MCPUtil` to get tools from mcp servers
         if self._mcp_servers:
-            tools_list.extend(await MCPUtil.get_all_function_tools(self._mcp_servers, convert_schemas_to_strict=False))
+            tools_list.extend(await MCPUtil.get_all_function_tools(
+                self._mcp_servers, convert_schemas_to_strict=False, 
+                run_context=self.context, agent=self.context.current_agent))
         tool_names = [tool.name for tool in tools_list]
         logger.info(f"Loaded {len(tool_names)} tools: {tool_names}")
         return tools_list

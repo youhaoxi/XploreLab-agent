@@ -6,7 +6,8 @@ from .file_edit_toolkit import FileEditToolkit
 from .github_toolkit import GitHubToolkit
 from .arxiv_toolkit import ArxivToolkit
 from .wikipedia_toolkit import WikipediaSearchTool
-
+from .codesnip_toolkit import CodesnipToolkit
+from .bash_tool import BashTool
 
 
 TOOLKIT_MAP = {
@@ -17,4 +18,6 @@ TOOLKIT_MAP = {
     "github": GitHubToolkit,
     "arxiv": ArxivToolkit,
     "wikipedia": WikipediaSearchTool,
+    "codesnip": CodesnipToolkit,
+    "bash": BashTool,
 }
