@@ -48,8 +48,8 @@ def run_command(child: pexpect.spawn, custom_prompt: str, cmd: str) -> str:
 
 
 class BashTool(AsyncBaseToolkit):
-    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
-        super().__init__(config, activated_tools)
+    def __init__(self, config: ToolkitConfig = None) -> None:
+        super().__init__(config)
         self.workspace_root = self.config.config.get("workspace_root", "/tmp/")
         # self.require_confirmation = self.config.config.get("require_confirmation", False)
         # self.command_filters = self.config.config.get("command_filters", [])

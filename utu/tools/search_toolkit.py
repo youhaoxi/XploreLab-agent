@@ -29,8 +29,8 @@ TEMPLATE_QA = r"""请根据下面的 <content> 内容回答 <query>:
 """
 
 class SearchToolkit(AsyncBaseToolkit):
-    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None):
-        super().__init__(config, activated_tools)
+    def __init__(self, config: ToolkitConfig = None):
+        super().__init__(config)
         self.jina_url_template = r"https://r.jina.ai/{url}"
         self.jina_header = {
             "Authorization": f"Bearer {os.getenv('JINA_API_KEY')}"

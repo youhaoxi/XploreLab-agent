@@ -9,7 +9,7 @@ from agents.mcp import MCPServerStdio, MCPServer, MCPUtil
 
 from .base import UTUAgentBase
 from ..utils import AgentsUtils
-from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
+from ..tools import AsyncBaseToolkit, ToolkitLoader
 from ..config import ToolkitConfig, AgentConfig
 
 logger = logging.getLogger("utu")
@@ -97,10 +97,6 @@ class UTUSimpleAgent(UTUAgentBase):
 
     async def _load_builtin_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
-        assert toolkit_config.name in TOOLKIT_MAP, f"Unknown toolkit name: {toolkit_config.name}"
-        toolkit = TOOLKIT_MAP[toolkit_config.name](
-            config=toolkit_config,
-            activated_tools=toolkit_config.activated_tools,
-        )
+        toolkit = ToolkitLoader.load_toolkits(toolkit_config)
         self._toolkits.append(toolkit)
         return toolkit

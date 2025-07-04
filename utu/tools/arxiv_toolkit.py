@@ -17,8 +17,8 @@ logger = logging.getLogger("utu")
 
 
 class ArxivToolkit(AsyncBaseToolkit):
-    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
-        super().__init__(config, activated_tools)
+    def __init__(self, config: ToolkitConfig = None) -> None:
+        super().__init__(config)
         self.client = arxiv.Client()
 
     def _get_search_results(

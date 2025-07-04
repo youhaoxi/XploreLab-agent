@@ -16,8 +16,8 @@ logger = logging.getLogger("utu")
 
 
 class FileEditToolkit(AsyncBaseToolkit):
-    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
-        super().__init__(config, activated_tools)
+    def __init__(self, config: ToolkitConfig = None) -> None:
+        super().__init__(config)
         self.work_dir = Path(self.config.config.get("work_dir", "./")).resolve()
         self.work_dir.mkdir(parents=True, exist_ok=True)
         self.default_encoding = self.config.config.get("default_encoding", "utf-8")

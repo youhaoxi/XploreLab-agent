@@ -24,8 +24,8 @@ Question: {question}"""
 INSTRUCTION_SUMMARY = r"""Please provide a structured description of the document, including important informations, e.g. author, date, title, keywords, summary, key points, etc."""
 
 class DocumentToolkit(AsyncBaseToolkit):
-    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
-        super().__init__(config, activated_tools)
+    def __init__(self, config: ToolkitConfig = None) -> None:
+        super().__init__(config)
         self.chunkr = Chunkr(api_key=os.getenv("CHUNKR_API_KEY"))
         self.chunkr.config = Configuration(
             high_resolution=self.config.config.get("high_resolution", True),

@@ -19,8 +19,8 @@ class SimpleMemoryToolkit(AsyncBaseToolkit):
     warnings when overwriting content or when edit operations would affect
     multiple occurrences.
     """
-    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
-        super().__init__(config, activated_tools)
+    def __init__(self, config: ToolkitConfig = None) -> None:
+        super().__init__(config)
         self.full_memory = ""
 
     def _read_memory(self) -> str:

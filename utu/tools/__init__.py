@@ -21,3 +21,15 @@ TOOLKIT_MAP = {
     "codesnip": CodesnipToolkit,
     "bash": BashTool,
 }
+
+
+from ..config import ToolkitConfig, ConfigLoader
+
+class ToolkitLoader:
+    @classmethod
+    def load_toolkits(cls, config: ToolkitConfig|str) -> AsyncBaseToolkit:
+        if isinstance(config, str):
+            config = ConfigLoader.load_toolkit_config(config)
+        assert config.mode == "builtin", f"Unknown toolkit mode: {config.mode}"
+        assert config.name in TOOLKIT_MAP, f"Unknown toolkit name: {config.name}"
+        return TOOLKIT_MAP[config.name](config=config)
