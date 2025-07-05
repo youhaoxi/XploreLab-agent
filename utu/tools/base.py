@@ -46,7 +46,10 @@ class AsyncBaseToolkit(abc.ABC):
         tools_map = await self.get_tools_map_func()
         tools = []
         for tool_name, tool in tools_map.items():
-            tools.append(function_tool(tool))
+            tools.append(function_tool(
+                tool, 
+                strict_mode=False  # turn off strict mode
+            ))
         return tools
 
     async def get_tools_in_openai(self) -> list[dict]:
