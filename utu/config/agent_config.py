@@ -11,8 +11,8 @@ DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
 
 
 class ModelConfig(ConfigBaseModel):
-    api_key: str
-    base_url: str
+    api_key: str | None = None
+    base_url: str | None = None
     model: str
 
 class ModelSettingsConfig(ConfigBaseModel, ModelSettings):
@@ -31,12 +31,12 @@ class ToolkitConfig(ConfigBaseModel):
     mode: Literal["builtin", "mcp"] = "builtin"
     name: str | None = None
     activated_tools: list[str] | None = None
-    config: dict | None = None
+    config: dict = Field(default_factory=dict)
     config_llm: ModelConfig | None = None
 
 
 class AgentConfig(ConfigBaseModel):
-    type: Literal["simple"] = "simple"
+    type: Literal["simple", "simple_env"] = "simple"
     model: ModelConfig
     model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
     agent: ProfileConfig = Field(default_factory=ProfileConfig)

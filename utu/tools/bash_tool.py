@@ -62,7 +62,10 @@ class BashTool(AsyncBaseToolkit):
 
         self.child, self.custom_prompt = start_persistent_shell(timeout=self.timeout)
         if self.workspace_root:
-            run_command(self.child, self.custom_prompt, f"cd {self.workspace_root}")
+            self.setup_workspace(self.workspace_root)
+
+    def setup_workspace(self, workspace_root: str):
+        run_command(self.child, self.custom_prompt, f"cd {workspace_root}")
 
     async def run_bash(self, command: str) -> str:
         """Execute a bash command in your workspace and return its output.

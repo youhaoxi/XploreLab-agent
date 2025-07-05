@@ -16,6 +16,7 @@ class UTUAgentBase:
     config: AgentConfig = None
     context: UTUContext = None
     tracer: Trace = None
+    trace_id: str = None
     
     _run_hooks: RunHooks = None
 
@@ -26,6 +27,7 @@ class UTUAgentBase:
     def __init__(self, config: AgentConfig|str):
         self._load_config(config)
         self._build_context()
+        self.trace_id = gen_trace_id()
 
     def _load_config(self, config: str|AgentConfig):
         if isinstance(config, str):
@@ -53,7 +55,7 @@ class UTUAgentBase:
             return
         self.tracer = trace(
             workflow_name=self.name,
-            trace_id=gen_trace_id(),
+            trace_id=self.trace_id,
         )
         self.tracer.start(mark_as_current=True)
         print(f"> trace_id: {self.tracer.trace_id}")
