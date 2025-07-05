@@ -7,8 +7,9 @@ TODO: rewrite openinference-instrumentation-openai-agents to support
 """
 
 from phoenix.otel import register, TracerProvider
-from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 from openinference.instrumentation.openai import OpenAIInstrumentor
+# from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
+from .otel_agents_instrumentor import OpenAIAgentsInstrumentor
 
 def setup_phoenix_tracing() -> TracerProvider:
     """ 
@@ -22,6 +23,6 @@ def setup_phoenix_tracing() -> TracerProvider:
         auto_instrument=False,
     )
     # manually instrument
-    OpenAIAgentsInstrumentor().instrument(tracer_provider=tracer_provider)
     OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+    OpenAIAgentsInstrumentor().instrument(tracer_provider=tracer_provider)
     return tracer_provider

@@ -4,6 +4,8 @@ from agents import (
     RunResult, RunResultStreaming, RunHooks,
     TResponseInputItem
 )
+from agents.tracing import trace, Trace, gen_trace_id
+
 
 from ..utils import AgentsUtils
 from ..config import ConfigLoader, AgentConfig
@@ -13,6 +15,7 @@ from .context import UTUContext
 class UTUAgentBase:
     config: AgentConfig = None
     context: UTUContext = None
+    tracer: Trace = None
     
     _run_hooks: RunHooks = None
 
@@ -45,9 +48,22 @@ class UTUAgentBase:
     def set_run_hooks(self, run_hooks: RunHooks):
         self._run_hooks = run_hooks
 
+    def _setup_tracer(self):
+        if self.tracer:
+            return
+        self.tracer = trace(
+            workflow_name=self.name,
+            trace_id=gen_trace_id(),
+        )
+        self.tracer.start(mark_as_current=True)
+        print(f"> trace_id: {self.tracer.trace_id}")
+        # TODO: get otel trace_id --> set same as self.tracer.trace_id
+        # print(f"> otel trace_id: {otel_span.get_span_context().trace_id}")
+
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem]) -> RunResult:
         # TODO: setup other runner options as @property
+        self._setup_tracer()
         return await Runner.run(
             self.context.current_agent, 
             input, 
@@ -58,6 +74,7 @@ class UTUAgentBase:
         )
 
     def run_streamed(self, input: str | list[TResponseInputItem]) -> RunResultStreaming:
+        self._setup_tracer()
         return Runner.run_streamed(
             self.context.current_agent, 
             input, 
