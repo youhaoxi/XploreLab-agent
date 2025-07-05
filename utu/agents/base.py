@@ -56,6 +56,9 @@ class UTUAgentBase:
         self.tracer = trace(
             workflow_name=self.name,
             trace_id=self.trace_id,
+            # metadata={
+            #     "config": str(self.config.model_dump())
+            # }  # FIXME: str too long for phoenix
         )
         self.tracer.start(mark_as_current=True)
         print(f"> trace_id: {self.tracer.trace_id}")
