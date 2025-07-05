@@ -1,9 +1,9 @@
 # @package _global_
 defaults:
-  - /agents/exp/v01@agent
+  - /agents/exp/v02@agent
   - _self_
 
-exp_id: "v0.1"
+exp_id: "v0.2"
 
 dataset: "data/utu_test/agent_test.jsonl"
 # eval_method: "BrowseComp"
