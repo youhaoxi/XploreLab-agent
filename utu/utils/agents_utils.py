@@ -1,3 +1,4 @@
+import os
 import json
 import uuid
 from collections.abc import AsyncIterator
@@ -36,6 +37,10 @@ class AgentsUtils:
         base_url: str = None,
         # mode: Literal["responses", "chat.completions"] = "chat.completions",
     ) -> OpenAIChatCompletionsModel:
+        api_key = api_key or os.getenv("UTU_API_KEY")
+        base_url = base_url or os.getenv("UTU_BASE_URL")
+        if not api_key or not base_url:
+            raise ValueError("UTU_API_KEY and UTU_BASE_URL must be set")
         openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
         return OpenAIChatCompletionsModel(model=model, openai_client=openai_client)
 
