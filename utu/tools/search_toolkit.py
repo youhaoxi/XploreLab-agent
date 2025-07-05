@@ -67,11 +67,7 @@ class SearchToolkit(AsyncBaseToolkit):
 
     @async_file_cache(expire_time=None)
     async def get_content(self, url: str) -> str:
-        """Get the content of the url
-        
-        Args:
-            url (str): The url to get content from.
-        """
+        # Get the content of the url
         logger.info(f"[tool] get_content: {oneline_object(url)}")
         response = requests.get(self.jina_url_template.format(url=url), headers=self.jina_header)
         logger.info(f"[tool] get_content: {oneline_object(response.text)}...")
@@ -111,5 +107,6 @@ class SearchToolkit(AsyncBaseToolkit):
     async def get_tools_map(self) -> dict[str, Callable]:
         return {
             "search_google_api": self.search_google_api,
-            "get_content": self.get_content,
+            # "get_content": self.get_content,
+            "web_qa": self.web_qa,
         }
