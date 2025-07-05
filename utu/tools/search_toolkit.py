@@ -12,6 +12,7 @@ logger = logging.getLogger("utu")
 
 
 # TODO: ref @smolagents -- to keep rich context info
+# FIXME::
 TEMPLATE_SUMMARY = r"""请对于以下内容进行总结：
 <content>
 {content}
@@ -45,19 +46,20 @@ class SearchToolkit(AsyncBaseToolkit):
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
     @async_file_cache(expire_time=None)
-    async def search_google_api(self, query: str, num_results: int = 20) -> str:
+    async def search_google_api(self, query: str, num_results: int = 10) -> str:
         """Search the query via Google api, the query should be a search query like humans search in Google, concrete and not vague or super long. More the single most important items.
         
         Args:
             query (str): The query to search for.
-            num_results (int, optional): The number of results to return. Defaults to 20.
+            num_results (int, optional): The number of results to return. Defaults to 10.
         """
+        # https://serper.dev/playground
         logger.info(f"[tool] search_google_api: {oneline_object(query)}")
         params = {
             'q': query,
             'gl': 'cn',
             'hl': 'zh-cn',
-            'num_results': num_results
+            'num': num_results
         }
         response = requests.request("POST", self.serper_url, headers=self.serper_header, json=params)
         results = response.json()["organic"]
@@ -83,10 +85,10 @@ class SearchToolkit(AsyncBaseToolkit):
         """
         logger.info(f"[tool] web_qa: {oneline_object({url, query})}")
         raw_content = await self.get_content(url)
-        if query is None:
-            result = await self._summary(raw_content)
-        else:
+        if query:
             result = await self._qa(raw_content, query)
+        else:
+            result = await self._summary(raw_content)
         return result
 
     async def _summary(self, content: str) -> str:
