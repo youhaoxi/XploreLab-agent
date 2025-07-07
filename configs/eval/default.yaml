@@ -1,10 +1,12 @@
+exp_id: "default"
+
 dataset: "data/utu_test/agent_test.jsonl"
 # eval_method: "BrowseComp"
 type: "mixed"
 question_field: "question"
 gt_field: "answer"
 
-output_file: "predict_results_8.jsonl"
+output_file: "predict_results.jsonl"
 metrics_file : "eval_metrics.json"
 judge_output_file: "judge_results.jsonl"
 

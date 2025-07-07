@@ -2,9 +2,9 @@ import os
 import json
 import aiofiles
 
-from utu.eval import EvaluationSample
+from ...config import EvalConfig
+from ..data import EvaluationSample
 from . import BaseProcesser, DATA_PROCESSER_FACTORY
-from utu.config import EvalConfig
 
 
 class MixedProcesser:

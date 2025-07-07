@@ -1,18 +1,15 @@
 import hashlib
 import pytest
 
-from utu.tools.search import SearchToolkit
+from utu.tools import SearchToolkit
 from utu.utils import oneline_object
-from utu.config import ConfigLoader, ToolkitConfig
+from utu.config import ConfigLoader
+
 
 @pytest.fixture
-def config() -> ToolkitConfig: 
+def search_toolkit() -> SearchToolkit:
     config = ConfigLoader.load_toolkit_config("search")
-    return config
-
-@pytest.fixture
-def search_toolkit(config: ToolkitConfig) -> SearchToolkit:
-    return SearchToolkit(config=config.config)
+    return SearchToolkit(config=config)
 
 
 test_query = "test"

@@ -1,5 +1,5 @@
+from ..data import EvaluationSample
 from .base import BaseMatchEval
-from utu.eval import EvaluationSample
 
 
 class GAIAEval(BaseMatchEval):

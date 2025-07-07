@@ -10,8 +10,13 @@ wheels/
 .venv
 
 # Misc
+.DS_Store
 uv.lock
 .env
 .vscode
 *.log
+*.db
+*.jsonl
+___*
 .cache/
+output/

@@ -1,9 +1,7 @@
 import pytest
 
-from utu.tools.github_toolkit import GitHubToolkit
-from utu.tools.arxiv_toolkit import ArxivToolkit
-from utu.tools.file_edit_toolkit import FileEditToolkit
-from utu.tools.wikipedia_toolkit import WikipediaSearchTool
+from utu.config import ConfigLoader
+from utu.tools import GitHubToolkit, ArxivToolkit, FileEditToolkit, WikipediaSearchTool, CodesnipToolkit, BashTool
 
 
 @pytest.fixture
@@ -57,4 +55,24 @@ async def test_edit_file(file_edit_toolkit: FileEditToolkit):
 async def test_wikipedia_search(wikipedia_toolkit: WikipediaSearchTool):
     result = await wikipedia_toolkit.wikipedia_search("Python_(programming_language)")
     print(result)
-    
+
+
+@pytest.fixture
+def codesnip_toolkit() -> CodesnipToolkit:
+    config = ConfigLoader.load_toolkit_config("codesnip")
+    return CodesnipToolkit(config=config)
+
+async def test_run_code(codesnip_toolkit: CodesnipToolkit):
+    result = await codesnip_toolkit.run_code("print('hello world')", "python")
+    print(result)
+
+@pytest.fixture
+def bash_toolkit() -> BashTool:
+    config = ConfigLoader.load_toolkit_config("bash")
+    return BashTool(config=config)
+
+async def test_run_bash(bash_toolkit: BashTool):
+    result = await bash_toolkit.run_bash("curl https://httpbin.org/get")
+    print(result)
+    result = await bash_toolkit.run_bash("wget https://www.gnu.org/software/wget/manual/wget.html -O wget.html")
+    print(result)

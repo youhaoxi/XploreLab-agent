@@ -1,0 +1,8 @@
+name: image
+mode: builtin
+activated_tools: null
+# config:
+config_llm:
+  model: "${oc.env:UTU_TOOL_IMAGE_MODEL}"
+  api_key: "${oc.env:UTU_API_KEY}"
+  base_url: "${oc.env:UTU_BASE_URL}"

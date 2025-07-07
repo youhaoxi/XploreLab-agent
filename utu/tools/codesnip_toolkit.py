@@ -1,0 +1,48 @@
+"""
+https://github.com/bytedance/SandboxFusion
+https://bytedance.github.io/SandboxFusion/docs/docs/get-started
+"""
+import logging
+from typing import Callable, Optional
+
+import requests
+
+from .base import AsyncBaseToolkit
+from ..config import ToolkitConfig
+from ..utils import oneline_object
+logger = logging.getLogger("utu")
+
+SUPPORTED_LANGUAGES = [
+    "python", "cpp", "nodejs", "go", "go_test", "java", "php", "csharp", "bash",
+    "typescript", "sql", "rust", "cuda", "lua", "R", "perl", "D_ut", "ruby", "scala", "julia",
+    "pttest", "junit", "kotlin_script", "jest", "verilog", "python_gpu", "lean", "swift", "racket"
+]
+
+class CodesnipToolkit(AsyncBaseToolkit):
+    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
+        super().__init__(config, activated_tools)
+        self.server_url = self.config.config.get("server_url")
+
+    async def run_code(self, code: str, language: str = "python") -> str:
+        f"""Run code in sandbox and return the result.
+        Supported languages: {SUPPORTED_LANGUAGES}
+        
+        Args:
+            code (str): The code to run.
+            language (str, optional): The language of the code. Defaults to "python".
+        Returns:
+            str: The result of the code.
+        """
+        payload = {
+            "code": code,
+            "language": language,
+        }
+        response = requests.post(f"{self.server_url}/run_code", json=payload)
+        result = response.json()
+        logger.info(f"[tool] run_code ```{oneline_object(payload)}``` got result: {oneline_object(result)}")
+        return str(result)
+
+    async def get_tools_map(self) -> dict[str, Callable]:
+        return {
+            "run_code": self.run_code,
+        }

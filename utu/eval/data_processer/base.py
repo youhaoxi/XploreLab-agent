@@ -1,11 +1,10 @@
 import os
-import abc
 import json
 import aiofiles
 import pathlib
 
-from utu.eval import EvaluationSample
-from utu.config import EvalConfig
+from ...config import EvalConfig
+from ..data import EvaluationSample
 
 
 class BaseProcesser:

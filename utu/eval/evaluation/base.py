@@ -1,15 +1,11 @@
 import re, string
 import abc
-import copy
 import asyncio
+from tqdm import tqdm
 from openai import AsyncOpenAI
-from agents import Agent, Tool, Model
-from agents import RunResult
 
-from utu.config import EvalConfig
-from utu.agents import UTUSimpleAgent
-from utu.eval import limit_concurrency, limit_concurrency_thread, process_with_threading, async_to_sync
-from utu.eval import EvaluationSample, EvaluationResult
+from ...config import EvalConfig
+from ..data import EvaluationSample, EvaluationResult
 
 
 DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
@@ -22,33 +18,47 @@ class BaseEval:
     JUDGE_TEMPLATE: str = None
 
     concurrency_limit: int = None
-    thread_size: int = None
-    judge_with_threading: bool = True
     name: str = None
 
     def __init__(self, config: EvalConfig) -> None:
         """
         Initialize the evaluation with concurrency and thread size.
         """
-        self.thread_size = config.thread_pool_size
         self.concurrency_limit = config.judge_concurrency
 
-    async def eval(self, predict_data: list[EvaluationSample], judge_with_threading: bool = None) -> tuple[list[EvaluationSample], EvaluationResult]:
+    async def eval(self, predict_data: list[EvaluationSample]) -> list[EvaluationSample]:
         """
         Evaluate the agent on the predict data.
         """
         # 1. judge if each prediction is correct or not
-        judge_with_threading = judge_with_threading or self.judge_with_threading
-        judge_func = self.threaded_judge if judge_with_threading else self.judge
-        judged_data = await judge_func(predict_data)
+        judged_data = await self.judge_with_asyncio(predict_data)
+        return judged_data
+    
+    async def stat(self, judged_data: list[EvaluationSample]) -> EvaluationResult:
         # 2. calculate metrics based on judged results 
         metrics = self.calculate_metrics(judged_data)
         eval_result = EvaluationResult(
             benchmark=self.name,
             metrics=metrics
         )
-        # 3. return the results
-        return judged_data, eval_result
+        return eval_result
+
+    async def judge_with_asyncio(self, predict_data: list[EvaluationSample]) -> list[EvaluationSample]:
+        semaphore = asyncio.Semaphore(self.concurrency_limit)
+        async def judge_with_semaphore(item: EvaluationSample):
+            async with semaphore:
+                try:
+                    return await self.judge_one(item)
+                except Exception as e:
+                    print(f">>>>>>>>>>>>>\nError judging sample '{item}': {e}\n<<<<<<<<<<<<<")
+                    return None
+        tasks = [judge_with_semaphore(item) for item in predict_data]
+        results = []
+        for task in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Judging"):
+            result = await task
+            if result is not None:
+                results.append(result)
+        return results
 
     @abc.abstractmethod
     async def judge(self, predict_data: list[EvaluationSample]) -> list[EvaluationSample]:
@@ -56,25 +66,6 @@ class BaseEval:
         Judge if the agent's predictions match ground truth.
         """
         pass
-
-    async def threaded_judge(self, predict_data: list[EvaluationSample]) -> list[EvaluationSample]:
-        """
-        Judge if the agent's predictions match ground truth with threaded concurrency.
-        """
-        # judge all data
-        @limit_concurrency_thread(self.concurrency_limit)
-        def judge_one_limit(index: int, data: EvaluationSample) -> tuple[int, EvaluationSample]:
-            result = asyncio.run(self.judge_one(data))
-            return index, result
-        judged_data = await process_with_threading(
-            thread_func=judge_one_limit,
-            save_func=None,
-            samples=predict_data,
-            thread_size=self.thread_size,
-            save_freq=10,  # Save every 10 samples
-            save_path=None  # No save path needed for this method
-        )
-        return judged_data
 
     @abc.abstractmethod
     async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
@@ -208,17 +199,15 @@ class BaseLLMJudgeEval(BaseEval):
 
         if correct_answer == "unknown":
             # if correct answer is unknown, we cannot judge
-            return_data = copy.deepcopy(data)
-            return_data.update(judged_response="invalid",
+            data.update(judged_response="invalid",
                                correct=False)
-            return return_data
+            return data
 
         # if exact match, return directly(maybe extract exact answer from response first)
         if self._extract_exact_answer(response) == correct_answer:
-            return_data = copy.deepcopy(data)
-            return_data.update(judged_response="Exact match",
+            data.update(judged_response="Exact match",
                                correct=True)
-            return return_data
+            return data
         
         messages = self._get_judge_messages(
             question=question,
@@ -243,11 +232,10 @@ class BaseLLMJudgeEval(BaseEval):
         else:
             raise RuntimeError("Failed to judge after multiple retries.")
 
-        return_data = copy.deepcopy(data)
-        return_data.judged_response = content
+        data.judged_response = content
         # update the return data with parsed content
-        return_data.update(**parsed_content)
-        return return_data
+        data.update(**parsed_content)
+        return data
     
     def _get_judge_messages(self, question: str, response: str, correct_answer: str) -> list:
         """
@@ -312,7 +300,6 @@ class BaseMatchEval(BaseEval):
         """
         Judge a single sample.
         """
-        result_data = copy.deepcopy(data)
 
         question = data.raw_question
         response = data.response
@@ -333,8 +320,8 @@ class BaseMatchEval(BaseEval):
 
             # check length is the same
             if len(gt_elems) != len(ma_elems):
-                result_data.update(correct=False)
-                return result_data
+                data.update(correct=False)
+                return data
 
             # compare each element as float or str
             comparisons = []
@@ -354,8 +341,8 @@ class BaseMatchEval(BaseEval):
         else:
             if_correct = self._normalize_str(response) == self._normalize_str(correct_answer)
 
-        result_data.update(correct=if_correct)
-        return result_data
+        data.update(correct=if_correct)
+        return data
 
     def _is_float(self, s: str) -> bool:
         """

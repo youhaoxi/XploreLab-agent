@@ -1,12 +1,6 @@
 import re
-import asyncio
-import copy
-from openai import AsyncOpenAI
-from agents import Agent, Tool, Model
-from agents import RunResult
 
-from utu.agents.base import UTUAgentBase
-from utu.eval import EvaluationSample
+from ..data import EvaluationSample
 from .base import BaseLLMJudgeEval
 
 
