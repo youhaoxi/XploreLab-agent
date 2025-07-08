@@ -1,4 +1,4 @@
-from .data import EvaluationSample, DBDataset
+from .data import EvaluationSample, DBDataManager
 from .evaluation import BaseEval, EVAL_FACTORY, MixedEval
 from .data_processer import BaseProcesser, DATA_PROCESSER_FACTORY, MixedProcesser
 from .benchmarks.base_benchmark import BaseBenchmark

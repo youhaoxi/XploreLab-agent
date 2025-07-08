@@ -9,7 +9,7 @@ from tqdm import tqdm
 from ...utils import set_log_level
 from ...config import EvalConfig, ConfigLoader
 from ...agents import UTUSimpleAgent, build_agent
-from ..data import DBDataset, EvaluationSample, EvaluationResult
+from ..data import DBDataManager, EvaluationSample, EvaluationResult
 from ..evaluation import BaseEval, EVAL_FACTORY
 from ..common import get_trajectory_from_agent_result
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseBenchmark:
-    dataset: DBDataset
+    dataset: DBDataManager
     total_tokens: int = 0
     _source_to_judge: dict[str, BaseEval] = {}
     _source_to_agent: dict[str, UTUSimpleAgent] = {}
@@ -30,7 +30,7 @@ class BaseBenchmark:
         self.config = config
         
         # dataset
-        self.dataset = DBDataset(config)
+        self.dataset = DBDataManager(config)
         self.dataset.load()
 
 

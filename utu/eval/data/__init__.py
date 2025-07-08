@@ -1,9 +1,9 @@
 from .datapoint import  EvaluationSample, EvaluationResult
-from .dataset import Dataset, DBDataset
+from .data_manager import DataManager, DBDataManager
 
 __all__ = [
     "EvaluationSample",
     "EvaluationResult",
-    "Dataset",
-    "DBDataset"
+    "DataManager",
+    "DBDataManager"
 ]
