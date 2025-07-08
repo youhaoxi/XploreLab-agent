@@ -74,7 +74,7 @@ class DataManager(BaseDataManager):
 class DBDataManager(DataManager):
     def __init__(self, config: EvalConfig) -> None:
         self.config = config
-        self.engine = create_engine("sqlite:///evaluation_samples.db")
+        self.engine = create_engine(self.config.db_url, echo=True)
         SQLModel.metadata.create_all(self.engine)
 
     def load(self) -> list[Datapoint]:
