@@ -19,9 +19,9 @@ GRADE: CORRECT or INCORRECT here
 
 Grade the student answers based ONLY on their factual accuracy. Ignore differences in punctuation and phrasing between the student answer and true answer. It is OK if the student answer contains more information than the true answer, as long as it does not contain any conflicting statements. Begin! 
 
-QUESTION: {query}
-CONTEXT: {context}
-STUDENT ANSWER: {result}
+QUESTION: {question}
+CONTEXT: {correct_answer}
+STUDENT ANSWER: {response}
 EXPLANATION:
 """.strip()
     name: str = "WebWalker"
