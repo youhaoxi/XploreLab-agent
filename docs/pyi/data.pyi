@@ -1,9 +1,4 @@
-""" 
-数据封装 v0.2
-    整体调用 (runner.py): 调用 Eval, DataManager 两个组件. 
-        流程: load data -> rollout -> evaluate & stat
-        其中 DataManager 模块负责保存数据, Eval 模块负责评估. 
-"""
+import abc
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
 from sqlmodel import SQLModel
@@ -11,6 +6,12 @@ from sqlmodel import SQLModel
 from utu.config import EvalConfig
 
 
+""" 
+数据封装 v0.2
+    整体调用 (runner.py): 调用 Eval, DataManager 两个组件. 
+        流程: load data -> rollout -> evaluate & stat
+        其中 DataManager 模块负责保存数据, Eval 模块负责评估. 
+"""
 # datapoint
 class Sample(BaseModel):
     """
@@ -75,23 +76,31 @@ class EvaluationResult(BaseModel):
 
 
 """ 
-blueprint for v0.3 
+v0.3
 1. 保留 Sample 作为数据模型, 同步到 DB;
 2. 其他组件合并为 Benchmark 类, 实现标准化的流程. 去除/集成 Processor, DataManager 等组件.
 """
-class Benchmark:
-    # name: str
-    # description: str
-    type: Literal["single", "mixed"]
+class BaseDataManager(abc.ABC):
+    def load(self) -> list[Sample]:
+        """Load the dataset. Preprocessing"""
+    def save(self, **kwargs) -> None:
+        """Save the dataset. e.g. to db"""
+    def get_samples(self, stage: Literal["init", "rollout", "judged"] = None) -> list[Sample]:
+        """Get samples of specified stage from the dataset. -> for steps in Benchmark."""
 
+
+class Benchmark:
     def __init__(self, config: EvalConfig) -> None:
         ...
 
-    # data?
+    async def main(self):
+        await self.rollout()
+        await self.judge()
+        await self.stat()
 
-    # steps
     async def rollout(self) -> dict:
-        """Rollout the benchmark. Return rollout results desc."""
+        """Step 1: Rollout the benchmark. Return rollout results desc."""
     async def judge(self) -> dict:
-        """Judge the rollout results. Return judge results desc. e.g. EvaluationResult"""
-
+        """Step 2: Judge the rollout results. Return judge results desc. e.g. EvaluationResult"""
+    async def stat(self):
+        """Step 3: Stat the results."""
