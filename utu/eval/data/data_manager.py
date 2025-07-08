@@ -35,7 +35,7 @@ class BaseDataManager(abc.ABC):
         raise NotImplementedError
 
 
-class Dataset(BaseDataManager):
+class DataManager(BaseDataManager):
     _source_to_processer: dict[str, BaseProcesser]
 
     def load(self) -> list[Datapoint]:
@@ -71,7 +71,7 @@ class Dataset(BaseDataManager):
                 f.write(json.dumps(sample.as_dict()) + '\n')
 
 
-class DBDataset(Dataset):
+class DBDataManager(DataManager):
     def __init__(self, config: EvalConfig) -> None:
         self.config = config
         self.engine = create_engine("sqlite:///evaluation_samples.db")
