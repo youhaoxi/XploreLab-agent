@@ -1,3 +1,4 @@
+import os
 from typing import Literal
 
 from .agent_config import AgentConfig
@@ -8,6 +9,7 @@ class EvalConfig(ConfigBaseModel):
     exp_id: str = "default"
     
     # TODO: seperate config into subconfigs: data/output/rollout/judge/agent
+    db_url: str = os.getenv("DB_URL", "sqlite:///evaluation_samples.db")
     # input
     dataset: str                 # built-in dataset name or custom dataset path
     type: Literal["single", "mixed"]  # 数据集里只包含单独的benchmark数据，还是包含多个benchmarks  
