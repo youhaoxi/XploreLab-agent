@@ -1,0 +1,38 @@
+# @package _global_
+type: simple_env
+model:
+  model: ${oc.env:UTU_MODEL_AGENT}
+toolkits:
+  search: 
+    name: search
+    mode: builtin
+    activated_tools: null
+    config: {
+      "summary_token_limit": 1_000,
+    }
+    config_llm: {"model": "${oc.env:UTU_TOOL_MODEL}"}
+  # bash:
+  #   name: bash
+  #   mode: builtin
+  #   activated_tools: null
+  codesnip:
+    name: codesnip
+    mode: builtin
+    config:
+        server_url: ${oc.env:CODESNIP_SERVER_URL}
+  arxiv:
+    name: arxiv
+    mode: builtin
+  image:
+    name: image
+    mode: builtin
+    config_llm:
+      model: "${oc.env:UTU_TOOL_IMAGE_MODEL}"
+  document:
+    name: document
+    mode: builtin
+    config: {
+      "high_resolution": true,
+    }
+    config_llm:
+      model: "${oc.env:UTU_TOOL_DOCUMENT_MODEL}"

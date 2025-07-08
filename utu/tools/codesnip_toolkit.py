@@ -24,8 +24,8 @@ class CodesnipToolkit(AsyncBaseToolkit):
         self.server_url = self.config.config.get("server_url")
 
     async def run_code(self, code: str, language: str = "python") -> str:
-        f"""Run code in sandbox and return the result.
-        Supported languages: {SUPPORTED_LANGUAGES}
+        """Run code in sandbox and return the result.
+        Supported languages: python, cpp, nodejs, go, go_test, java, php, csharp, bash, typescript, sql, rust, cuda, lua, R, perl, D_ut, ruby, scala, julia, pttest, junit, kotlin_script, jest, verilog, python_gpu, lean, swift, racket
         
         Args:
             code (str): The code to run.

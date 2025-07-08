@@ -47,6 +47,10 @@ class UTUAgentBase:
         """ Set the current agent """
         self.context.current_agent = agent
 
+    def get_agent(self) -> Agent:
+        """ Get the current agent """
+        return self.context.current_agent
+
     def set_run_hooks(self, run_hooks: RunHooks):
         self._run_hooks = run_hooks
 
