@@ -20,14 +20,12 @@ class MCPConverter:
 
 class AsyncBaseToolkit(abc.ABC):
     config: ToolkitConfig
-    activated_tools: list[str]
     tools_map: dict[str, Callable] = None
     
-    def __init__(self, config: ToolkitConfig|dict|None = None, activated_tools: list[str] = None):
+    def __init__(self, config: ToolkitConfig|dict|None = None):
         if not isinstance(config, ToolkitConfig):
             config = ToolkitConfig(config=config, name=self.__class__.__name__)
         self.config = config
-        self.activated_tools = activated_tools
     
     @abc.abstractmethod
     async def get_tools_map(self) -> dict[str, Callable]:
@@ -36,9 +34,9 @@ class AsyncBaseToolkit(abc.ABC):
     async def get_tools_map_func(self) -> dict[str, Callable]:
         if self.tools_map is None:
             self.tools_map = await self.get_tools_map()
-        if self.activated_tools:
-            assert all(tool_name in self.tools_map for tool_name in self.activated_tools), f"Error config activated tools: {self.activated_tools}"
-            tools_map = {tool_name: self.tools_map[tool_name] for tool_name in self.activated_tools}
+        if self.config.activated_tools:
+            assert all(tool_name in self.tools_map for tool_name in self.config.activated_tools), f"Error config activated tools: {self.config.activated_tools}"
+            tools_map = {tool_name: self.tools_map[tool_name] for tool_name in self.config.activated_tools}
         else:
             tools_map = self.tools_map
         return tools_map
@@ -48,7 +46,10 @@ class AsyncBaseToolkit(abc.ABC):
         tools_map = await self.get_tools_map_func()
         tools = []
         for tool_name, tool in tools_map.items():
-            tools.append(function_tool(tool))
+            tools.append(function_tool(
+                tool, 
+                strict_mode=False  # turn off strict mode
+            ))
         return tools
 
     async def get_tools_in_openai(self) -> list[dict]:

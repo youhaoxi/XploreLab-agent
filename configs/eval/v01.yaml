@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - /agents/v01@agent
+  - /agents/exp/v01@agent
   - _self_
 
 exp_id: "v0.1"

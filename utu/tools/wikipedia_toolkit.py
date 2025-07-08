@@ -21,8 +21,8 @@ class WikipediaSearchTool(AsyncBaseToolkit):
         extract_format (str): Defines the output format. Can be `"WIKI"` or `"HTML"`.
     """
 
-    def __init__(self, config: ToolkitConfig|dict = None, activated_tools: list[str] = None) -> None:
-        super().__init__(config, activated_tools)
+    def __init__(self, config: ToolkitConfig|dict = None) -> None:
+        super().__init__(config)
         try:
             import wikipediaapi
         except ImportError as e:

@@ -11,6 +11,7 @@ class MixedEval:
     _evaluators: dict[str, BaseEval]  # cache evaluators for different benchmarks
 
     def __init__(self, sources: set[str], config: EvalConfig):
+        # TODO: remove sources
         self._evaluators = {}
         for source in sources:
             if source not in self._evaluators:

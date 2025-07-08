@@ -1,0 +1,13 @@
+# @package _global_
+type: simple
+model:
+  model: ${oc.env:UTU_MODEL_AGENT}
+toolkits:
+  search: 
+    name: search
+    mode: builtin
+    activated_tools: null
+    config: {
+      "summary_token_limit": 1_000,
+    }
+    config_llm: {"model": "${oc.env:UTU_TOOL_MODEL}"}

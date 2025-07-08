@@ -1,7 +1,8 @@
 from typing import Callable, Optional
 from typing_extensions import Literal
 
-from pydantic import Field
+from pydantic import Field, ConfigDict
+from agents import ModelSettings
 
 from .base_config import ConfigBaseModel
 
@@ -10,9 +11,16 @@ DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
 
 
 class ModelConfig(ConfigBaseModel):
-    api_key: str
-    base_url: str
+    api_key: str | None = None
+    base_url: str | None = None
     model: str
+
+class ModelSettingsConfig(ConfigBaseModel, ModelSettings):
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True
+    )
+
+    parallel_tool_calls: bool | None = False  # default to False
 
 class ProfileConfig(ConfigBaseModel):
     name: Optional[str] = "default"
@@ -23,13 +31,14 @@ class ToolkitConfig(ConfigBaseModel):
     mode: Literal["builtin", "mcp"] = "builtin"
     name: str | None = None
     activated_tools: list[str] | None = None
-    config: dict | None = None
+    config: dict = Field(default_factory=dict)
     config_llm: ModelConfig | None = None
 
 
 class AgentConfig(ConfigBaseModel):
-    type: Literal["simple"] = "simple"
+    type: Literal["simple", "simple_env"] = "simple"
     model: ModelConfig
+    model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
     agent: ProfileConfig = Field(default_factory=ProfileConfig)
     toolkits: dict[str, ToolkitConfig] = Field(default_factory=dict)
     

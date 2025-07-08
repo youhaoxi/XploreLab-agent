@@ -17,6 +17,9 @@ uv.lock
 *.log
 *.db
 *.jsonl
+*.bak
+*.publish
 ___*
 .cache/
 output/
+workspace/

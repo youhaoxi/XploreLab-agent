@@ -1,6 +1,17 @@
 """ 
 https://github.com/pexpect/pexpect
 @ii-agent/src/ii_agent/tools/bash_tool.py
+
+
+--- https://www.anthropic.com/engineering/swe-bench-sonnet ---
+Run commands in a bash shell\n
+* When invoking this tool, the contents of the \"command\" parameter does NOT need to be XML-escaped.\n
+* You don't have access to the internet via this tool.\n
+* You do have access to a mirror of common linux and python packages via apt and pip.\n
+* State is persistent across command calls and discussions with the user.\n
+* To inspect a particular line range of a file, e.g. lines 10-25, try 'sed -n 10,25p /path/to/the/file'.\n
+* Please avoid commands that may produce a very large amount of output.\n
+* Please run long lived commands in the background, e.g. 'sleep 10 &' or start a server in the background."
 """
 
 import re
@@ -48,8 +59,8 @@ def run_command(child: pexpect.spawn, custom_prompt: str, cmd: str) -> str:
 
 
 class BashTool(AsyncBaseToolkit):
-    def __init__(self, config: ToolkitConfig = None, activated_tools: list[str] = None) -> None:
-        super().__init__(config, activated_tools)
+    def __init__(self, config: ToolkitConfig = None) -> None:
+        super().__init__(config)
         self.workspace_root = self.config.config.get("workspace_root", "/tmp/")
         # self.require_confirmation = self.config.config.get("require_confirmation", False)
         # self.command_filters = self.config.config.get("command_filters", [])
@@ -62,7 +73,10 @@ class BashTool(AsyncBaseToolkit):
 
         self.child, self.custom_prompt = start_persistent_shell(timeout=self.timeout)
         if self.workspace_root:
-            run_command(self.child, self.custom_prompt, f"cd {self.workspace_root}")
+            self.setup_workspace(self.workspace_root)
+
+    def setup_workspace(self, workspace_root: str):
+        run_command(self.child, self.custom_prompt, f"cd {workspace_root}")
 
     async def run_bash(self, command: str) -> str:
         """Execute a bash command in your workspace and return its output.

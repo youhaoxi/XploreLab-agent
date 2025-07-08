@@ -17,6 +17,7 @@ def test_load_agent_config():
     config = ConfigLoader.load_agent_config("default")
     config = ConfigLoader.load_agent_config("examples/mcp")
     config = ConfigLoader.load_agent_config("examples/eval")
+    config = ConfigLoader.load_agent_config("exp/v02")
     print(config)
 
 def test_load_eval_config():

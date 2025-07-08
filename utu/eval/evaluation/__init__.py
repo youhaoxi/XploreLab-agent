@@ -3,6 +3,7 @@ from .gaia import GAIAEval
 from .browse_comp import BrowseCompEval
 from .browse_comp_zh import BrowseCompZHEval
 from .xbench import XBenchEval
+from .web_walker import WebWalkerEval
 
 from utu.config import EvalConfig
 

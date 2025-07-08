@@ -1,5 +1,5 @@
 import os
-from typing import Iterator
+from typing import Iterator, AsyncIterator
 
 import openai
 from openai import AsyncOpenAI
@@ -45,10 +45,10 @@ class OpenAIUtils:
                 PrintUtils.print_bot(f"<{tool_call.function.name}>{tool_call.function.arguments}", add_prefix=True)
 
     @staticmethod
-    def print_stream(stream: Iterator[ChatCompletionChunk]) -> ChatCompletionMessage:
+    async def print_stream(stream: AsyncIterator[ChatCompletionChunk]) -> ChatCompletionMessage:
         final_tool_calls: dict[int, ChatCompletionMessageToolCall] = {}
         content = ""
-        for chunk in stream:
+        async for chunk in stream:
             delta = chunk.choices[0].delta
             if delta.content:
                 content += delta.content

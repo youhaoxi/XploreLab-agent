@@ -72,7 +72,7 @@ confidence: 从[response]中提取的置信度分数，介于0% 到100% 之间�
         for record in judged_data:
             if record.judged_response == "invalid":
                 continue
-            confidence = record.confidence
+            confidence = record.confidence or 0
             bin_idx = min(confidence // 20, len(self.CONFIDENCE_BINS) - 1)
             bin_stats = calibration[bin_idx]
             bin_stats['samples'] += 1

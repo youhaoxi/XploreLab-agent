@@ -9,7 +9,7 @@ from agents.mcp import MCPServerStdio, MCPServer, MCPUtil
 
 from .base import UTUAgentBase
 from ..utils import AgentsUtils
-from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
+from ..tools import AsyncBaseToolkit, ToolkitLoader
 from ..config import ToolkitConfig, AgentConfig
 
 logger = logging.getLogger("utu")
@@ -29,7 +29,7 @@ class UTUSimpleAgent(UTUAgentBase):
             self.config.agent.instructions = kwargs["instructions"]
             del kwargs["instructions"]
         if args or kwargs:
-            logger.warning(f"UTUSimpleAgent.__init__ received unexpected args: {args}, {kwargs}")
+            logger.warning(f"init received unexpected args: {args}, {kwargs}")
         self._exit_stack = AsyncExitStack()
 
     async def __aenter__(self):
@@ -72,7 +72,9 @@ class UTUSimpleAgent(UTUAgentBase):
                 raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
         # use `MCPUtil` to get tools from mcp servers
         if self._mcp_servers:
-            tools_list.extend(await MCPUtil.get_all_function_tools(self._mcp_servers, convert_schemas_to_strict=False))
+            tools_list.extend(await MCPUtil.get_all_function_tools(
+                self._mcp_servers, convert_schemas_to_strict=False, 
+                run_context=self.context, agent=self.context.current_agent))
         tool_names = [tool.name for tool in tools_list]
         logger.info(f"Loaded {len(tool_names)} tools: {tool_names}")
         return tools_list
@@ -95,10 +97,6 @@ class UTUSimpleAgent(UTUAgentBase):
 
     async def _load_builtin_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
-        assert toolkit_config.name in TOOLKIT_MAP, f"Unknown toolkit name: {toolkit_config.name}"
-        toolkit = TOOLKIT_MAP[toolkit_config.name](
-            config=toolkit_config,
-            activated_tools=toolkit_config.activated_tools,
-        )
+        toolkit = ToolkitLoader.load_toolkits(toolkit_config)
         self._toolkits.append(toolkit)
         return toolkit

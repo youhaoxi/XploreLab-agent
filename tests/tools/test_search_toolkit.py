@@ -1,4 +1,5 @@
 import hashlib
+import json
 import pytest
 
 from utu.tools import SearchToolkit
@@ -11,6 +12,11 @@ def search_toolkit() -> SearchToolkit:
     config = ConfigLoader.load_toolkit_config("search")
     return SearchToolkit(config=config)
 
+async def test_tool_schema(search_toolkit: SearchToolkit):
+    tools = await search_toolkit.get_tools_in_agents()
+    for tool in tools:
+        print(f"{tool.name}: {tool.description}")
+        print(json.dumps(tool.params_json_schema, indent=2, ensure_ascii=False))
 
 test_query = "test"
 async def test_search_google_api(search_toolkit: SearchToolkit):
