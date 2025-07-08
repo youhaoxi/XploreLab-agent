@@ -26,11 +26,13 @@ class DBDataManager(FileDataManager):
         self.engine = create_engine("sqlite:///evaluation_samples.db")
     
     async def init(self) -> list[EvaluationSampleSQL]:
+        """Init db for certain exp_id"""
         SQLModel.metadata.create_all(self.engine)
 
         # check if exp_id exists
         if self._check_exp_id():
             logger.warning(f"exp_id {self.config.exp_id} already exists in db")
+            return await self.get_samples()
         else:
             # if not, load and save samples to db -> state: init
             _samples = await self.load_dataset()
