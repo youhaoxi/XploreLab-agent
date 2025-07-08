@@ -98,5 +98,12 @@ BUILTIN_BENCHMARKS = {
         "processer": "XBench",
         "evaluator": "XBench",
         "description": "XBench benchmark for evaluation"
+    },
+    "WebWalker": {
+        "data_path": DIR_ROOT / "data" / "web_walker" / "test.jsonl",
+        "type": "single",
+        "processer": "default",
+        "evaluator": "WebWalker",
+        "description": "WebWalker benchmark for evaluation"
     }
 }
