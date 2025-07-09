@@ -1,13 +1,15 @@
+# @package _global_
+defaults:
+  - /agents/exp/v01@agent
+  - _self_
+
+exp_id: "v0.1_GAIA_test"
+
 dataset: "GAIA_test"
 type: "single"
 question_field: "Question"
 gt_field: "Final answer"
 
-output_file: "gaia_test_predict.jsonl"
-metrics_file : "gaia_test_metrics.json"
-judge_output_file: "gaia_test_judge.jsonl"
-
-thread_pool_size: 8
 concurrency: 8
 max_turns: 12
 

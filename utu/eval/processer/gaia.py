@@ -1,14 +1,14 @@
 import os
 
+from ...utils import DIR_ROOT
 from ..data import EvaluationSample as Datapoint
-from .base import BaseMatchProcesser
+from .base import BaseLLMJudgeProcesser
 
 
-class GAIAProcesser(BaseMatchProcesser):
+class GAIAProcesser(BaseLLMJudgeProcesser):
     """ Processer for GAIA evaluation. """
     name: str = "GAIA"
 
-    # TODO(siqi): fix the "file_name" to the correct path in the project
     def calculate_metrics(self, samples: list[Datapoint]) -> dict:
         # 1. calculate level metrics
         level_bin = {}
@@ -53,6 +53,7 @@ class GAIAProcesser(BaseMatchProcesser):
         Get the file prompt if applicable.
         """
         prompt_use_files = ""
+        file_name = self._formulate_file_path(file_name)
         if file_name:
             if ".MOV" in file_name:
                 return ""
@@ -85,3 +86,11 @@ class GAIAProcesser(BaseMatchProcesser):
             prompt_use_files += "\n\nYou have been given no local files to access."
 
         return prompt_use_files
+
+    def _formulate_file_path(self, file_name: str) -> str:
+        """ Formulate the file name to the absolute path of the file. """
+        if not file_name:
+            return ""
+        dataset_dir = DIR_ROOT / "data" / "gaia"
+        attach_file_path = dataset_dir / "files" / file_name
+        return str(attach_file_path)

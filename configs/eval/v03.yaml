@@ -5,15 +5,10 @@ defaults:
 
 exp_id: "v0.3"
 
-dataset: "data/utu_test/agent_test.jsonl"
-# eval_method: "BrowseComp"
+dataset: "data/utu_test/agent_test_webwalker.jsonl"
 type: "mixed"
 question_field: "question"
 gt_field: "answer"
-
-output_file: "predict_results.jsonl"
-metrics_file : "eval_metrics.json"
-judge_output_file: "judge_results.jsonl"
 
 concurrency: 8
 max_turns: 12

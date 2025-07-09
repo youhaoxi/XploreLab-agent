@@ -10,7 +10,7 @@ from ...utils import set_log_level
 from ...config import EvalConfig, ConfigLoader
 from ...agents import UTUSimpleAgent, build_agent
 from ..data import DBDataManager, EvaluationSample, EvaluationResult
-from ..evaluation import BaseEval, EVAL_FACTORY
+from ..processer import PROCESSER_FACTORY, BaseProcesser
 from ..common import get_trajectory_from_agent_result
 
 set_log_level("WARNING")
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class BaseBenchmark:
     dataset: DBDataManager
     total_tokens: int = 0
-    _source_to_judge: dict[str, BaseEval] = {}
+    _source_to_processer: dict[str, BaseProcesser] = {}
     _source_to_agent: dict[str, UTUSimpleAgent] = {}
 
     def __init__(self, config: EvalConfig|str) -> None:
@@ -37,6 +37,8 @@ class BaseBenchmark:
     async def main(self):
 
         print(f"> Running with config: {self.config}")
+        print(f"> Running preprocess...")
+        self.preprocess()
         # overall_start_time = time.time()
         print(f"> Running rollout...")
         await self.rollout()
@@ -50,6 +52,25 @@ class BaseBenchmark:
         print(f"> Running stat...")
         await self.stat()
 
+    def preprocess(self) -> None:
+        """ Preprocess the dataset before rollout. """
+        samples = self.dataset.get_samples(stage="init")
+        print(f"Preprocessing {len(samples)} samples...")
+        results = []
+        for sample in tqdm(samples, desc="Preprocessing"):
+            processed_sample = self.preprocess_one(sample)
+            if processed_sample is not None:
+                results.append(processed_sample)
+        print(f"Successfully preprocessed {len(results)} samples. Updated to db.")
+        return results
+    
+    def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
+        processer = self._get_processer(sample.source)
+        processed_sample = processer.preprocess_one(sample)
+        if processed_sample is None:
+            return None
+        self.dataset.save(sample)
+        return sample
 
     async def rollout(self) -> None:
         samples = self.dataset.get_samples(stage="init")
@@ -94,7 +115,7 @@ class BaseBenchmark:
 
     async def _get_agent(self, source) -> UTUSimpleAgent:
         if source not in self._source_to_agent:
-            instructions = self._get_judge(source).get_instructions()
+            instructions = self._get_processer(source).get_instructions()
             agent = build_agent(self.config.agent, name=f"{source}-agent", instructions=instructions)
             await agent.build()
             self._source_to_agent[source] = agent
@@ -123,16 +144,11 @@ class BaseBenchmark:
         return results
 
     async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
-        judger = self._get_judge(data.source)
+        judger = self._get_processer(data.source)
         result = await judger.judge_one(data)
         result.update(stage="judged")  # update stage to judged
         self.dataset.save(result)
         return result
-
-    def _get_judge(self, source: str) -> BaseEval:
-        if source not in self._source_to_judge:
-            self._source_to_judge[source] = EVAL_FACTORY.get(source, self.config)
-        return self._source_to_judge[source]
 
     async def stat(self):
         # TODO: wrap the data like @verl / @torch
@@ -143,12 +159,18 @@ class BaseBenchmark:
         data_by_benchmark = self._group_data_by_benchmark(judged_samples)
         overall_results: list[EvaluationResult] = []
         for benchmark, data in data_by_benchmark.items():
-            evaluator = self._get_judge(benchmark)
+            evaluator = self._get_processer(benchmark)
             result = await evaluator.stat(data)
             result.update(benchmark=benchmark)
             overall_results.append(result)
 
         print(json.dumps([r.as_dict() for r in overall_results], indent=4, ensure_ascii=False))
+    
+    def _get_processer(self, source: str) -> BaseProcesser:
+        if source not in self._source_to_processer:
+            processer = PROCESSER_FACTORY.get(source, self.config)
+            self._source_to_processer[source] = processer
+        return self._source_to_processer[source]
 
     def _group_data_by_benchmark(self, predict_data: list[EvaluationSample]) -> dict[str, list[EvaluationSample]]:
         # group data by benchmark

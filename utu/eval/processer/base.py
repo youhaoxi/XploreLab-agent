@@ -8,6 +8,7 @@ from openai import AsyncOpenAI
 
 from ...config import EvalConfig
 from ..data import EvaluationSample as Datapoint
+from ..data import EvaluationResult
 from .prompts import get_benchmark_templates
 
 class BaseProcesser:
@@ -37,9 +38,16 @@ class BaseProcesser:
         :return: List of EvaluationSample objects with augmented questions.
         """
         for sample in samples:
-            augmentd_question = self._augment_question(sample.raw_question, sample.file_name)
-            sample.augmented_question = augmentd_question
+            sample = self.preprocess_one(sample)
         return samples
+    
+    def preprocess_one(self, sample: Datapoint) -> Datapoint:
+        """ Preprocess a single sample. """
+        augmented_question = self._augment_question(sample.raw_question, sample.file_name)
+        sample.update(
+            augmented_question=augmented_question,
+        )
+        return sample
     
     @abc.abstractmethod
     async def judge(self, samples: list[Datapoint]) -> list[Datapoint]:
@@ -47,9 +55,9 @@ class BaseProcesser:
         pass
 
     @abc.abstractmethod
-    def stat(self, samples: list[Datapoint]) -> dict:
+    async def stat(self, samples: list[Datapoint]) -> EvaluationResult:
         metrics = self.calculate_metrics(samples)
-        eval_result = Datapoint(
+        eval_result = EvaluationResult(
             benchmark=self.name,
             metrics=metrics
         )
@@ -82,7 +90,7 @@ class BaseProcesser:
         """ Calculate metrics from the judged data. """
         pass
 
-    def get_instruction(self) -> str:
+    def get_instructions(self) -> str:
         """ Get the instruction for the processer. """
         return self.INSTRUCTION if self.INSTRUCTION else ""
     
@@ -90,7 +98,7 @@ class BaseProcesser:
         """ Load templates of current processer. """
         templates = get_benchmark_templates(self.name)
         self.INSTRUCTION = templates["system"]
-        self.AUGMENTED_TEMPLATE = templates.get("augment", None)
+        self.AUGMENTED_TEMPLATE = templates.get("augmented", None)
         self.JUDGE_TEMPLATE = templates.get("judge", None)
     
     def _augment_question(self, question: str, file_name: str = None) -> str:
