@@ -1,10 +1,10 @@
 import re
 
 from ..data import EvaluationSample as Datapoint
-from .base import BaseMatchProcesser
+from .base import BaseLLMJudgeProcesser
 
 
-class WebWalkerProcesser(BaseMatchProcesser):
+class WebWalkerProcesser(BaseLLMJudgeProcesser):
     """ Processer for WebWalker evaluation. """
     name: str = "WebWalker"
 
