@@ -24,6 +24,7 @@ class AsyncBaseToolkit(abc.ABC):
     
     def __init__(self, config: ToolkitConfig|dict|None = None):
         if not isinstance(config, ToolkitConfig):
+            config = config or {}
             config = ToolkitConfig(config=config, name=self.__class__.__name__)
         self.config = config
     

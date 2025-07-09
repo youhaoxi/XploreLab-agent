@@ -31,7 +31,7 @@ class ToolkitConfig(ConfigBaseModel):
     mode: Literal["builtin", "mcp"] = "builtin"
     name: str | None = None
     activated_tools: list[str] | None = None
-    config: dict = Field(default_factory=dict)
+    config: dict | None = Field(default_factory=dict)
     config_llm: ModelConfig | None = None
 
 
