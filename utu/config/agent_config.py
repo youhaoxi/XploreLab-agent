@@ -31,7 +31,7 @@ class ToolkitConfig(ConfigBaseModel):
     mode: Literal["builtin", "mcp"] = "builtin"
     name: str | None = None
     activated_tools: list[str] | None = None
-    config: dict = Field(default_factory=dict)
+    config: dict | None = Field(default_factory=dict)
     config_llm: ModelConfig | None = None
 
 
@@ -41,4 +41,4 @@ class AgentConfig(ConfigBaseModel):
     model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
     agent: ProfileConfig = Field(default_factory=ProfileConfig)
     toolkits: dict[str, ToolkitConfig] = Field(default_factory=dict)
-    
+    max_turns: int = 20

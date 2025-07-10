@@ -15,3 +15,4 @@ toolkits:
     name: bash
     mode: builtin
     activated_tools: null
+max_turns: 10

@@ -11,3 +11,4 @@ toolkits:
       "summary_token_limit": 1_000,
     }
     config_llm: {"model": "${oc.env:UTU_TOOL_MODEL}"}
+max_turns: 10

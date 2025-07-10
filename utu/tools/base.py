@@ -24,9 +24,24 @@ class AsyncBaseToolkit(abc.ABC):
     
     def __init__(self, config: ToolkitConfig|dict|None = None):
         if not isinstance(config, ToolkitConfig):
+            config = config or {}
             config = ToolkitConfig(config=config, name=self.__class__.__name__)
         self.config = config
-    
+
+    async def __aenter__(self):
+        await self.build()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.cleanup()
+
+    async def build(self):
+        pass
+
+    async def cleanup(self):
+        pass
+
+
     @abc.abstractmethod
     async def get_tools_map(self) -> dict[str, Callable]:
         pass

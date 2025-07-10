@@ -3,10 +3,10 @@ from contextlib import AsyncExitStack
 
 from agents import Tool, TContext, RunResult, RunResultStreaming, Agent, TResponseInputItem, Runner, RunHooks, RunConfig
 from agents.tracing import trace, Trace, gen_trace_id
-from agents.mcp import MCPServerStdio, MCPServer, MCPUtil
+from agents.mcp import MCPServerStdio, MCPServer
 
 from ..config import AgentConfig, ToolkitConfig, ConfigLoader
-from ..tools import AsyncBaseToolkit, ToolkitLoader
+from ..tools import AsyncBaseToolkit, TOOLKIT_MAP
 from ..utils import AgentsUtils
 
 logger = logging.getLogger("utu")
@@ -45,7 +45,7 @@ class RunnerMixin:
         return await Runner.run(
             self.current_agent, 
             input, 
-            # TODO: max_turns
+            max_turns=self.config.max_turns,
             # context=self,
             run_config=self._get_run_config(), 
             hooks=self._run_hooks
@@ -55,6 +55,7 @@ class RunnerMixin:
         return Runner.run_streamed(
             self.current_agent, 
             input, 
+            max_turns=self.config.max_turns,
             # context=self,
             run_config=self._get_run_config(), 
             hooks=self._run_hooks
@@ -104,7 +105,8 @@ class SimpleAgent(RunnerMixin):
         self.config = config
         
         self.setup_tracer()
-        self._exit_stack = AsyncExitStack()
+        self._mcps_exit_stack = AsyncExitStack()
+        self._tools_exit_stack = AsyncExitStack()
 
     async def __aenter__(self):
         await self.build()
@@ -128,8 +130,11 @@ class SimpleAgent(RunnerMixin):
     async def cleanup(self):
         """ Cleanup """
         logger.info("Cleaning up... (MCP servers)")
-        await self._exit_stack.aclose()
+        await self._mcps_exit_stack.aclose()
         self._mcp_servers = []
+        logger.info("Cleaning up... (tools)")
+        await self._tools_exit_stack.aclose()
+        self._toolkits = []
 
     async def build_instructions(self) -> str:
         """ Build instructions from config. You can override this method to build customized instructions. """
@@ -142,9 +147,7 @@ class SimpleAgent(RunnerMixin):
             if toolkit_config.mode == "mcp":
                 await self._load_mcp_server(toolkit_config)
             elif toolkit_config.mode == "builtin":
-                logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
-                toolkit = ToolkitLoader.load_toolkits(toolkit_config)
-                self._toolkits.append(toolkit)
+                toolkit = await self._load_toolkit(toolkit_config)
                 tools_list.extend(await toolkit.get_tools_in_agents())
             else:
                 raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
@@ -161,9 +164,17 @@ class SimpleAgent(RunnerMixin):
     # async def get_state(self) -> str:
     #     return ""
 
+    async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
+        logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
+        toolkit = await self._tools_exit_stack.enter_async_context(
+            TOOLKIT_MAP[toolkit_config.name](toolkit_config)
+        )
+        self._toolkits.append(toolkit)
+        return toolkit
+
     async def _load_mcp_server(self, toolkit_config: ToolkitConfig) -> MCPServer:
         logger.info(f"Loading MCP server `{toolkit_config.name}` with params {toolkit_config.config}")
-        server = await self._exit_stack.enter_async_context(
+        server = await self._mcps_exit_stack.enter_async_context(
             MCPServerStdio(  # FIXME: support other types of servers
                 name=toolkit_config.name,
                 params=toolkit_config.config,

@@ -36,3 +36,4 @@ toolkits:
     }
     config_llm:
       model: "${oc.env:UTU_TOOL_DOCUMENT_MODEL}"
+max_turns: 10

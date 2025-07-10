@@ -8,6 +8,7 @@ from .arxiv_toolkit import ArxivToolkit
 from .wikipedia_toolkit import WikipediaSearchTool
 from .codesnip_toolkit import CodesnipToolkit
 from .bash_tool import BashTool
+from .bash_remote_tool import BashRemoteToolkit
 
 
 TOOLKIT_MAP = {
@@ -20,16 +21,5 @@ TOOLKIT_MAP = {
     "wikipedia": WikipediaSearchTool,
     "codesnip": CodesnipToolkit,
     "bash": BashTool,
+    "bash_remote": BashRemoteToolkit,
 }
-
-
-from ..config import ToolkitConfig, ConfigLoader
-
-class ToolkitLoader:
-    @classmethod
-    def load_toolkits(cls, config: ToolkitConfig|str) -> AsyncBaseToolkit:
-        if isinstance(config, str):
-            config = ConfigLoader.load_toolkit_config(config)
-        assert config.mode == "builtin", f"Unknown toolkit mode: {config.mode}"
-        assert config.name in TOOLKIT_MAP, f"Unknown toolkit name: {config.name}"
-        return TOOLKIT_MAP[config.name](config=config)

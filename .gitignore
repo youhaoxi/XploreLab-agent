@@ -18,6 +18,7 @@ uv.lock
 *.db
 *.jsonl
 *.csv
+*.xlsx
 *.bak
 *.publish
 ___*
