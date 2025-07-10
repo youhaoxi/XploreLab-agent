@@ -2,7 +2,6 @@
 https://docs.github.com/en/rest?apiVersion=2022-11-28
 """
 
-import os
 from typing import Callable
 import requests
 from urllib.parse import urlparse
@@ -25,7 +24,7 @@ class GitHubToolkit(AsyncBaseToolkit):
             return {"error": "Invalid GitHub repository URL"}
         api_url = f"https://api.github.com/repos/{path_parts[0]}/{path_parts[1]}"
         headers = {
-            "Authorization": f"Bearer {os.getenv('GITHUB_TOKEN')}",
+            "Authorization": f"Bearer {self.config.config.get('github_token')}",
             "X-GitHub-Api-Version": "2022-11-28"
         }
         try:
