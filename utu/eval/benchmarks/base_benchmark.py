@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from ...utils import set_log_level
 from ...config import EvalConfig, ConfigLoader
-from ...agents import UTUSimpleAgent, build_agent
+from ...agents import SimpleAgent
 from ..data import DBDataManager, EvaluationSample, EvaluationResult
 from ..processer import PROCESSER_FACTORY, BaseProcesser
 from ..common import get_trajectory_from_agent_result
@@ -22,7 +22,7 @@ class BaseBenchmark:
     dataset: DBDataManager
     total_tokens: int = 0
     _source_to_processer: dict[str, BaseProcesser] = {}
-    _source_to_agent: dict[str, UTUSimpleAgent] = {}
+    _source_to_agent: dict[str, SimpleAgent] = {}
 
     def __init__(self, config: EvalConfig|str) -> None:
         # config
@@ -35,7 +35,6 @@ class BaseBenchmark:
 
 
     async def main(self):
-
         print(f"> Running with config: {self.config}")
         print(f"> Running preprocess...")
         self.preprocess()
@@ -51,6 +50,8 @@ class BaseBenchmark:
         await self.judge()
         print(f"> Running stat...")
         await self.stat()
+        print(f"> Cleaning up...")
+        await self.cleanup()
 
     def preprocess(self) -> None:
         """ Preprocess the dataset before rollout. """
@@ -113,10 +114,10 @@ class BaseBenchmark:
         self.total_tokens += sum([step.get("usage", {}).get("total_tokens", 0) for step in trajectory])
         return sample
 
-    async def _get_agent(self, source) -> UTUSimpleAgent:
+    async def _get_agent(self, source) -> SimpleAgent:
         if source not in self._source_to_agent:
             instructions = self._get_processer(source).get_instructions()
-            agent = build_agent(self.config.agent, name=f"{source}-agent", instructions=instructions)
+            agent = SimpleAgent(self.config.agent, name=f"{source}-agent", instructions=instructions)
             await agent.build()
             self._source_to_agent[source] = agent
         return self._source_to_agent[source]
@@ -181,3 +182,7 @@ class BaseBenchmark:
                 data_by_benchmark[benchmark] = []
             data_by_benchmark[benchmark].append(data)
         return data_by_benchmark
+
+    async def cleanup(self):
+        for agent in self._source_to_agent.values():
+            await agent.cleanup()

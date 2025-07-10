@@ -2,7 +2,7 @@ import argparse
 import asyncio
 
 from utu.config import ConfigLoader, AgentConfig
-from utu.agents import build_agent, UTUSimpleAgent
+from utu.agents import SimpleAgent
 
 async def main():
     parser = argparse.ArgumentParser()
@@ -19,8 +19,7 @@ async def main():
         for tool_name in args.tools:
             config.toolkits[tool_name] = ConfigLoader.load_toolkit_config(tool_name)
 
-    agent: UTUSimpleAgent = build_agent(config)
-    async with agent:
+    async with SimpleAgent(config) as agent:
         while True:
             user_input = input("> ")
             if user_input.lower() in ["exit", "quit", "q"]:

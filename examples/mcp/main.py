@@ -1,5 +1,5 @@
 import asyncio
-from utu.agents import UTUSimpleAgent
+from utu.agents import SimpleAgent
 
 
 # from https://en.wikipedia.org/wiki/Anthropic
@@ -12,7 +12,7 @@ queries = [
 ]
 
 async def main():
-    async with UTUSimpleAgent(
+    async with SimpleAgent(
         "examples/mcp",
         name="example-mcp-agent",
     ) as agent:
