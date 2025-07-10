@@ -7,7 +7,7 @@ from typing import Literal
 from sqlmodel import SQLModel, create_engine, Session, select
 
 from ...config import EvalConfig
-from ..data_processer import BUILTIN_BENCHMARKS, DATA_PROCESSER_FACTORY, BaseProcesser
+from ..processer import BUILTIN_BENCHMARKS
 from . import EvaluationSample as Datapoint
 
 logger = logging.getLogger(__name__)
@@ -36,9 +36,8 @@ class BaseDataManager(abc.ABC):
 
 
 class DataManager(BaseDataManager):
-    _source_to_processer: dict[str, BaseProcesser]
-
     def load(self) -> list[Datapoint]:
+        """ Load raw data from the specified dataset. """
         data_path = self._get_data_path()
         samples = []
         with open(data_path, 'r', encoding='utf-8') as f:
@@ -46,9 +45,14 @@ class DataManager(BaseDataManager):
                 data = json.loads(line.strip())
                 assert "source" in data, f"Missing source in data: {data}"
                 # assert data["source"].lower() in DATA_PROCESSER_FACTORY._registry, f"Unknown source: {data['source']}"
-                processer = DATA_PROCESSER_FACTORY.get(data["source"], self.config)
-                sample = processer.process_one(data)
-                sample.update(exp_id=self.config.exp_id)  # set exp_id!
+                sample = Datapoint(
+                    source=data["source"],
+                    raw_question=data.get(self.config.question_field, ""),
+                    level=data.get("level", 0),  # if applicable
+                    correct_answer=data.get(self.config.gt_field, ""),
+                    file_name=data.get("file name", ""),  # for GAIA
+                    exp_id=self.config.exp_id,
+                )
                 samples.append(sample)
         self.data = samples
         return samples

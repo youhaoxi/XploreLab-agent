@@ -1,25 +1,20 @@
 ## changed files
-- add folder `data_processer` to define classes for pre-processing input dataset.
-- add folder `evaluation` to define classes for post-processing output prediction. (e.g. call LLM to judge correctness, calculate metrics, etc.)
-- add file `common.py` to define samples' structure for pre-processing and post-processing, along with some common functions for evaluation.
+- add folder `data` to define unifined structures for dataset samples and evaluaon results, along with the DataManager class to for the management of the dataset.
+- add folder `processer` to define classes for pre-processing input dataset and post-processing output results(including judgement and stat.)
+- add folder `benchmark` to define classes for the overall evaluation process, including laoding dataset, running inference, and evaluating the results.
+- add file `common.py` to define some common functions for evaluation.
 - add file `run_eval.py` and script `run_eval.sh` to run evaluation.
-- add class `EvalConfig` in `utu/config/loader.py` to load evaluation config, and add new file `configs/eval/eval.yaml` to define evaluation config.
-- add some built-in benchmarks dataset in the folder `data`.
+- add class `EvalConfig` in `utu/config/eval_config.py` to load evaluation config, and add new folder `configs/eval` to define evaluation configs.
+- add some built-in benchmarks.
 
 ## run evaluation
 **1. configure your evaluation config in `configs/eval`.**
 ```
 dataset: [the dataset to be evaluated, maybe bulit-in benchmark name or file path for your own dataset.]
-eval_method: [you can speicify the evaluation method as benchmark name, or ignore this field to use default evaluation method.]
 type: ["mixed"|"single", "mixed" means the dataset contains samples from mixed benckmarks.]
 question_field: [the field name of question in the dataset.]
 gt_field: [the field name of ground truth in the dataset.]
 
-output_file: [output file name for prediction results.]
-metrics_file : [output file name for metrics results.]
-judge_output_file: [output file name for judgement results.]
-
-thread_pool_size: [size of thread pool for inference and evaluation.]
 concurrency: [concurrency for calling LLM service at inference time.]
 max_turns: [the maximum number of turns for agent's acitons.]
 

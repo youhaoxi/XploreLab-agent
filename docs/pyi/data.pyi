@@ -42,8 +42,10 @@ class BaseProcesser(abc.ABC):
         ...
     def get_instructions(self) -> str:
         """ Return the instructions for the agent. """
-    async def load(self) -> list[Sample]:
-        """ Load and process data. """
+    # async def load(self) -> list[Sample]:
+    #     """ Load and process data. """
+    async def preprocess(self, data: list[Sample]) -> list[Sample]:
+        """ Preprocess the raw dataset. e.g. augment the question. """
     async def judge_one(self, data: Sample) -> Sample:
         """ Judge a single sample. """
     async def stat(self, judged_data: list[Sample]) -> "EvaluationResult":
@@ -52,7 +54,8 @@ class BaseProcesser(abc.ABC):
 
 class DataManager:
     def load(self) -> list[Sample]:
-        """Load the dataset. Preprocessing"""
+        # """Load the dataset. Preprocessing"""
+        """ Load the raw dataset. """
     def save(self, **kwargs) -> None:
         """Save the dataset. e.g. to db"""
     def get_samples(self, stage: Literal["init", "rollout", "judged"] = None) -> list[Sample]:
@@ -64,10 +67,13 @@ class Benchmark:
         ...
 
     async def main(self):
+        await self.preprocess()
         await self.rollout()
         await self.judge()
         await self.stat()
 
+    def preprocess(self) -> list[Sample]:
+        """Preprocess the raw dataset. e.g. augment the question."""
     async def rollout(self) -> dict:
         """Step 1: Rollout the benchmark. Return rollout results desc."""
     async def judge(self) -> dict:

@@ -1,14 +1,16 @@
+# @package _global_
+defaults:
+  - /agents/exp/v01@agent
+  - _self_
+
+exp_id: "v0.1_BrowseComp_ZH"
+
 dataset: "BrowseComp_ZH"
 # eval_method: "BrowseComp"
 type: "single"
 question_field: "question"
 gt_field: "answer"
 
-output_file: "browse_comp_zh_predict.jsonl"
-metrics_file : "browse_comp_zh_metrics.json"
-judge_output_file: "browse_comp_zh_judge.jsonl"
-
-thread_pool_size: 8
 concurrency: 8
 max_turns: 12
 
