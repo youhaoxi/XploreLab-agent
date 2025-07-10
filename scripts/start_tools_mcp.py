@@ -1,6 +1,14 @@
+""" Utils to inspect tools
+- load all tools in TOOLKIT_MAP;
+- save the tool infos into .xlsx;
+- start a MCP server with all tools (can be checked with @modelcontextprotocol/inspector)
+"""
+
 import asyncio
+import pandas as pd
 from mcp.types import AnyFunction
 from mcp.server.fastmcp import FastMCP
+from agents import Tool
 from utu.config import ConfigLoader
 from utu.tools import (
     AsyncBaseToolkit, TOOLKIT_MAP, 
@@ -16,10 +24,26 @@ def get_toolkits() -> dict[str, AsyncBaseToolkit]:
     
 
 async def get_tools() -> dict[str, AnyFunction]:
-    tools = {}
+    tools_fn = {}
+    tools_agents = []
     for name, toolkit in get_toolkits().items():
-        tools.update(await toolkit.get_tools_map())
-    return tools
+        tools_fn.update(await toolkit.get_tools_map())
+        tools_agents.extend(await toolkit.get_tools_in_agents())
+    save_tools_info(tools_agents)
+    return tools_fn
+
+def save_tools_info(tools: list[Tool]):
+    tools_schema = []
+    for tool in tools:
+        tools_schema.append({
+            "name": tool.name,
+            "description": tool.description,
+            "schema": tool.params_json_schema,
+        })
+    df = pd.DataFrame(tools_schema)
+    # df.to_csv("tools.csv", index=False)
+    df.to_excel("tools.xlsx", index=False)
+    print(df)
 
 def main():
     mcp = FastMCP(
