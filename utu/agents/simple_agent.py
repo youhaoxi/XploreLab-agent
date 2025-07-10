@@ -45,7 +45,7 @@ class RunnerMixin:
         return await Runner.run(
             self.current_agent, 
             input, 
-            # TODO: max_turns
+            max_turns=self.config.max_turns,
             # context=self,
             run_config=self._get_run_config(), 
             hooks=self._run_hooks
@@ -55,6 +55,7 @@ class RunnerMixin:
         return Runner.run_streamed(
             self.current_agent, 
             input, 
+            max_turns=self.config.max_turns,
             # context=self,
             run_config=self._get_run_config(), 
             hooks=self._run_hooks
