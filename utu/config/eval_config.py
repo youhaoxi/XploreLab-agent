@@ -17,7 +17,6 @@ class EvalConfig(ConfigBaseModel):
     gt_field: str
     
     # rollout
-    max_turns: int  # FIXME: this is not used now!
     concurrency: int             # rollout parallelism
     
     # judgement
