@@ -8,6 +8,7 @@ from agents.mcp import MCPServerStdio, MCPServer
 from ..config import AgentConfig, ToolkitConfig, ConfigLoader
 from ..tools import AsyncBaseToolkit, TOOLKIT_MAP
 from ..utils import AgentsUtils
+from ..context import BaseContextManager, CONTEXT_MANAGER_MAP
 
 logger = logging.getLogger("utu")
 
@@ -16,6 +17,7 @@ class RunnerMixin:
     config: AgentConfig = None
     current_agent: Agent[TContext] = None
     input_items: list[TResponseInputItem] = []
+    context_manager: BaseContextManager = None
     tracer: Trace = None
     _run_hooks: RunHooks = None
 
@@ -40,25 +42,30 @@ class RunnerMixin:
         )
         return run_config
 
+    def _get_context(self) -> dict:
+        return {
+            "context_manager": self.context_manager,
+        }
+
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem]) -> RunResult:
         return await Runner.run(
             self.current_agent, 
             input, 
+            context=self._get_context(),
             max_turns=self.config.max_turns,
-            # context=self,
+            hooks=self._run_hooks,
             run_config=self._get_run_config(), 
-            hooks=self._run_hooks
         )
 
     def run_streamed(self, input: str | list[TResponseInputItem]) -> RunResultStreaming:
         return Runner.run_streamed(
             self.current_agent, 
             input, 
+            context=self._get_context(),
             max_turns=self.config.max_turns,
-            # context=self,
+            hooks=self._run_hooks,
             run_config=self._get_run_config(), 
-            hooks=self._run_hooks
         )
 
     # util apis
@@ -87,9 +94,11 @@ class SimpleAgent(RunnerMixin):
     config: AgentConfig = None
     current_agent: Agent[TContext] = None
     input_items: list[TResponseInputItem] = []
+    context_manager: BaseContextManager = None
     
     _mcp_servers: list[MCPServer] = []
     _toolkits: list[AsyncBaseToolkit] = []
+    _tools: list[Tool] = []
 
     def __init__(
         self, 
@@ -97,16 +106,28 @@ class SimpleAgent(RunnerMixin):
         *,
         name: str = None,
         instructions: str = None,
+        tools: list[Tool] = None,
     ):
         if isinstance(config, str):
             config = ConfigLoader.load_agent_config(config)
         if name: config.agent.name = name
         if instructions: config.agent.instructions = instructions
         self.config = config
+
+        if tools: self._tools = tools
         
+        self._build_context_manager()
         self.setup_tracer()
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
+
+    def _build_context_manager(self):
+        if (not self.config.context_manager) or (not self.config.context_manager.name):
+            self.context_manager = CONTEXT_MANAGER_MAP["dummy"]()
+        else:
+            self.context_manager = CONTEXT_MANAGER_MAP[self.config.context_manager.name](
+                self.config.context_manager.config
+            )
 
     async def __aenter__(self):
         await self.build()
@@ -118,7 +139,7 @@ class SimpleAgent(RunnerMixin):
     async def build(self):
         """ Build the agent """
         model = AgentsUtils.get_agents_model(**self.config.model.model_dump())
-        tools = await self.get_tools()
+        tools = self._tools if self._tools else await self.get_tools()
         self.current_agent = Agent(
             name=self.config.agent.name,
             instructions=await self.build_instructions(),

@@ -34,11 +34,15 @@ class ToolkitConfig(ConfigBaseModel):
     config: dict | None = Field(default_factory=dict)
     config_llm: ModelConfig | None = None
 
+class ContextManagerConfig(ConfigBaseModel):
+    name: str | None = None
+    config: dict | None = Field(default_factory=dict)
 
 class AgentConfig(ConfigBaseModel):
     type: Literal["simple", "simple_env"] = "simple"
     model: ModelConfig
     model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
     agent: ProfileConfig = Field(default_factory=ProfileConfig)
+    context_manager: ContextManagerConfig = Field(default_factory=ContextManagerConfig)
     toolkits: dict[str, ToolkitConfig] = Field(default_factory=dict)
     max_turns: int = 20
