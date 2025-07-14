@@ -1,5 +1,6 @@
 import os
 import logging
+import asyncio
 from typing import Callable
 
 import requests
@@ -12,15 +13,23 @@ logger = logging.getLogger("utu")
 
 
 # TODO: ref @smolagents -- to keep rich context info
-# FIXME::
-TEMPLATE_SUMMARY = r"""请对于以下内容进行总结：
+TEMPLATE_QA = r"""You are a webpage analysis agent that extract relevant information from the given webpage content to answer the given query. NOTE:
+1. Be concise, do not extract too long or irrelevant information.
+2. Before give your conclusion, you can summarize user's query if necessary.
+3. Use language same as query.
+
+<query>
+{query}
+</query>
 <content>
 {content}
 </content>
+"""
+TEMPLATE_LINKS = r"""You are a webpage analysis agent that extract relevant links to the given query. NOTE:
+1. You should extract the most relevant links to the query.
+2. You can only output urls that exist in following webpage.
+3. Output format: id.title(url)
 
-输出格式: Markdown"""
-
-TEMPLATE_QA = r"""请根据下面的 <content> 内容回答 <query>:
 <query>
 {query}
 </query>
@@ -75,7 +84,7 @@ class SearchToolkit(AsyncBaseToolkit):
         logger.info(f"[tool] get_content: {oneline_object(response.text)}...")
         return response.text
 
-    @async_file_cache(expire_time=None)
+    # @async_file_cache(expire_time=None)
     async def web_qa(self, url: str, query: str = None) -> str:
         """Query information you interested from the specified url
         
@@ -84,26 +93,17 @@ class SearchToolkit(AsyncBaseToolkit):
             query (str, optional): The query to search for. If not given, return the original content of the url.
         """
         logger.info(f"[tool] web_qa: {oneline_object({url, query})}")
-        raw_content = await self.get_content(url)
-        if query:
-            result = await self._qa(raw_content, query)
-        else:
-            result = await self._summary(raw_content)
+        content = await self.get_content(url)
+        query = query or "Summarize the content of this webpage."
+        res_summary, res_links = await asyncio.gather(self._qa(content, query), self._extract_links(content, query))
+        result = f"Summary: {res_summary}\n\nRelated Links: {res_links}"
         return result
-
-    async def _summary(self, content: str) -> str:
-        if TokenUtils.count_tokens(content) > self.summary_token_limit:
-            template = TEMPLATE_SUMMARY.format(content=content)
-            summarized_content = await self.llm.query_one(messages=[{"role": "user", "content": template}])
-            if "Markdown Content" in content:
-                header = content.split("Markdown Content")[0]
-            else:
-                header = ""
-            content = f"{header}Summaried Content (The original content is too long to show here.)\n{summarized_content}"
-        return content
 
     async def _qa(self, content: str, query: str) -> str:
         template = TEMPLATE_QA.format(content=content, query=query)
+        return await self.llm.query_one(messages=[{"role": "user", "content": template}])
+    async def _extract_links(self, content: str, query: str) -> str:
+        template = TEMPLATE_LINKS.format(content=content, query=query)
         return await self.llm.query_one(messages=[{"role": "user", "content": template}])
 
     async def get_tools_map(self) -> dict[str, Callable]:

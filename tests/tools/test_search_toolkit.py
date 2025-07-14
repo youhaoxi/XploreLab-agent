@@ -43,4 +43,4 @@ async def test_web_qa(search_toolkit: SearchToolkit):
     for q in queries:
         print(f"query: {q}")
         result = await search_toolkit.web_qa(*q)
-        print(f"result: {oneline_object(result)}")
+        print(f"result: {result}")
