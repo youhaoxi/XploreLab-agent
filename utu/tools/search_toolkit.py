@@ -46,12 +46,12 @@ class SearchToolkit(AsyncBaseToolkit):
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
     @async_file_cache(expire_time=None)
-    async def search_google_api(self, query: str, num_results: int = 10) -> str:
+    async def search_google_api(self, query: str, num_results: int = 5) -> str:
         """Search the query via Google api, the query should be a search query like humans search in Google, concrete and not vague or super long. More the single most important items.
         
         Args:
             query (str): The query to search for.
-            num_results (int, optional): The number of results to return. Defaults to 10.
+            num_results (int, optional): The number of results to return. Defaults to 5.
         """
         # https://serper.dev/playground
         logger.info(f"[tool] search_google_api: {oneline_object(query)}")
@@ -62,6 +62,7 @@ class SearchToolkit(AsyncBaseToolkit):
             'num': num_results
         }
         response = requests.request("POST", self.serper_url, headers=self.serper_header, json=params)
+        assert response.status_code == 200, response.text
         results = response.json()["organic"]
         msg = f'🔍  Results for query "{query}": {results}'
         logger.info(oneline_object(msg))
