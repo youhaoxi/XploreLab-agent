@@ -20,6 +20,8 @@ async def test_audio_input():
     completion = await client.chat_completion(
         model="gpt-4o-audio-preview",
         modalities=["text", "audio"],
+        # voice: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, and shimmer
+        # format: wav, mp3, flac, opus, or pcm16
         audio={"voice": "alloy", "format": "wav"},
         messages=[
             {
@@ -42,3 +44,23 @@ async def test_audio_input():
     )
 
     print(completion.choices[0].message)
+
+
+# https://platform.openai.com/docs/api-reference/audio/createTranscription
+async def test_transcription():
+    # flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm
+    url = "https://cdn.openai.com/API/docs/audio/alloy.wav"
+    response = requests.get(url)
+    response.raise_for_status()
+    with open("alloy.wav", "wb") as f:
+        f.write(response.content)
+    audio_file = open("alloy.wav", "rb")
+
+    # model: gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1
+    transcript = await client.audio.transcriptions.create(
+        model="whisper-1",
+        file=audio_file,
+        response_format="verbose_json",
+        timestamp_granularities=["segment"]
+    )
+    print(transcript)
