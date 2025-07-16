@@ -22,6 +22,7 @@ uv.lock
 *.xls
 *.pdf
 *.mp3
+*.wav
 *.MOV
 *.xml
 *.png
@@ -35,6 +36,6 @@ uv.lock
 *.publish
 ___*
 .cache/
-data/
+/data/
 output/
 workspace/

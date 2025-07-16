@@ -1,3 +1,5 @@
+# https://github.com/openai/simple-evals/blob/main/browsecomp_eval.py
+
 SYSTEM_PROMPT = """
 You are a helpful assistant.
 """.strip()

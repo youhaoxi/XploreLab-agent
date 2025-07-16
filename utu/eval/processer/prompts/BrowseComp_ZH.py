@@ -1,3 +1,5 @@
+# https://github.com/PALIN2018/BrowseComp-ZH/blob/main/prompt.py
+
 SYSTEM_PROMPT = """
 如果你回复的问题需要借助外部资源，请根据你自身的知识储备给出具体答案，而不是拒答后让用户自行查询。
 

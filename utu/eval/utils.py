@@ -9,6 +9,7 @@ def parse_eval_config() -> EvalConfig:
     parser.add_argument("--exp_id", type=str, default=None, help="Experiment ID.")
     parser.add_argument("--agent_model", type=str, default=None, help="Agent model.")
     parser.add_argument("--dataset", type=str, default=None, help="Dataset.")
+    parser.add_argument("--dataset_type", type=str, default=None, help="Dataset type.")
     args = parser.parse_args()
     
     config = ConfigLoader.load_eval_config(args.config_name)
@@ -18,4 +19,6 @@ def parse_eval_config() -> EvalConfig:
         config.agent.model.model = args.agent_model
     if args.dataset:
         config.dataset = args.dataset
+    if args.dataset_type:
+        config.type = args.dataset_type
     return config
