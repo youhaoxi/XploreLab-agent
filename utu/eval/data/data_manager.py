@@ -46,10 +46,10 @@ class DataManager(BaseDataManager):
                 # assert "source" in data, f"Missing source in data: {data}"
                 # assert data["source"].lower() in DATA_PROCESSER_FACTORY._registry, f"Unknown source: {data['source']}"
                 sample = Datapoint(
-                    source=data.get("source", self.config.dataset),
-                    raw_question=data.get(self.config.question_field, ""),
+                    source=data.get("source", self.config.data.dataset),
+                    raw_question=data.get(self.config.data.question_field, ""),
                     level=data.get("level", 0),  # if applicable
-                    correct_answer=data.get(self.config.gt_field, ""),
+                    correct_answer=data.get(self.config.data.gt_field, ""),
                     file_name=data.get("file name", ""),  # for GAIA
                     exp_id=self.config.exp_id,
                 )
@@ -58,10 +58,10 @@ class DataManager(BaseDataManager):
         return samples
 
     def _get_data_path(self) -> pathlib.Path:
-        if self.config.type == "single" and self.config.dataset in BUILTIN_BENCHMARKS:
-            data_path = pathlib.Path(BUILTIN_BENCHMARKS[self.config.dataset]["data_path"])
+        if self.config.data.type == "single" and self.config.data.dataset in BUILTIN_BENCHMARKS:
+            data_path = pathlib.Path(BUILTIN_BENCHMARKS[self.config.data.dataset]["data_path"])
         else:
-            data_path = pathlib.Path(self.config.dataset)
+            data_path = pathlib.Path(self.config.data.dataset)
         assert data_path.exists(), f"Data file {data_path} does not exist."
         assert str(data_path).endswith(".jsonl"), f"Only support .jsonl files, but got {data_path}."
         return data_path

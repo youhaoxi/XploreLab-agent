@@ -1,19 +1,15 @@
 # @package _global_
 defaults:
-  - /agents/exp/v01@agent
+  - /agents/exp/v03@agent
+  - /eval/data/mixed@data
   - _self_
 
-exp_id: "v0.1_BrowseComp"
+exp_id: "v0.3"
 
-dataset: "BrowseComp"
-type: "single"
-question_field: "question"
-gt_field: "answer"
-
-concurrency: 8
+concurrency: 16
 
 judge_model: ${oc.env:JUDGE_MODEL}
 judge_api_key: ${oc.env:JUDGE_API_KEY}
 judge_model_base_url: ${oc.env:JUDGE_MODEL_BASE_URL}
-judge_concurrency: 8
+judge_concurrency: 16
 judge_max_tokens: 4096
