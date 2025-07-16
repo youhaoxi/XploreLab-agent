@@ -43,10 +43,10 @@ class DataManager(BaseDataManager):
         with open(data_path, 'r', encoding='utf-8') as f:
             for line in f:
                 data = json.loads(line.strip())
-                assert "source" in data, f"Missing source in data: {data}"
+                # assert "source" in data, f"Missing source in data: {data}"
                 # assert data["source"].lower() in DATA_PROCESSER_FACTORY._registry, f"Unknown source: {data['source']}"
                 sample = Datapoint(
-                    source=data["source"],
+                    source=data.get("source", self.config.dataset),
                     raw_question=data.get(self.config.question_field, ""),
                     level=data.get("level", 0),  # if applicable
                     correct_answer=data.get(self.config.gt_field, ""),
