@@ -6,7 +6,7 @@ import logging
 DIR_LOGS = pathlib.Path(__file__).parent.parent.parent / "logs"
 DIR_LOGS.mkdir(exist_ok=True)
 
-LOGGING_LEVEL = logging.INFO
+LOGGING_LEVEL = logging.WARNING
 
 def set_log_level(level: str | int) -> None:
     """ Setup logging level """
@@ -18,6 +18,9 @@ def set_log_level(level: str | int) -> None:
     logger.setLevel(level)
 
 def setup_logging() -> None:
+    logger_sql = logging.getLogger("sqlalchemy")
+    logger_sql.setLevel(logging.WARNING)
+
     log_format = "%(asctime)s - %(name)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s"
     logging.basicConfig(
         format=log_format,

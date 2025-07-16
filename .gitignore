@@ -35,6 +35,6 @@ uv.lock
 *.publish
 ___*
 .cache/
-data/
+/data/
 output/
 workspace/
