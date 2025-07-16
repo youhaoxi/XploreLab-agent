@@ -117,7 +117,8 @@ class BaseBenchmark:
     async def _get_agent(self, source) -> SimpleAgent:
         if source not in self._source_to_agent:
             instructions = self._get_processer(source).get_instructions()
-            agent = SimpleAgent(self.config.agent, name=f"{source}-agent", instructions=instructions)
+            # SP: configed instructions + processer instructions
+            agent = SimpleAgent(self.config.agent, name=f"{source}-agent", instructions=f"{self.config.agent.agent.instructions}\n\n{instructions}")
             await agent.build()
             self._source_to_agent[source] = agent
         return self._source_to_agent[source]

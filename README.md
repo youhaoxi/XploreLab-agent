@@ -1,5 +1,3 @@
-todo | misc
-- [ ] add WebWalkerQA
 
 ## Setup
 
@@ -35,7 +33,10 @@ python examples/tool_maker/main.py
 python scripts/run_eval.py --config_name v01 --exp_id "v0.1_dsv3"
 
 # dump output (set --clear_records if you want to clear records)
-python scripts/dump_db.py --exp_id "v0.1_dsv3" --clear_records
+python scripts/dump_db.py --exp_id "v0.1_dsv3"
+
+# analysis
+python scripts/analysis/tool_usage.py --exp_id "v0.1_dsv3"
 ```
 
 ## Run tests
