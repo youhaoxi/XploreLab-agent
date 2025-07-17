@@ -9,6 +9,7 @@ from .wikipedia_toolkit import WikipediaSearchTool
 from .codesnip_toolkit import CodesnipToolkit
 from .bash_tool import BashTool
 from .bash_remote_tool import BashRemoteToolkit
+from .python_execute_tool import PythonExecuteTool
 
 
 TOOLKIT_MAP = {
@@ -22,4 +23,5 @@ TOOLKIT_MAP = {
     "codesnip": CodesnipToolkit,
     "bash": BashTool,
     "bash_remote": BashRemoteToolkit,
+    "python_execute": PythonExecuteTool,
 }
