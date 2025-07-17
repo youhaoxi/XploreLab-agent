@@ -1,7 +1,10 @@
 import pytest
 
 from utu.config import ConfigLoader
-from utu.tools import GitHubToolkit, ArxivToolkit, FileEditToolkit, WikipediaSearchTool, CodesnipToolkit, BashTool, BashRemoteToolkit, PythonExecuteTool
+from utu.tools import (
+    GitHubToolkit, ArxivToolkit, FileEditToolkit, WikipediaSearchTool, 
+    CodesnipToolkit, BashTool, BashRemoteToolkit, PythonExecuteTool,
+)
 
 
 @pytest.fixture

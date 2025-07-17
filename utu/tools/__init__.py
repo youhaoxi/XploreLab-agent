@@ -10,6 +10,7 @@ from .codesnip_toolkit import CodesnipToolkit
 from .bash_tool import BashTool
 from .bash_remote_tool import BashRemoteToolkit
 from .python_execute_tool import PythonExecuteTool
+from .video_toolkit import VideoToolkit
 
 
 TOOLKIT_MAP = {
@@ -24,4 +25,5 @@ TOOLKIT_MAP = {
     "bash": BashTool,
     "bash_remote": BashRemoteToolkit,
     "python_execute": PythonExecuteTool,
+    "video": VideoToolkit,
 }

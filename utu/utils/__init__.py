@@ -5,7 +5,7 @@ from .log import set_log_level, oneline_object, setup_logging
 from .tool_cache import async_file_cache
 from .path import DIR_ROOT
 from .token import TokenUtils
-
+from .env import setup_env
 
 __all__ = [
     "PrintUtils",
@@ -14,5 +14,6 @@ __all__ = [
     "set_log_level", "oneline_object", "setup_logging",
     "async_file_cache",
     "DIR_ROOT",
-    "TokenUtils"
+    "TokenUtils",
+    "setup_env"
 ]
