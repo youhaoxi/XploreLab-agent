@@ -3,7 +3,11 @@
 https://github.com/martin-majlis/Wikipedia-API
 https://www.mediawiki.org/wiki/API:Main_page
 """
+import calendar
+import datetime
 from typing import Callable
+
+import requests
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
@@ -74,7 +78,57 @@ class WikipediaSearchTool(AsyncBaseToolkit):
         except Exception as e:
             return f"Error fetching Wikipedia summary: {str(e)}"
 
+
+    async def search_wikipedia_revisions(self, entity: str, year: int, month: int) -> str:
+        """Get the revisions of a Wikipedia entity in a given month, return the revision url.
+
+        Args:
+            entity: the name of the Wikipedia entity, e.g. "Penguin"
+            year: the year, e.g. 2022
+            month: the month, e.g. 12
+        """
+        base_url = "https://en.wikipedia.org/w/api.php"
+
+        start_date = datetime.datetime(year, month, 1)
+        last_day = calendar.monthrange(year, month)[1]
+        end_date = datetime.datetime(year, month, last_day, 23, 59, 59)
+        start_iso = start_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+        end_iso = end_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        params = {
+            "action": "query",
+            "format": "json",
+            "titles": entity,
+            "prop": "revisions",
+            "rvlimit": "max",
+            "rvstart": start_iso,
+            "rvend": end_iso,
+            "rvdir": "newer",
+        }
+
+        try:
+            response = requests.get(base_url, params=params)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            return f"Request error: {e}"
+
+        data = response.json()
+        revisions_list = []
+        pages = data.get("query", {}).get("pages", {})
+        for _, page in pages.items():
+            if "revisions" in page:
+                for rev in page["revisions"]:
+                    oldid = rev["revid"]
+                    timestamp = rev["timestamp"]
+                    # Construct the revision url
+                    rev_url = f"https://en.wikipedia.org/w/index.php?title={entity}&oldid={oldid}"
+                    revisions_list.append(
+                        {"timestamp": timestamp, "oldid": oldid, "url": rev_url}
+                    )
+        return str(revisions_list)
+
     async def get_tools_map(self) -> dict[str, Callable]:
         return {
             "wikipedia_search": self.wikipedia_search,
+            "search_wikipedia_revisions": self.search_wikipedia_revisions,
         }
