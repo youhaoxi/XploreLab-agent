@@ -59,6 +59,9 @@ async def test_wikipedia_search(wikipedia_toolkit: WikipediaSearchTool):
     result = await wikipedia_toolkit.wikipedia_search("Python_(programming_language)")
     print(result)
 
+async def test_wikipedia_revisions(wikipedia_toolkit: WikipediaSearchTool):
+    result = await wikipedia_toolkit.search_wikipedia_revisions("Penguin", 2022, 12)
+    print(result)
 
 @pytest.fixture
 def codesnip_toolkit() -> CodesnipToolkit:
