@@ -40,10 +40,15 @@ class FileUtils:
 
     @staticmethod
     def get_file_md5(file_path: str) -> str:
+        """Clac md5 for local or web file"""
         hash_md5 = hashlib.md5()
         if FileUtils.is_web_url(file_path):
-            file_path = FileUtils.download_file(file_path)
-        with open(file_path, "rb") as f:
-            for chunk in iter(lambda: f.read(4096), b""):
-                hash_md5.update(chunk)
+            with requests.get(file_path, stream=True) as r:
+                r.raise_for_status()
+                for chunk in r.iter_content(chunk_size=4096):
+                    hash_md5.update(chunk)
+        else:
+            with open(file_path, "rb") as f:
+                for chunk in iter(lambda: f.read(4096), b""):
+                    hash_md5.update(chunk)
         return hash_md5.hexdigest()

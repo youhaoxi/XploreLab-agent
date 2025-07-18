@@ -11,4 +11,7 @@ def test_ext():
     assert FileUtils.is_web_url(local_url) == False
 
 def test_md5():
-    assert FileUtils.get_file_md5(web_url) == FileUtils.get_file_md5(local_url)
+    md5_web = FileUtils.get_file_md5(web_url)
+    md5_local = FileUtils.get_file_md5(local_url)
+    print(md5_web, md5_local)
+    assert md5_web == md5_local

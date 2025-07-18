@@ -5,7 +5,7 @@ from typing import Callable
 
 from openai.types.audio import TranscriptionVerbose
 
-from ..utils import SimplifiedAsyncOpenAI, async_file_cache, FileUtils
+from ..utils import SimplifiedAsyncOpenAI, async_file_cache, FileUtils, DIR_ROOT
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
 
@@ -41,11 +41,14 @@ class AudioToolkit(AsyncBaseToolkit):
         return transcript.model_dump()
 
     def handle_audio_path(self, path: str) -> str:
-        # if web url, download it. return md5
-        if FileUtils.is_web_url(path):
-            path = FileUtils.download_file(path)
-            logger.debug(f"Downloaded audio file to {path}")
         md5 = FileUtils.get_file_md5(path)
+        if FileUtils.is_web_url(path):
+            # download audio to data/_audio, with md5
+            fn = DIR_ROOT / "data" / "_audio" / f"{md5}{FileUtils.get_file_ext(path)}"
+            fn.parent.mkdir(parents=True, exist_ok=True)
+            if not fn.exists():
+                path = FileUtils.download_file(path, fn)
+                logger.info(f"Downloaded audio file to {path}")
         self.md5_to_path[md5] = path  # record md5 to map
         return md5
 
