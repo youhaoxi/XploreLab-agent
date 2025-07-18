@@ -1,3 +1,7 @@
+""" 
+https://github.com/googleapis/python-genai
+https://ai.google.dev/gemini-api/docs/api-key
+"""
 import logging
 from typing import Callable
 
@@ -25,9 +29,6 @@ class VideoToolkit(AsyncBaseToolkit):
         Args:
             video_path (str): The path or URL to the video file. 
             question (str): The question to ask about the video.
-
-        Returns:
-            str: The answer to the question.
         """
         if not video_url.startswith("http"):
             video_part = Part.from_uri(file_uri=video_url)
