@@ -9,7 +9,9 @@ from .wikipedia_toolkit import WikipediaSearchTool
 from .codesnip_toolkit import CodesnipToolkit
 from .bash_tool import BashTool
 from .bash_remote_tool import BashRemoteToolkit
-from .serper_toolkit import SerperToolkit
+from .python_execute_tool import PythonExecuteTool
+from .video_toolkit import VideoToolkit
+from .audio_toolkit import AudioToolkit
 
 
 TOOLKIT_MAP = {
@@ -23,5 +25,7 @@ TOOLKIT_MAP = {
     "codesnip": CodesnipToolkit,
     "bash": BashTool,
     "bash_remote": BashRemoteToolkit,
-    "serper": SerperToolkit,
+    "python_execute": PythonExecuteTool,
+    "video": VideoToolkit,
+    "audio": AudioToolkit,
 }

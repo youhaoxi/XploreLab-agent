@@ -32,7 +32,8 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
             cache_args = args[1:] if args and hasattr(args[0], func.__name__) else args  # remove `self`
             args_str = str(cache_args) + str(sorted(kwargs.items()))
             cache_key = hashlib.md5(args_str.encode()).hexdigest()
-            cache_file = cache_path / f"{func_name}_{cache_key}.json"
+            cache_file = cache_path / f"{func_name}" / f"{func_name}_{cache_key}.json"
+            cache_file.parent.mkdir(exist_ok=True, parents=True)
             
             if cache_file.exists():
                 with open(cache_file, 'r') as f:
