@@ -12,6 +12,7 @@ from .bash_remote_tool import BashRemoteToolkit
 from .python_execute_tool import PythonExecuteTool
 from .video_toolkit import VideoToolkit
 from .audio_toolkit import AudioToolkit
+from .serper_toolkit import SerperToolkit   
 
 
 TOOLKIT_MAP = {
@@ -28,4 +29,5 @@ TOOLKIT_MAP = {
     "python_execute": PythonExecuteTool,
     "video": VideoToolkit,
     "audio": AudioToolkit,
+    "serper": SerperToolkit,
 }
