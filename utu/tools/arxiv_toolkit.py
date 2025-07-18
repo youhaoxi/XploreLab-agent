@@ -46,12 +46,19 @@ class ArxivToolkit(AsyncBaseToolkit):
 
         Args:
             query (str): The search query string.
-            paper_ids (List[str], optional): A list of specific arXiv paper IDs to search for. (default: :obj:`None`)
-            max_results (int, optional): The maximum number of search results to return. (default: :obj:`5`)
+            paper_ids (List[str], optional): A list of specific arXiv paper IDs to search for. (default None)
+            max_results (int, optional): The maximum number of search results to return. (default 5)
 
-        Returns:
-            List[Dict[str, str]]: A list of dictionaries, each containing information about a paper, including title, published date, authors, entry ID, summary.
+        Tips:
+            1. Use customized query for advanced search, including filtering and operators.
+            2. filtering: ti for title, au for author, abs for abstract, all for all field match.
+            3. operation: AND, OR, ANDNOT.
+            4. data range: filter by paper's submittedDate, format YYYYMMDDTTTT. e.g. submittedDate:[202301010600 TO 202401010600]
+            e.g. query="au:del_maestro AND ti:checkerboard" means search paper which has author Del Maestro and "checkerboard" keyword in title.
         """
+        # https://info.arxiv.org/help/api/user-manual.html#query_details
+        # Returns:
+        #     List[Dict[str, str]]: A list of dictionaries, each containing information about a paper, including title, published date, authors, entry ID, summary.
         search_results = self._get_search_results(
             query, paper_ids, max_results
         )

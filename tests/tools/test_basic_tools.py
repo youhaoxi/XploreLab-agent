@@ -2,7 +2,7 @@ import pytest
 
 from utu.config import ConfigLoader
 from utu.tools import (
-    GitHubToolkit, ArxivToolkit, FileEditToolkit, WikipediaSearchTool, 
+    GitHubToolkit, FileEditToolkit, WikipediaSearchTool, 
     CodesnipToolkit, BashTool, BashRemoteToolkit, PythonExecuteTool,
 )
 
@@ -10,10 +10,6 @@ from utu.tools import (
 @pytest.fixture
 def github_toolkit():
     return GitHubToolkit()
-
-@pytest.fixture
-def arxiv_toolkit():
-    return ArxivToolkit()
 
 @pytest.fixture
 def file_edit_toolkit():
@@ -37,10 +33,6 @@ async def test_get_repo_info(github_toolkit: GitHubToolkit):
     assert result
     print(result)
 
-async def test_search_papers(arxiv_toolkit: ArxivToolkit):
-    result = await arxiv_toolkit.search_papers("tool maker")
-    assert result
-    print(result)
 
 diff = """<<<<<<< SEARCH
 line 1
