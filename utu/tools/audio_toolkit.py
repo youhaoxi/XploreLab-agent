@@ -33,14 +33,14 @@ class AudioToolkit(AsyncBaseToolkit):
         # model: gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1
         fn = self.md5_to_path[md5]
         transcript: TranscriptionVerbose = await self.client.audio.transcriptions.create(
-            model=self.config['audio_model']['model'],
+            model=self.config.config['audio_model']['model'],
             file=open(fn, "rb"),
             response_format="verbose_json",
             timestamp_granularities=["segment"]
         )
         return transcript.model_dump()
 
-    def handle_audio_path(self, path: str) -> str:
+    def handle_path(self, path: str) -> str:
         md5 = FileUtils.get_file_md5(path)
         if FileUtils.is_web_url(path):
             # download audio to data/_audio, with md5
@@ -49,6 +49,7 @@ class AudioToolkit(AsyncBaseToolkit):
             if not fn.exists():
                 path = FileUtils.download_file(path, fn)
                 logger.info(f"Downloaded audio file to {path}")
+            path = fn
         self.md5_to_path[md5] = path  # record md5 to map
         return md5
 
@@ -61,7 +62,7 @@ class AudioToolkit(AsyncBaseToolkit):
             question (str): The question to ask about the audio.
         """
         logger.debug(f"Processing audio file `{audio_path}` with question `{question}`.")
-        md5 = self.handle_audio_path(audio_path)
+        md5 = self.handle_path(audio_path)
         res = await self.transcribe(md5)
 
         messages = [

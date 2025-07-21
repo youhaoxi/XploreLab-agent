@@ -58,6 +58,7 @@ class DocumentToolkit(AsyncBaseToolkit):
             if not fn.exists():
                 path = FileUtils.download_file(path, fn)
                 logger.info(f"Downloaded document file to {path}")
+                path = fn
         self.md5_to_path[md5] = path  # record md5 to map
         return md5
 
