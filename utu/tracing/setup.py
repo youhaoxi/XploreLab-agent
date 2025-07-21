@@ -5,11 +5,13 @@ TODO: rewrite openinference-instrumentation-openai-agents to support
     1. session-level tracing in @phoenix https://arize.com/docs/phoenix/tracing/how-to-tracing/setup-tracing/setup-sessions
     ref: test_tracing.py
 """
-
+from agents import add_trace_processor
 from phoenix.otel import register, TracerProvider
 from openinference.instrumentation.openai import OpenAIInstrumentor
 # from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 from .otel_agents_instrumentor import OpenAIAgentsInstrumentor
+from .db_tracer import DBTracingProcessor
+
 
 def setup_phoenix_tracing() -> TracerProvider:
     """ 
@@ -26,3 +28,6 @@ def setup_phoenix_tracing() -> TracerProvider:
     OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
     OpenAIAgentsInstrumentor().instrument(tracer_provider=tracer_provider)
     return tracer_provider
+
+def setup_db_tracing():
+    add_trace_processor(DBTracingProcessor())
