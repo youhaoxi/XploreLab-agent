@@ -1,4 +1,5 @@
 import os
+import re
 import logging
 import asyncio
 from typing import Callable
@@ -38,6 +39,13 @@ TEMPLATE_LINKS = r"""You are a webpage analysis agent that extract relevant link
 </content>
 """
 
+banned_sites = (
+    "https://huggingface.co/datasets/",
+    "https://grok.com/share/",
+    "https://modelscope.cn/datasets/"
+)
+RE_MATCHED_SITES = re.compile(r"^(" + "|".join(banned_sites) + r")")
+
 class SearchToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None):
         super().__init__(config)
@@ -73,16 +81,27 @@ class SearchToolkit(AsyncBaseToolkit):
 
         Args:
             query (str): The query to search for.
-            num_results (int, optional): The number of results to return. Defaults to 5.
+            num_results (int, optional): The number of results to return. Defaults to 10.
         """
         # https://serper.dev/playground
         logger.info(f"[tool] search_google_api: {oneline_object(query)}")
         res = await self.search_google(query)
-        # TODO: filter the search results
-        results = res["organic"][:num_results]
+        # filter the search results
+        results = self._filter_results(res["organic"], num_results)
         msg = f'🔍  Results for query "{query}": {results}'
         logger.info(oneline_object(msg))
         return msg
+    
+    def _filter_results(self, results: list[dict], limit: int) -> list[dict]:
+        # can also use search operator `-site:huggingface.co`
+        res = []
+        for result in results:
+            if not RE_MATCHED_SITES.match(result["link"]):
+                res.append(result)
+            if len(res) >= limit:
+                break
+        return res
+
 
     @async_file_cache(expire_time=None)
     async def get_content(self, url: str) -> str:

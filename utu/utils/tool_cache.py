@@ -86,7 +86,7 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
                     ToolCacheModel.function == func_name and
                     ToolCacheModel.cache_key == cache_key
                 )
-                if_exist = session.exec(stmt).one_or_none()
+                if_exist = session.exec(stmt).first()  # one_or_none
                 if if_exist and (expire_time is None or (time.time() - if_exist.timestamp) < expire_time):
                     logger.info(f"🔄 Using cached result for {func_name} from db")
                     return if_exist.result

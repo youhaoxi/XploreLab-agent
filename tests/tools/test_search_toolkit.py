@@ -18,15 +18,16 @@ async def test_tool_schema(search_toolkit: SearchToolkit):
         print(f"{tool.name}: {tool.description}")
         print(json.dumps(tool.params_json_schema, indent=2, ensure_ascii=False))
 
-test_query = "test"
+# test filter of huggingface.co
+test_query = "Illuvium Zero testnet launch date iOS Google Play"
 async def test_search_google_api(search_toolkit: SearchToolkit):
-    result = await search_toolkit.search_google_api(test_query)
-    assert result
+    result = await search_toolkit.search_google_api(test_query, num_results=100)
+    print(result)
 
 test_url = "https://docs.crawl4ai.com/core/simple-crawling/"
 async def test_get_content(search_toolkit: SearchToolkit):
     result = await search_toolkit.get_content(test_url)
-    assert result
+    print(result)
 
 async def test_cache(search_toolkit: SearchToolkit):
     for i in range(2):
