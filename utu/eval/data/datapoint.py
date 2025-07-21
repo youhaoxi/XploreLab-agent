@@ -64,7 +64,7 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
 
     def model_dump(self, *args, **kwargs):
         keys = [
-            "source", "raw_question", "level", "augmented_question", "correct_answer", "file_name", "stage", "response",
+            "source", "raw_question", "level", "augmented_question", "correct_answer", "file_name", "stage", "trace_id", "response",
             "time_cost", "trajectory", "extracted_final_answer", "judged_response", "reasoning", "correct", "confidence",
             "exp_id"
         ]
