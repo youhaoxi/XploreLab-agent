@@ -11,7 +11,7 @@ from chunkr_ai.models import Configuration
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
-from ..utils import async_file_cache, oneline_object, SimplifiedAsyncOpenAI
+from ..utils import async_file_cache, SimplifiedAsyncOpenAI, FileUtils, DIR_ROOT
 
 logger = logging.getLogger("utu")
 
@@ -32,12 +32,13 @@ class DocumentToolkit(AsyncBaseToolkit):
         )
         self.text_limit = self.config.config.get("text_limit", 100_000)
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
+        self.md5_to_path = {}
     
     @async_file_cache(expire_time=None)
-    async def parse_document(self, document_path: str) -> str:
+    async def parse_document(self, md5: str) -> str:
         # https://docs.chunkr.ai/sdk/data-operations/create#supported-file-types
-        logger.info(f"[tool] parse_document: {oneline_object(document_path)}")
-        task = await self.chunkr.upload(document_path)
+        logger.info(f"[tool] parse_document: {self.md5_to_path[md5]}")
+        task = await self.chunkr.upload(self.md5_to_path[md5])
 
         logger.info(f"  getting results...")
         markdown = task.markdown()
@@ -48,6 +49,18 @@ class DocumentToolkit(AsyncBaseToolkit):
         # self.chunkr.close()
         return markdown
 
+    def handle_path(self, path: str) -> str:
+        md5 = FileUtils.get_file_md5(path)
+        if FileUtils.is_web_url(path):
+            # download document to data/_document, with md5
+            fn = DIR_ROOT / "data" / "_document" / f"{md5}{FileUtils.get_file_ext(path)}"
+            fn.parent.mkdir(parents=True, exist_ok=True)
+            if not fn.exists():
+                path = FileUtils.download_file(path, fn)
+                logger.info(f"Downloaded document file to {path}")
+        self.md5_to_path[md5] = path  # record md5 to map
+        return md5
+
     async def document_qa(self, document_path: str, question: Optional[str] = None) -> str:
         """Get file content summary or answer questions about attached document.
         Supported file types: pdf, docx, pptx, xlsx, xls, ppt, doc
@@ -56,7 +69,8 @@ class DocumentToolkit(AsyncBaseToolkit):
             document_path (str): Local path or URL to a document.
             question (str, optional): The question to answer. If not provided, a description of the document will be generated.
         """
-        document_markdown = await self.parse_document(document_path)
+        md5 = self.handle_path(document_path)
+        document_markdown = await self.parse_document(md5)
         if len(document_markdown) > self.text_limit:
             document_markdown = document_markdown[:self.text_limit] + "\n..."
         messages = [
