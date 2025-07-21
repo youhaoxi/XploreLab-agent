@@ -104,6 +104,7 @@ class BaseBenchmark:
         # Update the sample with the predicted answer and trajectory
         trajectory = get_trajectory_from_agent_result(result)
         sample.update(
+            trace_id=agent.trace_id,
             response=predicted_answer,
             time_cost=end_time - start_time,
             trajectory=json.dumps(trajectory, ensure_ascii=False),

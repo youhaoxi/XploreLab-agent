@@ -16,27 +16,31 @@ class RunnerMixin:
     config: AgentConfig = None
     current_agent: Agent[TContext] = None
     input_items: list[TResponseInputItem] = []
-    tracer: Trace = None
+    # tracer: Trace = None
+    trace_id: str = None
     _run_hooks: RunHooks = None
 
-    def setup_tracer(self):
-        if self.tracer: return
-        self.tracer = trace(
-            workflow_name=self.config.agent.name,  # FIXME: multi-agent?
-            trace_id=gen_trace_id(),
-            # metadata={
-            #     "config": str(self.config.model_dump())
-            # }  # FIXME: str too long for phoenix
-        )
-        self.tracer.start(mark_as_current=True)
-        print(f"> trace_id: {self.tracer.trace_id}")
-        # TODO: get otel trace_id --> set same as self.tracer.trace_id
-        # print(f"> otel trace_id: {otel_span.get_span_context().trace_id}")
+    # def setup_tracer(self):
+    #     if self.tracer: return
+    #     self.tracer = trace(
+    #         workflow_name=self.config.agent.name,  # FIXME: multi-agent?
+    #         trace_id=gen_trace_id(),
+    #         # metadata={
+    #         #     "config": str(self.config.model_dump())
+    #         # }  # FIXME: str too long for phoenix
+    #     )
+    #     self.tracer.start(mark_as_current=True)
+    #     print(f"> trace_id: {self.tracer.trace_id}")
+    #     # TODO: get otel trace_id --> set same as self.tracer.trace_id
+    #     # print(f"> otel trace_id: {otel_span.get_span_context().trace_id}")
 
     def _get_run_config(self) -> RunConfig:
-        # TODO: setup other runner options as @property
+        self.trace_id = gen_trace_id()
+        logger.info(f"> trace_id: {self.trace_id}")
         run_config = RunConfig(
             model_settings=self.config.model_settings,
+            trace_id=self.trace_id,
+            workflow_name=self.config.agent.name,
         )
         return run_config
 
@@ -104,7 +108,7 @@ class SimpleAgent(RunnerMixin):
         if instructions: config.agent.instructions = instructions
         self.config = config
         
-        self.setup_tracer()
+        # self.setup_tracer()
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
 
