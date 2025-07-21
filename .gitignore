@@ -39,3 +39,11 @@ ___*
 /data/
 output/
 workspace/
+
+mytools/
+
+logs/
+
+.pytest_cache/
+uv.lock
+.env

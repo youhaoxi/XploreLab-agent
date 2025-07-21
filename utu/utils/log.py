@@ -18,8 +18,7 @@ def set_log_level(level: str | int) -> None:
     logger.setLevel(level)
 
 def setup_logging() -> None:
-    # logger_sql = logging.getLogger("sqlalchemy")
-    # logger_sql.setLevel(logging.WARNING)
+    logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
 
     log_format = "%(asctime)s - %(name)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s"
     logging.basicConfig(

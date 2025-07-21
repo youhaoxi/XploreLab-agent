@@ -49,6 +49,7 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     file_name: Optional[str] = ""  # for GAIA
     stage: str = "init"  # Literal["init", "rollout", "judged]
     # 2) rollout
+    trace_id: Optional[str] = Field(default=None)
     response: Optional[str] = Field(default=None)
     time_cost: Optional[float] = Field(default=None)  # time cost in seconds
     trajectory: Optional[str] = Field(default=None)  # the agent's reasoning process, a list of messages
@@ -63,7 +64,7 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
 
     def model_dump(self, *args, **kwargs):
         keys = [
-            "source", "raw_question", "level", "augmented_question", "correct_answer", "file_name", "stage", "response",
+            "source", "raw_question", "level", "augmented_question", "correct_answer", "file_name", "stage", "trace_id", "response",
             "time_cost", "trajectory", "extracted_final_answer", "judged_response", "reasoning", "correct", "confidence",
             "exp_id"
         ]

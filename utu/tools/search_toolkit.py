@@ -55,24 +55,31 @@ class SearchToolkit(AsyncBaseToolkit):
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
     @async_file_cache(expire_time=None)
-    async def search_google_api(self, query: str, num_results: int = 5) -> str:
-        """Search the query via Google api, the query should be a search query like humans search in Google, concrete and not vague or super long. More the single most important items.
-        
+    async def search_google(self, query: str):
+        params = {
+            'q': query,
+            'gl': 'cn',
+            'hl': 'zh-cn',
+            'num': 100
+        }
+        response = requests.request("POST", self.serper_url, headers=self.serper_header, json=params)
+        results = response.json()
+        return results
+
+    async def search_google_api(self, query: str, num_results: int = 10) -> str:
+        """Search the query via Google api. NOTE:
+        1. try Google search operators, e.g. " " for exact match; -xxx for exclude; * wildcard matching; filetype:xxx for file types; site:xxx for site search. before:YYYY-MM-DD, after:YYYY-MM-DD for time range.
+        2. search query should be concrete and not vague or super long
+
         Args:
             query (str): The query to search for.
             num_results (int, optional): The number of results to return. Defaults to 5.
         """
         # https://serper.dev/playground
         logger.info(f"[tool] search_google_api: {oneline_object(query)}")
-        params = {
-            'q': query,
-            'gl': 'cn',
-            'hl': 'zh-cn',
-            'num': num_results
-        }
-        response = requests.request("POST", self.serper_url, headers=self.serper_header, json=params)
-        assert response.status_code == 200, response.text
-        results = response.json()["organic"]
+        res = await self.search_google(query)
+        # TODO: filter the search results
+        results = res["organic"][:num_results]
         msg = f'🔍  Results for query "{query}": {results}'
         logger.info(oneline_object(msg))
         return msg
