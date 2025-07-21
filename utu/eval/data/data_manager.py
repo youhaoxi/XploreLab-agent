@@ -89,14 +89,14 @@ class DBDataManager(DataManager):
         self.save(self.data)  # save to db
         return self.data
 
-    def get_samples(self, stage: Literal["init", "rollout", "judged"] = None) -> list[Datapoint]:
+    def get_samples(self, stage: Literal["init", "rollout", "judged"] = None, limit: int = None) -> list[Datapoint]:
         """Get samples from exp_id with specified stage."""
         with Session(self.engine) as session:
             samples = session.exec(
                 select(Datapoint).where(
                     Datapoint.exp_id == self.config.exp_id,
-                    Datapoint.stage == stage if stage else True
-                )
+                    Datapoint.stage == stage if stage else True,
+                ).limit(limit)
             ).all()
             return samples
 
