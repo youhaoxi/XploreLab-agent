@@ -7,8 +7,8 @@ from typing import Literal
 from sqlmodel import SQLModel, create_engine, Session, select
 
 from ...config import EvalConfig
+from ...db import EvaluationSample as Datapoint
 from ..processer import BUILTIN_BENCHMARKS
-from . import EvaluationSample as Datapoint
 
 logger = logging.getLogger(__name__)
 

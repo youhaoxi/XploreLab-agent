@@ -125,7 +125,7 @@ class SimpleAgent(RunnerMixin):
         if tools: self._tools = tools
         
         self._build_context_manager()
-        self.setup_tracer()
+        # self.setup_tracer()
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
 

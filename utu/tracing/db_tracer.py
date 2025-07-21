@@ -19,7 +19,7 @@ from agents.tracing.span_data import (
 )
 from sqlmodel import create_engine, Session, SQLModel
 
-from .db_model import ToolTracingModel, GenerationTracingModel
+from ..db import ToolTracingModel, GenerationTracingModel
 
 
 class DBTracingProcessor(TracingProcessor):

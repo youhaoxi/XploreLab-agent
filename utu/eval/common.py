@@ -1,13 +1,8 @@
 import asyncio
 import threading
-import concurrent.futures
-from queue import Queue, Empty
-from tqdm import tqdm
 from dataclasses import dataclass, asdict
 from agents import RunResult
 from agents.models.chatcmpl_converter import Converter
-
-from .data import EvaluationSample
 
 
 # 限制并发数量的装饰器
@@ -39,91 +34,6 @@ def async_to_sync(func):
         result = asyncio.run(func(*args, **kwargs))
         return index, result
     return wrapper
-
-
-async def process_with_threading(
-                                 thread_func,
-                                 save_func,
-                                 samples: list[EvaluationSample], 
-                                 thread_size: int, 
-                                 save_freq: int = 10, 
-                                 save_path: str = None):
-    """
-    Process the samples using a fixed-size thread pool.
-    """
-    # 初始化缓存队列
-    data_queue = Queue()
-    for i, sample in enumerate(samples):
-        data_queue.put((i, sample))
-    
-    # 初始化杂项
-    results = {}  # 输出缓存
-    saved_count = 0  # 记录当前进度
-    continuous_results = []  # 待保存的连续输出结果序列
-    tbar = tqdm(total=len(samples), desc="Processing")
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=thread_size) as executor:
-        futures = {executor.submit(thread_func, *data_queue.get()): _ for _ in range(min(thread_size, data_queue.qsize()))}
-
-        while futures:
-            # 等待任何一个任务完成
-            done, futures = concurrent.futures.wait(futures, return_when=concurrent.futures.FIRST_COMPLETED)
-
-            # 同步已完成的任务
-            for future in done:
-                index, result = future.result()  # 获取index和结果
-                results[index] = result  # 将结果添加到输出缓存
-                
-                # 从缓存中取出连续的结果
-                for i in range(saved_count, len(samples)):
-                    if i in results:
-                        continuous_results.append(results[i])
-                        saved_count += 1
-                        tbar.update(1)
-                        del results[i]
-                    else:
-                        break
-
-                # 保存连续的结果（如果提供了保存路径和频率）
-                if save_path and len(continuous_results) >= save_freq:
-                    await save_func(continuous_results, save_path)
-                    # 重置连续结果序列
-                    continuous_results = []
-                
-                # 向线程池中补充新任务
-                try:
-                    new_data = data_queue.get_nowait()
-                    new_future = executor.submit(thread_func, *new_data)
-                    futures.add(new_future)
-                # 直到数据全跑完
-                except Empty:
-                    pass
-
-    # 保存剩余的结果
-    final_results = []
-    # 清空连续结果序列
-    if continuous_results:
-        final_results.extend(continuous_results)
-        if save_path:
-            await save_func(continuous_results, save_path)
-    # 清空缓存
-    if results:
-        remaining_results = []
-        for index in sorted(list(results.keys())):
-            remaining_results.append(results[index])
-            final_results.append(results[index])
-            del results[index]
-            tbar.update(1)
-        if save_path:
-            await save_func(remaining_results, save_path)
-    
-    tbar.close()
-    
-    # 按原始顺序返回结果
-    if not final_results:
-        final_results = continuous_results
-    
-    return final_results
 
 
 def get_trajectory_from_agent_result(agent_result: RunResult) -> list[dict]:
