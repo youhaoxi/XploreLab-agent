@@ -1,21 +1,26 @@
+import os
 import json
 import time
 import hashlib
 import pathlib
 import logging
 import functools
-from typing import Optional
+from typing import Optional, Literal
 from datetime import datetime
 
+from sqlmodel import create_engine, Session, select
+
 from .path import DIR_ROOT
+from ..db import ToolCacheModel
 
 logger = logging.getLogger("utu")
 
 DIR_CACHE = DIR_ROOT / ".cache"
 DIR_CACHE.mkdir(exist_ok=True)
 
+engine = create_engine(os.getenv("DB_URL"), echo=True)
 
-def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optional[int] = None):
+def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optional[int] = None, mode: Literal["db", "file"] = "db"):
     """Decorator to cache async function results to local files.
     Args:
         cache_dir (str|pathlib.Path): Directory to store cache files
@@ -25,7 +30,7 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
     cache_path = pathlib.Path(cache_dir)
     cache_path.mkdir(exist_ok=True, parents=True)
     
-    def decorator(func):
+    def decorator_file(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
             func_name = func.__name__
@@ -66,7 +71,47 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
             
             logger.info(f"💾 Cached result for {func_name} to {cache_file}")
             return result
-        
         return wrapper
     
-    return decorator
+    def decorator_db(func):
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            func_name = func.__name__
+            cache_args = args[1:] if args and hasattr(args[0], func.__name__) else args  # remove `self`
+            args_str = str(cache_args) + str(sorted(kwargs.items()))
+            cache_key = hashlib.md5(args_str.encode()).hexdigest()
+
+            with Session(engine) as session:
+                stmt = select(ToolCacheModel).where(
+                    ToolCacheModel.function == func_name and
+                    ToolCacheModel.cache_key == cache_key
+                )
+                if_exist = session.exec(stmt).one_or_none()
+                if if_exist and (expire_time is None or (time.time() - if_exist.timestamp) < expire_time):
+                    logger.info(f"🔄 Using cached result for {func_name} from db")
+                    return if_exist.result
+                else:
+                    start_time = time.time()
+                    result = await func(*args, **kwargs)
+                    execution_time = time.time() - start_time
+                    data = ToolCacheModel(
+                        function=func_name,
+                        args=args_str,
+                        kwargs=str(kwargs),
+                        result=result,
+                        cache_key=cache_key,
+                        execution_time=execution_time,
+                        timestamp=time.time(),
+                        datetime=datetime.now().isoformat(),
+                    )
+                    session.add(data)
+                    session.commit()
+                    logger.info(f"💾 Cached result for {func_name} to db")
+                    return result
+        return wrapper
+
+    if mode == "db":
+        return decorator_db
+    elif mode == "file":
+        return decorator_file
+    else: raise ValueError(f"Invalid mode: {mode}")
