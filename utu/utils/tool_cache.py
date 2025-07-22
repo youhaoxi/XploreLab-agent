@@ -83,7 +83,7 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
 
             with Session(engine) as session:
                 stmt = select(ToolCacheModel).where(
-                    ToolCacheModel.function == func_name and
+                    ToolCacheModel.function == func_name,
                     ToolCacheModel.cache_key == cache_key
                 )
                 if_exist = session.exec(stmt).first()  # one_or_none
