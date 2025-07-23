@@ -24,7 +24,7 @@ from ..db import ToolTracingModel, GenerationTracingModel
 
 class DBTracingProcessor(TracingProcessor):
     def __init__(self) -> None:
-        self.engine = create_engine(os.getenv("DB_URL"), echo=True)
+        self.engine = create_engine(os.getenv("DB_URL"))
         SQLModel.metadata.create_all(self.engine)
 
     def on_trace_start(self, trace: "Trace") -> None:

@@ -18,7 +18,7 @@ logger = logging.getLogger("utu")
 DIR_CACHE = DIR_ROOT / ".cache"
 DIR_CACHE.mkdir(exist_ok=True)
 
-engine = create_engine(os.getenv("DB_URL"), echo=True)
+engine = create_engine(os.getenv("DB_URL"))
 
 def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optional[int] = None, mode: Literal["db", "file"] = "db"):
     """Decorator to cache async function results to local files.

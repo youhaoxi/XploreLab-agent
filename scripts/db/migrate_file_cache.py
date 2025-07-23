@@ -8,7 +8,7 @@ from utu.db import ToolCacheModel
 from utu.utils.tool_cache import DIR_CACHE
 
 
-engine = create_engine(os.getenv("DB_URL"), echo=True)
+engine = create_engine(os.getenv("DB_URL"))
 
 
 def convert_data(data: dict) -> ToolCacheModel:
