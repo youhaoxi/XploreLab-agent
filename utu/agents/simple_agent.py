@@ -13,6 +13,7 @@ from ..config import AgentConfig, ToolkitConfig, ConfigLoader
 from ..tools import AsyncBaseToolkit, TOOLKIT_MAP
 from ..utils import AgentsUtils
 from ..context import BaseContextManager, CONTEXT_MANAGER_MAP
+from ..tracing import setup_phoenix_tracing, setup_db_tracing
 
 logger = logging.getLogger("utu")
 
@@ -22,9 +23,9 @@ class RunnerMixin:
     current_agent: Agent[TContext] = None
     input_items: list[TResponseInputItem] = []
     context_manager: BaseContextManager = None
-    # tracer: Trace = None
     trace_id: str = None
     _run_hooks: RunHooks = None
+    _tracer_provider = None
 
     # def setup_tracer(self):
     #     if self.tracer: return
@@ -39,6 +40,11 @@ class RunnerMixin:
     #     print(f"> trace_id: {self.tracer.trace_id}")
     #     # TODO: get otel trace_id --> set same as self.tracer.trace_id
     #     # print(f"> otel trace_id: {otel_span.get_span_context().trace_id}")
+
+    def _setup_tracing(self):
+        if not self._tracer_provider:
+            self._tracer_provider = setup_phoenix_tracing()
+            setup_db_tracing()
 
     def _get_run_config(self) -> RunConfig:
         self.trace_id = gen_trace_id()
@@ -57,6 +63,7 @@ class RunnerMixin:
 
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem]) -> RunResult:
+        self._setup_tracing()
         return await Runner.run(
             self.current_agent, 
             input, 
@@ -67,6 +74,7 @@ class RunnerMixin:
         )
 
     def run_streamed(self, input: str | list[TResponseInputItem]) -> RunResultStreaming:
+        self._setup_tracing()
         return Runner.run_streamed(
             self.current_agent, 
             input, 

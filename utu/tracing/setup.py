@@ -15,7 +15,7 @@ from .db_tracer import DBTracingProcessor
 
 def setup_phoenix_tracing() -> TracerProvider:
     """ 
-    TODO: add try-except when start phoenix
+    - [ ] add try-except when start phoenix
     """
     tracer_provider = register(
         endpoint="http://9.134.230.111:4317",

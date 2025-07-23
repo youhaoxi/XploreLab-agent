@@ -24,7 +24,7 @@ def get_args():
     return config
 
 
-def stat_trajectory(t: str) -> dict:
+def stat_trajectory(t: str|dict) -> dict:
     """stat tool usage in single trajectory"""
     stat = {
         "turns_total": 0,
@@ -33,7 +33,7 @@ def stat_trajectory(t: str) -> dict:
         "avg_tool_calls": 0,
         "tool_calls": defaultdict(int),
     }
-    trajectory = json.loads(t)
+    trajectory = json.loads(t) if isinstance(t, str) else t
     stat["turns_total"] = len(trajectory)
     for msg in trajectory:
         if msg["role"] == "assistant":
@@ -103,7 +103,9 @@ def main(config: EvalConfig):
     samples = db.get_samples()  # get samples from specific exp_id
     df = pd.DataFrame([sample.as_dict() for sample in samples])
     
-    stats_series = df['trajectory'].apply(stat_trajectory)
+    # remove empty trajectory
+    series_trajectory = df['trajectory'].dropna()
+    stats_series = series_trajectory.apply(stat_trajectory)
     agg_stats = aggregate_stats(stats_series)
     print_stats_summary(agg_stats)
 
