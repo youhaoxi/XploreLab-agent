@@ -1,44 +1,17 @@
-from typing import Optional
+from typing import Optional, Any
 from datetime import datetime
 
-from pydantic import BaseModel, Field
-from sqlmodel import SQLModel, Field as SQLField
+from sqlmodel import SQLModel, Field, JSON, Column
+
+from .utu_basemodel import UTUBaseModel
 
 
-class UTUBaseModel(BaseModel):
-    def update(self, **kwargs):
-        """
-        Update the evaluation sample with the given keyword arguments.
-        """
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-    
-    def get(self, key, default=None):
-        """
-        Get the value of the specified key, or return default if not found.
-        """
-        return getattr(self, key, default)
-
-    @classmethod
-    def from_dict(cls, data: dict):
-        """
-        Create an EvaluationSample from a dictionary.
-        """
-        return cls(**data)
-
-    def as_dict(self) -> dict:
-        # only contain fields that are not None
-        return {k: v for k, v in self.model_dump().items() if v is not None}
-
-
-# @dataclass
 class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     __tablename__ = 'evaluation_data'
     
-    id: Optional[int] = SQLField(default=None, primary_key=True)
-    created_at: Optional[datetime] = SQLField(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = SQLField(default_factory=datetime.utcnow)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
     # 1) base info
     source: str = ""  # dataset name
