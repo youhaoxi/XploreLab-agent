@@ -39,7 +39,7 @@ class ContextManagerConfig(ConfigBaseModel):
     config: dict | None = Field(default_factory=dict)
 
 class AgentConfig(ConfigBaseModel):
-    type: Literal["simple", "simple_env"] = "simple"
+    type: Literal["simple", "simple_env"] = "simple"  # FIXME: 
     model: ModelConfig
     model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
     agent: ProfileConfig = Field(default_factory=ProfileConfig)
