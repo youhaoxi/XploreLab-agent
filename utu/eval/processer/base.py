@@ -257,15 +257,15 @@ class BaseLLMJudgeProcesser(BaseProcesser):
             raise ValueError("Invalid judge response format.")
         
         return {
-            "extracted_final_answer": match.group("extracted_final_answer").strip(),
-            "reasoning": match.group("reasoning").strip(),
-            "correct":match.group("correct").strip().lower() == "yes",
-            "confidence": int(match.group("confidence"))
+            "extracted_final_answer": match.group("extracted_final_answer").strip() if match.group("extracted_final_answer") else "",
+            "reasoning": match.group("reasoning").strip() if match.group("reasoning") else "",
+            "correct":match.group("correct").strip().lower() == "yes" if match.group("correct") else False,
+            "confidence": int(match.group("confidence")) if match.group("confidence") else None
         }
 
     def _extract_exact_answer(self, response: str) -> str:
         """ Extract the exact answer from the response. """
-        return response
+        return response.strip() if response else ""
     
 
 class BaseMatchProcesser(BaseProcesser):

@@ -67,8 +67,8 @@ class XBenchProcesser(BaseLLMJudgeProcesser):
             raise ValueError("Invalid judge response format.")
         
         return {
-            "extracted_final_answer": match.group("extracted_final_answer").strip() if match.group("extracted_final_answer") else None,
-            "reasoning": match.group("reasoning").strip() if match.group("reasoning") else response.strip(),
+            "extracted_final_answer": match.group("extracted_final_answer").strip() if match.group("extracted_final_answer") else "",
+            "reasoning": match.group("reasoning").strip() if match.group("reasoning") else "",
             "correct": match.group("correct").strip() == "正确" if match.group("correct") else False,
         }
     
@@ -76,6 +76,6 @@ class XBenchProcesser(BaseLLMJudgeProcesser):
         """ Earse the exact answer from the response. """
         pattern = re.compile(r"最终答案:\s*(.*)")
         match = pattern.search(response)
-        if not match:
+        if not match or not match.group(1):
             return ""
         return match.group(1).strip()

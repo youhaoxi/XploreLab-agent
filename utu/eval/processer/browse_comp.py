@@ -69,8 +69,8 @@ class BrowseCompProcesser(BaseLLMJudgeProcesser):
             raise ValueError("Invalid judge response format.")
         
         return {
-            "extracted_final_answer": match.group("extracted_final_answer").strip() if match.group("extracted_final_answer") else None,
-            "reasoning": match.group("reasoning").strip() if match.group("reasoning") else response.strip(),
+            "extracted_final_answer": match.group("extracted_final_answer").strip() if match.group("extracted_final_answer") else "",
+            "reasoning": match.group("reasoning").strip() if match.group("reasoning") else "",
             "correct": match.group("correct").strip().lower() == "yes" if match.group("correct") else False,
             "confidence": int(match.group("confidence")) if match.group("confidence") else None
         }
@@ -79,6 +79,6 @@ class BrowseCompProcesser(BaseLLMJudgeProcesser):
         """ Extract the exact answer from the response. """
         pattern = re.compile(r"Exact Answer:\s*(.*)")
         match = pattern.search(response)
-        if not match:
+        if not match or not match.group(1):
             return ""
         return match.group(1).strip()

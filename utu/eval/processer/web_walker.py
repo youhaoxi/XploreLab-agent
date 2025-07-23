@@ -63,11 +63,11 @@ class WebWalkerProcesser(BaseLLMJudgeProcesser):
             raise ValueError("Invalid judge response format.")
         
         return {
-            "reasoning": match.group("reasoning").strip() if match.group("reasoning") else response.strip(),
+            "reasoning": match.group("reasoning").strip() if match.group("reasoning") else "",
             "correct": match.group("correct").strip() == "CORRECT" if match.group("correct") else False,
         }
 
     def _extract_exact_answer(self, response: str) -> str:
         """ Extract the exact answer from the response. """
         # not specified in the template, so we return the original response
-        return response.strip()
+        return response.strip() if response else ""
