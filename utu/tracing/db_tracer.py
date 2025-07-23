@@ -39,7 +39,6 @@ class DBTracingProcessor(TracingProcessor):
 
     def on_span_end(self, span: Span[Any]) -> None:
         data = span.span_data
-        # TODO: save trace_id into trajectory table
         if isinstance(data, GenerationSpanData):
             with Session(self.engine) as session:
                 session.add(GenerationTracingModel(
