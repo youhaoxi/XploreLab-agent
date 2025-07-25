@@ -46,10 +46,16 @@ class RunnerMixin:
             self._tracer_provider = setup_phoenix_tracing()
             setup_db_tracing()
 
+    def set_trace_id(self, trace_id: str):
+        if self.trace_id is not None: logger.warning(f"trace_id is already set to {self.trace_id}, will be overriden by {trace_id}!")
+        self.trace_id = trace_id
+
     def _get_run_config(self) -> RunConfig:
-        self.trace_id = gen_trace_id()
+        if self.trace_id is None:
+            self.trace_id = gen_trace_id()
         logger.info(f"> trace_id: {self.trace_id}")
         run_config = RunConfig(
+            model=self.current_agent.model,
             model_settings=self.config.model_settings,
             trace_id=self.trace_id,
             workflow_name=self.config.agent.name,
