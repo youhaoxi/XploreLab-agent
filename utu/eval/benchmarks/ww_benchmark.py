@@ -1,0 +1,46 @@
+import time
+import json
+
+from .base_benchmark import BaseBenchmark
+from ..data import EvaluationSample
+from ...agents.ww_agent import WWAgent
+
+
+class WWBenchmark(BaseBenchmark):
+    """ 复用现有逻辑, 重写 agent, process, rollout 逻辑 """
+    agent: WWAgent = None
+
+    def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
+        # remark: 可以快速调整一下看看是否对于结果有影响
+        sample.update(
+            augmented_question=sample.raw_question,
+        )
+        self.dataset.save(sample)
+        return sample
+
+    async def _get_agent(self) -> WWAgent:
+        if self.agent is None:
+            self.agent = WWAgent(self.config.agent)
+            await self.agent.build()
+        return self.agent
+
+    async def rollout_one(self, sample: EvaluationSample) -> EvaluationSample:
+        agent = await self._get_agent()
+        start_time = time.time()
+        result = await agent.run(sample.augmented_question)
+        end_time = time.time()
+
+        # Update the sample with the predicted answer and trajectory
+        if not isinstance(result.trajectory, str):
+            result.trajectory = json.dumps(result.trajectory, ensure_ascii=False)
+        sample.update(
+            trace_id=agent.trace_id,
+            response=result.final_output,
+            time_cost=end_time - start_time,
+            trajectory=result.trajectory,
+            stage="rollout"  # update stage to rollout!
+        )
+        self.dataset.save(sample)
+        # update the total tokens
+        # self.total_tokens += sum([step.get("usage", {}).get("total_tokens", 0) for step in trajectory])
+        return sample
