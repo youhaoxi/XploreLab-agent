@@ -4,7 +4,10 @@ from agents import gen_trace_id
 
 # from agents import RunResult
 from ..config import AgentConfig, ConfigLoader
-from .utils import SearcherAgent, PlannerAgent, AnalysisAgent, NextTaskResult, SearchResult
+from .utils import NextTaskResult, SearchResult
+from .ww_analyst import AnalysisAgent
+from .ww_searcher import SearcherAgent
+from .ww_planner import PlannerAgent
 
 
 @dataclass
