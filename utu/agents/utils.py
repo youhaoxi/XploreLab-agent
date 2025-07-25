@@ -35,6 +35,7 @@ class NextTaskResult:
 class SearchResult:
     output: str
     trajectory: list[dict]
+    search_results: list[dict] = field(default_factory=list)
 
 
 @dataclass
@@ -44,4 +45,3 @@ class AnalysisResult:
     @property
     def trajectory(self):
         return [{"role": "assistant", "content": f"[analysis] {self.output}"}]
-

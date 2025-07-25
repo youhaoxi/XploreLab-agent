@@ -13,6 +13,7 @@ from .python_execute_tool import PythonExecuteTool
 from .video_toolkit import VideoToolkit
 from .audio_toolkit import AudioToolkit
 from .serper_toolkit import SerperToolkit   
+from .ww_searcher_tools import DecomposeQueryToolkit, WebSearchToolkit, SummarizeToolkit
 
 
 TOOLKIT_MAP = {
@@ -30,4 +31,7 @@ TOOLKIT_MAP = {
     "video": VideoToolkit,
     "audio": AudioToolkit,
     "serper": SerperToolkit,
+    "query_decomposer": DecomposeQueryToolkit,
+    "summarizer": SummarizeToolkit,
+    "web_searcher": WebSearchToolkit,
 }
