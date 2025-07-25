@@ -32,6 +32,8 @@ class WWAgent:
 
     async def run(self, input: str) -> WWRunResult:
         self.trace_id = gen_trace_id()
+        self.agent.set_trace_id(self.trace_id)  # pass down trace_id
+
         result = await self.agent.run(input)
         return WWRunResult(
             final_output=result.final_output,
