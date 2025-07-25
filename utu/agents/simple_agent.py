@@ -6,14 +6,14 @@ import logging
 from contextlib import AsyncExitStack
 
 from agents import Tool, TContext, RunResult, RunResultStreaming, Agent, TResponseInputItem, Runner, RunHooks, RunConfig
-from agents.tracing import trace, Trace, gen_trace_id
+from agents.tracing import gen_trace_id
 from agents.mcp import MCPServerStdio, MCPServer
 
 from ..config import AgentConfig, ToolkitConfig, ConfigLoader
 from ..tools import AsyncBaseToolkit, TOOLKIT_MAP
 from ..utils import AgentsUtils
 from ..context import BaseContextManager, CONTEXT_MANAGER_MAP
-from ..tracing import setup_phoenix_tracing, setup_db_tracing
+from ..tracing import setup_tracing
 
 logger = logging.getLogger("utu")
 
@@ -25,7 +25,6 @@ class RunnerMixin:
     context_manager: BaseContextManager = None
     trace_id: str = None
     _run_hooks: RunHooks = None
-    _tracer_provider = None
 
     # def setup_tracer(self):
     #     if self.tracer: return
@@ -40,11 +39,6 @@ class RunnerMixin:
     #     print(f"> trace_id: {self.tracer.trace_id}")
     #     # TODO: get otel trace_id --> set same as self.tracer.trace_id
     #     # print(f"> otel trace_id: {otel_span.get_span_context().trace_id}")
-
-    def _setup_tracing(self):
-        if not self._tracer_provider:
-            self._tracer_provider = setup_phoenix_tracing()
-            setup_db_tracing()
 
     def set_trace_id(self, trace_id: str):
         if self.trace_id is not None: logger.warning(f"trace_id is already set to {self.trace_id}, will be overriden by {trace_id}!")
@@ -69,7 +63,7 @@ class RunnerMixin:
 
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem]) -> RunResult:
-        self._setup_tracing()
+        setup_tracing()
         return await Runner.run(
             self.current_agent, 
             input, 
@@ -80,7 +74,7 @@ class RunnerMixin:
         )
 
     def run_streamed(self, input: str | list[TResponseInputItem]) -> RunResultStreaming:
-        self._setup_tracing()
+        setup_tracing()
         return Runner.run_streamed(
             self.current_agent, 
             input, 

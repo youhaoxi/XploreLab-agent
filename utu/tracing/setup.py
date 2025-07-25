@@ -13,11 +13,16 @@ from .otel_agents_instrumentor import OpenAIAgentsInstrumentor
 from .db_tracer import DBTracingProcessor
 
 
-def setup_phoenix_tracing() -> TracerProvider:
+PHOENIX_TRACING_PROVIDER = None
+DB_TRACING_PROCESSOR = None
+
+def setup_phoenix_tracing() -> None:
     """ 
     - [ ] add try-except when start phoenix
     """
-    tracer_provider = register(
+    global PHOENIX_TRACING_PROVIDER
+    if PHOENIX_TRACING_PROVIDER is not None: return
+    PHOENIX_TRACING_PROVIDER = register(
         endpoint="http://9.134.230.111:4317",
         project_name="uTu agent",
         batch=True,
@@ -25,9 +30,17 @@ def setup_phoenix_tracing() -> TracerProvider:
         auto_instrument=False,
     )
     # manually instrument
-    OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
-    OpenAIAgentsInstrumentor().instrument(tracer_provider=tracer_provider)
-    return tracer_provider
+    OpenAIInstrumentor().instrument(tracer_provider=PHOENIX_TRACING_PROVIDER)
+    OpenAIAgentsInstrumentor().instrument(tracer_provider=PHOENIX_TRACING_PROVIDER)
 
-def setup_db_tracing():
-    add_trace_processor(DBTracingProcessor())
+
+def setup_db_tracing() -> None:
+    global DB_TRACING_PROCESSOR
+    if DB_TRACING_PROCESSOR is not None: return
+    DB_TRACING_PROCESSOR = DBTracingProcessor()
+    add_trace_processor(DB_TRACING_PROCESSOR)
+
+
+def setup_tracing() -> None:
+    setup_phoenix_tracing()
+    setup_db_tracing()
