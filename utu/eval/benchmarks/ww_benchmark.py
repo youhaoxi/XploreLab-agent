@@ -8,8 +8,6 @@ from ...agents.ww_agent import WWAgent
 
 class WWBenchmark(BaseBenchmark):
     """ 复用现有逻辑, 重写 agent, process, rollout 逻辑 """
-    agent: WWAgent = None
-
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
         # remark: 可以快速调整一下看看是否对于结果有影响
         sample.update(
@@ -19,10 +17,10 @@ class WWBenchmark(BaseBenchmark):
         return sample
 
     async def _get_agent(self) -> WWAgent:
-        if self.agent is None:
-            self.agent = WWAgent(self.config.agent)
-            await self.agent.build()
-        return self.agent
+        # init a new agent for each rollout!
+        agent = WWAgent(self.config.agent)
+        await agent.build()
+        return agent
 
     async def rollout_one(self, sample: EvaluationSample) -> EvaluationSample:
         agent = await self._get_agent()
@@ -34,7 +32,7 @@ class WWBenchmark(BaseBenchmark):
         if not isinstance(result.trajectory, str):
             result.trajectory = json.dumps(result.trajectory, ensure_ascii=False)
         sample.update(
-            trace_id=agent.trace_id,
+            trace_id=result.trace_id,
             response=result.final_output,
             time_cost=end_time - start_time,
             trajectory=result.trajectory,

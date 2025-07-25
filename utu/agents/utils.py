@@ -6,16 +6,25 @@ from ..config import AgentConfig
 class Base:
     def __init__(self, config: AgentConfig):
         self.config = config
+        self.trace_id: str = None
 
     async def build(self):
         pass
 
+    def set_trace_id(self, trace_id: str):
+        self.trace_id = trace_id
+
+
+@dataclass
+class Task:
+    agent: str
+    task: str
 
 @dataclass
 class NextTaskResult:
-    task: str = ""
+    task: Task = None
     is_finished: bool = False
-    todo: list[str] = field(default_factory=list)
+    todo: list[dict] = field(default_factory=list)
 
     @property
     def trajectory(self):

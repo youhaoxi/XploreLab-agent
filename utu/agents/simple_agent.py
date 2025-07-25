@@ -40,6 +40,7 @@ class RunnerMixin:
     #     # TODO: get otel trace_id --> set same as self.tracer.trace_id
     #     # print(f"> otel trace_id: {otel_span.get_span_context().trace_id}")
 
+    # FIXME: trace_id should bound to session, not agent!
     def set_trace_id(self, trace_id: str):
         if self.trace_id is not None: logger.warning(f"trace_id is already set to {self.trace_id}, will be overriden by {trace_id}!")
         self.trace_id = trace_id
