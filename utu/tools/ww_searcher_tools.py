@@ -130,7 +130,7 @@ class WebSearchToolkit(AsyncBaseToolkit):
         # config
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
         self.num_result = self.config.config.get("num_result", 10)
-        self.max_concurrent_searches = self.config.config.get("max_concurrent_searches", 5)
+        self.max_concurrency = self.config.config.get("max_concurrency", 5)
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
     async def run(self, query: str, background: str = "") -> list[dict]:
@@ -175,7 +175,8 @@ class WebSearchToolkit(AsyncBaseToolkit):
             num_results (int, optional): The number of results to return. Defaults to 10.
         """
         # https://serper.dev/playground
-        res = await self.search_google(query)
+        async with asyncio.Semaphore(self.max_concurrency):
+            res = await self.search_google(query)
         # filter the search results
         results = self._filter_results(res["organic"], num_results)
         return results
@@ -206,7 +207,7 @@ class WebSearchToolkit(AsyncBaseToolkit):
             url (str): The url to get content from.
             query (str, optional): The query to search for. If not given, return the original content of the url.
         """
-        async with asyncio.Semaphore(self.max_concurrent_searches):
+        async with asyncio.Semaphore(self.max_concurrency):
             content = await self.get_content(url)
             query = query or "Summarize the content of this webpage."
             res_summary, res_links = await asyncio.gather(self._qa(content, query, background), self._extract_links(content, query, background))
@@ -236,6 +237,7 @@ class SummarizeToolkit(AsyncBaseToolkit):
         super().__init__(config)
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
         self.max_chars = self.config.config.get("max_chars", 20_000)
+        self.max_concurrency = self.config.config.get("max_concurrency", 5)
 
     async def run(self, query: str, background: str, search_results: list[dict]) -> str:
         """ Summarize web content based on search results.
@@ -251,7 +253,9 @@ class SummarizeToolkit(AsyncBaseToolkit):
             formattedSearchResults=formatted_search_result
         )
         
-        response = await self.llm.query_one(messages=[{"role": "user", "content": prompt}])
+        async with asyncio.Semaphore(self.max_concurrency):
+            # Use the LLM to generate the summary
+            response = await self.llm.query_one(messages=[{"role": "user", "content": prompt}])
         return response.strip()
     
     def _get_formatted_search_result(self, search_results: list[dict]) -> str:
