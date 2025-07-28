@@ -6,7 +6,7 @@ import logging
 from contextlib import AsyncExitStack
 
 from agents import Tool, TContext, RunResult, RunResultStreaming, Agent, TResponseInputItem, Runner, RunHooks, RunConfig
-from agents.tracing import gen_trace_id
+from agents.tracing import gen_trace_id, get_current_trace
 from agents.mcp import MCPServerStdio, MCPServer
 
 from ..config import AgentConfig, ToolkitConfig, ConfigLoader
@@ -23,36 +23,21 @@ class RunnerMixin:
     current_agent: Agent[TContext] = None
     input_items: list[TResponseInputItem] = []
     context_manager: BaseContextManager = None
-    trace_id: str = None
     _run_hooks: RunHooks = None
+    trace_id: str = None
 
-    # def setup_tracer(self):
-    #     if self.tracer: return
-    #     self.tracer = trace(
-    #         workflow_name=self.config.agent.name,  # FIXME: multi-agent?
-    #         trace_id=gen_trace_id(),
-    #         # metadata={
-    #         #     "config": str(self.config.model_dump())
-    #         # }  # FIXME: str too long for phoenix
-    #     )
-    #     self.tracer.start(mark_as_current=True)
-    #     print(f"> trace_id: {self.tracer.trace_id}")
-    #     # TODO: get otel trace_id --> set same as self.tracer.trace_id
-    #     # print(f"> otel trace_id: {otel_span.get_span_context().trace_id}")
-
-    # FIXME: trace_id should bound to session, not agent!
-    def set_trace_id(self, trace_id: str):
-        if self.trace_id is not None: logger.warning(f"trace_id is already set to {self.trace_id}, will be overriden by {trace_id}!")
-        self.trace_id = trace_id
+    def _get_trace_id(self) -> str:
+        if not self.trace_id:
+            current_trace = get_current_trace()
+            self.trace_id = gen_trace_id() if current_trace is None else current_trace.trace_id
+        logger.info(f"> trace_id: {self.trace_id}")
+        return self.trace_id
 
     def _get_run_config(self) -> RunConfig:
-        if self.trace_id is None:
-            self.trace_id = gen_trace_id()
-        logger.info(f"> trace_id: {self.trace_id}")
         run_config = RunConfig(
             model=self.current_agent.model,
             model_settings=self.config.model_settings,
-            trace_id=self.trace_id,
+            trace_id=self._get_trace_id(),
             workflow_name=self.config.agent.name,
         )
         return run_config
@@ -63,8 +48,9 @@ class RunnerMixin:
         }
 
     # wrap `Runner` apis in @openai-agents
-    async def run(self, input: str | list[TResponseInputItem]) -> RunResult:
+    async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResult:
         setup_tracing()
+        if trace_id: self.trace_id = trace_id
         return await Runner.run(
             self.current_agent, 
             input, 
@@ -74,8 +60,9 @@ class RunnerMixin:
             run_config=self._get_run_config(), 
         )
 
-    def run_streamed(self, input: str | list[TResponseInputItem]) -> RunResultStreaming:
+    def run_streamed(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResultStreaming:
         setup_tracing()
+        if trace_id: self.trace_id = trace_id
         return Runner.run_streamed(
             self.current_agent, 
             input, 

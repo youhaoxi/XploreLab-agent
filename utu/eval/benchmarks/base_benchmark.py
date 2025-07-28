@@ -5,6 +5,7 @@ import time
 import traceback
 
 from tqdm import tqdm
+from agents.tracing import gen_trace_id
 
 from ...utils import set_log_level
 from ...config import EvalConfig, ConfigLoader
@@ -96,15 +97,16 @@ class BaseBenchmark:
 
     async def rollout_one(self, sample: EvaluationSample) -> EvaluationSample:
         agent = await self._get_agent(sample.source)
+        trace_id = gen_trace_id()
         start_time = time.time()
-        result = await agent.run(sample.augmented_question)
+        result = await agent.run(sample.augmented_question, trace_id=trace_id)
         end_time = time.time()
         predicted_answer = result.final_output
 
         # Update the sample with the predicted answer and trajectory
         trajectory = get_trajectory_from_agent_result(result)
         sample.update(
-            trace_id=agent.trace_id,
+            trace_id=trace_id,
             response=predicted_answer,
             time_cost=end_time - start_time,
             trajectory=json.dumps(trajectory, ensure_ascii=False),
