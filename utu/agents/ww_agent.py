@@ -1,9 +1,12 @@
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
+
 from agents import gen_trace_id
+from agents.tracing import function_span, trace
 
 # from agents import RunResult
 from ..config import AgentConfig, ConfigLoader
+from ..tracing import setup_tracing
 from .utils import NextTaskResult, SearchResult, AnalysisResult
 from .ww_analyst import AnalysisAgent
 from .ww_searcher_simple import SearcherAgent
@@ -35,32 +38,50 @@ class WWAgent:
 
     async def run(self, input: str) -> WWRunResult:
         # setup
+        setup_tracing()
         trace_id = gen_trace_id()
 
         task_records: list[tuple[NextTaskResult, SearchResult]] = []
         trajectory: list[dict] = []  # for tracing
         analysis_result: AnalysisResult | None = None
-        while True:
-            next_task = await self.planner_agent.get_next_task(input, task_records[-1][1] if task_records else None, trace_id)
-            trajectory.extend(next_task.trajectory)
-            if next_task.is_finished: break
 
-            if next_task.task.agent == "SearchAgent":
-                result = await self.search_agent.research(next_task.task.task, trace_id=trace_id)
-                task_records.append((next_task, result))
-                trajectory.extend(result.trajectory)
-            elif next_task.task.agent == "AnalysisAgent":
-                analysis_result = await self.analysis_agent.analyze(task_records, trace_id=trace_id)
+        # FIXME: error_tracing
+        with trace(workflow_name="ww_agent", trace_id=trace_id):
+            while True:
+                next_task = await self.plan(input, task_records[-1][1].output if task_records else None, trace_id)
+                trajectory.extend(next_task.trajectory)
+                if next_task.is_finished: break
+
+                if next_task.task.agent == "SearchAgent":
+                    result = await self.search_agent.research(next_task.task.task, trace_id=trace_id)
+                    task_records.append((next_task, result))
+                    trajectory.extend(result.trajectory)
+                elif next_task.task.agent == "AnalysisAgent":
+                    analysis_result = await self.analyze(task_records, trace_id=trace_id)
+                    trajectory.extend(analysis_result.trajectory)
+                else:
+                    raise ValueError(f"Unknown agent name: {next_task.task.agent}")
+
+            if analysis_result is None:
+                analysis_result = await self.analyze(task_records, trace_id=trace_id)
                 trajectory.extend(analysis_result.trajectory)
-            else:
-                raise ValueError(f"Unknown agent name: {next_task.task.agent}")
-
-        if analysis_result is None:
-            analysis_result = await self.analysis_agent.analyze(task_records, trace_id=trace_id)
-            trajectory.extend(analysis_result.trajectory)
 
         return WWRunResult(
             final_output=analysis_result.output,
             trajectory=trajectory,
             trace_id=trace_id,
         )
+
+    async def plan(self, input: str, prev_subtask_result: str = None, trace_id: str = None) -> NextTaskResult:
+        with function_span("planner") as span_fn:
+            next_task = await self.planner_agent.get_next_task(input, prev_subtask_result, trace_id)
+            span_fn.span_data.input = str({"input": input, "prev_subtask_result": prev_subtask_result})
+            span_fn.span_data.output = asdict(next_task)
+        return next_task
+
+    async def analyze(self, task_records: list[tuple[NextTaskResult, SearchResult]], trace_id: str = None) -> AnalysisResult:
+        with function_span("analysis") as span_fn:
+            analysis_result = await self.analysis_agent.analyze(task_records, trace_id=trace_id)
+            span_fn.span_data.input = str({"task_records": task_records})
+            span_fn.span_data.output = asdict(analysis_result)
+        return analysis_result

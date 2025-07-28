@@ -15,7 +15,8 @@ class DummayPlannerAgent(Base):
 class PlannerAgent(Base):
     def __init__(self, config: AgentConfig):
         super().__init__(config)
-        self.base_url = "http://9.134.241.185:10101"
+        self.base_url = "http://9.134.243.10:10101"
+        self.traceid_to_nexttask: dict[str, Task] = {}
 
     async def get_next_task(self, query: str=None, prev_subtask_result: str=None, trace_id: str=None) -> NextTaskResult:
         next_task: Task = None
@@ -29,8 +30,10 @@ class PlannerAgent(Base):
             response.raise_for_status()
             result = response.json()
             next_task = Task(**result["next_step"])
+            self.traceid_to_nexttask[trace_id] = next_task
             return NextTaskResult(task=next_task, todo=result["plan"])
         else:
+            next_task = self.traceid_to_nexttask.get(trace_id)
             update_data = {
                 "session_id": trace_id,
                 "task": next_task.task,
@@ -40,4 +43,5 @@ class PlannerAgent(Base):
             response.raise_for_status()
             result = response.json()
             next_task = Task(**result["next_step"]) if (not result["task_finished"]) else None
+            self.traceid_to_nexttask[trace_id] = next_task
             return NextTaskResult(task=next_task, is_finished=result["task_finished"], todo=result["plan"])
