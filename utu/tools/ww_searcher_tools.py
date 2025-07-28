@@ -130,6 +130,7 @@ class WebSearchToolkit(AsyncBaseToolkit):
         # config
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
         self.num_result = self.config.config.get("num_result", 10)
+        self.max_chars = self.config.config.get("max_chars", 300_000)
         self.max_concurrency = self.config.config.get("max_concurrency", 5)
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
@@ -215,9 +216,11 @@ class WebSearchToolkit(AsyncBaseToolkit):
         return result
 
     async def _qa(self, content: str, query: str, background: str) -> str:
+        content = content[:self.max_chars]  # truncate content to max_chars
         template = TEMPLATE_QA.format(content=content, query=query, background=background)
         return await self.llm.query_one(messages=[{"role": "user", "content": template}])
     async def _extract_links(self, content: str, query: str, background: str) -> str:
+        content = content[:self.max_chars]  # truncate content to max_chars
         template = TEMPLATE_LINKS.format(content=content, query=query, background=background)
         return await self.llm.query_one(messages=[{"role": "user", "content": template}])
 
