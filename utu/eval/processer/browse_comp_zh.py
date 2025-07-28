@@ -74,6 +74,8 @@ class BrowseCompZHProcesser(BaseLLMJudgeProcesser):
             r"(?=.*?confidence:\s*(?P<confidence>\d+)\s*%?(?=\n\s*\w+:|$))?",
             re.DOTALL
         )
+        # remove the bold formatting
+        response = response.replace("**", "")
         match = pattern.search(response)
         if not match:
             raise ValueError("Invalid judge response format")

@@ -62,6 +62,8 @@ class XBenchProcesser(BaseLLMJudgeProcesser):
             r"(?=.*?结论:\s*(?P<correct>.*?)(?=\n\s*\w+:|$))?",
             re.DOTALL
         )
+        # remove the bold formatting
+        response = response.replace("**", "")
         match = pattern.search(response)
         if not match:
             raise ValueError("Invalid judge response format.")
