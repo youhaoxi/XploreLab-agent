@@ -14,7 +14,8 @@ toolkits:
     name: web_searcher
     config: 
       num_result: 3
-      max_concurrency: 5
+      max_chars: 300_000
+      max_concurrency: 1
       summary_token_limit: 1_000
     config_llm: 
       model: ${oc.env:WW_SEARCH_SEARCHER_MODEL}
@@ -24,7 +25,7 @@ toolkits:
     name: summarizer
     config: 
       max_chars: 20_000
-      max_concurrency: 5
+      max_concurrency: 1
     config_llm: 
       model: ${oc.env:WW_SEARCH_SUMMARIZER_MODEL}
       base_url: ${oc.env:WW_SEARCH_TOOL_BASE_URL}
