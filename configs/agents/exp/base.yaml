@@ -1,7 +1,8 @@
 # @package _global_
 type: simple_env
 model:
-  model: ${oc.env:UTU_MODEL_AGENT}
+  model_provider:
+    model: ${oc.env:UTU_MODEL_AGENT}
 agent:
   instructions: |-
     You are a helpful assistant that can search the web, extract webpage content, and provide relevant information to solve the given task.

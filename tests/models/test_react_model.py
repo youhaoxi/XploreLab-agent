@@ -1,4 +1,3 @@
-import asyncio
 from agents import Agent, Runner
 
 from utu.config import ConfigLoader
@@ -7,9 +6,9 @@ from utu.tools import SearchToolkit
 from utu.models.react import ReactModel, get_react_model
 
 
-async def main():
+async def test_react_model():
     model_config = ConfigLoader.load_model_config()
-    model: ReactModel = get_react_model(**model_config.model_dump())
+    model: ReactModel = get_react_model(**model_config.model_provider.model_dump())
     agent = Agent(
         name="test_agent",
         instructions="You are a helpful assistant.",
@@ -24,6 +23,3 @@ async def main():
     # AgentsUtils.print_new_items(result.new_items)
     next_input_items = result.to_input_list()
     print(next_input_items)
-
-if __name__ == "__main__":
-    asyncio.run(main())

@@ -4,5 +4,5 @@ defaults:
   - _self_
 
 agent:
-    name: utu-default
-    instructions: "You are a helpful assistant."
+  name: utu-default
+  instructions: "You are a helpful assistant."

@@ -1,6 +1,7 @@
 # @package _global_
 model:
-  model: ${oc.env:WW_MODEL_SEARCH_AGENT}
+  model_provider:
+    model: ${oc.env:WW_MODEL_SEARCH_AGENT}
 toolkits:
   query_decomposer:
     name: query_decomposer

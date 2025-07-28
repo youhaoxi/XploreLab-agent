@@ -16,9 +16,9 @@ def parse_eval_config() -> EvalConfig:
     if args.exp_id:
         config.exp_id = args.exp_id
     if args.agent_model:
-        config.agent.model.model = args.agent_model
+        config.agent.model.model_provider.model = args.agent_model
     if args.dataset:
-        config.dataset = args.dataset
+        config.data.dataset = args.dataset
     if args.dataset_type:
-        config.type = args.dataset_type
+        config.data.type = args.dataset_type
     return config

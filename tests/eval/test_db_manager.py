@@ -4,6 +4,7 @@ from utu.config import ConfigLoader
 
 config = ConfigLoader.load_eval_config("v00")
 config.exp_id = f"test_{uuid.uuid4()}"  # ensure unique
+print(config)
 db_manager = DBDataManager(config)
 
 async def test_db_manager():

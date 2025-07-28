@@ -36,7 +36,7 @@ class RunnerMixin:
     def _get_run_config(self) -> RunConfig:
         run_config = RunConfig(
             model=self.current_agent.model,
-            model_settings=self.config.model_settings,
+            model_settings=self.config.model.model_settings,
             trace_id=self._get_trace_id(),
             workflow_name=self.config.agent.name,
         )
@@ -142,7 +142,7 @@ class SimpleAgent(RunnerMixin):
 
     async def build(self):
         """ Build the agent """
-        model = AgentsUtils.get_agents_model(**self.config.model.model_dump())
+        model = AgentsUtils.get_agents_model(**self.config.model.model_provider.model_dump())
         tools = self._tools if self._tools else await self.get_tools()
         self.current_agent = Agent(
             name=self.config.agent.name,

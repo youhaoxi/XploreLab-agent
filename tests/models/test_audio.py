@@ -5,7 +5,7 @@ from utu.config import ConfigLoader
 
 
 config = ConfigLoader.load_model_config("v00")
-client = SimplifiedAsyncOpenAI(**config.model_dump())
+client = SimplifiedAsyncOpenAI(**config.model_provider.model_dump())
 
 
 # https://platform.openai.com/docs/guides/audio?example=audio-in#add-audio-to-your-existing-application

@@ -13,13 +13,12 @@ def test_load_toolkit_config():
     print(config)
 
 def test_load_agent_config():
-    config = ConfigLoader.load_agent_config("v01")
+    config = ConfigLoader.load_agent_config("v00")
     config = ConfigLoader.load_agent_config("default")
     config = ConfigLoader.load_agent_config("examples/mcp")
     config = ConfigLoader.load_agent_config("examples/eval")
-    config = ConfigLoader.load_agent_config("exp/v02")
     print(config)
 
 def test_load_eval_config():
-    config = ConfigLoader.load_eval_config("v01")
+    config = ConfigLoader.load_eval_config("v00")
     print(config)

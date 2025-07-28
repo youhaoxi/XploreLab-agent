@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from omegaconf import OmegaConf, DictConfig
 from hydra import compose, initialize
 
-from .agent_config import AgentConfig, ModelConfig, ToolkitConfig
+from .agent_config import AgentConfig, ModelConfigs, ToolkitConfig
 from .eval_config import EvalConfig
 
 TConfig = TypeVar("TConfig", bound=BaseModel)
@@ -38,9 +38,9 @@ class ConfigLoader:
         return ToolkitConfig(**cfg)
 
     @classmethod
-    def load_model_config(cls, name: str = "base") -> ModelConfig:
+    def load_model_config(cls, name: str = "base") -> ModelConfigs:
         cfg = cls._load_config_to_dict(name, config_path="../../configs/agents/model")
-        return ModelConfig(**cfg)
+        return ModelConfigs(**cfg)
 
     @classmethod
     def load_eval_config(cls, name: str = "default") -> EvalConfig:

@@ -10,14 +10,10 @@ from .base_config import ConfigBaseModel
 DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
 
 
-class ModelConfig(ConfigBaseModel):
+class ModelProviderConfig(ConfigBaseModel):
     api_key: str | None = None
     base_url: str | None = None
     model: str
-
-    temperature: float | None = None
-    top_p: float | None = None
-    # ...
 
 
 class ModelSettingsConfig(ConfigBaseModel, ModelSettings):
@@ -26,6 +22,11 @@ class ModelSettingsConfig(ConfigBaseModel, ModelSettings):
     )
 
     parallel_tool_calls: bool | None = False  # default to False
+
+
+class ModelConfigs(ConfigBaseModel):
+    model_provider: ModelProviderConfig
+    model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
 
 class ProfileConfig(ConfigBaseModel):
     name: Optional[str] = "default"
@@ -37,7 +38,7 @@ class ToolkitConfig(ConfigBaseModel):
     name: str | None = None
     activated_tools: list[str] | None = None
     config: dict | None = Field(default_factory=dict)
-    config_llm: ModelConfig | None = None
+    config_llm: ModelProviderConfig | None = None
 
 class ContextManagerConfig(ConfigBaseModel):
     name: str | None = None
@@ -45,8 +46,7 @@ class ContextManagerConfig(ConfigBaseModel):
 
 class AgentConfig(ConfigBaseModel):
     type: Literal["simple", "simple_env"] = "simple"  # FIXME: 
-    model: ModelConfig
-    model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
+    model: ModelConfigs = Field(default_factory=ModelConfigs)
     agent: ProfileConfig = Field(default_factory=ProfileConfig)
     context_manager: ContextManagerConfig = Field(default_factory=ContextManagerConfig)
     toolkits: dict[str, ToolkitConfig] = Field(default_factory=dict)
