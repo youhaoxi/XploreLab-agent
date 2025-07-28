@@ -59,7 +59,7 @@ class SearchToolkit(AsyncBaseToolkit):
             'Content-Type': 'application/json'
         }
         # config
-        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
+        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump() if self.config.config_llm else {})
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
     @async_file_cache(expire_time=None)
@@ -74,7 +74,7 @@ class SearchToolkit(AsyncBaseToolkit):
         results = response.json()
         return results
 
-    async def search_google_api(self, query: str, num_results: int = 10) -> str:
+    async def search_google_api(self, query: str, num_results: int = 10) -> dict:
         """Search the query via Google api. NOTE:
         1. try Google search operators, e.g. " " for exact match; -xxx for exclude; * wildcard matching; filetype:xxx for file types; site:xxx for site search. before:YYYY-MM-DD, after:YYYY-MM-DD for time range.
         2. search query should be concrete and not vague or super long

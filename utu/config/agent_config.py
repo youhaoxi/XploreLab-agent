@@ -15,6 +15,11 @@ class ModelConfig(ConfigBaseModel):
     base_url: str | None = None
     model: str
 
+    temperature: float | None = None
+    top_p: float | None = None
+    # ...
+
+
 class ModelSettingsConfig(ConfigBaseModel, ModelSettings):
     model_config = ConfigDict(
         arbitrary_types_allowed=True
