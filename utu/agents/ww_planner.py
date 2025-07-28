@@ -5,7 +5,7 @@ from .utils import Base, NextTaskResult, Task
 from ..config import AgentConfig
 
 
-class DummayPlannerAgent(Base):
+class DummyPlannerAgent(Base):
     async def get_next_task(self, query=None, prev_subtask_result=None, trace_id=None) -> NextTaskResult:
         """ get next task to execute """
         if prev_subtask_result:
