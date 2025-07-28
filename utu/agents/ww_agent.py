@@ -6,7 +6,7 @@ from agents import gen_trace_id
 from ..config import AgentConfig, ConfigLoader
 from .utils import NextTaskResult, SearchResult, AnalysisResult
 from .ww_analyst import AnalysisAgent
-from .ww_searcher import SearcherAgent
+from .ww_searcher_simple import SearcherAgent
 from .ww_planner import PlannerAgent
 
 
@@ -36,7 +36,6 @@ class WWAgent:
     async def run(self, input: str) -> WWRunResult:
         # setup
         trace_id = gen_trace_id()
-        self.search_agent.agent.set_trace_id(trace_id)  # pass down trace_id
 
         task_records: list[tuple[NextTaskResult, SearchResult]] = []
         trajectory: list[dict] = []  # for tracing
@@ -47,17 +46,17 @@ class WWAgent:
             if next_task.is_finished: break
 
             if next_task.task.agent == "SearchAgent":
-                result = await self.search_agent.research(next_task.task.task)
+                result = await self.search_agent.research(next_task.task.task, trace_id=trace_id)
                 task_records.append((next_task, result))
                 trajectory.extend(result.trajectory)
             elif next_task.task.agent == "AnalysisAgent":
-                analysis_result = await self.analysis_agent.analyze(task_records)
+                analysis_result = await self.analysis_agent.analyze(task_records, trace_id=trace_id)
                 trajectory.extend(analysis_result.trajectory)
             else:
                 raise ValueError(f"Unknown agent name: {next_task.task.agent}")
 
         if analysis_result is None:
-            analysis_result = await self.analysis_agent.analyze(task_records)
+            analysis_result = await self.analysis_agent.analyze(task_records, trace_id=trace_id)
             trajectory.extend(analysis_result.trajectory)
 
         return WWRunResult(

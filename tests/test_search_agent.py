@@ -1,5 +1,5 @@
 import asyncio
-from utu.agents import SearcherAgent, SearchResult
+from utu.agents.ww_searcher import SearcherAgent
 from utu.config import ConfigLoader
 
 

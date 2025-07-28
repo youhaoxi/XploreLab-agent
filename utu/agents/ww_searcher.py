@@ -54,7 +54,7 @@ class SearcherAgent(Base):
                 raise ValueError(f"Unknown tool: {tool_name}")
 
     # TODO: add background information
-    async def research(self, query: str, background: str = None) -> SearchResult:
+    async def research(self, query: str, background: str = None, trace_id: str = None) -> SearchResult:
         """ Run the search agent with a given query.
         
         This method will:
