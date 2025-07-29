@@ -13,7 +13,7 @@ from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
 from ..utils import async_file_cache, SimplifiedAsyncOpenAI, FileUtils, DIR_ROOT
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 
 # ref @smolagents

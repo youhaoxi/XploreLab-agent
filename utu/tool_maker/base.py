@@ -3,7 +3,7 @@ from agents import Agent, function_tool
 from agents.mcp import MCPServerStdioParams
 from ..utils import oneline_object
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 
 @function_tool

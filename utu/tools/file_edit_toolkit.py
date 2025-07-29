@@ -64,7 +64,7 @@ from datetime import datetime
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 
 class FileEditToolkit(AsyncBaseToolkit):

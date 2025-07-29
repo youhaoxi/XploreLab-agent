@@ -15,7 +15,7 @@ from ..utils import AgentsUtils
 from ..context import BaseContextManager, CONTEXT_MANAGER_MAP
 from ..tracing import setup_tracing
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 
 class RunnerMixin:

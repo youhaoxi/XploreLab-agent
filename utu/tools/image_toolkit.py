@@ -16,7 +16,7 @@ from .base import AsyncBaseToolkit
 from ..utils import SimplifiedAsyncOpenAI
 from ..config import ToolkitConfig
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 # ref @camel
 SP_DESCRIPTION = """You are an image analysis expert. Provide a detailed description including text if present."""
@@ -83,12 +83,6 @@ class ImageToolkit(AsyncBaseToolkit):
                 {"role": "user", "content": [{"type": "text", "text": question}, {"type": "image_url", "image_url": {"url": image_str}}]}
             ]
             output = await self.llm.query_one(messages=messages)
-        # except Exception as e:
-        #     print(e)
-        #     raise
-        #     # if "Payload Too Large" in str(e):
-        #     #     new_image_path = resize_image(image_path)
-        #     #     output = process_images_and_text(new_image_path, question, self.client)
         return output
 
     async def get_tools_map(self) -> dict[str, Callable]:

@@ -36,34 +36,25 @@ class BaseBenchmark:
 
 
     async def main(self):
-        print(f"> Running with config: {self.config}")
-        print(f"> Running preprocess...")
+        logger.info(f"> Running with config: {self.config}")
         self.preprocess()
-        # overall_start_time = time.time()
-        print(f"> Running rollout...")
         await self.rollout()
-        # time_cost = time.time() - overall_start_time; tokens = self.total_tokens
-        # print(f"Processed {tokens} tokens in {time_cost:.2f} seconds.")
-        # print(f"The average inference speed is {tokens / time_cost:.2f} tokens/second.")
-        # print((f"total tokens: {tokens}, time cost: {time_cost:.2f}, avg_speed: {tokens / time_cost:.2f}\n"))
-        # 4. evaluate the results
-        print(f"> Running judge...")
         await self.judge()
-        print(f"> Running stat...")
+        logger.info(f"> Running stat...")
         await self.stat()
-        print(f"> Cleaning up...")
+        logger.info(f"> Cleaning up...")
         await self.cleanup()
 
     def preprocess(self) -> None:
         """ Preprocess the dataset before rollout. """
         samples = self.dataset.get_samples(stage="init")
-        print(f"Preprocessing {len(samples)} samples...")
+        logger.info(f"Preprocessing {len(samples)} samples...")
         results = []
         for sample in tqdm(samples, desc="Preprocessing"):
             processed_sample = self.preprocess_one(sample)
             if processed_sample is not None:
                 results.append(processed_sample)
-        print(f"Successfully preprocessed {len(results)} samples. Updated to db.")
+        logger.info(f"Successfully preprocessed {len(results)} samples. Updated to db.")
         return results
     
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
@@ -76,7 +67,7 @@ class BaseBenchmark:
 
     async def rollout(self) -> None:
         samples = self.dataset.get_samples(stage="init")
-        print(f"Rollout {len(samples)} samples...")
+        logger.info(f"Rollout {len(samples)} samples...")
 
         semaphore = asyncio.Semaphore(self.config.concurrency)
         async def rollout_with_semaphore(item: EvaluationSample):
@@ -84,15 +75,14 @@ class BaseBenchmark:
                 try:
                     return await self.rollout_one(item)
                 except Exception as e:
-                    print(f">>>>>>>>>>>>>\nError running rollout on sample '{item.raw_question}': {e}\n<<<<<<<<<<<<<")
-                    traceback.print_exc()
+                    logger.error(f">>>>>>>>>>>>>\nError running rollout on sample '{item.raw_question}': {e}\n<<<<<<<<<<<<<", exc_info=True)
         tasks = [rollout_with_semaphore(item) for item in samples]
         results = []
         for task in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Rolling out"):
             result = await task
             if result is not None:
                 results.append(result)
-        print(f"Successfully rollout {len(results)} samples. Updated to db.")
+        logger.info(f"Successfully rollout {len(results)} samples. Updated to db.")
         return results
 
     async def rollout_one(self, sample: EvaluationSample) -> EvaluationSample:
@@ -128,7 +118,7 @@ class BaseBenchmark:
 
     async def judge(self) -> list[EvaluationSample]:
         samples = self.dataset.get_samples(stage="rollout")
-        print(f"Judging {len(samples)} samples...")
+        logger.info(f"Judging {len(samples)} samples...")
 
         semaphore = asyncio.Semaphore(self.config.judge_concurrency)
         async def judge_with_semaphore(item: EvaluationSample):
@@ -136,8 +126,7 @@ class BaseBenchmark:
                 try:
                     return await self.judge_one(item)
                 except Exception as e:
-                    print(f">>>>>>>>>>>>>\nError judging sample '{item}': {e}\n<<<<<<<<<<<<<")
-                    traceback.print_exc()
+                    logger.error(f">>>>>>>>>>>>>\nError judging sample '{item}': {e}\n<<<<<<<<<<<<<", exc_info=True)
                     return None
         tasks = [judge_with_semaphore(item) for item in samples]
         results = []
@@ -145,7 +134,7 @@ class BaseBenchmark:
             result = await task
             if result is not None:
                 results.append(result)
-        print(f"Successfully judged {len(results)} samples. Updated to db.")
+        logger.info(f"Successfully judged {len(results)} samples. Updated to db.")
         return results
 
     async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
@@ -159,7 +148,7 @@ class BaseBenchmark:
         # TODO: wrap the data like @verl / @torch
         # TODO: log to wandb
         judged_samples = self.dataset.get_samples(stage="judged")
-        print(f"Stat from {len(judged_samples)} samples:")
+        logger.info(f"Stat from {len(judged_samples)} samples:")
 
         data_by_benchmark = self._group_data_by_benchmark(judged_samples)
         overall_results: list[EvaluationResult] = []
@@ -169,7 +158,7 @@ class BaseBenchmark:
             result.update(benchmark=benchmark)
             overall_results.append(result)
 
-        print(json.dumps([r.as_dict() for r in overall_results], indent=4, ensure_ascii=False))
+        logger.info(json.dumps([r.as_dict() for r in overall_results], indent=4, ensure_ascii=False))
     
     def _get_processer(self, source: str) -> BaseProcesser:
         if source not in self._source_to_processer:

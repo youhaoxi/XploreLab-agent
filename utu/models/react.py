@@ -24,7 +24,7 @@ from agents.items import TResponseStreamEvent
 
 from .react_converter import ReactConverter, ConverterPreprocessInput
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 
 

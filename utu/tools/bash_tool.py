@@ -23,7 +23,7 @@ import pexpect
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 
 def start_persistent_shell(timeout: int) -> tuple[pexpect.spawn, str]:

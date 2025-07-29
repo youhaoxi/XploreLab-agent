@@ -13,7 +13,7 @@ from sqlmodel import create_engine, Session, select
 from .path import DIR_ROOT
 from ..db import ToolCacheModel
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 DIR_CACHE = DIR_ROOT / ".cache"
 DIR_CACHE.mkdir(exist_ok=True)

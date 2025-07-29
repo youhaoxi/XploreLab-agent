@@ -10,7 +10,7 @@ import requests
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
 from ..utils import oneline_object
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 SUPPORTED_LANGUAGES = [
     "python", "cpp", "nodejs", "go", "go_test", "java", "php", "csharp", "bash",

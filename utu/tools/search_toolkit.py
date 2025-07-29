@@ -10,7 +10,7 @@ from .base import AsyncBaseToolkit
 from ..utils import oneline_object, async_file_cache, SimplifiedAsyncOpenAI, TokenUtils
 from ..config import ToolkitConfig
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 
 # TODO: ref @smolagents -- to keep rich context info

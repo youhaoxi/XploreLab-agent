@@ -8,7 +8,7 @@ from typing import Callable, Literal
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 
 class SimpleMemoryToolkit(AsyncBaseToolkit):

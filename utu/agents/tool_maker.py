@@ -9,7 +9,7 @@ from .base import UTUContext
 from .simple import UTUSimpleAgent
 from ..tool_maker import make_tool
 
-logger = logging.getLogger("utu")
+logger = logging.getLogger(__name__)
 
 
 class ToolMakerRunHooks(RunHooks):

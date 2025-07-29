@@ -2,6 +2,7 @@ import re
 import asyncio
 import abc
 import string
+import logging
 from tqdm import tqdm
 from typing import List
 from openai import AsyncOpenAI
@@ -10,6 +11,9 @@ from ...config import EvalConfig
 from ..data import EvaluationSample as Datapoint
 from ..data import EvaluationResult
 from .prompts import get_benchmark_templates
+
+logger = logging.getLogger(__name__)
+
 
 class BaseProcesser:
     """ Base class for processers in evaluation tasks. 
@@ -70,7 +74,7 @@ class BaseProcesser:
                 try:
                     return await self.judge_one(item)
                 except Exception as e:
-                    print(f">>>>>>>>>>>>>\nError judging sample '{item}': {e}\n<<<<<<<<<<<<<")
+                    logger.error(f">>>>>>>>>>>>>\nError judging sample '{item}': {e}\n<<<<<<<<<<<<<", exc_info=True)
                     return None
         tasks = [judge_with_semaphore(item) for item in predict_data]
         results = []
@@ -137,12 +141,12 @@ class BaseLLMJudgeProcesser(BaseProcesser):
         """ Judge if the agent's predictions match ground truth. """
         # judge all data
         judged_data = []
-        print(f"Judging {len(samples)} items with concurrency limit {self.concurrency_limit}...")
+        logger.info(f"Judging {len(samples)} items with concurrency limit {self.concurrency_limit}...")
         tasks = [self.judge_one(data) for data in samples]
         for i, task in enumerate(asyncio.as_completed(tasks)):
             result = await task
             judged_data.append(result)
-            print(f"Judged {i + 1}/{len(samples)} items...")
+            logger.info(f"Judged {i + 1}/{len(samples)} items...")
         return judged_data
     
     async def judge_one(self, data: Datapoint) -> Datapoint:
@@ -181,7 +185,7 @@ class BaseLLMJudgeProcesser(BaseProcesser):
                 parsed_content = self._parse_judge_response(content)
                 break
             except Exception as e:
-                print(f"Error during judging: {e}, retrying {attempt + 1}/{self.retries}...")
+                logger.error(f"Error during judging: {e}, retrying {attempt + 1}/{self.retries}...", exc_info=True)
                 continue
         else:
             raise RuntimeError("Failed to judge after multiple retries.")
