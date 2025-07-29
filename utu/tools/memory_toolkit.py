@@ -2,13 +2,13 @@
 @ii-agent/src/ii_agent/tools/memory/
 """
 
-import logging
 from typing import Callable, Literal
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from ..utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class SimpleMemoryToolkit(AsyncBaseToolkit):

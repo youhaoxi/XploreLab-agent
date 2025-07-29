@@ -3,7 +3,6 @@ import json
 import time
 import hashlib
 import pathlib
-import logging
 import functools
 from typing import Optional, Literal
 from datetime import datetime
@@ -12,8 +11,9 @@ from sqlmodel import create_engine, Session, select
 
 from .path import DIR_ROOT
 from ..db import ToolCacheModel
+from ..utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 DIR_CACHE = DIR_ROOT / ".cache"
 DIR_CACHE.mkdir(exist_ok=True)
@@ -45,7 +45,7 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
                     cache_data = json.load(f)
                 
                 if expire_time is None or (time.time() - cache_data['metadata']['timestamp']) < expire_time:
-                    logger.info(f"🔄 Using cached result for {func_name} from {cache_file}")
+                    logger.debug(f"🔄 Using cached result for {func_name} from {cache_file}")
                     return cache_data['result']
             
             start_time = time.time()
@@ -69,7 +69,7 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
             with open(cache_file, 'w') as f:
                 json.dump(cache_data, f, ensure_ascii=False, indent=2)
             
-            logger.info(f"💾 Cached result for {func_name} to {cache_file}")
+            logger.debug(f"💾 Cached result for {func_name} to {cache_file}")
             return result
         return wrapper
     
@@ -88,7 +88,7 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
                 )
                 if_exist = session.exec(stmt).first()  # one_or_none
                 if if_exist and (expire_time is None or (time.time() - if_exist.timestamp) < expire_time):
-                    logger.info(f"🔄 Using cached result for {func_name} from db")
+                    logger.debug(f"🔄 Using cached result for {func_name} from db")
                     return if_exist.result
                 else:
                     start_time = time.time()
@@ -106,7 +106,7 @@ def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optio
                     )
                     session.add(data)
                     session.commit()
-                    logger.info(f"💾 Cached result for {func_name} to db")
+                    logger.debug(f"💾 Cached result for {func_name} to db")
                     return result
         return wrapper
 

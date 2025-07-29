@@ -2,7 +2,6 @@
 - [ ] env https://github.com/RAGEN-AI/RAGEN/blob/main/ragen/env/base.py (gym like)
 """
 
-import logging
 from contextlib import AsyncExitStack
 
 from agents import Tool, TContext, RunResult, RunResultStreaming, Agent, TResponseInputItem, Runner, RunHooks, RunConfig
@@ -11,11 +10,11 @@ from agents.mcp import MCPServerStdio, MCPServer
 
 from ..config import AgentConfig, ToolkitConfig, ConfigLoader
 from ..tools import AsyncBaseToolkit, TOOLKIT_MAP
-from ..utils import AgentsUtils
+from ..utils import AgentsUtils, get_logger
 from ..context import BaseContextManager, CONTEXT_MANAGER_MAP
 from ..tracing import setup_tracing
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class RunnerMixin:

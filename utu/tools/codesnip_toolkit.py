@@ -2,15 +2,15 @@
 https://github.com/bytedance/SandboxFusion
 https://bytedance.github.io/SandboxFusion/docs/docs/get-started
 """
-import logging
 from typing import Callable, Optional
 
 import requests
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
-from ..utils import oneline_object
-logger = logging.getLogger(__name__)
+from ..utils import oneline_object, get_logger
+
+logger = get_logger(__name__)
 
 SUPPORTED_LANGUAGES = [
     "python", "cpp", "nodejs", "go", "go_test", "java", "php", "csharp", "bash",

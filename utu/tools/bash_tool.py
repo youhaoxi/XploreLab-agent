@@ -15,15 +15,15 @@ Run commands in a bash shell\n
 """
 
 import re
-import logging
 from typing import Callable
 
 import pexpect
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from ..utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def start_persistent_shell(timeout: int) -> tuple[pexpect.spawn, str]:

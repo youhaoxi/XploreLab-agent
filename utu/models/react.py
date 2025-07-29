@@ -22,9 +22,10 @@ from agents import (
 )
 from agents.items import TResponseStreamEvent
 
+from ..utils import get_logger
 from .react_converter import ReactConverter, ConverterPreprocessInput
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 

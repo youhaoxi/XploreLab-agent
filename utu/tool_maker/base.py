@@ -1,9 +1,9 @@
-import logging
 from agents import Agent, function_tool
 from agents.mcp import MCPServerStdioParams
-from ..utils import oneline_object
 
-logger = logging.getLogger(__name__)
+from ..utils import oneline_object, get_logger
+
+logger = get_logger(__name__)
 
 
 @function_tool

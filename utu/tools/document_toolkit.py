@@ -3,7 +3,6 @@ https://github.com/lumina-ai-inc/chunkr
 """
 
 from typing import Optional, Callable
-import logging
 import os
 
 from chunkr_ai import Chunkr
@@ -11,9 +10,9 @@ from chunkr_ai.models import Configuration
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
-from ..utils import async_file_cache, SimplifiedAsyncOpenAI, FileUtils, DIR_ROOT
+from ..utils import async_file_cache, SimplifiedAsyncOpenAI, FileUtils, DIR_ROOT, get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 # ref @smolagents

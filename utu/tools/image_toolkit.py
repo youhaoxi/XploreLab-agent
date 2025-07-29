@@ -6,17 +6,16 @@ https://platform.openai.com/docs/guides/images-vision?api-mode=chat
 from typing import Optional, Callable
 from io import BytesIO
 import requests
-import logging
 import base64
 
 from urllib.parse import urlparse
 from PIL import Image
 
 from .base import AsyncBaseToolkit
-from ..utils import SimplifiedAsyncOpenAI
+from ..utils import SimplifiedAsyncOpenAI, get_logger
 from ..config import ToolkitConfig
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # ref @camel
 SP_DESCRIPTION = """You are an image analysis expert. Provide a detailed description including text if present."""

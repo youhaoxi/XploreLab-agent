@@ -1,22 +1,20 @@
 import asyncio
 import json
-import logging
 import time
-import traceback
 
 from tqdm import tqdm
 from agents.tracing import gen_trace_id
 
-from ...utils import set_log_level
+from ...utils import get_logger, setup_logging
+
 from ...config import EvalConfig, ConfigLoader
 from ...agents import SimpleAgent
 from ..data import DBDataManager, EvaluationSample, EvaluationResult
 from ..processer import PROCESSER_FACTORY, BaseProcesser
 from ..common import get_trajectory_from_agent_result
 
-set_log_level("WARNING")
-logger = logging.getLogger(__name__)
-
+setup_logging()
+logger = get_logger(__name__)
 
 
 class BaseBenchmark:

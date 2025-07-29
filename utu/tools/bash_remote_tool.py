@@ -1,13 +1,13 @@
 import uuid
-import logging
 from typing import Callable
 
 import httpx
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from ..utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class BashRemoteToolkit(AsyncBaseToolkit):

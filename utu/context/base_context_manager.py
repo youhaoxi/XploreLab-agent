@@ -1,9 +1,10 @@
 import abc
-import logging
 
 from agents.run import SingleStepResult
 
-logger = logging.getLogger(__name__)
+from ..utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class BaseContextManager(abc.ABC):
@@ -13,5 +14,4 @@ class BaseContextManager(abc.ABC):
 
 class DummyContextManager(BaseContextManager):
     def process(self, single_step_result: SingleStepResult) -> SingleStepResult:
-        logger.info("DummyContextManager: process")
         return single_step_result

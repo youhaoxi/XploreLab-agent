@@ -4,7 +4,6 @@ https://github.com/Arize-ai/openinference/blob/828b556d9cbb5b6e30537d4b05945ca93
 
 from __future__ import annotations
 
-import logging
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Iterable, Iterator, Mapping, Optional, Union
 
@@ -62,7 +61,9 @@ from openinference.semconv.trace import (
     ToolCallAttributes,
 )
 
-logger = logging.getLogger(__name__)
+from ..utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class OpenInferenceTracingProcessor(TracingProcessor):

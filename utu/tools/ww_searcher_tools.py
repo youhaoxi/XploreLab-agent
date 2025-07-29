@@ -1,16 +1,15 @@
 import os
 import re
 import json
-import logging
 import asyncio
 import requests
 from typing import Callable
 
 from .base import AsyncBaseToolkit
-from ..utils import SimplifiedAsyncOpenAI, async_file_cache, oneline_object
+from ..utils import SimplifiedAsyncOpenAI, async_file_cache, oneline_object, get_logger
 from ..config import ToolkitConfig
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 """ ========== Decompose Query Toolkit ========= """
 DECOMPOSE_QUERY_PROMPT = """As an expert research methodologist, your task is to decompose a complex research question into strategic sub-queries that will collectively build a comprehensive understanding of the topic.

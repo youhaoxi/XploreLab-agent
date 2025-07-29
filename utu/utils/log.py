@@ -1,43 +1,69 @@
 import json
-import sys
 import pathlib
 import logging
+from logging.handlers import TimedRotatingFileHandler
+
+from colorlog import ColoredFormatter
+
 
 DIR_LOGS = pathlib.Path(__file__).parent.parent.parent / "logs"
 DIR_LOGS.mkdir(exist_ok=True)
 
-LOGGING_LEVEL = logging.WARNING
+# Flag to track if logging has been set up
+_LOGGING_INITIALIZED = False
 
-def set_log_level(level: str | int) -> None:
-    """ Setup logging level """
-    if isinstance(level, str):
-        level = getattr(logging, level.upper())
-    global LOGGING_LEVEL
-    LOGGING_LEVEL = level
-    logger = logging.getLogger("utu")
-    logger.setLevel(level)
 
 def setup_logging() -> None:
-    log_format = "%(asctime)s - %(name)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s"
-    logging.basicConfig(
-        format=log_format,
-        datefmt="%Y-%m-%d %H:%M:%S",
-        level=LOGGING_LEVEL,
+    # Check if logging has already been initialized
+    global _LOGGING_INITIALIZED
+    if _LOGGING_INITIALIZED:
+        return
+    
+    # set httpx logging level to WARNING
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+    if root_logger.handlers:
+        root_logger.handlers.clear()
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    color_formatter = ColoredFormatter(
+        "%(green)s%(asctime)s%(reset)s[%(blue)s%(name)s%(reset)s] - "
+        "%(log_color)s%(levelname)s%(reset)s - %(filename)s:%(lineno)d - %(green)s%(message)s%(reset)s - "
+        "%(cyan)s%(threadName)s%(reset)s",
+        log_colors={
+            "DEBUG": "cyan",
+            "INFO": "white",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "red,bg_white",
+        },
+        secondary_log_colors={"asctime": {"green": "green"}, "name": {"blue": "blue"}},
     )
+    console_handler.setFormatter(color_formatter)
 
-    logger = logging.getLogger("utu")
-    logger.setLevel(LOGGING_LEVEL)
+    file_handler = TimedRotatingFileHandler(DIR_LOGS / "utu.log", when="midnight", interval=1, backupCount=30, encoding="utf-8")
+    file_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(asctime)s[%(name)s] - %(levelname)s - %(filename)s:%(lineno)d - %(message)s - %(threadName)s")
+    file_handler.setFormatter(formatter)
 
-    # for handler in logger.handlers[:]:
-    #     logger.removeHandler(handler)
+    root_logger.addHandler(console_handler)
+    root_logger.addHandler(file_handler)
+    
+    # Mark logging as initialized
+    _LOGGING_INITIALIZED = True
 
-    # stdout_handler = logging.StreamHandler(sys.stdout)
-    # stdout_handler.setFormatter(logging.Formatter(log_format))
-    # logger.addHandler(stdout_handler)
 
-    file_handler = logging.FileHandler(DIR_LOGS / "utu.log")
-    file_handler.setFormatter(logging.Formatter(log_format))
-    logger.addHandler(file_handler)
+def get_logger(name: str) -> logging.Logger:
+    logger = logging.getLogger(name)
+    def log_error_with_exc(msg, *args, **kwargs):
+        kwargs["exc_info"] = True
+        logger.error(msg, *args, **kwargs)
+    logger.error_exc = log_error_with_exc
+    return logger
+
 
 def oneline_object(obj: object, limit: int = 100) -> str:
     try:

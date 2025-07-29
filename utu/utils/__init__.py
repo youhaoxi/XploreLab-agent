@@ -1,7 +1,7 @@
 from .print_utils import PrintUtils
 from .agents_utils import AgentsUtils
 from .openai_utils import SimplifiedAsyncOpenAI, OpenAIUtils
-from .log import set_log_level, oneline_object, setup_logging
+from .log import oneline_object, setup_logging, get_logger
 from .tool_cache import async_file_cache
 from .path import DIR_ROOT, FileUtils
 from .token import TokenUtils
@@ -11,7 +11,7 @@ __all__ = [
     "PrintUtils",
     "SimplifiedAsyncOpenAI", "OpenAIUtils",
     "AgentsUtils",
-    "set_log_level", "oneline_object", "setup_logging",
+    "oneline_object", "setup_logging", "get_logger",
     "async_file_cache",
     "DIR_ROOT", "FileUtils",
     "TokenUtils",

@@ -4,16 +4,16 @@ https://info.arxiv.org/help/api/index.html
 https://github.com/lukasschwab/arxiv.py
 """
 
-import logging
 from typing import Generator, List, Optional, Dict, Callable
 
 import arxiv
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from ..utils import get_logger
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class ArxivToolkit(AsyncBaseToolkit):

@@ -2,7 +2,6 @@
 https://github.com/googleapis/python-genai
 https://ai.google.dev/gemini-api/docs/api-key
 """
-import logging
 from typing import Callable
 
 from google import genai
@@ -10,8 +9,9 @@ from google.genai.types import HttpOptions, Part
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from ..utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class VideoToolkit(AsyncBaseToolkit):

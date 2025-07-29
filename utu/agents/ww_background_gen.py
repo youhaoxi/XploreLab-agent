@@ -2,14 +2,13 @@
 
 import re
 import json
-import logging
 import asyncio
 from datetime import datetime
 
 from ..tools import SearchToolkit
-from ..utils import SimplifiedAsyncOpenAI, async_file_cache, oneline_object
+from ..utils import SimplifiedAsyncOpenAI, async_file_cache, oneline_object, get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 step1_prompt = """Your task is to act as a helpful AI Language Model (LLM) to assist users in generating search queries for information you are not familiar with. Your goal is to determine if you have enough knowledge about the concepts mentioned in the user's query. If you do, no query will be generated. If not, you will create search queries for the very basic information about these concepts.

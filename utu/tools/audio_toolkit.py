@@ -1,15 +1,13 @@
-import os
-import base64
-import logging
+
 from typing import Callable
 
 from openai.types.audio import TranscriptionVerbose
 
-from ..utils import SimplifiedAsyncOpenAI, async_file_cache, FileUtils, DIR_ROOT
+from ..utils import SimplifiedAsyncOpenAI, async_file_cache, FileUtils, DIR_ROOT, get_logger
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 INSTRUCTION_QA = """Answer the following question based on the given audio information:

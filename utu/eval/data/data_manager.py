@@ -1,6 +1,5 @@
 import abc
 import json
-import logging
 import pathlib
 from typing import Literal
 
@@ -9,8 +8,9 @@ from sqlmodel import SQLModel, create_engine, Session, select
 from ...config import EvalConfig
 from ...db import EvaluationSample as Datapoint
 from ..processer import BUILTIN_BENCHMARKS
+from ...utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class BaseDataManager(abc.ABC):

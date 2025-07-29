@@ -2,7 +2,6 @@ import re
 import asyncio
 import abc
 import string
-import logging
 from tqdm import tqdm
 from typing import List
 from openai import AsyncOpenAI
@@ -11,8 +10,9 @@ from ...config import EvalConfig
 from ..data import EvaluationSample as Datapoint
 from ..data import EvaluationResult
 from .prompts import get_benchmark_templates
+from ...utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class BaseProcesser:

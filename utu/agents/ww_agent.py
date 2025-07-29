@@ -10,8 +10,8 @@ from ..tracing import setup_tracing
 from .utils import NextTaskResult, SearchResult, AnalysisResult
 from .ww_background_gen import ModuleGenBackground
 
-# MODE = "simple"
-MODE = "plan"
+# MODE = "simple | plan"
+MODE = "simple"
 if MODE == "simple":
     from .ww_analyst import DummyAnalysisAgent as AnalysisAgent
     from .ww_searcher_simple import SearcherAgent
@@ -27,7 +27,7 @@ else:
 @dataclass
 class WWRunResult:
     final_output: str
-    trajectory: list[dict]
+    trajectory: list[dict]  # TODO: add handoff info
     trace_id: str = ""
 
 

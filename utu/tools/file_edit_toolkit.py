@@ -54,7 +54,6 @@ Notes for using the `str_replace` command:\n
    }
 """
 
-import logging
 import shutil
 import re
 from pathlib import Path
@@ -63,8 +62,9 @@ from datetime import datetime
 
 from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from ..utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class FileEditToolkit(AsyncBaseToolkit):
