@@ -28,11 +28,10 @@ class DBTracingProcessor(TracingProcessor):
         SQLModel.metadata.create_all(self.engine)
 
     def on_trace_start(self, trace: "Trace") -> None:
-        print(f"on_trace_start: {trace.trace_id}")
         self.trace = trace
 
     def on_trace_end(self, trace: "Trace") -> None:
-        print(f"on_trace_end: {trace.trace_id}")
+        pass
 
     def on_span_start(self, span: Span[Any]) -> None:
         pass

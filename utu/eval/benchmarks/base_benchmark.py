@@ -34,7 +34,7 @@ class BaseBenchmark:
 
 
     async def main(self):
-        logger.info(f"> Running with config: {self.config}")
+        logger.info(f"> Running with config: \n{json.dumps(self.config.model_dump(), indent=2, ensure_ascii=False)}")
         self.preprocess()
         await self.rollout()
         await self.judge()
@@ -114,8 +114,13 @@ class BaseBenchmark:
             self._source_to_agent[source] = agent
         return self._source_to_agent[source]
 
-    async def judge(self) -> list[EvaluationSample]:
-        samples = self.dataset.get_samples(stage="rollout")
+    async def judge(self, stage: str|None = "rollout") -> list[EvaluationSample]:
+        """Judge samples.
+        
+        Args:
+            stage (str|None, optional): The stage of samples to judge. If set to None, you can rejudge all samples.
+        """
+        samples = self.dataset.get_samples(stage=stage)
         logger.info(f"Judging {len(samples)} samples...")
 
         semaphore = asyncio.Semaphore(self.config.judge_concurrency)
