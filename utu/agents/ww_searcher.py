@@ -7,43 +7,26 @@ Workflow based implementation of a search agent
 """
 import json
 import asyncio
-from pydantic import BaseModel
-from openai import AsyncOpenAI
 
 from .utils import Base, SearchResult
 from ..config import AgentConfig
-from .simple_agent import SimpleAgent
-from ..eval.common import get_trajectory_from_agent_result
+from ..config import ConfigLoader
 from ..tools import TOOLKIT_MAP
 
-'''
-class SearchResult(BaseModel):
-    trace_id: str
-    """ The session ID for the search run, useful for tracking and debugging."""
-
-    final_output: str
-    """ The final output of the search agent after processing the query and summarizing results."""
-
-    trajectory: list[dict]
-    """ The trajectory of the search agent."""
-
-    search_results: list[dict]
-    """ The list of search results obtained during the search process."""
-'''
 
 class SearcherAgent(Base):
     """
     A worklfow-based search agent that decomposes a query, searches the web for sub-queries,
     summarizes the results, and provides a final analysis.
     """
-    llm: AsyncOpenAI = None  # OpenAI client for LLM calls
     trajectory: list[dict] = None  # Track tool calls and results
 
     def __init__(self, config: AgentConfig):
         super().__init__(config)
         self.trajectory = []
+        self.config = ConfigLoader.load_agent_config("search_agent")
 
-    def build(self):
+    async def build(self):
         """ Build tools for the search agent. """
         for tool_name, tool_config in self.config.toolkits.items():
             if tool_name in TOOLKIT_MAP:

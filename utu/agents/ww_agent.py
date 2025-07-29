@@ -10,15 +10,18 @@ from ..tracing import setup_tracing
 from .utils import NextTaskResult, SearchResult, AnalysisResult
 from .ww_background_gen import ModuleGenBackground
 
-MODE = "simple"
+# MODE = "simple"
+MODE = "plan"
 if MODE == "simple":
-    from .ww_analyst import AnalysisAgent
+    from .ww_analyst import DummyAnalysisAgent as AnalysisAgent
     from .ww_searcher_simple import SearcherAgent
     from .ww_planner import DummyPlannerAgent as PlannerAgent
-else:
+elif MODE == "plan":
     from .ww_analyst import AnalysisAgent
     from .ww_searcher import SearcherAgent
     from .ww_planner import PlannerAgent
+else:
+    raise ValueError(f"Unknown mode: {MODE}")
 
 
 @dataclass
@@ -68,13 +71,13 @@ class WWAgent:
                     task_records.append((next_task, result))
                     trajectory.extend(result.trajectory)
                 elif next_task.task.agent == "AnalysisAgent":
-                    analysis_result = await self.analyze(task_records, trace_id=trace_id)
+                    analysis_result = await self.analyze(input, task_records, trace_id=trace_id)
                     trajectory.extend(analysis_result.trajectory)
                 else:
                     raise ValueError(f"Unknown agent name: {next_task.task.agent}")
 
             if analysis_result is None:
-                analysis_result = await self.analyze(task_records, trace_id=trace_id)
+                analysis_result = await self.analyze(input, task_records, trace_id=trace_id)
                 trajectory.extend(analysis_result.trajectory)
 
         return WWRunResult(
@@ -90,9 +93,9 @@ class WWAgent:
             span_fn.span_data.output = asdict(next_task)
         return next_task
 
-    async def analyze(self, task_records: list[tuple[NextTaskResult, SearchResult]], trace_id: str = None) -> AnalysisResult:
+    async def analyze(self, input: str, task_records: list[tuple[NextTaskResult, SearchResult]], trace_id: str = None) -> AnalysisResult:
         with function_span("analysis") as span_fn:
-            analysis_result = await self.analysis_agent.analyze(task_records, trace_id=trace_id)
-            span_fn.span_data.input = str({"task_records": task_records})
+            analysis_result = await self.analysis_agent.analyze(input, task_records, trace_id=trace_id)
+            span_fn.span_data.input = str({"input": input, "task_records": task_records})
             span_fn.span_data.output = asdict(analysis_result)
         return analysis_result
