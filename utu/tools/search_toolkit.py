@@ -1,16 +1,15 @@
 import os
 import re
-import logging
 import asyncio
 from typing import Callable
 
 import requests
 
 from .base import AsyncBaseToolkit
-from ..utils import oneline_object, async_file_cache, SimplifiedAsyncOpenAI, TokenUtils
+from ..utils import oneline_object, async_file_cache, SimplifiedAsyncOpenAI, get_logger
 from ..config import ToolkitConfig
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 # TODO: ref @smolagents -- to keep rich context info
@@ -113,11 +112,11 @@ class SearchToolkit(AsyncBaseToolkit):
 
     # @async_file_cache(expire_time=None)
     async def web_qa(self, url: str, query: str = None) -> str:
-        """Query information you interested from the specified url
+        """Ask question to a webpage, you will get the answer and related links from the specified url.
         
         Args:
-            url (str): The url to get content from.
-            query (str, optional): The query to search for. If not given, return the original content of the url.
+            url (str): The url to ask question to.
+            query (str, optional): The question to ask. If not given, return the summary of the webpage.
         """
         logger.info(f"[tool] web_qa: {oneline_object({url, query})}")
         content = await self.get_content(url)
