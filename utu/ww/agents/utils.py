@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from ..config import AgentConfig
+from ...config import AgentConfig
 
 
 class Base:

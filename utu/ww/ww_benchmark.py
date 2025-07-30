@@ -1,9 +1,9 @@
 import time
 import json
 
-from .base_benchmark import BaseBenchmark
-from ..data import EvaluationSample
-from ...agents.ww_agent import WWAgent
+from ..eval.benchmarks.base_benchmark import BaseBenchmark
+from ..eval.data import EvaluationSample
+from .agents.main import WWAgent
 
 
 class WWBenchmark(BaseBenchmark):

@@ -2,7 +2,7 @@ import requests
 import asyncio
 
 from .utils import Base, NextTaskResult, Task
-from ..config import AgentConfig
+from ...config import AgentConfig
 
 
 class DummyPlannerAgent(Base):

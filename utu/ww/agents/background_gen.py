@@ -5,8 +5,8 @@ import json
 import asyncio
 from datetime import datetime
 
-from ..tools import SearchToolkit
-from ..utils import SimplifiedAsyncOpenAI, async_file_cache, oneline_object, get_logger
+from ...tools import SearchToolkit
+from ...utils import SimplifiedAsyncOpenAI, async_file_cache, oneline_object, get_logger
 
 logger = get_logger(__name__)
 
@@ -78,8 +78,9 @@ class ModuleGenBackground:
             assert "queries" in try_load_json
             assert "in_your_knowledge" in try_load_json
             return try_load_json
-        except:
-            return None
+        except AssertionError:
+            logger.error(f"Failed to extract and load JSON from text: {text}")
+        return None
 
     def _format_serp(self, serp: dict) -> str:
         """格式化搜索结果"""
@@ -113,6 +114,8 @@ class ModuleGenBackground:
         )
         json_response = self._extract_and_load_json(response)
         logger.debug(f">>> STEP1 RESPONSE: {oneline_object(response)}")
+        if not json_response:
+            return {"status": "error", "message": "Failed to extract and load JSON from response"}
         if json_response["in_your_knowledge"]:
             return {"status": "in_knowledge"}
         else:

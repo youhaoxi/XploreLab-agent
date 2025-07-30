@@ -4,17 +4,16 @@ from dataclasses import dataclass, asdict
 from agents import gen_trace_id
 from agents.tracing import function_span, trace
 
-# from agents import RunResult
-from ..config import AgentConfig, ConfigLoader
-from ..tracing import setup_tracing
+from ...config import AgentConfig, ConfigLoader
+from ...tracing import setup_tracing
 from .utils import NextTaskResult, SearchResult, AnalysisResult
-from .ww_background_gen import ModuleGenBackground
+from .background_gen import ModuleGenBackground
 
 # MODE = "simple | plan"
 MODE = "simple"
 if MODE == "simple":
     from .ww_analyst import DummyAnalysisAgent as AnalysisAgent
-    from .ww_searcher_simple import SearcherAgent
+    from .ww_searcher import SimpleSearcherAgent as SearcherAgent
     from .ww_planner import DummyPlannerAgent as PlannerAgent
 elif MODE == "plan":
     from .ww_analyst import AnalysisAgent
@@ -59,8 +58,9 @@ class WWAgent:
 
         # FIXME: error_tracing
         with trace(workflow_name="ww_agent", trace_id=trace_id):
-            input_background = await self.background_gen.generate_background_info(input)
-            aug_input = f"{input}\n\nBackgrounds maybe helpful: {input_background['background']}"
+            # input_background = await self.background_gen.generate_background_info(input)
+            # aug_input = f"{input}\n\nBackgrounds maybe helpful: {input_background['background']}"
+            aug_input = input
             while True:
                 next_task = await self.plan(aug_input, task_records[-1][1].output if task_records else None, trace_id)
                 trajectory.extend(next_task.trajectory)

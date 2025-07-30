@@ -9,9 +9,28 @@ import json
 import asyncio
 
 from .utils import Base, SearchResult
-from ..config import AgentConfig
-from ..config import ConfigLoader
-from ..tools import TOOLKIT_MAP
+from ...config import AgentConfig, ConfigLoader
+from ...tools import TOOLKIT_MAP
+from ...agents.simple_agent import SimpleAgent
+from ...eval.common import get_trajectory_from_agent_result
+
+
+class SimpleSearcherAgent(Base):
+    def __init__(self, config: AgentConfig):
+        super().__init__(config)
+        self.agent = SimpleAgent(config)  # v0
+
+    async def build(self):
+        await self.agent.build()
+
+    async def research(self, subtask: str, trace_id: str = None) -> SearchResult:
+        """search webpages for a specific subtask, return a report """
+        run_result = await self.agent.run(subtask, trace_id=trace_id)
+        return SearchResult(
+            output=run_result.final_output,
+            trajectory=get_trajectory_from_agent_result(run_result),
+        )
+
 
 
 class SearcherAgent(Base):

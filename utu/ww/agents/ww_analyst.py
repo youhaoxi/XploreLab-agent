@@ -1,6 +1,6 @@
 from .utils import Base, AnalysisResult, NextTaskResult, SearchResult
-from ..config import AgentConfig
-from ..utils import SimplifiedAsyncOpenAI
+from ...config import AgentConfig
+from ...utils import SimplifiedAsyncOpenAI
 
 
 TEMPLATE = """Please answer the original question based on the trajectory of the subtasks.

@@ -1,6 +1,6 @@
 import asyncio
 
-from utu.eval.benchmarks.ww_benchmark import WWBenchmark
+from utu.ww.ww_benchmark import WWBenchmark
 from utu.eval.utils import parse_eval_config
 
 
