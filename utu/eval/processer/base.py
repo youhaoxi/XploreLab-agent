@@ -11,7 +11,7 @@ from ...utils import get_logger
 logger = get_logger(__name__)
 
 
-class BaseProcesser(abc.ABC):
+class BaseProcesser:
     """ Base class for processers in evaluation tasks. 
     
     Each processer implements the following evaluation phases:
