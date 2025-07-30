@@ -6,7 +6,7 @@ useful:
 import os
 from typing import Any
 
-from agents.tracing import Span, Trace, TracingProcessor
+from agents.tracing import Span, Trace, TracingProcessor, get_current_trace
 from agents.tracing.span_data import (
     AgentSpanData,
     CustomSpanData,
@@ -28,7 +28,7 @@ class DBTracingProcessor(TracingProcessor):
         SQLModel.metadata.create_all(self.engine)
 
     def on_trace_start(self, trace: "Trace") -> None:
-        self.trace = trace
+        pass
 
     def on_trace_end(self, trace: "Trace") -> None:
         pass
@@ -41,7 +41,7 @@ class DBTracingProcessor(TracingProcessor):
         if isinstance(data, GenerationSpanData):
             with Session(self.engine) as session:
                 session.add(GenerationTracingModel(
-                    trace_id=self.trace.trace_id,
+                    trace_id=get_current_trace().trace_id,
                     span_id=span.span_id,
                     input=data.input,
                     output=data.output,
@@ -57,7 +57,7 @@ class DBTracingProcessor(TracingProcessor):
                     input=data.input,
                     output=data.output,
                     mcp_data=data.mcp_data,
-                    trace_id=self.trace.trace_id,
+                    trace_id=get_current_trace().trace_id,
                     span_id=span.span_id,
                 ))
                 session.commit()
