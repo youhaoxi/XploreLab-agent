@@ -10,9 +10,6 @@ class WebWalkerProcesser(BaseLLMJudgeProcesser):
 
     def calculate_metrics(self, samples: list[Datapoint]) -> dict:
         """ Calculate metrics from the judged data. """
-        """
-        Calculate metrics from the judged data.
-        """
         # 1. calculate level metrics
         level_bin = {}
         invalid_count = 0

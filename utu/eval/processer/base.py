@@ -1,21 +1,17 @@
 import re
-import asyncio
 import abc
 import string
-from tqdm import tqdm
-from typing import List
 from openai import AsyncOpenAI
 
 from ...config import EvalConfig
-from ..data import EvaluationSample as Datapoint
-from ..data import EvaluationResult
+from ..data import EvaluationSample, EvaluationResult
 from .prompts import get_benchmark_templates
 from ...utils import get_logger
 
 logger = get_logger(__name__)
 
 
-class BaseProcesser:
+class BaseProcesser(abc.ABC):
     """ Base class for processers in evaluation tasks. 
     
     Each processer implements the following evaluation phases:
@@ -28,38 +24,21 @@ class BaseProcesser:
     AUGMENTED_TEMPLATE: str = None
     JUDGE_TEMPLATE: str = None
     # concurrency limit
-    concurrency_limit: int = None
     name: str = None
 
     def __init__(self, config: EvalConfig) -> None:
-        self.concurrency_limit = config.judge_concurrency
         self._load_templates()
     
-    def preprocess(self, samples: List[Datapoint]) -> List[Datapoint]:
-        """ Preprocess data from dataset by augmenting the question. 
-        
-        :param samples: List of Datapoint objects.
-        :return: List of EvaluationSample objects with augmented questions.
-        """
-        for sample in samples:
-            sample = self.preprocess_one(sample)
-        return samples
-    
-    def preprocess_one(self, sample: Datapoint) -> Datapoint:
+    def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
         """ Preprocess a single sample. """
         augmented_question = self._augment_question(sample.raw_question, sample.file_name)
         sample.update(
             augmented_question=augmented_question,
         )
         return sample
-    
-    @abc.abstractmethod
-    async def judge(self, samples: list[Datapoint]) -> list[Datapoint]:
-        """ Judge if the agent's predictions match ground truth. """
-        pass
 
     @abc.abstractmethod
-    async def stat(self, samples: list[Datapoint]) -> EvaluationResult:
+    async def stat(self, samples: list[EvaluationSample]) -> EvaluationResult:
         metrics = self.calculate_metrics(samples)
         eval_result = EvaluationResult(
             benchmark=self.name,
@@ -67,30 +46,13 @@ class BaseProcesser:
         )
         return eval_result
     
-    async def judge_with_asyncio(self, predict_data: list[Datapoint]) -> list[Datapoint]:
-        semaphore = asyncio.Semaphore(self.concurrency_limit)
-        async def judge_with_semaphore(item: Datapoint):
-            async with semaphore:
-                try:
-                    return await self.judge_one(item)
-                except Exception as e:
-                    logger.error(f">>>>>>>>>>>>>\nError judging sample '{item}': {e}\n<<<<<<<<<<<<<", exc_info=True)
-                    return None
-        tasks = [judge_with_semaphore(item) for item in predict_data]
-        results = []
-        for task in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Judging"):
-            result = await task
-            if result is not None:
-                results.append(result)
-        return results
-
     @abc.abstractmethod
-    async def judge_one(self, sample: Datapoint) -> Datapoint:
+    async def judge_one(self, sample: EvaluationSample) -> EvaluationSample:
         """ Judge a single sample. """
         pass
 
     @abc.abstractmethod
-    def calculate_metrics(self, samples: list[Datapoint]) -> dict:
+    def calculate_metrics(self, samples: list[EvaluationSample]) -> dict:
         """ Calculate metrics from the judged data. """
         pass
 
@@ -137,19 +99,7 @@ class BaseLLMJudgeProcesser(BaseProcesser):
         )
         self.max_tokens = config.judge_max_tokens
 
-    async def judge(self, samples: list[Datapoint]) -> list[Datapoint]:
-        """ Judge if the agent's predictions match ground truth. """
-        # judge all data
-        judged_data = []
-        logger.info(f"Judging {len(samples)} items with concurrency limit {self.concurrency_limit}...")
-        tasks = [self.judge_one(data) for data in samples]
-        for i, task in enumerate(asyncio.as_completed(tasks)):
-            result = await task
-            judged_data.append(result)
-            logger.info(f"Judged {i + 1}/{len(samples)} items...")
-        return judged_data
-    
-    async def judge_one(self, data: Datapoint) -> Datapoint:
+    async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
         """ Judge a single sample. """
         question = data.raw_question
         response = data.response
@@ -195,7 +145,7 @@ class BaseLLMJudgeProcesser(BaseProcesser):
         data.update(**parsed_content)
         return data
 
-    def calculate_metrics(self, samples: list[Datapoint]) -> dict:
+    def calculate_metrics(self, samples: list[EvaluationSample]) -> dict:
         """ Caculate metrics from the judged data. """
         # 1. calculate level metrics
         level_bin = {}
@@ -278,7 +228,7 @@ class BaseLLMJudgeProcesser(BaseProcesser):
 class BaseMatchProcesser(BaseProcesser):
     """ Base class for processers that use match-based judging. """
     
-    async def judge(self, samples: list[Datapoint]) -> list[Datapoint]:
+    async def judge(self, samples: list[EvaluationSample]) -> list[EvaluationSample]:
         """ Judge if the agent's predictions match ground truth. """
         judged_data = []
         for data in samples:
@@ -287,7 +237,7 @@ class BaseMatchProcesser(BaseProcesser):
 
         return judged_data
     
-    async def judge_one(self, data: Datapoint) -> Datapoint:
+    async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
         """ Judge a single sample. """
         question = data.raw_question
         response = data.response

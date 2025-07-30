@@ -5,6 +5,23 @@ from sqlmodel import SQLModel, Field, JSON, Column
 
 from .utu_basemodel import UTUBaseModel
 
+class DatasetSample(SQLModel, table=True):
+    __tablename__ = 'data'
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    dataset: str = ""  # dataset name, for exp
+    index: Optional[int] = Field(default=None)  # The index of the datapoint in the dataset, starting from 1
+    source: str = ""  # dataset name for mixed dataset
+    source_index: Optional[int] = Field(default=None)  # The index of the datapoint in the source dataset, if available
+
+    question: str = ""
+    answer: Optional[str] = ""
+    topic: Optional[str] = ""
+    level: Optional[str] = ""
+    file_name: Optional[str] = ""  # for GAIA
+
+    meta: Optional[Any] = Field(default=None, sa_column=Column(JSON))  # e.g. annotator_metadata in GAIA, extra_info in WebWalker
+
 
 class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     __tablename__ = 'evaluation_data'
