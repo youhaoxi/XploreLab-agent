@@ -6,8 +6,8 @@ import asyncio
 import pathlib
 import copy
 import json
-from agents.models.chatcmpl_converter import Converter
 
+from utu.utils import ChatCompletionConverter
 from utu.agents import SimpleAgent
 
 flock = asyncio.Lock()
@@ -24,7 +24,7 @@ async def rollout(agent: SimpleAgent, data: dict) -> dict:
 
     output = copy.deepcopy(data)
     output["Answer Predicted"] = predicted
-    output["trajectory"] = Converter.items_to_messages(result.to_input_list())
+    output["trajectory"] = ChatCompletionConverter.items_to_messages(result.to_input_list())
     async with flock:
         with open(ofn, "a") as f:
             line = json.dumps(data, ensure_ascii=False)

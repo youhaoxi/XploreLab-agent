@@ -1,14 +1,14 @@
 import os
 import json
 import uuid
-from collections.abc import AsyncIterator
-from typing import Literal
+from collections.abc import AsyncIterator, Iterable
 
 from openai import AsyncOpenAI
 from openai.types.responses import ResponseFunctionToolCall
+from openai.types.chat import ChatCompletionMessageParam
 
 from agents import (
-    HandoffOutputItem,
+    HandoffOutputItem, TResponseInputItem, 
     ItemHelpers,
     MessageOutputItem,
     OpenAIChatCompletionsModel,
@@ -18,6 +18,7 @@ from agents import (
     ToolCallOutputItem,
 )
 from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEvent, RunItemStreamEvent
+from agents.models.chatcmpl_converter import Converter
 
 from .print_utils import PrintUtils
 
@@ -99,4 +100,24 @@ class AgentsUtils:
                 PrintUtils.print_info(f">> new agent: {event.new_agent.name}")
         print()  # Newline after stream?
 
+
+class ChatCompletionConverter(Converter):
+    @classmethod
+    def items_to_messages(cls, items: str|Iterable[TResponseInputItem]) -> list[ChatCompletionMessageParam]:
+        # skip reasoning, see chatcmpl_converter.Converter.items_to_messages()
+        # agents.exceptions.UserError: Unhandled item type or structure: {'id': '__fake_id__', 'summary': [{'text': '...', 'type': 'summary_text'}], 'type': 'reasoning'}
+        if not isinstance(items, str):
+            items = cls.filter_items(items)
+        return Converter.items_to_messages(items)
+
+    @classmethod
+    def filter_items(cls, items: str|Iterable[TResponseInputItem]) -> str|list[TResponseInputItem]:
+        if isinstance(items, str):
+            return items
+        filtered_items = []
+        for item in items:
+            if item.get("type", None) == "reasoning":
+                continue
+            filtered_items.append(item)
+        return filtered_items
 

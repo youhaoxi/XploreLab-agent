@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 
 import jinja2
 from agents import Tool, Handoff, TResponseInputItem, AgentOutputSchema, ModelSettings
+# FIXME: change to ChatCompletionConverter
 from agents.models.chatcmpl_converter import Converter
 from openai.types.responses import ResponseOutputItem, ResponseOutputMessage, ResponseFunctionToolCall, EasyInputMessageParam
 from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageToolCall

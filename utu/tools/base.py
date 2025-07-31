@@ -2,10 +2,10 @@ import abc
 from typing import Callable
 
 from agents import FunctionTool, function_tool
-from agents.models.chatcmpl_converter import Converter
 import mcp.types as types
 
 from ..config import ToolkitConfig
+from ..utils import ChatCompletionConverter
 
 
 class MCPConverter:
@@ -69,7 +69,7 @@ class AsyncBaseToolkit(abc.ABC):
 
     async def get_tools_in_openai(self) -> list[dict]:
         tools = await self.get_tools_in_agents()
-        return [Converter.tool_to_openai(tool) for tool in tools]
+        return [ChatCompletionConverter.tool_to_openai(tool) for tool in tools]
     
     async def get_tools_in_mcp(self) -> list[types.Tool]:
         tools = await self.get_tools_in_agents()

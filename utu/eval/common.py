@@ -1,8 +1,10 @@
 import asyncio
 import threading
 from dataclasses import dataclass, asdict
+
 from agents import RunResult
-from agents.models.chatcmpl_converter import Converter
+
+from ..utils import ChatCompletionConverter
 
 
 # 限制并发数量的装饰器
@@ -37,7 +39,7 @@ def async_to_sync(func):
 
 
 def get_trajectory_from_agent_result(agent_result: RunResult) -> list[dict]:
-    messages = Converter.items_to_messages(agent_result.to_input_list())
+    messages = ChatCompletionConverter.items_to_messages(agent_result.to_input_list())
     trajectory = [dict(message) for message in messages]
     model_responses = agent_result.raw_responses
     usage_list = []
