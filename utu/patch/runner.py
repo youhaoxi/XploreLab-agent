@@ -1,31 +1,76 @@
+import asyncio
 
 from agents.run import AgentRunner, AgentToolUseTracker, SingleStepResult
-from agents import TContext, TResponseInputItem, Agent, Tool, ModelResponse, RunHooks, RunItem, RunContextWrapper, AgentOutputSchemaBase, RunConfig, Handoff
+from agents import (
+    TContext, TResponseInputItem, 
+    Agent, Tool, ModelResponse, RunHooks, RunItem, RunContextWrapper, 
+    AgentOutputSchemaBase, RunConfig, Handoff, ItemHelpers
+)
+from agents.util import _coro
 
 from ..context import BaseContextManager
 
 
 class UTUAgentRunner(AgentRunner):
     @classmethod
-    async def _get_single_step_result_from_response(
+    async def _run_single_turn(
         cls,
         *,
         agent: Agent[TContext],
         all_tools: list[Tool],
         original_input: str | list[TResponseInputItem],
-        pre_step_items: list[RunItem],
-        new_response: ModelResponse,
-        output_schema: AgentOutputSchemaBase | None,
-        handoffs: list[Handoff],
+        generated_items: list[RunItem],
         hooks: RunHooks[TContext],
         context_wrapper: RunContextWrapper[TContext],
         run_config: RunConfig,
+        should_run_agent_start_hooks: bool,
         tool_use_tracker: AgentToolUseTracker,
+        previous_response_id: str | None,
     ) -> SingleStepResult:
-        original_result = await super()._get_single_step_result_from_response(
+        # Ensure we run the hooks before anything else
+        if should_run_agent_start_hooks:
+            await asyncio.gather(
+                hooks.on_agent_start(context_wrapper, agent),
+                (
+                    agent.hooks.on_start(context_wrapper, agent)
+                    if agent.hooks
+                    else _coro.noop_coroutine()
+                ),
+            )
+
+        system_prompt, prompt_config = await asyncio.gather(
+            agent.get_system_prompt(context_wrapper),
+            agent.get_prompt(context_wrapper),
+        )
+
+        output_schema = cls._get_output_schema(agent)
+        handoffs = await cls._get_handoffs(agent, context_wrapper)
+        input = ItemHelpers.input_to_new_input_list(original_input)
+        input.extend([generated_item.to_input_item() for generated_item in generated_items])
+
+        # FIXME: set context manage as a hook?
+        context_manager: BaseContextManager|None = context_wrapper.context.get("context_manager", None)
+        # ADD: preprocess
+        if context_manager:
+            input = context_manager.preprocess(input)
+        new_response = await cls._get_new_response(
+            agent,
+            system_prompt,
+            input,
+            output_schema,
+            all_tools,
+            handoffs,
+            context_wrapper,
+            run_config,
+            tool_use_tracker,
+            previous_response_id,
+            prompt_config,
+        )
+
+        single_turn_result = await cls._get_single_step_result_from_response(
             agent=agent,
             original_input=original_input,
-            pre_step_items=pre_step_items,
+            pre_step_items=generated_items,
             new_response=new_response,
             output_schema=output_schema,
             all_tools=all_tools,
@@ -35,8 +80,7 @@ class UTUAgentRunner(AgentRunner):
             run_config=run_config,
             tool_use_tracker=tool_use_tracker,
         )
-        # FIXME: set context manage as a hook?
-        context_manager: BaseContextManager|None = context_wrapper.context.get("context_manager", None)
+        # ADD: postprocess
         if context_manager:
-            return context_manager.process(original_result)
-        return original_result
+            single_turn_result = context_manager.process(single_turn_result)
+        return single_turn_result
