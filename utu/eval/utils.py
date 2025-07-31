@@ -10,6 +10,7 @@ def parse_eval_config() -> EvalConfig:
     parser.add_argument("--agent_model", type=str, default=None, help="Agent model.")
     parser.add_argument("--dataset", type=str, default=None, help="Dataset.")
     parser.add_argument("--dataset_type", type=str, default=None, help="Dataset type.")
+    parser.add_argument("--concurrency", type=int, default=None, help="Test concurrency.")
     args = parser.parse_args()
     
     config = ConfigLoader.load_eval_config(args.config_name)
@@ -21,4 +22,6 @@ def parse_eval_config() -> EvalConfig:
         config.data.dataset = args.dataset
     if args.dataset_type:
         config.data.type = args.dataset_type
+    if args.concurrency:
+        config.concurrency = args.concurrency
     return config

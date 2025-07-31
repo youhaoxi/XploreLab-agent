@@ -11,9 +11,9 @@ DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
 
 
 class ModelProviderConfig(ConfigBaseModel):
-    api_key: str | None = None
-    base_url: str | None = None
     model: str
+    base_url: str | None = None
+    api_key: str | None = "xxx"
 
 
 class ModelSettingsConfig(ConfigBaseModel, ModelSettings):
