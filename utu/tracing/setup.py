@@ -13,8 +13,8 @@ from .otel_agents_instrumentor import OpenAIAgentsInstrumentor
 from .db_tracer import DBTracingProcessor
 
 
-PHOENIX_TRACING_PROVIDER = None
-DB_TRACING_PROCESSOR = None
+PHOENIX_TRACING_PROVIDER: TracerProvider|None = None
+DB_TRACING_PROCESSOR: DBTracingProcessor|None = None
 
 def setup_phoenix_tracing(project_name: str = "uTu agent") -> None:
     """ 
