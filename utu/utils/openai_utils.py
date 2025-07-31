@@ -60,7 +60,10 @@ class OpenAIUtils:
                         final_tool_calls[index] = tool_call
                         PrintUtils.print_info(f"<{tool_call.function.name}>{tool_call.function.arguments}", end="")
                     else:
-                        final_tool_calls[index].function.arguments += tool_call.function.arguments
+                        if final_tool_calls[index].function.arguments:
+                            final_tool_calls[index].function.arguments += tool_call.function.arguments
+                        else:
+                            final_tool_calls[index].function.arguments = tool_call.function.arguments
                         PrintUtils.print_info(f"{tool_call.function.arguments}", end="")
         PrintUtils.print_info("")  # print a newline
         tool_calls = [ChatCompletionMessageToolCall(
