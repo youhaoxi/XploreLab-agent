@@ -16,7 +16,7 @@ from .db_tracer import DBTracingProcessor
 PHOENIX_TRACING_PROVIDER = None
 DB_TRACING_PROCESSOR = None
 
-def setup_phoenix_tracing() -> None:
+def setup_phoenix_tracing(project_name: str = "uTu agent") -> None:
     """ 
     - [ ] add try-except when start phoenix
     """
@@ -24,14 +24,14 @@ def setup_phoenix_tracing() -> None:
     if PHOENIX_TRACING_PROVIDER is not None: return
     PHOENIX_TRACING_PROVIDER = register(
         endpoint="http://9.134.230.111:4317",
-        project_name="uTu agent",
-        batch=True,
+        project_name=project_name,
+        # batch=True,  # NOTE: SimpleSpanProcessor may reduce performance, but BatchSpanProcessor can lead to error!
         # protocol="grpc", # grpc | http/protobuf, will automatically inferred!
         auto_instrument=False,
     )
     # manually instrument
     OpenAIInstrumentor().instrument(tracer_provider=PHOENIX_TRACING_PROVIDER)
-    OpenAIAgentsInstrumentor().instrument(tracer_provider=PHOENIX_TRACING_PROVIDER)
+    OpenAIAgentsInstrumentor().instrument(tracer_provider=PHOENIX_TRACING_PROVIDER, exclusive_processor=True)  # remove default tracing to openai
 
 
 def setup_db_tracing() -> None:
