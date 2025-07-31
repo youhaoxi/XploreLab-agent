@@ -5,6 +5,7 @@ updated: @2025-07-31 0864c13
 
 from __future__ import annotations
 
+import json
 from collections import OrderedDict
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Iterable, Iterator, Mapping, Optional, Union
@@ -92,6 +93,8 @@ class OpenInferenceTracingProcessor(TracingProcessor):
             name=trace.name,
             attributes={
                 OPENINFERENCE_SPAN_KIND: OpenInferenceSpanKindValues.AGENT.value,
+                # ADD: for phoenix tracing
+                METADATA: json.dumps({"trace_id": trace.trace_id}),
             },
         )
         self._root_spans[trace.trace_id] = otel_span

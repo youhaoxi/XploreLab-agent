@@ -7,6 +7,7 @@ requires-python = ">=3.11"
 dependencies = [
     "aiofiles>=24.1.0",
     "alembic>=1.16.4",
+    "arize-phoenix-client>=1.14.1",
     "arize-phoenix-otel>=0.11.0",
     "arxiv>=2.2.0",
     "chunkr-ai>=0.1.0",
