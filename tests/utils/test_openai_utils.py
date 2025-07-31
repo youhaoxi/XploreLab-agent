@@ -27,14 +27,23 @@ tools = [{
     }
 }]
 
+async def test_model():
+    res = await openai_client.chat_completion(messages=messages, tools=tools, stream=False)
+    print(res.choices[0].message)
+
+async def test_model_stream():
+    stream = await openai_client.chat_completion(messages=messages, tools=tools, stream=True)
+    async for chunk in stream:
+        print(chunk.choices[0].delta)
+
+
+async def test_print_message():
+    res = await openai_client.chat_completion(messages=messages, tools=tools, stream=False)
+    OpenAIUtils.print_message(res.choices[0].message)
+
 async def test_print_stream():
     stream = await openai_client.chat_completion(messages=messages, tools=tools, stream=True)
     message = await OpenAIUtils.print_stream(stream)
     print()
     print(message)
     print()
-
-
-async def test_print_message():
-    res = await openai_client.chat_completion(messages=messages, tools=tools, stream=False)
-    OpenAIUtils.print_message(res.choices[0].message)

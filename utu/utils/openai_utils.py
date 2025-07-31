@@ -1,8 +1,7 @@
 import os
-from typing import Iterator, AsyncIterator
+from typing import AsyncIterator
 
-import openai
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, AsyncStream
 from openai.types.chat import ChatCompletionChunk, ChatCompletionMessageToolCall, ChatCompletionMessage
 from openai.types.chat.chat_completion import ChatCompletion
 
@@ -38,6 +37,8 @@ OPENAI_DEFAULT_CONFIG = {
 class OpenAIUtils:
     @staticmethod
     def print_message(message: ChatCompletionMessage) -> None:
+        if hasattr(message, "reasoning_content") and message.reasoning_content:
+            PrintUtils.print_info(f"{message.reasoning_content}")
         if message.content:
             PrintUtils.print_bot(f"{message.content}", add_prefix=True)
         if message.tool_calls:
@@ -50,21 +51,23 @@ class OpenAIUtils:
         content = ""
         async for chunk in stream:
             delta = chunk.choices[0].delta
+            if hasattr(delta, "reasoning_content") and delta.reasoning_content:
+                PrintUtils.print_info(f"{delta.reasoning_content}", end="", color="green")
             if delta.content:
                 content += delta.content
-                PrintUtils.print_info(f"{delta.content}", end="")
+                PrintUtils.print_info(f"{delta.content}", end="", color="gray")
             if delta.tool_calls:
                 for tool_call in delta.tool_calls:
                     index = tool_call.index
                     if index not in final_tool_calls:
                         final_tool_calls[index] = tool_call
-                        PrintUtils.print_info(f"<{tool_call.function.name}>{tool_call.function.arguments}", end="")
+                        PrintUtils.print_info(f"<{tool_call.function.name}>{tool_call.function.arguments}", end="", color="blue")
                     else:
                         if final_tool_calls[index].function.arguments:
                             final_tool_calls[index].function.arguments += tool_call.function.arguments
                         else:
                             final_tool_calls[index].function.arguments = tool_call.function.arguments
-                        PrintUtils.print_info(f"{tool_call.function.arguments}", end="")
+                        PrintUtils.print_info(f"{tool_call.function.arguments}", end="", color="blue")
         PrintUtils.print_info("")  # print a newline
         tool_calls = [ChatCompletionMessageToolCall(
             id=tool_call.id,
@@ -89,8 +92,6 @@ class OpenAIUtils:
         # use the default model if not specified
         if "model" not in kwargs:
             kwargs["model"] = base_kwargs["model"]
-        
-
         return kwargs
 
 
@@ -112,7 +113,7 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
                 default_config[k] = v
             else:
                 openai_client_kwargs[k] = v
-        api_key = api_key or os.getenv("UTU_API_KEY")
+        api_key = api_key or os.getenv("UTU_API_KEY") or "xxx"
         base_url = base_url or os.getenv("UTU_BASE_URL")
         default_config["model"] = default_config.get("model", os.getenv("UTU_MODEL"))
         
@@ -126,6 +127,6 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
         chat_completion: ChatCompletion = await self.chat.completions.create(**kwargs)
         return chat_completion.choices[0].message.content
 
-    async def chat_completion(self, **kwargs) -> ChatCompletion:
+    async def chat_completion(self, **kwargs) -> AsyncStream[ChatCompletionChunk] | ChatCompletion:
         kwargs = OpenAIUtils.process_chat_completion_params(kwargs, self._default_config)
         return await self.chat.completions.create(**kwargs)
