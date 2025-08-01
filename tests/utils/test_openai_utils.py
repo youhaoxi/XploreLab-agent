@@ -47,3 +47,24 @@ async def test_print_stream():
     print()
     print(message)
     print()
+
+
+# test extra bodys
+async def test_retry():
+    res = await openai_client.chat_completion(messages=messages, tools=tools, stream=False,
+        # manually trigger retry with 500 (internal server error)
+        extra_body={
+            "return_status_code": 500,
+            "enable_format_check": True
+        }
+    )
+    print(res)
+
+async def test_parallel_tool_calls():
+    res = await openai_client.chat_completion(messages=messages, tools=tools, stream=False,
+        # manually trigger retry with 500 (internal server error)
+        extra_body={
+            "parallel_tool_calls": False
+        }
+    )
+    print(res)

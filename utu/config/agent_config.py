@@ -21,7 +21,7 @@ class ModelSettingsConfig(ConfigBaseModel, ModelSettings):
         arbitrary_types_allowed=True
     )
 
-    parallel_tool_calls: bool | None = False  # default to False
+    # parallel_tool_calls: bool | None = False  # default to False?
 
 
 class ModelConfigs(ConfigBaseModel):
