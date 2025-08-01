@@ -78,7 +78,7 @@ class DataManager(BaseDataManager):
 class DBDataManager(DataManager):
     def __init__(self, config: EvalConfig) -> None:
         self.config = config
-        self.engine = create_engine(self.config.db_url, pool_size=30, max_overflow=50, pool_timeout=30)
+        self.engine = create_engine(self.config.db_url, pool_size=300, max_overflow=500, pool_timeout=30)
         SQLModel.metadata.create_all(self.engine)
 
     def load(self) -> list[EvaluationSample]:

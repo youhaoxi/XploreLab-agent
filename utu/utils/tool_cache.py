@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 DIR_CACHE = DIR_ROOT / ".cache"
 DIR_CACHE.mkdir(exist_ok=True)
 
-engine = create_engine(os.getenv("DB_URL"), pool_size=30, max_overflow=50, pool_timeout=30)  # set a larger pool size to avoid connection pool overflow
+engine = create_engine(os.getenv("DB_URL"), pool_size=300, max_overflow=500, pool_timeout=30)  # set a larger pool size to avoid connection pool overflow
 
 def async_file_cache(cache_dir: str|pathlib.Path = DIR_CACHE, expire_time: Optional[int] = None, mode: Literal["db", "file"] = "db"):
     """Decorator to cache async function results to local files.
