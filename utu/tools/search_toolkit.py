@@ -3,7 +3,7 @@ import re
 import asyncio
 from typing import Callable
 
-import requests
+import aiohttp
 
 from .base import AsyncBaseToolkit
 from ..utils import oneline_object, async_file_cache, SimplifiedAsyncOpenAI, get_logger
@@ -69,18 +69,27 @@ class SearchToolkit(AsyncBaseToolkit):
             'hl': 'zh-cn',
             'num': 100
         }
-        response = requests.request("POST", self.serper_url, headers=self.serper_header, json=params)
-        results = response.json()
-        return results
+        async with aiohttp.ClientSession() as session:
+            async with session.post(self.serper_url, headers=self.serper_header, json=params) as response:
+                results = await response.json()
+                return results
 
-    async def search_google_api(self, query: str, num_results: int = 10) -> dict:
-        """Search the query via Google api. NOTE:
-        1. try Google search operators, e.g. " " for exact match; -xxx for exclude; * wildcard matching; filetype:xxx for file types; site:xxx for site search. before:YYYY-MM-DD, after:YYYY-MM-DD for time range.
-        2. search query should be concrete and not vague or super long
+    async def search_google_api(self, query: str, num_results: int = 5) -> dict:
+        """web search to gather information from the web.
+
+        Tips:
+        1. search query should be concrete and not vague or super long
+        2. try to add Google search operators in query if necessary,
+        - " " for exact match;
+        - -xxx for exclude;
+        - * wildcard matching;
+        - filetype:xxx for file types;
+        - site:xxx for site search;
+        - before:YYYY-MM-DD, after:YYYY-MM-DD for time range.
 
         Args:
             query (str): The query to search for.
-            num_results (int, optional): The number of results to return. Defaults to 10.
+            num_results (int, optional): The number of results to return. Defaults to 5.
         """
         # https://serper.dev/playground
         logger.info(f"[tool] search_google_api: {oneline_object(query)}")
@@ -106,9 +115,11 @@ class SearchToolkit(AsyncBaseToolkit):
     async def get_content(self, url: str) -> str:
         # Get the content of the url
         logger.info(f"[tool] get_content: {oneline_object(url)}")
-        response = requests.get(self.jina_url_template.format(url=url), headers=self.jina_header)
-        logger.info(f"[tool] get_content: {oneline_object(response.text)}...")
-        return response.text
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.jina_url_template.format(url=url), headers=self.jina_header) as response:
+                text = await response.text()
+                logger.info(f"[tool] get_content: {oneline_object(text)}...")
+                return text
 
     # @async_file_cache(expire_time=None)
     async def web_qa(self, url: str, query: str = None) -> str:
