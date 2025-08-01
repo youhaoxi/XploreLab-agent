@@ -40,6 +40,7 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     stage: str = "init"  # Literal["init", "rollout", "judged]
     # 2) rollout
     trace_id: Optional[str] = Field(default=None)
+    trace_url: Optional[str] = Field(default=None)
     response: Optional[str] = Field(default=None)
     time_cost: Optional[float] = Field(default=None)  # time cost in seconds
     trajectory: Optional[str] = Field(default=None)  # the agent's reasoning process, a list of messages
