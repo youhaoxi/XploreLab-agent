@@ -31,7 +31,9 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
     # 1) base info
-    source: str = ""  # dataset name
+    dataset: str = ""  # dataset name
+    dataset_index: Optional[int] = Field(default=None)
+    source: str = ""
     raw_question: str = ""
     level: Optional[int] = 0  # hardness level of the question, if applicable
     augmented_question: Optional[str] = ""

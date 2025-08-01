@@ -96,6 +96,8 @@ class DBDataManager(DataManager):
             samples = []
             for dp in datapoints:
                 sample = EvaluationSample(
+                    dataset=dp.dataset,
+                    dataset_index=dp.index,
                     source=dp.source,
                     raw_question=dp.question,
                     level=dp.level,
