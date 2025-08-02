@@ -1,6 +1,6 @@
 import re
 
-from ..data import EvaluationSample as Datapoint
+from ..data import EvaluationSample
 from .base import BaseLLMJudgeProcesser
 
 
@@ -8,7 +8,12 @@ class WebWalkerProcesser(BaseLLMJudgeProcesser):
     """ Processer for WebWalker evaluation. """
     name: str = "WebWalker"
 
-    def calculate_metrics(self, samples: list[Datapoint]) -> dict:
+    # def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
+    #     aug_question = f"{sample.raw_question}\nReference url: {sample.meta['root_url']}"
+    #     sample.update(augmented_question=aug_question)
+    #     return sample
+
+    def calculate_metrics(self, samples: list[EvaluationSample]) -> dict:
         """ Calculate metrics from the judged data. """
         # 1. calculate level metrics
         level_bin = {}

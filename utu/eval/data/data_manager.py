@@ -103,6 +103,7 @@ class DBDataManager(DataManager):
                     level=dp.level,
                     correct_answer=dp.answer,
                     file_name=dp.file_name,
+                    meta=dp.meta,
                     exp_id=self.config.exp_id,  # add exp_id
                 )
                 samples.append(sample)

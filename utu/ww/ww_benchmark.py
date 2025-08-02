@@ -9,11 +9,9 @@ from .agents.main import WWAgent
 class WWBenchmark(BaseBenchmark):
     """ 复用现有逻辑, 重写 agent, process, rollout 逻辑 """
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
-        # remark: 可以快速调整一下看看是否对于结果有影响
-        sample.update(
-            augmented_question=sample.raw_question,
-        )
-        self.dataset.save(sample)
+        aug_question = f"{sample.raw_question}\nReference url: {sample.meta['root_url']}"
+        sample.update(augmented_question=aug_question)
+        # self.dataset.save(sample)
         return sample
 
     async def _get_agent(self) -> WWAgent:

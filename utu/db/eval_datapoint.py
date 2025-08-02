@@ -39,7 +39,7 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     augmented_question: Optional[str] = ""
     correct_answer: Optional[str] = ""
     file_name: Optional[str] = ""  # for GAIA
-    stage: str = "init"  # Literal["init", "rollout", "judged]
+    meta: Optional[Any] = Field(default=None, sa_column=Column(JSON))
     # 2) rollout
     trace_id: Optional[str] = Field(default=None)
     trace_url: Optional[str] = Field(default=None)
@@ -54,6 +54,7 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     confidence: Optional[int] = Field(default=None)
     # id
     exp_id: str = Field(default="default")
+    stage: str = "init"  # Literal["init", "rollout", "judged]
 
     def model_dump(self, *args, **kwargs):
         keys = [
