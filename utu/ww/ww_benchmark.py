@@ -11,7 +11,7 @@ class WWBenchmark(BaseBenchmark):
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
         aug_question = f"{sample.raw_question}\nReference url: {sample.meta['root_url']}"
         sample.update(augmented_question=aug_question)
-        # self.dataset.save(sample)
+        self.dataset.save(sample)
         return sample
 
     async def _get_agent(self) -> WWAgent:
