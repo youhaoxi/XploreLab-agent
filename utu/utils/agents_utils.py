@@ -1,27 +1,30 @@
 import os
 import json
 import uuid
+import logging
 from collections.abc import AsyncIterator, Iterable
 
 from openai import AsyncOpenAI
 from openai.types.responses import ResponseFunctionToolCall
-from openai.types.chat import ChatCompletionMessageParam
+from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 
 from agents import (
     HandoffOutputItem, TResponseInputItem, 
     ItemHelpers,
     MessageOutputItem,
     OpenAIChatCompletionsModel,
-    RunItem,
+    RunItem, ModelSettings, ModelTracing,
     StreamEvent,
-    ToolCallItem,
+    ToolCallItem, FunctionTool,
     ToolCallOutputItem,
 )
 from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEvent, RunItemStreamEvent
 from agents.models.chatcmpl_converter import Converter
 
 from .print_utils import PrintUtils
+from .openai_utils import OpenAIChatCompletionParams
 
+logger = logging.getLogger(__name__)
 
 class AgentsUtils:
     @staticmethod
@@ -33,11 +36,12 @@ class AgentsUtils:
 
     @staticmethod
     def get_agents_model(
-        model: str,
+        model: str = None,
         api_key: str = None,
         base_url: str = None,
         # mode: Literal["responses", "chat.completions"] = "chat.completions",
     ) -> OpenAIChatCompletionsModel:
+        model = model or os.getenv("UTU_MODEL")
         api_key = api_key or os.getenv("UTU_API_KEY")
         base_url = base_url or os.getenv("UTU_BASE_URL")
         if not api_key or not base_url:
@@ -100,6 +104,43 @@ class AgentsUtils:
                 PrintUtils.print_info(f">> new agent: {event.new_agent.name}")
         print()  # Newline after stream?
 
+    @staticmethod
+    def convert_model_settings(params: OpenAIChatCompletionParams) -> ModelSettings:
+        # "tools", "messages", "model"
+        # FIXME: move to extra_args
+        for p in ("max_completion_tokens", "top_logprobs", "logprobs", "seed", "stop"):
+            if p in params:
+                logger.warning(f"Parameter `{p}` is not supported in ModelSettings")
+        return ModelSettings(
+            max_tokens=params.get("max_tokens", None),
+            temperature=params.get("temperature", None),
+            top_p=params.get("top_p", None),
+            frequency_penalty=params.get("frequency_penalty", None),
+            presence_penalty=params.get("presence_penalty", None),
+            tool_choice=params.get("tool_choice", None),
+            parallel_tool_calls=params.get("parallel_tool_calls", None),
+            extra_query=params.get("extra_query", None),
+            extra_body=params.get("extra_body", None),
+            extra_headers=params.get("extra_headers", None),
+        )
+
+    @staticmethod
+    def convert_sp_input(messages: list[ChatCompletionMessageParam]) -> tuple[str|None, str|list[TResponseInputItem]]:
+        if isinstance(messages, str):
+            return None, messages
+        if messages[0].get("role", None) == "system":
+            return messages[0]["content"], messages[1:]
+        return None, messages
+
+    @staticmethod
+    def convert_tool(tool: ChatCompletionToolParam) -> FunctionTool:
+        assert tool["type"] == "function"
+        return FunctionTool(
+            name=tool["function"]["name"],
+            description=tool["function"].get("description", ""),
+            params_json_schema=tool["function"].get("parameters", None),
+            on_invoke_tool=None,
+        )
 
 class ChatCompletionConverter(Converter):
     @classmethod
@@ -121,3 +162,30 @@ class ChatCompletionConverter(Converter):
             filtered_items.append(item)
         return filtered_items
 
+
+class SimplifiedOpenAIChatCompletionsModel(OpenAIChatCompletionsModel):
+    """ extend OpenAIChatCompletionsModel to support basic api 
+    - enable tracing based on SimplifiedAsyncOpenAI
+    """
+    async def query_one(self, **kwargs) -> str:
+        system_instructions, input = AgentsUtils.convert_sp_input(kwargs["messages"])
+        model_settings = AgentsUtils.convert_model_settings(kwargs)
+        tools = [AgentsUtils.convert_tool(tool) for tool in kwargs.get("tools", [])]
+        response = await self.get_response(
+            system_instructions=system_instructions,
+            input=input,
+            model_settings=model_settings,
+            tools=tools,
+            output_schema=None, handoffs=[],
+            tracing=ModelTracing.ENABLED,
+            previous_response_id=None, prompt=None,
+        )
+        return ChatCompletionConverter.items_to_messages(response.to_input_items())
+        # with generation_span(
+        #     model=kwargs["model"],
+        #     model_config=_model_settings,
+        #     input=_messages,
+        # ) as span_generation:
+        #     result = await self.chat.completions.create(**kwargs)
+        #     span_generation.span_data.output = result.choices[0].message.model_dump()
+        #     return result
