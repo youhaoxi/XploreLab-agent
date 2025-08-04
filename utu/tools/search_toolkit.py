@@ -26,9 +26,9 @@ TEMPLATE_QA = r"""You are a webpage analysis agent that extract relevant informa
 </content>
 """
 TEMPLATE_LINKS = r"""You are a webpage analysis agent that extract relevant links to the given query. NOTE:
-1. You should extract the most relevant links to the query.
+1. You should extract the most relevant links to the query. Do not include the url of given webpage.
 2. You can only output urls that exist in following webpage.
-3. Output format: id.title(url)
+3. Output format: id. title(url)
 
 <query>
 {query}
@@ -96,12 +96,20 @@ class SearchToolkit(AsyncBaseToolkit):
         res = await self.search_google(query)
         # filter the search results
         results = self._filter_results(res["organic"], num_results)
-        msg = f'🔍  Results for query "{query}": {results}'
+        formatted_results = []
+        for i, r in enumerate(results, 1):
+            formatted_results.append(f"{i}. {r['title']} ({r['link']})")
+            if 'snippet' in r:
+                formatted_results[-1] += f"\nsnippet: {r['snippet']}"
+            if 'sitelinks' in r:
+                formatted_results[-1] += f"\nsitelinks: {r['sitelinks']}"
+        msg = '\n'.join(formatted_results)
         logger.info(oneline_object(msg))
         return msg
     
     def _filter_results(self, results: list[dict], limit: int) -> list[dict]:
         # can also use search operator `-site:huggingface.co`
+        # ret: {title, link, snippet, position, | sitelinks}
         res = []
         for result in results:
             if not RE_MATCHED_SITES.match(result["link"]):
@@ -131,7 +139,7 @@ class SearchToolkit(AsyncBaseToolkit):
         """
         logger.info(f"[tool] web_qa: {oneline_object({url, query})}")
         content = await self.get_content(url)
-        query = query or "Summarize the content of this webpage."
+        query = query or "Summarize the content of this webpage, in the same language as the webpage."  # use the same language
         res_summary, res_links = await asyncio.gather(self._qa(content, query), self._extract_links(content, query))
         result = f"Summary: {res_summary}\n\nRelated Links: {res_links}"
         return result
