@@ -4,6 +4,8 @@ from ...utils import SimplifiedAsyncOpenAI
 
 
 TEMPLATE = """Please answer the original question based on the trajectory of the subtasks.
+
+## input
 <question>
 {question}
 </question>
@@ -11,7 +13,10 @@ TEMPLATE = """Please answer the original question based on the trajectory of the
 {trajectory}
 </trajectory>
 
-Your response should be in the following format:
+## rules
+- language: your response should be in the same language as the question.
+
+## output format
 Explanation: {{your explanation for your final answer}}
 Exact Answer: {{your succinct, final answer}}
 Confidence: {{your confidence score between 0% and 100% for your answer}}

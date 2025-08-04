@@ -30,7 +30,11 @@ class NextTaskResult:
 
     @property
     def trajectory(self):
-        return [{"role": "assistant", "content": f"[planner] {self.todo}"}]
+        todos_str = []
+        for i,task in enumerate(self.todo, 1):
+            todos_str.append(f"{i}. {task.task} ({task.agent_name})")
+        todos_str = "\n".join(todos_str)
+        return [{"role": "assistant", "content": f"[planner]\n{todos_str}"}]
 
 
 @dataclass
