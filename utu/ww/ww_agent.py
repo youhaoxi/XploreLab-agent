@@ -29,6 +29,20 @@ class WWRunResult:
     trace_id: str = ""
 
 
+TEMPLATE_SEARCH = r"""Original Problem:
+{problem}
+
+Plan:
+{plan}
+
+Previous Trajectory:
+{trajectory}
+
+Current Task:
+{task}
+""".strip()
+
+
 class WWAgent:
     def __init__(self, config: AgentConfig|str):
         if isinstance(config, str):
@@ -72,7 +86,21 @@ class WWAgent:
             trajectory.extend(plan.trajectory)
             for task in plan.todo:
                 if task.agent_name == "SearchAgent":
-                    result = await self.search_agent.research(task.task, trace_id=trace_id)
+                    str_plan = "\n".join([
+                        f"{i}. {t.task}" for i, t in enumerate(plan.todo, 1)
+                    ])
+                    str_traj = "\n".join([
+                        f"{i}. ({t.task}): {t.output}" for i, t in enumerate(task_records, 1)
+                    ])
+                    result = await self.search_agent.research(
+                        TEMPLATE_SEARCH.format(
+                            problem=input,
+                            plan=str_plan,
+                            trajectory=str_traj,
+                            task=task.task,
+                        ),
+                        trace_id=trace_id
+                    )
                     task_records.append(result)
                     trajectory.extend(result.trajectory)
                 elif task.agent_name == "AnalysisAgent":
