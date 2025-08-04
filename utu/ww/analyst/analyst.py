@@ -1,4 +1,4 @@
-from .utils import Base, AnalysisResult, NextTaskResult, SearchResult
+from ..utils import Base, AnalysisResult, SearchResult
 from ...config import AgentConfig
 from ...utils import SimplifiedAsyncOpenAI
 

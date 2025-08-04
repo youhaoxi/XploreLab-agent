@@ -4,22 +4,20 @@ from dataclasses import dataclass, asdict
 from agents import gen_trace_id
 from agents.tracing import function_span, trace, agent_span
 
-from ...config import AgentConfig, ConfigLoader
-from ...tracing import setup_tracing
-from .utils import NextTaskResult, SearchResult, AnalysisResult
-from .background_gen import ModuleGenBackground
+from ..config import AgentConfig, ConfigLoader
+from ..tracing import setup_tracing
+from .utils import NextTaskResult, SearchResult, AnalysisResult, ModuleGenBackground
 
 # MODE = "simple | plan"
 MODE = "plan"
 if MODE == "simple":
-    from .ww_analyst import DummyAnalysisAgent as AnalysisAgent
-    from .ww_searcher import SimpleSearcherAgent as SearcherAgent
-    from ..planner import DummyPlannerAgent as PlannerAgent
+    from .analyst import DummyAnalysisAgent as AnalysisAgent
+    from .searcher import SimpleSearcherAgent as SearcherAgent
+    from .planner import DummyPlannerAgent as PlannerAgent
 elif MODE == "plan":
-    from .ww_analyst import AnalysisAgent
-    # from .ww_searcher import SearcherAgent
-    from .ww_searcher import SimpleSearcherAgent as SearcherAgent
-    from ..planner import PlannerAgent
+    from .analyst import AnalysisAgent
+    from .searcher import SimpleSearcherAgent as SearcherAgent
+    from .planner import PlannerAgent
 else:
     raise ValueError(f"Unknown mode: {MODE}")
 

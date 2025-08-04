@@ -8,7 +8,7 @@ Workflow based implementation of a search agent
 import json
 import asyncio
 
-from .utils import Base, SearchResult
+from ..utils import Base, SearchResult
 from ...config import AgentConfig, ConfigLoader
 from ...tools import TOOLKIT_MAP
 from ...agents.simple_agent import SimpleAgent

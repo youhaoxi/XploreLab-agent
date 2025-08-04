@@ -4,7 +4,7 @@ from typing import Literal
 
 from jinja2 import Environment, FileSystemLoader
 
-from ..agents.utils import Base, NextTaskResult, Task
+from ..utils import Base, NextTaskResult, Task
 from ...config import AgentConfig
 from ...utils import SimplifiedAsyncOpenAI
 from .session_manager import SessionManager

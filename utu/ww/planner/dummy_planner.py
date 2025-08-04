@@ -1,4 +1,4 @@
-from ..agents.utils import Base, NextTaskResult, Task
+from ..utils import Base, NextTaskResult, Task
 
 
 class DummyPlannerAgent(Base):

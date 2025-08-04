@@ -3,7 +3,7 @@ import json
 
 from ..eval.benchmarks.base_benchmark import BaseBenchmark
 from ..eval.data import EvaluationSample
-from .agents.main import WWAgent
+from .ww_agent import WWAgent
 
 
 class WWBenchmark(BaseBenchmark):
