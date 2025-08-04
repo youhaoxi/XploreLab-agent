@@ -27,6 +27,7 @@ class SimpleSearcherAgent(Base):
         """search webpages for a specific subtask, return a report """
         run_result = await self.agent.run(subtask, trace_id=trace_id)
         return SearchResult(
+            task=subtask,
             output=run_result.final_output,
             trajectory=get_trajectory_from_agent_result(run_result),
         )
@@ -98,7 +99,7 @@ class SearcherAgent(Base):
         self._cleanup_sub_trajectories()
 
         return SearchResult(
-            # trace_id=self.trace_id,
+            task=query,
             output=final_output,
             trajectory=self._get_trajectory(),
             search_results=search_results

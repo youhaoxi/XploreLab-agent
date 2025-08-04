@@ -14,7 +14,7 @@ MODE = "plan"
 if MODE == "simple":
     from .ww_analyst import DummyAnalysisAgent as AnalysisAgent
     from .ww_searcher import SimpleSearcherAgent as SearcherAgent
-    from .ww_planner import DummyPlannerAgent as PlannerAgent
+    from ..planner import DummyPlannerAgent as PlannerAgent
 elif MODE == "plan":
     from .ww_analyst import AnalysisAgent
     # from .ww_searcher import SearcherAgent

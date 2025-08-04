@@ -1,3 +1,4 @@
-from .ww_planner import PlannerAgent
+from .planner import PlannerAgent
+from .dummy_planner import DummyPlannerAgent
 
-__all__ = ["PlannerAgent"]
+__all__ = ["PlannerAgent", "DummyPlannerAgent"]
