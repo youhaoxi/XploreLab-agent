@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Optional
 
 from ...config import AgentConfig
 
@@ -17,14 +18,15 @@ class Base:
 
 @dataclass
 class Task:
-    agent: str
+    agent_name: str
     task: str
+    completed: Optional[bool] = None
 
 @dataclass
 class NextTaskResult:
     task: Task = None
     is_finished: bool = False
-    todo: list[dict] = field(default_factory=list)
+    todo: list[Task] = field(default_factory=list)
 
     @property
     def trajectory(self):
@@ -33,6 +35,7 @@ class NextTaskResult:
 
 @dataclass
 class SearchResult:
+    task: str
     output: str
     trajectory: list[dict]
     search_results: list[dict] = field(default_factory=list)

@@ -29,10 +29,10 @@ class PlannerAgent(Base):
         """ get next task to execute """
         if not prev_subtask_result:
             result = await self.create_plan(query, session_id=trace_id)
-            return NextTaskResult(task=Task(**result["next_step"]), todo=result["plan"])
+            return NextTaskResult(task=Task(**result["next_step"]), todo=[Task(**task) for task in result["plan"]])
         else:
             result = await self.update_plan(prev_task, prev_subtask_result, session_id=trace_id)
-            return NextTaskResult(task=Task(**result["next_step"]), todo=result["plan"])
+            return NextTaskResult(task=Task(**result["next_step"]), todo=[Task(**task) for task in result["plan"]])
 
     async def execute_planning(self, mode: Literal["planning", "update_planning"], question: str, background_info: str = "",
                         previous_plan: str = "", task: str = "", task_results: str = "", 

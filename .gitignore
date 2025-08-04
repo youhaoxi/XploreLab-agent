@@ -35,6 +35,7 @@ uv.lock
 *.bak
 *.publish
 ___*
+_SESSION_DATA
 .cache/
 /data/
 output/

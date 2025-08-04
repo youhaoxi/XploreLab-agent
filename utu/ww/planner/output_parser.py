@@ -15,7 +15,7 @@ class PlannerTask:
 @dataclass
 class NextStep:
     """表示下一步要执行的任务"""
-    agent: str
+    agent_name: str
     task: str
 
 
@@ -100,9 +100,9 @@ class PlannerOutputParser:
         """提取next_step部分的内容"""
         match = re.search(self.next_step_pattern, text, re.DOTALL)
         if match:
-            agent = match.group(1).strip()
+            agent_name = match.group(1).strip()
             task = match.group(2).strip()
-            return NextStep(agent=agent, task=task)
+            return NextStep(agent_name=agent_name, task=task)
         return None
     
     def _check_task_finished(self, text: str) -> bool:
@@ -126,7 +126,7 @@ class PlannerOutputParser:
         
         if parsed_output.next_step:
             result["next_step"] = {
-                "agent": parsed_output.next_step.agent,
+                "agent_name": parsed_output.next_step.agent_name,
                 "task": parsed_output.next_step.task
             }
         
