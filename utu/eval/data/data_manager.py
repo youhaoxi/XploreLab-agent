@@ -119,7 +119,7 @@ class DBDataManager(DataManager):
                 select(EvaluationSample).where(
                     EvaluationSample.exp_id == self.config.exp_id,
                     EvaluationSample.stage == stage if stage else True,
-                ).limit(limit)
+                ).order_by(EvaluationSample.dataset_index).limit(limit)
             ).all()
             return samples
 

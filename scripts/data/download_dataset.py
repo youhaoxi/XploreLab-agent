@@ -22,7 +22,7 @@ def download_dataset(dataset_name: str, output_path: str):
     with Session(engine) as session:
         print(f"Fetching datapoints for dataset: '{dataset_name}'...")
         
-        statement = select(DatasetSample).where(DatasetSample.dataset == dataset_name)
+        statement = select(DatasetSample).where(DatasetSample.dataset == dataset_name).order_by(DatasetSample.index)
         datapoints = session.exec(statement).all()
 
         if not datapoints:
