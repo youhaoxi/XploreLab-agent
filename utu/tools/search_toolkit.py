@@ -71,6 +71,7 @@ class SearchToolkit(AsyncBaseToolkit):
         }
         async with aiohttp.ClientSession() as session:
             async with session.post(self.serper_url, headers=self.serper_header, json=params) as response:
+                response.raise_for_status()  # avoid cache error!
                 results = await response.json()
                 return results
 
