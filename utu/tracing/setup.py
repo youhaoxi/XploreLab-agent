@@ -32,7 +32,7 @@ def setup_phoenix_tracing(
     PHOENIX_TRACING_PROVIDER = register(
         endpoint=endpoint,
         project_name=project_name,
-        # batch=True,  # NOTE: SimpleSpanProcessor may reduce performance, but BatchSpanProcessor can lead to error!
+        batch=True,  # TEST: SimpleSpanProcessor may reduce performance, but BatchSpanProcessor can lead to error?
         # protocol="grpc", # grpc | http/protobuf, will automatically inferred!
         auto_instrument=False,
     )

@@ -90,7 +90,7 @@ class WWAgent:
                         f"{i}. {t.task}" for i, t in enumerate(plan.todo, 1)
                     ])
                     str_traj = "\n".join([
-                        f"{i}. ({t.task}): {t.output}" for i, t in enumerate(task_records, 1)
+                        f"<subtask>{t.task}</subtask>\n<output>{r.output}</output>" for i, (r, t) in enumerate(zip(task_records, plan.todo), 1)
                     ])
                     result = await self.search_agent.research(
                         TEMPLATE_SEARCH.format(

@@ -31,8 +31,8 @@ def setup_logging() -> None:
     console_handler.setLevel(logging.INFO)
     color_formatter = ColoredFormatter(
         "%(green)s%(asctime)s%(reset)s[%(blue)s%(name)s%(reset)s] - "
-        "%(log_color)s%(levelname)s%(reset)s - %(filename)s:%(lineno)d - %(green)s%(message)s%(reset)s - "
-        "%(cyan)s%(threadName)s%(reset)s",
+        "%(log_color)s%(levelname)s%(reset)s - %(filename)s:%(lineno)d - %(green)s%(message)s%(reset)s",
+        # " - %(cyan)s%(threadName)s%(reset)s",
         log_colors={
             "DEBUG": "cyan",
             "INFO": "white",
