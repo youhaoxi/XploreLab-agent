@@ -142,12 +142,11 @@ class SimpleAgent(RunnerMixin):
     async def build(self):
         """ Build the agent """
         model = AgentsUtils.get_agents_model(**self.config.model.model_provider.model_dump())
-        tools = self._tools if self._tools else await self.get_tools()
         self.current_agent = Agent(
             name=self.config.agent.name,
             instructions=await self.build_instructions(),
             model=model,
-            tools=tools,
+            tools=await self.get_tools(),
             mcp_servers=self._mcp_servers
         )
 
@@ -165,6 +164,9 @@ class SimpleAgent(RunnerMixin):
         return self.config.agent.instructions
 
     async def get_tools(self) -> list[Tool]:
+        if self._tools:
+            return self._tools
+        
         tools_list: list[Tool] = []
         # TODO: handle duplicate tool names
         for toolkit_name, toolkit_config in self.config.toolkits.items():
@@ -183,10 +185,8 @@ class SimpleAgent(RunnerMixin):
         #         run_context=RunContextWrapper(context=self.context), agent=self.current_agent))
         tool_names = [tool.name for tool in tools_list]
         logger.info(f"Loaded {len(tool_names)} tools: {tool_names}")
+        self._tools = tools_list
         return tools_list
-
-    # async def get_state(self) -> str:
-    #     return ""
 
     async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")

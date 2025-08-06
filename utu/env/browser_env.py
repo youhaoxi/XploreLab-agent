@@ -1,17 +1,67 @@
+import json
+import logging
+
+from agents import Tool, FunctionTool, TContext, RunContextWrapper
+
 from .base_env import BaseEnv
 from .utils.docker_manager import DockerManager
+from .utils.mcp_client import MCPClient
+
+logger = logging.getLogger(__name__)
 
 
 class BrowserEnv(BaseEnv):
     def __init__(self, trace_id: str):
         self.trace_id = trace_id
         self.docker_manager = DockerManager()
+        self.browser_state: str = None
 
     async def build(self):
-        pass
+        self.container_info = await self.docker_manager.start_container(self.trace_id)
+        self.mcp_url = self.container_info["mcp_url"]
 
     async def cleanup(self):
-        pass
+        await self.docker_manager.stop_container(self.trace_id)
 
     def get_sp_prefix(self) -> str:
         return ""
+
+    async def get_tools(self) -> list[Tool]:
+        activated_tools = (
+            "search_google", "go_to_url", "go_back",
+            # "wait",
+            "click_element", "input_text", 
+            "switch_tab", "open_tab",
+            "scroll_down", "scroll_up",
+            "download_file"
+            # "search_google_api"
+        )
+        tools: list[Tool] = []
+
+        def create_on_invoke_tool(tool_name: str):
+            async def on_invoke_tool(ctx: RunContextWrapper[TContext], input_json: str) -> str:
+                try:
+                    async with MCPClient.get_mcp_client(self.mcp_url) as client:
+                        res = await client.call_tool(tool_name, json.loads(input_json))
+                        if res.isError:
+                            return f"Error: {res.content}"
+                        self.browser_state = res.content[1].text  # DISCUSS: record the web actions?
+                        return res.content[0].text
+                except Exception as e:
+                    logger.error(f"except: {e}", exc_info=True)
+                    return f"Error: {e}"
+            return on_invoke_tool
+
+        async with MCPClient.get_mcp_client(self.mcp_url) as client:
+            res = await client.list_tools()
+            assert res.nextCursor is None
+            for tool in res.tools:
+                if tool.name not in activated_tools:
+                    continue
+                tools.append(FunctionTool(
+                    name=tool.name,
+                    description=tool.description,
+                    params_json_schema=tool.inputSchema,
+                    on_invoke_tool=create_on_invoke_tool(tool.name),
+                ))
+            return tools

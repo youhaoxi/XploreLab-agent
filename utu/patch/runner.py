@@ -49,8 +49,8 @@ class UTUAgentRunner(AgentRunner):
         input.extend([generated_item.to_input_item() for generated_item in generated_items])
 
         # FIXME: set context manage as a hook?
+        # ADD: context manager
         context_manager: BaseContextManager|None = context_wrapper.context.get("context_manager", None)
-        # ADD: preprocess
         if context_manager:
             input = context_manager.preprocess(input)
         new_response = await cls._get_new_response(
