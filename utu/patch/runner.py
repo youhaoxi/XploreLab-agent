@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from agents.run import AgentRunner, AgentToolUseTracker, SingleStepResult
 from agents import (
@@ -10,8 +11,10 @@ from agents.util import _coro
 
 from ..context import BaseContextManager
 
+logger = logging.getLogger(__name__)
 
 class UTUAgentRunner(AgentRunner):
+    # TODO: also add context_manager to _run_single_turn_streamed for .run_streamed
     @classmethod
     async def _run_single_turn(
         cls,
@@ -52,7 +55,7 @@ class UTUAgentRunner(AgentRunner):
         # ADD: context manager
         context_manager: BaseContextManager|None = context_wrapper.context.get("context_manager", None)
         if context_manager:
-            input = context_manager.preprocess(input)
+            input = context_manager.preprocess(input, context_wrapper)
         new_response = await cls._get_new_response(
             agent,
             system_prompt,

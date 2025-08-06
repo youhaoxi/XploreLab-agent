@@ -26,6 +26,9 @@ class BrowserEnv(BaseEnv):
     def get_sp_prefix(self) -> str:
         return ""
 
+    def get_state(self) -> str:
+        return self.browser_state
+
     async def get_tools(self) -> list[Tool]:
         activated_tools = (
             "search_google", "go_to_url", "go_back",
@@ -44,7 +47,7 @@ class BrowserEnv(BaseEnv):
                     async with MCPClient.get_mcp_client(self.mcp_url) as client:
                         res = await client.call_tool(tool_name, json.loads(input_json))
                         if res.isError:
-                            return f"Error: {res.content}"
+                            return f"Error: {res.content[0].text}"
                         self.browser_state = res.content[1].text  # DISCUSS: record the web actions?
                         return res.content[0].text
                 except Exception as e:

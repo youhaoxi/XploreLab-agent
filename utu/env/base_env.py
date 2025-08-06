@@ -14,6 +14,11 @@ class Env(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def get_state(self) -> str:
+        raise NotImplementedError
+
+
+    @abc.abstractmethod
     async def get_tools(self) -> list[Tool]:
         raise NotImplementedError
 
@@ -33,6 +38,9 @@ class Env(abc.ABC):
 
 class BaseEnv(Env):
     def get_sp_prefix(self) -> str:
+        return ""
+
+    def get_state(self) -> str:
         return ""
 
     async def get_tools(self) -> list[Tool]:

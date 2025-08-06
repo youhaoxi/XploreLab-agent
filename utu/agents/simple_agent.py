@@ -11,7 +11,8 @@ from agents.mcp import MCPServerStdio, MCPServer
 from ..config import AgentConfig, ToolkitConfig, ConfigLoader
 from ..tools import AsyncBaseToolkit, TOOLKIT_MAP
 from ..utils import AgentsUtils, get_logger
-from ..context import BaseContextManager, CONTEXT_MANAGER_MAP
+from ..context import BaseContextManager, build_context_manager
+from ..env import get_env, BaseEnv
 from ..tracing import setup_tracing
 
 logger = get_logger(__name__)
@@ -21,6 +22,7 @@ class RunnerMixin:
     config: AgentConfig = None
     current_agent: Agent[TContext] = None
     input_items: list[TResponseInputItem] = []
+    env: BaseEnv = None
     context_manager: BaseContextManager = None
     _run_hooks: RunHooks = None
     trace_id: str = None
@@ -44,6 +46,7 @@ class RunnerMixin:
     def _get_context(self) -> dict:
         return {
             "context_manager": self.context_manager,
+            "env": self.env,
         }
 
     # wrap `Runner` apis in @openai-agents
@@ -119,18 +122,9 @@ class SimpleAgent(RunnerMixin):
 
         if tools: self._tools = tools
         
-        self._build_context_manager()
         # self.setup_tracer()
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
-
-    def _build_context_manager(self):
-        if (not self.config.context_manager) or (not self.config.context_manager.name):
-            self.context_manager = CONTEXT_MANAGER_MAP["dummy"]()
-        else:
-            self.context_manager = CONTEXT_MANAGER_MAP[self.config.context_manager.name](
-                self.config.context_manager.config
-            )
 
     async def __aenter__(self):
         await self.build()
@@ -141,6 +135,8 @@ class SimpleAgent(RunnerMixin):
 
     async def build(self):
         """ Build the agent """
+        self.env = await get_env("browser_docker", self.trace_id)
+        await self.env.build()
         model = AgentsUtils.get_agents_model(**self.config.model.model_provider.model_dump())
         self.current_agent = Agent(
             name=self.config.agent.name,
@@ -149,6 +145,7 @@ class SimpleAgent(RunnerMixin):
             tools=await self.get_tools(),
             mcp_servers=self._mcp_servers
         )
+        self.context_manager = build_context_manager(self.config)
 
     async def cleanup(self):
         """ Cleanup """
@@ -158,16 +155,20 @@ class SimpleAgent(RunnerMixin):
         logger.info("Cleaning up... (tools)")
         await self._tools_exit_stack.aclose()
         self._toolkits = []
+        logger.info("Cleaning up... (env)")
+        await self.env.cleanup()
 
     async def build_instructions(self) -> str:
         """ Build instructions from config. You can override this method to build customized instructions. """
-        return self.config.agent.instructions
+        sp_prefix = self.env.get_sp_prefix()
+        return sp_prefix + self.config.agent.instructions
 
     async def get_tools(self) -> list[Tool]:
         if self._tools:
             return self._tools
         
         tools_list: list[Tool] = []
+        tools_list += await self.env.get_tools()  # add env tools
         # TODO: handle duplicate tool names
         for toolkit_name, toolkit_config in self.config.toolkits.items():
             if toolkit_config.mode == "mcp":

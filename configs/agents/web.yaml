@@ -6,3 +6,6 @@ defaults:
 agent:
   name: web-agent
   instructions: "You are a helpful assistant."
+
+context_manager:
+  name: env
