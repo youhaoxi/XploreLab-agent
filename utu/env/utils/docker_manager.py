@@ -1,11 +1,14 @@
 import logging
 import asyncio
+import time
 from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, Dict
 
 import docker
 import docker.errors
+import requests
+from requests.exceptions import RequestException
 
 from .port_manager import PortManager
 
@@ -129,7 +132,48 @@ class DockerManager:
                 )
                 
                 container_info.container_id = container.id
-                container_info.status = ContainerStatus.RUNNING
+                
+                # 等待服务的 /ping 端点返回 200 状态码
+                ping_url = f"http://{self.port_manager.get_host_ip()}:{port}/ping"
+                max_retries = 30  # 最多尝试30次
+                retry_interval = 1  # 每次间隔1秒
+                service_ready = False
+                
+                logger.info(f"等待容器 {id} 服务就绪，检查 {ping_url}")
+                
+                for attempt in range(max_retries):
+                    try:
+                        response = requests.get(ping_url, timeout=2)
+                        if response.status_code == 200:
+                            service_ready = True
+                            logger.info(f"容器 {id} 服务已就绪，/ping 返回 200")
+                            break
+                        logger.debug(f"容器 {id} 服务未就绪，/ping 返回状态码 {response.status_code}，重试中...")
+                    except RequestException as e:
+                        logger.debug(f"容器 {id} 服务未就绪，连接异常: {e}，重试中...")
+                    
+                    time.sleep(retry_interval)
+                
+                if service_ready:
+                    container_info.status = ContainerStatus.RUNNING
+                else:
+                    # 服务未就绪，标记为错误状态并停止容器
+                    container_info.status = ContainerStatus.ERROR
+                    container_info.error_msg = "服务未能在规定时间内就绪，/ping 未返回 200 状态码"
+                    try:
+                        container.stop(timeout=5)
+                    except Exception as e:
+                        logger.error(f"停止未就绪容器 {id} 时出错: {e}")
+                    
+                    if container_info.port:
+                        self.port_manager.release_port(container_info.port)
+                        container_info.port = None
+                    
+                    return {
+                        "success": False,
+                        "error": container_info.error_msg,
+                        "id": id
+                    }
                 
                 logger.info(f"容器 {id} 启动成功，端口: {port}, Docker ID: {container.id[:12]}")
                 

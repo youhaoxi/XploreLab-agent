@@ -13,7 +13,6 @@ async def test_mcp():
         print(res)
         container_info = await docker_manager.start_container(id)
         print(f"container_info: {container_info}")
-        await asyncio.sleep(5)
         async with MCPClient.get_mcp_client(container_info["mcp_url"]) as client:
             res = await client.list_tools()
             print(res)
