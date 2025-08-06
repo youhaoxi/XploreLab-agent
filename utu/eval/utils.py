@@ -5,7 +5,7 @@ from utu.config import ConfigLoader, EvalConfig
 
 def parse_eval_config() -> EvalConfig:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_name", type=str, default="v01", help="Configuration name for evaluation.")
+    parser.add_argument("--config_name", type=str, default="ww", help="Configuration name for evaluation.")
     parser.add_argument("--exp_id", type=str, default=None, help="Experiment ID.")
     parser.add_argument("--agent_model", type=str, default=None, help="Agent model.")
     parser.add_argument("--dataset", type=str, default=None, help="Dataset.")
