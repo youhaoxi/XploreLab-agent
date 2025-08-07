@@ -15,6 +15,7 @@ from agents import (
     OpenAIChatCompletionsModel,
     RunItem, ModelSettings, ModelTracing,
     StreamEvent,
+    RunResult,
     ToolCallItem, FunctionTool,
     ToolCallOutputItem,
 )
@@ -48,6 +49,13 @@ class AgentsUtils:
             raise ValueError("UTU_API_KEY and UTU_BASE_URL must be set")
         openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
         return OpenAIChatCompletionsModel(model=model, openai_client=openai_client)
+
+    @staticmethod
+    def get_trajectory_from_agent_result(agent_result: RunResult) -> dict:
+        return {
+            "agent": agent_result.last_agent.name,
+            "trajectory": Converter.items_to_messages(agent_result.to_input_list()),
+        }
 
     @staticmethod
     def print_new_items(new_items: list[RunItem]) -> None:

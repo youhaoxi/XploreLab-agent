@@ -7,7 +7,6 @@ from .env_context_manager import EnvContextManager
 # }
 
 def build_context_manager(config: AgentConfig):
-    print(f"> build_context_manager: {config.context_manager}")
     if (not config.context_manager) or (not config.context_manager.name):
         return DummyContextManager()
     match config.context_manager.name:

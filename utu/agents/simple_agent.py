@@ -55,7 +55,7 @@ class SimpleAgent:
 
     async def build(self):
         """ Build the agent """
-        self.env = await get_env("browser_docker", self._trace_id)
+        self.env = await get_env(self.config, self._trace_id)  # FIXME: trace_id
         await self.env.build()
         model = AgentsUtils.get_agents_model(**self.config.model.model_provider.model_dump())
         self.current_agent = Agent(
