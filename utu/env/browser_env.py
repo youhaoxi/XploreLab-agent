@@ -56,6 +56,7 @@ class BrowserEnv(BaseEnv):
             return on_invoke_tool
 
         async with MCPClient.get_mcp_client(self.mcp_url) as client:
+            # NOTE: check `MCPUtil` in @agents
             res = await client.list_tools()
             assert res.nextCursor is None
             for tool in res.tools:
