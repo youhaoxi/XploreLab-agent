@@ -7,6 +7,8 @@ config:
     api_key: ${oc.env:AUDIO_API_KEY}
     base_url: ${oc.env:AUDIO_BASE_URL}
 config_llm:
-  model: ${oc.env:UTU_LLM_MODEL}
-  api_key: ${oc.env:UTU_LLM_API_KEY}
-  base_url: ${oc.env:UTU_LLM_BASE_URL}
+  model_provider:
+    type: ${oc.env:UTU_LLM_TYPE}
+    model: ${oc.env:UTU_LLM_MODEL}
+    api_key: ${oc.env:UTU_LLM_API_KEY}
+    base_url: ${oc.env:UTU_LLM_BASE_URL}

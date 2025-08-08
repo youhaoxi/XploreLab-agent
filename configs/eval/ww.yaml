@@ -55,10 +55,11 @@ agent:
         SERPER_API_KEY: ${oc.env:SERPER_API_KEY}
         JINA_API_KEY: ${oc.env:JINA_API_KEY}
       config_llm:
-        type: ${oc.env:UTU_LLM_TYPE}
-        model: ${oc.env:UTU_LLM_MODEL}
-        base_url: ${oc.env:UTU_LLM_BASE_URL}
-        api_key: ${oc.env:UTU_LLM_API_KEY}
+        model_provider:
+          type: ${oc.env:UTU_LLM_TYPE}
+          model: ${oc.env:UTU_LLM_MODEL}
+          base_url: ${oc.env:UTU_LLM_BASE_URL}
+          api_key: ${oc.env:UTU_LLM_API_KEY}
   max_turns: 20
 
 concurrency: 50

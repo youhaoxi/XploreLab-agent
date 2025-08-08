@@ -3,6 +3,8 @@ mode: builtin
 activated_tools: null
 # config:
 config_llm:
-  model: ${oc.env:UTU_TOOL_IMAGE_MODEL}
-  api_key: ${oc.env:UTU_LLM_API_KEY}
-  base_url: ${oc.env:UTU_LLM_BASE_URL}
+  model_provider:
+    type: ${oc.env:UTU_LLM_TYPE}
+    model: ${oc.env:UTU_TOOL_IMAGE_MODEL}
+    api_key: ${oc.env:UTU_LLM_API_KEY}
+    base_url: ${oc.env:UTU_LLM_BASE_URL}

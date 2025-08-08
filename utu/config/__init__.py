@@ -1,5 +1,6 @@
 from .loader import ConfigLoader
-from .agent_config import AgentConfig, ModelProviderConfig, ToolkitConfig
+from .agent_config import AgentConfig, ToolkitConfig
 from .eval_config import EvalConfig
+from .model_config import ModelConfigs
 
-__all__ = ["ConfigLoader", "AgentConfig", "ModelProviderConfig", "ToolkitConfig", "EvalConfig"]
+__all__ = ["ConfigLoader", "AgentConfig", "ToolkitConfig", "EvalConfig", "ModelConfigs"]

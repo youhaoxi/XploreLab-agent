@@ -29,7 +29,7 @@ class DocumentToolkit(AsyncBaseToolkit):
             high_resolution=self.config.config.get("high_resolution", True),
         )
         self.text_limit = self.config.config.get("text_limit", 100_000)
-        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
+        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_provider.model_dump())
         self.md5_to_path = {}
     
     @async_file_cache(expire_time=None)
@@ -80,7 +80,7 @@ class DocumentToolkit(AsyncBaseToolkit):
             messages.append({"role": "user", "content": INSTRUCTION_QA.format(question=question)})
         else:
             messages.append({"role": "user", "content": INSTRUCTION_SUMMARY})
-        output = await self.llm.query_one(messages=messages)
+        output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         if not question:
             output = f"You did not provide a particular question, so here is a detailed caption for the document: {output}"
         return output

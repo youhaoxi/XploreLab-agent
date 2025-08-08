@@ -4,7 +4,7 @@ from typing_extensions import Literal
 from pydantic import Field
 
 from .base_config import ConfigBaseModel
-from .model_config import ModelConfigs, ModelProviderConfig
+from .model_config import ModelConfigs
 
 
 DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
@@ -20,7 +20,7 @@ class ToolkitConfig(ConfigBaseModel):
     name: str | None = None
     activated_tools: list[str] | None = None
     config: dict | None = Field(default_factory=dict)
-    config_llm: ModelProviderConfig | None = None  # TODO: -> ModelConfigs
+    config_llm: ModelConfigs | None = None
 
 class ContextManagerConfig(ConfigBaseModel):
     name: str | None = None

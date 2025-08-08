@@ -58,7 +58,7 @@ class SearchToolkit(AsyncBaseToolkit):
         }
         # config
         print(f"> config: {self.config}")
-        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump() if self.config.config_llm else {})
+        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_provider.model_dump() if self.config.config_llm else {})
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
     @async_file_cache(expire_time=None)
@@ -147,10 +147,10 @@ class SearchToolkit(AsyncBaseToolkit):
 
     async def _qa(self, content: str, query: str) -> str:
         template = TEMPLATE_QA.format(content=content, query=query)
-        return await self.llm.query_one(messages=[{"role": "user", "content": template}])
+        return await self.llm.query_one(messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump())
     async def _extract_links(self, content: str, query: str) -> str:
         template = TEMPLATE_LINKS.format(content=content, query=query)
-        return await self.llm.query_one(messages=[{"role": "user", "content": template}])
+        return await self.llm.query_one(messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump())
 
     async def get_tools_map(self) -> dict[str, Callable]:
         return {

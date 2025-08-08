@@ -5,6 +5,8 @@ config:
   high_resolution: true
   CHUNKR_API_KEY: ${oc.env:CHUNKR_API_KEY}
 config_llm:
-  model: ${oc.env:UTU_TOOL_DOCUMENT_MODEL}
-  api_key: ${oc.env:UTU_LLM_API_KEY}
-  base_url: ${oc.env:UTU_LLM_BASE_URL}
+  model_provider:
+    type: ${oc.env:UTU_LLM_TYPE}
+    model: ${oc.env:UTU_TOOL_DOCUMENT_MODEL}
+    api_key: ${oc.env:UTU_LLM_API_KEY}
+    base_url: ${oc.env:UTU_LLM_BASE_URL}

@@ -23,7 +23,7 @@ class AudioToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
         self.client = SimplifiedAsyncOpenAI(**config.config['audio_model'])
-        self.llm = SimplifiedAsyncOpenAI(**config.config_llm.model_dump())
+        self.llm = SimplifiedAsyncOpenAI(**config.config_llm.model_provider.model_dump())
         self.md5_to_path = {}
 
     @async_file_cache(expire_time=None)
@@ -72,7 +72,7 @@ class AudioToolkit(AsyncBaseToolkit):
                 transcription=res["text"]
             )},
         ]
-        output = await self.llm.query_one(messages=messages)
+        output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         return output
 
     async def get_tools_map(self) -> dict[str, Callable]:
