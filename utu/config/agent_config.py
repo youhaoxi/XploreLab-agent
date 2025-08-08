@@ -11,6 +11,7 @@ DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
 
 
 class ModelProviderConfig(ConfigBaseModel):
+    type: Literal["chat.completions", "responses"] = "chat.completions"
     model: str
     base_url: str | None = None
     api_key: str | None = "xxx"

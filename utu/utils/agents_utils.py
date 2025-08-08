@@ -5,7 +5,7 @@ import logging
 from collections.abc import AsyncIterator, Iterable
 
 from openai import AsyncOpenAI
-from openai.types.responses import ResponseFunctionToolCall
+from openai.types.responses import ResponseFunctionToolCall, FunctionToolParam
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 
 from agents import (
@@ -170,6 +170,15 @@ class ChatCompletionConverter(Converter):
             filtered_items.append(item)
         return filtered_items
 
+    @classmethod
+    def tool_chatcompletion_to_responses(cls, tool: ChatCompletionToolParam) -> FunctionToolParam:
+        assert tool["type"] == "function"
+        return FunctionToolParam(
+            name=tool["function"]["name"],
+            description=tool["function"].get("description", ""),
+            parameters=tool["function"].get("parameters", None),
+            type="function",
+        )
 
 class SimplifiedOpenAIChatCompletionsModel(OpenAIChatCompletionsModel):
     """ extend OpenAIChatCompletionsModel to support basic api 

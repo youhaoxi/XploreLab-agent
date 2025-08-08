@@ -17,7 +17,7 @@ async def test_audio_input():
     wav_data = response.content
     encoded_string = base64.b64encode(wav_data).decode('utf-8')
 
-    completion = await client.chat_completion(
+    completion = await client.chat_completions_create(
         model="gpt-4o-audio-preview",
         modalities=["text", "audio"],
         # voice: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, and shimmer

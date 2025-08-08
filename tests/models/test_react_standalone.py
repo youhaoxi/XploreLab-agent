@@ -217,8 +217,8 @@ async def main():
         
     tasks = tasks_multi
     for i, task in enumerate(tasks):
-        result_fc = await simplified_openai.chat_completion(**task)
-        result_react = await simplified_openai.chat_completion(**process(task))
+        result_fc = await simplified_openai.chat_completions_create(**task)
+        result_react = await simplified_openai.chat_completions_create(**process(task))
         print(f"[{i+1:02d}/{len(tasks):02d}] {task['messages'][0]['content']}")
         print(f"FC: {print_chat_completion(result_fc)}")
         print(f"React: {print_chat_completion(result_react)}")
