@@ -2,7 +2,7 @@
 type: simple_env
 model:
   model_provider:
-    model: ${oc.env:UTU_MODEL_AGENT}
+    model: ${oc.env:UTU_LLM_MODEL}
 agent:
   instructions: |-
     You are a helpful assistant that can search the web, extract webpage content, and provide relevant information to solve the given task.
@@ -27,7 +27,8 @@ toolkits:
     config: {
       "summary_token_limit": 1_000,
     }
-    config_llm: {"model": "${oc.env:UTU_TOOL_MODEL}"}
+    config_llm: 
+      model: ${oc.env:UTU_LLM_MODEL}
   # bash:
   #   name: bash
   #   mode: builtin

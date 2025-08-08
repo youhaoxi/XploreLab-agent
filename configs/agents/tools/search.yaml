@@ -6,6 +6,7 @@ config:
   SERPER_API_KEY: ${oc.env:SERPER_API_KEY}
   JINA_API_KEY: ${oc.env:JINA_API_KEY}
 config_llm:
-  model: "${oc.env:UTU_TOOL_MODEL}"
-  api_key: "${oc.env:UTU_API_KEY}"
-  base_url: "${oc.env:UTU_BASE_URL}"
+  type: ${oc.env:UTU_LLM_TYPE}
+  model: ${oc.env:UTU_LLM_MODEL}
+  api_key: ${oc.env:UTU_LLM_API_KEY}
+  base_url: ${oc.env:UTU_LLM_BASE_URL}

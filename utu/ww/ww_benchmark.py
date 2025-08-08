@@ -36,7 +36,7 @@ class WWBenchmark(BaseBenchmark):
             trace_id=result.trace_id,
             response=result.final_output,
             time_cost=end_time - start_time,
-            trajectory=result.trajectory,
+            trajectories=result.trajectory,
             stage="rollout"  # update stage to rollout!
         )
         self.dataset.save(sample)

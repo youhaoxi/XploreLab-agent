@@ -20,7 +20,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "matplotlib>=3.10.3",
     "mcp>=1.12.3",
-    "openai==1.97.1",  # https://github.com/openai/openai-agents-python/issues/1395
+    "openai==1.97.1", # https://github.com/openai/openai-agents-python/issues/1395
     "openai-agents==0.2.5",
     "openinference-instrumentation-openai>=0.1.30",
     "openinference-instrumentation-openai-agents>=0.1.14",
@@ -29,6 +29,7 @@ dependencies = [
     "pexpect>=4.9.0",
     "pillow>=11.2.1",
     "psycopg2-binary>=2.9.10",
+    "rich>=14.1.0",
     "sqlmodel>=0.0.24",
     "tiktoken>=0.9.0",
     "toml>=0.10.2",

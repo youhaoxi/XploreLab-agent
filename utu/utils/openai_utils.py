@@ -173,7 +173,7 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
     def __init__(
         self,
         *,
-        type: Literal["chat.completions", "responses"] = "chat.completions",
+        type: Literal["chat.completions", "responses"] = None,
         # openai client kwargs
         api_key: str | None = None,
         base_url: str | None = None,
@@ -181,10 +181,11 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
         **kwargs: dict,
     ) -> None:
         super().__init__(
-            api_key=api_key or os.getenv("UTU_API_KEY") or "xxx",
-            base_url=base_url or os.getenv("UTU_BASE_URL")
+            api_key=api_key or os.getenv("UTU_LLM_API_KEY") or "xxx",
+            base_url=base_url or os.getenv("UTU_LLM_BASE_URL")
         )
-        self.type = type
+        print(f"> type: {type}, UTU_LLM_TYPE: {os.getenv('UTU_LLM_TYPE')}")
+        self.type = type or os.getenv("UTU_LLM_TYPE", "chat.completions")
         self.type_create_params = OpenAIChatCompletionParamsKeys if self.type == "chat.completions" else OpenAIResponsesParamsKeys
         self.default_config = self._process_kwargs(kwargs)
 
@@ -194,7 +195,7 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
         for k, v in kwargs.items():
             if k in self.type_create_params:
                 default_config[k] = v
-        default_config["model"] = default_config.get("model", os.getenv("UTU_MODEL"))
+        default_config["model"] = default_config.get("model", os.getenv("UTU_LLM_MODEL"))
         return default_config
 
     async def query_one(self, **kwargs) -> str:

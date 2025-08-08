@@ -1,7 +1,8 @@
 model_provider:
-  api_key: ${oc.env:UTU_API_KEY}
-  base_url: ${oc.env:UTU_BASE_URL}
-  model: ${oc.env:UTU_MODEL}
+  type: "${oc.env:UTU_LLM_TYPE}"
+  model: ${oc.env:UTU_LLM_MODEL}
+  base_url: ${oc.env:UTU_LLM_BASE_URL}
+  api_key: ${oc.env:UTU_LLM_API_KEY}
 # model_settings:
 #   temperature: 0.3
 #   top_p: 0.95

@@ -3,7 +3,6 @@ import json
 import pytest
 
 from utu.tools import SearchToolkit
-from utu.utils import oneline_object
 from utu.config import ConfigLoader
 
 

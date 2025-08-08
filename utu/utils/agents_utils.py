@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import logging
+from typing import Literal
 from collections.abc import AsyncIterator, Iterable
 
 from openai import AsyncOpenAI
@@ -12,7 +13,7 @@ from agents import (
     HandoffOutputItem, TResponseInputItem, 
     ItemHelpers,
     MessageOutputItem,
-    OpenAIChatCompletionsModel,
+    OpenAIChatCompletionsModel, OpenAIResponsesModel,
     RunItem, ModelSettings, ModelTracing,
     StreamEvent,
     RunResult,
@@ -37,18 +38,24 @@ class AgentsUtils:
 
     @staticmethod
     def get_agents_model(
+        type: Literal["responses", "chat.completions"] = None,
         model: str = None,
-        api_key: str = None,
         base_url: str = None,
-        # mode: Literal["responses", "chat.completions"] = "chat.completions",
-    ) -> OpenAIChatCompletionsModel:
-        model = model or os.getenv("UTU_MODEL")
-        api_key = api_key or os.getenv("UTU_API_KEY")
-        base_url = base_url or os.getenv("UTU_BASE_URL")
+        api_key: str = None,
+    ) -> OpenAIChatCompletionsModel | OpenAIResponsesModel:
+        type = type or os.getenv("UTU_LLM_TYPE", "chat.completions")
+        model = model or os.getenv("UTU_LLM_MODEL")
+        base_url = base_url or os.getenv("UTU_LLM_BASE_URL")
+        api_key = api_key or os.getenv("UTU_LLM_API_KEY")
         if not api_key or not base_url:
-            raise ValueError("UTU_API_KEY and UTU_BASE_URL must be set")
+            raise ValueError("UTU_LLM_API_KEY and UTU_LLM_BASE_URL must be set")
         openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
-        return OpenAIChatCompletionsModel(model=model, openai_client=openai_client)
+        if type == "chat.completions":
+            return OpenAIChatCompletionsModel(model=model, openai_client=openai_client)
+        elif type == "responses":
+            return OpenAIResponsesModel(model=model, openai_client=openai_client)
+        else:
+            raise ValueError("Invalid type: " + type)
 
     @staticmethod
     def get_trajectory_from_agent_result(agent_result: RunResult) -> dict:

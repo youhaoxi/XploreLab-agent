@@ -57,6 +57,7 @@ class SearchToolkit(AsyncBaseToolkit):
             'Content-Type': 'application/json'
         }
         # config
+        print(f"> config: {self.config}")
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump() if self.config.config_llm else {})
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 

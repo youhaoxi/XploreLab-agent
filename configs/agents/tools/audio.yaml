@@ -4,9 +4,9 @@ activated_tools: null
 config:
   audio_model:
     model: whisper-1
-    api_key: "${oc.env:AUDIO_API_KEY}"
-    base_url: "${oc.env:AUDIO_BASE_URL}"
+    api_key: ${oc.env:AUDIO_API_KEY}
+    base_url: ${oc.env:AUDIO_BASE_URL}
 config_llm:
-  model: "${oc.env:UTU_TOOL_MODEL}"
-  api_key: "${oc.env:UTU_API_KEY}"
-  base_url: "${oc.env:UTU_BASE_URL}"
+  model: ${oc.env:UTU_LLM_MODEL}
+  api_key: ${oc.env:UTU_LLM_API_KEY}
+  base_url: ${oc.env:UTU_LLM_BASE_URL}
