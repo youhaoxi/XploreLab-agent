@@ -11,6 +11,7 @@ def parse_eval_config() -> EvalConfig:
     parser.add_argument("--dataset", type=str, default=None, help="Dataset.")
     parser.add_argument("--dataset_type", type=str, default=None, help="Dataset type.")
     parser.add_argument("--concurrency", type=int, default=None, help="Test concurrency.")
+    parser.add_argument("--judge_concurrency", type=int, default=None, help="Judge concurrency.")
     args = parser.parse_args()
     
     config = ConfigLoader.load_eval_config(args.config_name)
@@ -24,4 +25,6 @@ def parse_eval_config() -> EvalConfig:
         config.data.type = args.dataset_type
     if args.concurrency:
         config.concurrency = args.concurrency
+    if args.judge_concurrency:
+        config.judge_concurrency = args.judge_concurrency
     return config

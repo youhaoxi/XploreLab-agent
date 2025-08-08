@@ -4,7 +4,7 @@ from utu.config import ConfigLoader
 
 config = ConfigLoader.load_model_config("test")
 openai_client = SimplifiedAsyncOpenAI(**config.model_provider.model_dump())
-print(f"Testing {config.model_provider.model}, with api_key={config.model_provider.api_key[:5]}..., base_url={config.model_provider.base_url}")
+print(f"Testing {config.model_provider.model} [{config.model_provider.type}], with base_url={config.model_provider.base_url}")
 # messages = [{"role": "user", "content": "Tell a joke. And what is the weather like in Bogotá and Shanghai?"}]
 messages = [{"role": "user", "content": "给我讲两个笑话, 然后帮我查一下北京天津的天气"}]
 tools = [{

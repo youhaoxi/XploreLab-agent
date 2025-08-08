@@ -4,7 +4,7 @@ from utu.utils import SimplifiedAsyncOpenAI
 from utu.config import ConfigLoader
 
 
-config = ConfigLoader.load_model_config("v00")
+config = ConfigLoader.load_model_config("base")
 client = SimplifiedAsyncOpenAI(**config.model_provider.model_dump())
 
 

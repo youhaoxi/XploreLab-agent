@@ -180,11 +180,11 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
         # default configs
         **kwargs: dict,
     ) -> None:
+        print(f"> type: {type}, base_url: {base_url}, kwargs: {kwargs}")
         super().__init__(
             api_key=api_key or os.getenv("UTU_LLM_API_KEY") or "xxx",
             base_url=base_url or os.getenv("UTU_LLM_BASE_URL")
         )
-        print(f"> type: {type}, UTU_LLM_TYPE: {os.getenv('UTU_LLM_TYPE')}")
         self.type = type or os.getenv("UTU_LLM_TYPE", "chat.completions")
         self.type_create_params = OpenAIChatCompletionParamsKeys if self.type == "chat.completions" else OpenAIResponsesParamsKeys
         self.default_config = self._process_kwargs(kwargs)
@@ -199,7 +199,9 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
         return default_config
 
     async def query_one(self, **kwargs) -> str:
-        """Simplified chat.complete API"""
+        """Simplified chat.complete / responses API
+        WARNING: Only for basic text i/o usage! You should not use the method with querying with customized configs!
+        """
         if "stream" in kwargs:
             assert kwargs["stream"] is False, "stream is not supported in `query_one`"
 

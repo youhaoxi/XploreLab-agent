@@ -4,7 +4,8 @@ from pydantic import BaseModel
 from omegaconf import OmegaConf, DictConfig
 from hydra import compose, initialize
 
-from .agent_config import AgentConfig, ModelConfigs, ToolkitConfig
+from .model_config import ModelConfigs
+from .agent_config import AgentConfig, ToolkitConfig
 from .eval_config import EvalConfig
 
 TConfig = TypeVar("TConfig", bound=BaseModel)

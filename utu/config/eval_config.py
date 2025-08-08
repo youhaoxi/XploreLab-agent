@@ -1,7 +1,9 @@
 import os
 from typing import Literal
 
-from .agent_config import AgentConfig
+from pydantic import Field
+
+from .agent_config import AgentConfig, ModelConfigs
 from .base_config import ConfigBaseModel
 
 
@@ -15,19 +17,15 @@ class EvalConfig(ConfigBaseModel):
     # TODO: seperate config into subconfigs: data/output/rollout/judge/agent
     exp_id: str = "default"
     
+    # data
     db_url: str = os.getenv("DB_URL", "sqlite:///evaluation_samples.db")
     data: DataConfig = None
 
     # rollout
+    agent: AgentConfig | None = None
     concurrency: int             # rollout parallelism
     
     # judgement
-    judge_model: str
-    judge_api_key: str
-    judge_model_base_url: str
+    judge_model: ModelConfigs = Field(default_factory=ModelConfigs)
     judge_concurrency: int       # judgement parallelism
-    judge_max_tokens: int
     eval_method: str = None # 使用什么benchmark的评估方法（"GAIA", "BrowseCamp", ...)
-
-    # agent
-    agent: AgentConfig | None = None

@@ -23,7 +23,6 @@ def get_weather(city: str, date: str) -> str:
 config = ConfigLoader.load_model_config("test")
 model = AgentsUtils.get_agents_model(**config.model_provider.model_dump())
 sp = f"You are a helpful assistant. The date of today is {datetime.now().strftime('%Y-%m-%d (%A)')}."
-logging.info(f"> {sp}")
 agent = Agent(
     name="General Assistant", 
     instructions=sp, 

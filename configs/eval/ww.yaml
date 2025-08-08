@@ -63,10 +63,12 @@ agent:
 
 concurrency: 50
 
-judge_model: ${oc.env:JUDGE_MODEL}
-judge_api_key: ${oc.env:JUDGE_API_KEY}
-judge_model_base_url: ${oc.env:JUDGE_MODEL_BASE_URL}
+judge_model:
+  model_provider:
+    type: ${oc.env:JUDGE_LLM_TYPE}
+    model: ${oc.env:JUDGE_LLM_MODEL}
+    base_url: ${oc.env:JUDGE_LLM_BASE_URL}
+    api_key: ${oc.env:JUDGE_LLM_API_KEY}
+  model_params:
+    temperature: 0.5
 judge_concurrency: 64
-judge_max_tokens: 4096
-
-
