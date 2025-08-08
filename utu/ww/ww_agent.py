@@ -5,21 +5,15 @@ from agents import gen_trace_id
 from agents.tracing import function_span, trace, agent_span
 
 from ..config import AgentConfig, ConfigLoader
+from ..utils import get_logger
 from ..tracing import setup_tracing
 from .utils import NextTaskResult, SearchResult, AnalysisResult, ModuleGenBackground
 
-# MODE = "simple | plan"
-MODE = "plan"
-if MODE == "simple":
-    from .analyst import DummyAnalysisAgent as AnalysisAgent
-    from .searcher import SimpleSearcherAgent as SearcherAgent
-    from .planner import DummyPlannerAgent as PlannerAgent
-elif MODE == "plan":
-    from .analyst import AnalysisAgent
-    from .searcher import SimpleSearcherAgent as SearcherAgent
-    from .planner import PlannerAgent
-else:
-    raise ValueError(f"Unknown mode: {MODE}")
+from .planner import PlannerAgent
+from .searcher import SimpleSearcherAgent as SearcherAgent
+from .analyst import AnalysisAgent
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -53,7 +47,7 @@ class WWAgent:
         self.planner_agent = PlannerAgent(config)
         self.search_agent = SearcherAgent(config)
         self.analysis_agent = AnalysisAgent(config)
-        self.background_gen = ModuleGenBackground()
+        # self.background_gen = ModuleGenBackground()
 
     async def build(self):
         await self.planner_agent.build()
@@ -64,6 +58,7 @@ class WWAgent:
         # setup
         setup_tracing()
         trace_id = gen_trace_id()
+        logger.info(f"> trace_id: {trace_id}")
 
         # task_records: list[tuple[NextTaskResult, SearchResult]] = []
         trajectory: list[dict] = []  # for tracing

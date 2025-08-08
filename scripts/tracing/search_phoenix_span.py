@@ -15,7 +15,7 @@ phoenix_utils = PhoenixUtils(project_name=project_name)
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_name", type=str, default="v00", help="Configuration name for evaluation.")
+    parser.add_argument("--config_name", type=str, default="ww", help="Configuration name for evaluation.")
     parser.add_argument("--exp_id", type=str, default=None, help="Experiment ID.")
     args = parser.parse_args()
 
