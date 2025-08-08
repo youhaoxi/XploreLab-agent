@@ -1,11 +1,14 @@
 import logging
 import asyncio
+import time
 from enum import Enum
 from dataclasses import dataclass
 from typing import Optional, Dict
 
 import docker
 import docker.errors
+import requests
+from requests.exceptions import RequestException
 
 from .port_manager import PortManager
 
@@ -123,12 +126,54 @@ class DockerManager:
                     detach=True,
                     remove=True,  # remove on stop
                     environment={
-                        'CONTAINER_ID': str(id)
+                        'CONTAINER_ID': str(id),
+                        'ENV': 'local',
                     }
                 )
                 
                 container_info.container_id = container.id
-                container_info.status = ContainerStatus.RUNNING
+                
+                # 等待服务的 /ping 端点返回 200 状态码
+                ping_url = f"http://{self.port_manager.get_host_ip()}:{port}/ping"
+                max_retries = 30  # 最多尝试30次
+                retry_interval = 1  # 每次间隔1秒
+                service_ready = False
+                
+                logger.info(f"等待容器 {id} 服务就绪，检查 {ping_url}")
+                
+                for attempt in range(max_retries):
+                    try:
+                        response = requests.get(ping_url, timeout=2)
+                        if response.status_code == 200:
+                            service_ready = True
+                            logger.info(f"容器 {id} 服务已就绪，/ping 返回 200")
+                            break
+                        logger.debug(f"容器 {id} 服务未就绪，/ping 返回状态码 {response.status_code}，重试中...")
+                    except RequestException as e:
+                        logger.debug(f"容器 {id} 服务未就绪，连接异常: {e}，重试中...")
+                    
+                    time.sleep(retry_interval)
+                
+                if service_ready:
+                    container_info.status = ContainerStatus.RUNNING
+                else:
+                    # 服务未就绪，标记为错误状态并停止容器
+                    container_info.status = ContainerStatus.ERROR
+                    container_info.error_msg = "服务未能在规定时间内就绪，/ping 未返回 200 状态码"
+                    try:
+                        container.stop(timeout=5)
+                    except Exception as e:
+                        logger.error(f"停止未就绪容器 {id} 时出错: {e}")
+                    
+                    if container_info.port:
+                        self.port_manager.release_port(container_info.port)
+                        container_info.port = None
+                    
+                    return {
+                        "success": False,
+                        "error": container_info.error_msg,
+                        "id": id
+                    }
                 
                 logger.info(f"容器 {id} 启动成功，端口: {port}, Docker ID: {container.id[:12]}")
                 
@@ -184,7 +229,6 @@ class DockerManager:
             container_info.status = ContainerStatus.STOPPING
             
             try:
-                # 停止Docker容器
                 if container_info.container_id:
                     try:
                         container = self.client.containers.get(container_info.container_id)
@@ -195,11 +239,9 @@ class DockerManager:
                     except Exception as e:
                         logger.error(f"停止容器 {id} 时出错: {e}")
                 
-                # 释放端口
                 if container_info.port:
                     self.port_manager.release_port(container_info.port)
                 
-                # 更新状态
                 container_info.status = ContainerStatus.STOPPED
                 container_info.container_id = None
                 container_info.port = None
@@ -223,6 +265,49 @@ class DockerManager:
                     "id": id
                 }
 
+    async def stop_container_by_cid(self, cid: str) -> dict:
+        """停止一个容器"""
+        try:
+            container = self.client.containers.get(cid)
+            container.stop(timeout=10)
+            logger.info(f"容器 {cid} 停止成功")
+            return {
+                "success": True,
+                "message": "容器停止成功",
+                "id": cid
+            }
+        except docker.errors.NotFound:
+            logger.warning(f"容器 {cid} 的Docker实例不存在，可能已被删除")
+            return {
+                "success": False,
+                "error": "容器不存在",
+                "id": cid
+            }
+        except Exception as e:
+            logger.error(f"停止容器 {cid} 时出错: {e}")
+            return {
+                "success": False,
+                "error": f"停止容器失败: {str(e)}",
+                "id": cid
+            }
+
+    async def stop_all_by_cid(self, container_ids: list[str]) -> dict:
+        """停止所有容器"""
+        # 并发停止所有容器
+        tasks = [self.stop_container_by_cid(cid) for cid in container_ids]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        success_count = sum(1 for r in results if isinstance(r, dict) and r.get("success", False))
+        logger.info(f"停止容器完成，成功停止 {success_count}/{len(container_ids)} 个")
+        
+        return {
+            "success": True,
+            "message": f"批量停止完成",
+            "total_count": len(container_ids),
+            "stopped_count": success_count,
+            "results": results
+        }
+
     async def stop_all(self) -> dict:
         """停止所有容器"""
         container_ids = list(self.containers.keys())
@@ -239,9 +324,7 @@ class DockerManager:
         tasks = [self.stop_container(cid) for cid in container_ids]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
-        success_count = sum(1 for r in results 
-                          if isinstance(r, dict) and r.get("success", False))
-        
+        success_count = sum(1 for r in results if isinstance(r, dict) and r.get("success", False))
         logger.info(f"停止容器完成，成功停止 {success_count}/{len(container_ids)} 个")
         
         return {
@@ -251,6 +334,69 @@ class DockerManager:
             "stopped_count": success_count,
             "results": results
         }
+
+    async def find_all(self, stop=False) -> dict:
+        """查找系统中运行的所有容器"""
+        try:
+            start_time = asyncio.get_event_loop().time()
+            containers = self.client.containers.list(all=True)
+            
+            found_containers = []
+            for container in containers:
+                image_prefix = self.image_name.split(':')[0]
+                if not self._is_our_container(container, image_prefix):
+                    continue
+                found_containers.append(self._extract_container_info(container))
+            
+            total_time = asyncio.get_event_loop().time() - start_time
+            logger.info(f"查找完成，发现 {len(found_containers)} 个相关容器，耗时 {total_time:.2f}秒")
+            
+            if stop:
+                return await self.stop_all_by_cid([c["docker_id"] for c in found_containers])
+            
+            return {
+                "success": True,
+                "search_time": total_time,
+                "total_found": len(found_containers),
+                "found_containers": found_containers,
+            }
+            
+        except Exception as e:
+            logger.error(f"查找容器时出错: {e}")
+            return {
+                "success": False,
+                "error": f"查找容器时出错: {str(e)}"
+            }
+
+    def _is_our_container(self, container, image_prefix: str) -> bool:
+        """判断容器是否属于我们管理的类型"""
+        # 检查镜像名称
+        if hasattr(container, 'image') and hasattr(container.image, 'tags'):
+            for tag in container.image.tags:
+                if tag.startswith(image_prefix):
+                    return True
+        # 检查容器名称模式
+        if container.name and container.name.startswith(f"{image_prefix}_"):
+            return True
+        # 检查环境变量
+        if hasattr(container, 'attrs') and 'Config' in container.attrs:
+            env_vars = container.attrs['Config'].get('Env', [])
+            for env in env_vars:
+                if env.startswith('CONTAINER_ID='):
+                    return True
+        return False
+    def _extract_container_info(self, container) -> dict:
+        """提取容器信息"""
+        info = {
+            "docker_id": container.id,
+            "name": container.name,
+            "status": container.status,
+            "image": container.image.tags[0] if container.image.tags else "unknown",
+            "created": container.attrs.get('Created', ''),
+            "ports": {},
+            "environment": {},
+        }
+        return info
 
     def get_status(self, id: str) -> dict:
         """获取容器状态"""

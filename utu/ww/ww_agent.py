@@ -25,7 +25,7 @@ else:
 @dataclass
 class WWRunResult:
     final_output: str
-    trajectory: list[dict]  # TODO: add handoff info
+    trajectory: list[dict]  # [{"agent": "SearchAgent", "trajectory": [{"role": "user", "content": "..."}, ...]}, ...]
     trace_id: str = ""
 
 
@@ -50,14 +50,14 @@ class WWAgent:
         self.config = config
         
         # init subagents
-        self.search_agent = SearcherAgent(config)
         self.planner_agent = PlannerAgent(config)
+        self.search_agent = SearcherAgent(config)
         self.analysis_agent = AnalysisAgent(config)
         self.background_gen = ModuleGenBackground()
 
     async def build(self):
-        await self.search_agent.build()
         await self.planner_agent.build()
+        await self.search_agent.build()
         await self.analysis_agent.build()
 
     async def run(self, input: str) -> WWRunResult:
@@ -83,7 +83,7 @@ class WWAgent:
             # MODE 2: plan & exec
             task_records: list[SearchResult] = []
             plan = await self.plan(input, trace_id=trace_id)
-            trajectory.extend(plan.trajectory)
+            trajectory.append(plan.trajectory)
             for task in plan.todo:
                 if task.agent_name == "SearchAgent":
                     str_plan = "\n".join([
@@ -102,16 +102,16 @@ class WWAgent:
                         trace_id=trace_id
                     )
                     task_records.append(result)
-                    trajectory.extend(result.trajectory)
+                    trajectory.append(result.trajectory)
                 elif task.agent_name == "AnalysisAgent":
                     analysis_result = await self.analyze(input, task_records, trace_id=trace_id)
-                    trajectory.extend(analysis_result.trajectory)
+                    trajectory.append(analysis_result.trajectory)
                 else:
                     raise ValueError(f"Unknown agent name: {task.agent_name}")
 
             if analysis_result is None:
                 analysis_result = await self.analyze(input, task_records, trace_id=trace_id)
-                trajectory.extend(analysis_result.trajectory)
+                trajectory.append(analysis_result.trajectory)
 
         return WWRunResult(
             final_output=analysis_result.output,

@@ -1,5 +1,5 @@
 """ 
-EvaluationDatapoint: add index column
+EvaluationSample: add index column
 """
 
 
@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import ProgrammingError
 from collections import defaultdict
 
-from utu.db.data_model import EvaluationDatapoint
+from utu.db import EvaluationSample
 
 def update_indices():
     """
@@ -46,7 +46,7 @@ def update_indices():
     # Step 2: Populate the 'index' column
     try:
         print("Fetching all evaluation datapoints to update indices...")
-        datapoints = session.query(EvaluationDatapoint).order_by(EvaluationDatapoint.id).all()
+        datapoints = session.query(EvaluationSample).order_by(EvaluationSample.id).all()
 
         # Group datapoints by dataset
         dataset_map = defaultdict(list)
