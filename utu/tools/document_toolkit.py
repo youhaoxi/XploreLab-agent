@@ -3,7 +3,6 @@ https://github.com/lumina-ai-inc/chunkr
 """
 
 from typing import Optional, Callable
-import os
 
 from chunkr_ai import Chunkr
 from chunkr_ai.models import Configuration
@@ -25,7 +24,7 @@ INSTRUCTION_SUMMARY = r"""Please provide a structured description of the documen
 class DocumentToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        self.chunkr = Chunkr(api_key=os.getenv("CHUNKR_API_KEY"))
+        self.chunkr = Chunkr(api_key=self.config.config.get("CHUNKR_API_KEY"))
         self.chunkr.config = Configuration(
             high_resolution=self.config.config.get("high_resolution", True),
         )

@@ -36,6 +36,9 @@ async def test_model_stream():
     async for chunk in stream:
         print(chunk.choices[0].delta)
 
+async def test_query_one():
+    res = await openai_client.query_one(messages=messages, tools=tools, stream=False)
+    print(res)
 
 async def test_print():
     res = await openai_client.chat_completion(messages=messages, tools=tools, stream=False)

@@ -1,11 +1,10 @@
 name: document
 mode: builtin
 activated_tools: null
-config: {
-  "high_resolution": true,
-}
+config:
+  high_resolution: true
+  CHUNKR_API_KEY: ${oc.env:CHUNKR_API_KEY}
 config_llm:
   model: "${oc.env:UTU_TOOL_DOCUMENT_MODEL}"
   api_key: "${oc.env:UTU_API_KEY}"
   base_url: "${oc.env:UTU_BASE_URL}"
-  

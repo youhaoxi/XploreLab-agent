@@ -1,4 +1,3 @@
-import os
 import re
 import asyncio
 from typing import Callable
@@ -50,11 +49,11 @@ class SearchToolkit(AsyncBaseToolkit):
         super().__init__(config)
         self.jina_url_template = r"https://r.jina.ai/{url}"
         self.jina_header = {
-            "Authorization": f"Bearer {os.getenv('JINA_API_KEY')}"
+            "Authorization": f"Bearer {self.config.config.get('JINA_API_KEY')}"
         }
         self.serper_url = r"https://google.serper.dev/search"
         self.serper_header = {
-            "X-API-KEY": os.getenv('SERPER_API_KEY'),
+            "X-API-KEY": self.config.config.get('SERPER_API_KEY'),
             'Content-Type': 'application/json'
         }
         # config

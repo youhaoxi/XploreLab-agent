@@ -135,6 +135,6 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
 
     async def chat_completion(self, **kwargs) -> ChatCompletion | AsyncStream[ChatCompletionChunk]:
         kwargs = OpenAIUtils.process_chat_completion_params(kwargs, self._default_config)
-        _model_settings = copy.deepcopy(kwargs)
-        _messages = _model_settings.pop("messages")
+        # _model_settings = copy.deepcopy(kwargs)
+        # _messages = _model_settings.pop("messages")
         return await self.chat.completions.create(**kwargs)
