@@ -9,10 +9,10 @@ from .base_config import ConfigBaseModel
 
 
 class ModelProviderConfig(ConfigBaseModel):
-    type: Literal["chat.completions", "responses"] = os.getenv("UTU_MODEL_TYPE")
-    model: str = os.getenv("UTU_MODEL")
-    base_url: str | None = os.getenv("UTU_MODEL_BASE_URL")
-    api_key: str | None = os.getenv("UTU_MODEL_API_KEY")
+    type: Literal["chat.completions", "responses"] = os.getenv("UTU_LLM_TYPE")
+    model: str = os.getenv("UTU_LLM_MODEL")
+    base_url: str | None = os.getenv("UTU_LLM_BASE_URL")
+    api_key: str | None = os.getenv("UTU_LLM_API_KEY")
 
 
 class ModelSettingsConfig(ConfigBaseModel, ModelSettings):

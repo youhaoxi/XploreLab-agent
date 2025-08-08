@@ -24,10 +24,10 @@ async def rollout(agent: SimpleAgent, data: dict) -> dict:
 
     output = copy.deepcopy(data)
     output["Answer Predicted"] = predicted
-    output["trajectory"] = ChatCompletionConverter.items_to_messages(result.to_input_list())
+    output["trajectory"] = ChatCompletionConverter.items_to_dict(result.to_input_list())
     async with flock:
         with open(ofn, "a") as f:
-            line = json.dumps(data, ensure_ascii=False)
+            line = json.dumps(output, ensure_ascii=False)
             f.write(line + "\n")
     return output
 

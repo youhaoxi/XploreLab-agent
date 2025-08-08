@@ -28,6 +28,66 @@ from .openai_utils import OpenAIChatCompletionParams
 
 logger = logging.getLogger(__name__)
 
+
+
+class ChatCompletionConverter(Converter):
+    @classmethod
+    def items_to_messages(cls, items: str|Iterable[TResponseInputItem]) -> list[ChatCompletionMessageParam]:
+        # skip reasoning, see chatcmpl_converter.Converter.items_to_messages()
+        # agents.exceptions.UserError: Unhandled item type or structure: {'id': '__fake_id__', 'summary': [{'text': '...', 'type': 'summary_text'}], 'type': 'reasoning'}
+        if not isinstance(items, str):  # TODO: check it!
+            items = cls.filter_items(items)
+        return Converter.items_to_messages(items)
+
+    @classmethod
+    def filter_items(cls, items: str|Iterable[TResponseInputItem]) -> str|list[TResponseInputItem]:
+        if isinstance(items, str):
+            return items
+        filtered_items = []
+        for item in items:
+            if item.get("type", None) == "reasoning":
+                continue
+            filtered_items.append(item)
+        return filtered_items
+
+    @classmethod
+    def tool_chatcompletion_to_responses(cls, tool: ChatCompletionToolParam) -> FunctionToolParam:
+        assert tool["type"] == "function"
+        return FunctionToolParam(
+            name=tool["function"]["name"],
+            description=tool["function"].get("description", ""),
+            parameters=tool["function"].get("parameters", None),
+            type="function",
+        )
+
+    @classmethod
+    def items_to_dict(cls, items: str|Iterable[TResponseInputItem]) -> list[dict]:
+        """convert items to a list of dict which have {"role", "content"}"""
+        if isinstance(items, str):
+            return [{"role": "user", "content": items}]
+        result = []
+        for item in items:
+            if msg := Converter.maybe_easy_input_message(item): result.append(msg)
+            elif msg := Converter.maybe_input_message(item): result.append(msg)
+            elif msg := Converter.maybe_response_output_message(item): result.append(msg)
+            elif msg := Converter.maybe_file_search_call(item):
+                msg.update({"role": "tool", "content": msg["results"]})
+                result.append(msg)
+            elif msg := Converter.maybe_function_tool_call(item):
+                msg.update({"role": "assistant", "content": f"{msg['name']}({msg['arguments']})"})
+                result.append(msg)
+            elif msg := Converter.maybe_function_tool_call_output(item):
+                msg.update({"role": "tool", "content": msg["output"], "tool_call_id": msg["call_id"]})
+                result.append(msg)
+            elif msg := Converter.maybe_reasoning_message(item):
+                msg.update({"role": "assistant", "content": msg["summary"]})
+                result.append(msg)
+            else:
+                logger.warning(f"Unknown message type: {item}")
+                result.append({"role": "assistant", "content": f"Unknown message type: {item}"})
+        return result
+
+
 class AgentsUtils:
     @staticmethod
     def generate_group_id() -> str:
@@ -61,7 +121,7 @@ class AgentsUtils:
     def get_trajectory_from_agent_result(agent_result: RunResult) -> dict:
         return {
             "agent": agent_result.last_agent.name,
-            "trajectory": Converter.items_to_messages(agent_result.to_input_list()),
+            "trajectory": ChatCompletionConverter.items_to_dict(agent_result.to_input_list()),
         }
 
     @staticmethod
@@ -157,35 +217,6 @@ class AgentsUtils:
             on_invoke_tool=None,
         )
 
-class ChatCompletionConverter(Converter):
-    @classmethod
-    def items_to_messages(cls, items: str|Iterable[TResponseInputItem]) -> list[ChatCompletionMessageParam]:
-        # skip reasoning, see chatcmpl_converter.Converter.items_to_messages()
-        # agents.exceptions.UserError: Unhandled item type or structure: {'id': '__fake_id__', 'summary': [{'text': '...', 'type': 'summary_text'}], 'type': 'reasoning'}
-        if not isinstance(items, str):
-            items = cls.filter_items(items)
-        return Converter.items_to_messages(items)
-
-    @classmethod
-    def filter_items(cls, items: str|Iterable[TResponseInputItem]) -> str|list[TResponseInputItem]:
-        if isinstance(items, str):
-            return items
-        filtered_items = []
-        for item in items:
-            if item.get("type", None) == "reasoning":
-                continue
-            filtered_items.append(item)
-        return filtered_items
-
-    @classmethod
-    def tool_chatcompletion_to_responses(cls, tool: ChatCompletionToolParam) -> FunctionToolParam:
-        assert tool["type"] == "function"
-        return FunctionToolParam(
-            name=tool["function"]["name"],
-            description=tool["function"].get("description", ""),
-            parameters=tool["function"].get("parameters", None),
-            type="function",
-        )
 
 class SimplifiedOpenAIChatCompletionsModel(OpenAIChatCompletionsModel):
     """ extend OpenAIChatCompletionsModel to support basic api 

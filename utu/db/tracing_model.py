@@ -14,7 +14,7 @@ class ToolTracingModel(SQLModel, table=True):
     span_id: str = ""
 
     name: str = ""
-    input: Optional[str] = Field(default=None)
+    input: Optional[Any] = Field(default=None, sa_column=Column(JSON))
     output: Optional[Any] = Field(default=None, sa_column=Column(JSON))
     mcp_data: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column(JSON))
 

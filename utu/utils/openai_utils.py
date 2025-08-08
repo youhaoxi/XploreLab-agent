@@ -224,7 +224,7 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
 
     async def responses_create(self, **kwargs) -> Response | AsyncStream[ResponseStreamEvent]:
         unknown_params = OpenAIUtils.check_known_keys(kwargs, self.type_create_params)
-        if unknown_params - set("messages"):  #ignore
+        if unknown_params - {"messages"}:  #ignore
             logger.warning(f"Unknown parameters: {unknown_params} for {self.type} API!")
         assert self.type == "responses", "`responses_create` is not supported for chat.completions API"
         kwargs = OpenAIUtils.process_responses_params(kwargs, self.default_config)
