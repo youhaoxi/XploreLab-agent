@@ -20,7 +20,7 @@ from agents.tracing.span_data import (
 from sqlmodel import create_engine, Session, SQLModel
 
 from ..db import ToolTracingModel, GenerationTracingModel
-
+from ..utils import OpenAIUtils
 
 class DBTracingProcessor(TracingProcessor):
     def __init__(self) -> None:
@@ -48,6 +48,20 @@ class DBTracingProcessor(TracingProcessor):
                     model=data.model,
                     model_configs=data.model_config,
                     usage=data.usage,
+                ))
+                session.commit()
+        elif isinstance(data, ResponseSpanData):
+            with Session(self.engine) as session:
+                session.add(GenerationTracingModel(
+                    trace_id=get_current_trace().trace_id,
+                    span_id=span.span_id,
+                    input=data.input,
+                    output=OpenAIUtils.get_response_output(data.response),
+                    model=OpenAIUtils.maybe_basemodel_to_dict(data.response.model),
+                    model_configs=OpenAIUtils.get_response_configs(data.response),
+                    usage=OpenAIUtils.maybe_basemodel_to_dict(data.response.usage),
+                    type="responses",
+                    response_id=data.response.id,
                 ))
                 session.commit()
         elif isinstance(data, FunctionSpanData):

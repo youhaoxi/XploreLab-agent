@@ -2,10 +2,11 @@
 https://github.com/Arize-ai/openinference/blob/main/python/instrumentation/openinference-instrumentation-openai-agents/src/openinference/instrumentation/openai_agents/_processor.py
 updated: @2025-07-31 0864c13
 """
-
+# from openinference.instrumentation.openai_agents._processor import OpenInferenceTracingProcessor
 from __future__ import annotations
 
 import json
+import logging
 from collections import OrderedDict
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Iterable, Iterator, Mapping, Optional, Union
@@ -64,9 +65,7 @@ from openinference.semconv.trace import (
     ToolCallAttributes,
 )
 
-from ..utils import get_logger
-
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class OpenInferenceTracingProcessor(TracingProcessor):
