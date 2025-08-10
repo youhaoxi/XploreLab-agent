@@ -1,4 +1,4 @@
-from utu.utils import SimplifiedAsyncOpenAI, OpenAIUtils, ChatCompletionConverter
+from utu.utils import SimplifiedAsyncOpenAI, OpenAIUtils
 from utu.config import ConfigLoader
 
 
@@ -26,7 +26,7 @@ tools = [{
         "strict": True
     }
 }]
-tools_response = [ChatCompletionConverter.tool_chatcompletion_to_responses(t) for t in tools]
+tools_response = [OpenAIUtils.tool_chatcompletion_to_responses(t) for t in tools]
 
 async def test_model():
     res = await openai_client.chat_completions_create(messages=messages, tools=tools, stream=False)
@@ -52,10 +52,12 @@ async def test_print_stream():
     print(message)
     print()
 
+# test responses -----------------------------------------------------------------------
 async def test_responses():
     res = await openai_client.responses_create(input=messages, tools=tools_response)
     # res = await openai_client.query_one(input=messages, tools=tools_response)
-    print(res)
+    OpenAIUtils.print_response(res)
+    print(OpenAIUtils.get_response_configs(res))
 
 
 
