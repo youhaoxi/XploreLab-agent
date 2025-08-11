@@ -21,7 +21,7 @@ async def main():
     config = ConfigLoader.load_agent_config("examples/base")
     config.max_turns = 100
     async with SimpleAgent(
-        config,
+        config=config,
         name="example-context-manager",
         tools=[count],
     ) as agent:

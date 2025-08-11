@@ -1,8 +1,10 @@
+from pydantic import BaseModel
+
 from utu.utils import SimplifiedAsyncOpenAI, OpenAIUtils
 from utu.config import ConfigLoader
 
 
-config = ConfigLoader.load_model_config("test")
+config = ConfigLoader.load_model_config("base")
 openai_client = SimplifiedAsyncOpenAI(**config.model_provider.model_dump())
 print(f"Testing {config.model_provider.model} [{config.model_provider.type}], with base_url={config.model_provider.base_url}")
 # messages = [{"role": "user", "content": "Tell a joke. And what is the weather like in Bogotá and Shanghai?"}]
@@ -55,11 +57,37 @@ async def test_print_stream():
 # test responses -----------------------------------------------------------------------
 async def test_responses():
     res = await openai_client.responses_create(input=messages, tools=tools_response)
-    # res = await openai_client.query_one(input=messages, tools=tools_response)
+    print(res)
+    for item in res.output:
+        print(item)
+
+async def test_print_response():
+    res = await openai_client.responses_create(input=messages, tools=tools_response)
     OpenAIUtils.print_response(res)
     print(OpenAIUtils.get_response_configs(res))
 
+async def test_output_schema():
+    class ExtractedEvent(BaseModel):
+        date: str
+        """date of the event, in the format of YYYY-MM-DD"""
+        summary: str
+        """summary of the event"""
 
+    response_format = {
+        "format": {
+            "type": "json_schema",
+            "name": "extracted_event",
+            "schema": ExtractedEvent.model_json_schema(),
+            "strict": True,
+        }
+    }
+
+    input = "extract the event from the following text: Bob is going to have a birthday party on 2025-08-12."
+    res = await openai_client.responses.create(
+        input=input, text=response_format
+    )
+    OpenAIUtils.print_response(res)
+    print(OpenAIUtils.get_response_configs(res))
 
 # test extra bodys -----------------------------------------------------------------------
 async def test_retry():

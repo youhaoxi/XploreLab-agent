@@ -18,7 +18,7 @@ from ...agents.simple_agent import SimpleAgent
 class SimpleSearcherAgent(Base):
     def __init__(self, config: AgentConfig):
         super().__init__(config)
-        self.agent = SimpleAgent(config)
+        self.agent = SimpleAgent(config=config)
 
     async def build(self):
         await self.agent.build()

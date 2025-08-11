@@ -33,7 +33,7 @@ async def rollout(agent: SimpleAgent, data: dict) -> dict:
 
 async def main(concurrency: int = 5):
     async with SimpleAgent(
-        "examples/eval",
+        config="examples/eval",
         name="example-eval-agent",
         instructions="You should answer the question with the tools provided."
     ) as agent:
