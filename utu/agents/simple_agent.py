@@ -1,6 +1,12 @@
 from contextlib import AsyncExitStack
+from typing import Any, Callable
 
-from agents import Tool, TContext, RunResult, RunResultStreaming, Agent, TResponseInputItem, Runner, RunHooks, RunConfig
+from agents import (
+    Tool, TContext, TResponseInputItem, 
+    Model, ModelSettings,
+    RunResult, RunResultStreaming, 
+    Agent, Runner, RunHooks, RunConfig, AgentOutputSchemaBase,
+)
 from agents.tracing import gen_trace_id, get_current_trace
 from agents.mcp import MCPServerStdio, MCPServer
 
@@ -19,14 +25,22 @@ class SimpleAgent:
 
     def __init__(
         self, 
-        config: AgentConfig|str,
         *,
-        name: str = None,
-        instructions: str = None,
+        config: AgentConfig|str|None = None,  # use config to pass agent configs
+        name: str|None = None,
+        instructions: str|Callable|None = None,
+        model: str|Model|None = None,
+        model_settings: ModelSettings|None = None,
         tools: list[Tool] = None,
+        output_type: type[Any]|AgentOutputSchemaBase|None = None,
     ):
-        self.config = self._process_config(config, name, instructions)
+        self.config = self._get_config(config)
+        self.name = name or self.config.agent.name
+        self.instructions = instructions or self.config.agent.instructions
+        self.model = self._get_model(self.config, model)
+        self.model_settings = self._get_model_settings(self.config, model_settings)
         self.tools: list[Tool] = tools or []
+        self.output_type: type[Any]|AgentOutputSchemaBase|None = output_type
         self.context_manager: BaseContextManager = None
         self.env: BaseEnv = None
         self.current_agent: Agent[TContext] = None
@@ -39,12 +53,19 @@ class SimpleAgent:
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
 
-    def _process_config(self, config: AgentConfig|str, name: str = None, instructions: str = None) -> AgentConfig:
-        if isinstance(config, str):
-            config = ConfigLoader.load_agent_config(config)
-        if name: config.agent.name = name
-        if instructions: config.agent.instructions = instructions
-        return config
+    def _get_config(self, config: AgentConfig|str|None) -> AgentConfig:
+        if isinstance(config, AgentConfig): return config
+        return ConfigLoader.load_agent_config(config or "base")
+
+    def _get_model(self, config: AgentConfig, model: str|Model|None = None) -> Model:
+        if isinstance(model, Model): return model
+        model_provider_config = config.model.model_provider.model_dump()
+        if isinstance(model, str): model_provider_config["model"] = model
+        return AgentsUtils.get_agents_model(**model_provider_config)
+    
+    def _get_model_settings(self, config: AgentConfig, model_settings: ModelSettings|None = None) -> ModelSettings:
+        if isinstance(model_settings, ModelSettings): return model_settings
+        return config.model.model_settings
 
     async def __aenter__(self):
         await self.build()
@@ -57,13 +78,15 @@ class SimpleAgent:
         """ Build the agent """
         self.env = await get_env(self.config, self._trace_id)  # FIXME: trace_id
         await self.env.build()
-        model = AgentsUtils.get_agents_model(**self.config.model.model_provider.model_dump())
+        # model & agent
         self.current_agent = Agent(
             name=self.config.agent.name,
-            instructions=await self.build_instructions(),
-            model=model,
+            instructions=self.config.agent.instructions,
+            model=self.model,
+            model_settings=self.model_settings,
             tools=await self.get_tools(),
-            mcp_servers=self._mcp_servers
+            output_type=self.output_type,
+            mcp_servers=self._mcp_servers,
         )
         self.context_manager = build_context_manager(self.config)
 
@@ -77,11 +100,6 @@ class SimpleAgent:
         self._toolkits = []
         logger.info("Cleaning up env...")
         await self.env.cleanup()
-
-    async def build_instructions(self) -> str:
-        """ Build instructions from config. You can override this method to build customized instructions. """
-        sp_prefix = self.env.get_sp_prefix()
-        return sp_prefix + self.config.agent.instructions
 
     async def get_tools(self) -> list[Tool]:
         if self.tools:
