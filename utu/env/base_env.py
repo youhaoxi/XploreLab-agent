@@ -5,18 +5,9 @@ from agents import Tool
 
 
 class Env(abc.ABC):
-    @staticmethod
-    def get_time() -> str:
-        return datetime.datetime.now().strftime(r"%Y-%m-%d %H:%M:%S")
-
-    @abc.abstractmethod
-    def get_sp_prefix(self) -> str:
-        raise NotImplementedError
-
     @abc.abstractmethod
     def get_state(self) -> str:
         raise NotImplementedError
-
 
     @abc.abstractmethod
     async def get_tools(self) -> list[Tool]:
@@ -37,8 +28,9 @@ class Env(abc.ABC):
 
 
 class BaseEnv(Env):
-    def get_sp_prefix(self) -> str:
-        return ""
+    @staticmethod
+    def get_time() -> str:
+        return datetime.datetime.now().strftime(r"%Y-%m-%d %H:%M:%S")
 
     def get_state(self) -> str:
         return ""

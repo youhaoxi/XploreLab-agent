@@ -101,7 +101,10 @@ class AgentsUtils:
         api_key = api_key or os.getenv("UTU_LLM_API_KEY")
         if not api_key or not base_url:
             raise ValueError("UTU_LLM_API_KEY and UTU_LLM_BASE_URL must be set")
-        openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+        openai_client = AsyncOpenAI(
+            api_key=api_key, base_url=base_url,
+            timeout=100,
+        )
         if type == "chat.completions":
             return OpenAIChatCompletionsModel(model=model, openai_client=openai_client)
         elif type == "responses":

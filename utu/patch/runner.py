@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import json
 
 from agents.run import AgentRunner, AgentToolUseTracker, SingleStepResult
 from agents import (
@@ -69,6 +70,9 @@ class UTUAgentRunner(AgentRunner):
             previous_response_id,
             prompt_config,
         )
+
+        # ADD: response logging
+        # print(json.dumps([item.model_dump() for item in new_response.output], ensure_ascii=False))
 
         single_turn_result = await cls._get_single_step_result_from_response(
             agent=agent,

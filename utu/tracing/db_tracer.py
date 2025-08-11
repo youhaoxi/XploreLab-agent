@@ -51,6 +51,7 @@ class DBTracingProcessor(TracingProcessor):
                 ))
                 session.commit()
         elif isinstance(data, ResponseSpanData):
+            # print(f"> response_id={data.response.id}: {data.response.model_dump()}")
             with Session(self.engine) as session:
                 session.add(GenerationTracingModel(
                     trace_id=get_current_trace().trace_id,

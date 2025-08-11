@@ -73,7 +73,7 @@ class OpenAIUtils:
                     content = getattr(item, "content", item.summary)
                     PrintUtils.print_bot(f"{content}", add_prefix=True, color="gray")
                 case "message":
-                    PrintUtils.print_bot(item.content, add_prefix=True)
+                    PrintUtils.print_bot(f"{item.content}", add_prefix=True)
                 case "function_call":
                     PrintUtils.print_info(f"<{item.name}>({item.arguments})")
                 case "file_search_call":

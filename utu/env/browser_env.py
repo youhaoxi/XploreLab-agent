@@ -23,9 +23,6 @@ class BrowserEnv(BaseEnv):
     async def cleanup(self):
         await self.docker_manager.stop_container(self.trace_id)
 
-    def get_sp_prefix(self) -> str:
-        return ""
-
     def get_state(self) -> str:
         return self.browser_state
 

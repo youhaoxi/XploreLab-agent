@@ -1,6 +1,6 @@
 from .base_env import BaseEnv
 
-SP_PREFIX = r"""<env>
+TEMPLATE = r"""<env>
 {env}
 </env>
 <instructions>
@@ -15,10 +15,10 @@ class ShellLocalEnv(BaseEnv):
     def __init__(self, workspace: str):
         self.workspace = workspace
 
-    def get_sp_prefix(self) -> str:
+    def get_state(self) -> str:
         env_strs = [
             f"Time: {self.get_time()}",
             f"Workspace: {self.workspace}",
         ]
-        sp_prefix = SP_PREFIX.format(env="\n".join(env_strs))
+        sp_prefix = TEMPLATE.format(env="\n".join(env_strs))
         return sp_prefix
