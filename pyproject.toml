@@ -39,6 +39,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.16",
+    "mkdocstrings[python]>=0.30.0",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.0.0",
     "tencentcloud-sdk-python>=3.0.1425",
