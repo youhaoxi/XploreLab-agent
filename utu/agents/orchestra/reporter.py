@@ -1,39 +1,30 @@
+import pathlib
+
 from .common import AnalysisResult, TaskRecorder
 from ...config import AgentConfig
-from ...utils import SimplifiedAsyncOpenAI
-
-
-TEMPLATE = """Please answer the original question based on the trajectory of the subtasks.
-
-## input
-<question>
-{question}
-</question>
-<trajectory>
-{trajectory}
-</trajectory>
-
-## rules
-- language: your response should be in the same language as the question.
-
-## output format
-Explanation: {{your explanation for your final answer}}
-Exact Answer: {{your succinct, final answer}}
-Confidence: {{your confidence score between 0% and 100% for your answer}}
-""".strip()
+from ...utils import SimplifiedAsyncOpenAI, get_jinja_template
 
 
 class ReporterAgent:
     def __init__(self, config: AgentConfig):
         self.config = config
         self.llm = SimplifiedAsyncOpenAI(**self.config.reporter_model.model_params.model_dump())
+        self.template = self._get_template()
+
+    def _get_template(self):
+        template_path = self.config.reporter_config.get("template_path", None)
+        if template_path and pathlib.Path(template_path).exists():
+            template_path = pathlib.Path(template_path)
+        else:
+            template_path = pathlib.Path(__file__).parent / "prompts" / "reporter_sp.j2"
+        return get_jinja_template(template_path)
 
     async def build(self):
         pass
 
     async def report(self, task_recorder: TaskRecorder) -> AnalysisResult:
         """analyze the result of a subtask, return a report"""
-        query = TEMPLATE.format(
+        query = self.template.render(
             question=task_recorder.task,
             trajectory=task_recorder.get_trajectory_str()
         )

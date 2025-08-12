@@ -2,8 +2,6 @@ import re
 import pathlib
 import json
 
-import jinja2
-
 from .common import CreatePlanResult, Subtask, TaskRecorder, AgentInfo
 from ...config import AgentConfig
 from ...utils import SimplifiedAsyncOpenAI, get_jinja_env
@@ -50,13 +48,15 @@ class PlannerAgent:
         self.config = config
         self.llm = SimplifiedAsyncOpenAI(**self.config.planner_model.model_provider.model_dump())
         self.output_parser = OutputParser()
-        self.jinja_env: jinja2.Environment = get_jinja_env(pathlib.Path(__file__).parent / "prompts")
+        self.jinja_env = get_jinja_env(pathlib.Path(__file__).parent / "prompts")
         self.planner_examples = self._load_planner_examples()
         self.available_agents = self._load_available_agents()
 
     def _load_planner_examples(self) -> list[dict]:
-        examples_path = pathlib.Path(self.config.planner_config.get("examples_path", ""))
-        if not examples_path.exists():
+        examples_path = self.config.planner_config.get("examples_path", "")
+        if examples_path and pathlib.Path(examples_path).exists():
+            examples_path = pathlib.Path(examples_path)
+        else:
             examples_path = pathlib.Path(__file__).parent / "data" / "planner_examples.json"
         with open(examples_path, "r", encoding="utf-8") as f:
             return json.load(f)

@@ -1,5 +1,5 @@
 import asyncio
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
 
 
 def get_event_loop() -> asyncio.AbstractEventLoop:
@@ -12,3 +12,7 @@ def get_event_loop() -> asyncio.AbstractEventLoop:
 
 def get_jinja_env(directory: str) -> Environment:
     return Environment(loader=FileSystemLoader(directory))
+
+def get_jinja_template(template_path: str) -> Template:
+    with open(template_path, "r", encoding="utf-8") as f:
+        return Template(f.read())

@@ -52,17 +52,18 @@ class AgentConfig(ConfigBaseModel):
     planner_model: ModelConfigs = Field(default_factory=ModelConfigs)
     """Planner model config"""
     planner_config: dict = Field(default_factory=dict)
-    """Planner config (dict)
-    
+    """Planner config (dict)\n
     - `examples_path`: path to planner examples json file"""
     workers: dict[str, "AgentConfig"] = Field(default_factory=dict)
     """Workers config"""
     workers_info: list[dict] = Field(default_factory=list)
-    """Workers info, list of {name, desc, strengths, weaknesses}
-    
+    """Workers info, list of {name, desc, strengths, weaknesses}\n
     - `name`: worker name
     - `desc`: worker description
     - `strengths`: worker strengths
     - `weaknesses`: worker weaknesses"""
     reporter_model: ModelConfigs = Field(default_factory=ModelConfigs)
     """Reporter model config"""
+    reporter_config: dict = Field(default_factory=dict)
+    """Reporter config (dict)\n
+    - `template_path`: template Jinja2 file path, with `question` and `trajectory` variables"""
