@@ -9,6 +9,7 @@ from .base_config import ConfigBaseModel
 
 
 class ModelProviderConfig(ConfigBaseModel):
+    """config for model provider"""
     type: Literal["chat.completions", "responses"] = os.getenv("UTU_LLM_TYPE")
     model: str = os.getenv("UTU_LLM_MODEL")
     base_url: str | None = os.getenv("UTU_LLM_BASE_URL")
@@ -29,8 +30,11 @@ class ModelParamsConfig(ConfigBaseModel):
 
 
 class ModelConfigs(ConfigBaseModel):
+    """Overall model config"""
+
     model_provider: ModelProviderConfig = Field(default_factory=ModelProviderConfig)
-    # for agent's model settings
+    """config for model provider"""
     model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
-    # for basic model usage, e.g. `query_one` in tools / judger
+    """config for agent's model settings"""
     model_params: ModelParamsConfig = Field(default_factory=ModelParamsConfig)
+    """config for basic model usage, e.g. `query_one` in tools / judger"""

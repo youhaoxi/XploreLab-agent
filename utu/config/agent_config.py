@@ -32,17 +32,30 @@ class EnvConfig(ConfigBaseModel):
 
 
 class AgentConfig(ConfigBaseModel):
+    """Overall agent config"""
     type: Literal["simple", "orchestra"] = "simple"
+    """Agent type, "simple" or "orchestra"""
 
     model: ModelConfigs = Field(default_factory=ModelConfigs)
+    """Model config, with model_provider, model_settings, model_params"""
     agent: ProfileConfig = Field(default_factory=ProfileConfig)
+    """Agent profile config"""
     context_manager: ContextManagerConfig = Field(default_factory=ContextManagerConfig)
+    """Context manager config"""
     env: EnvConfig = Field(default_factory=EnvConfig)
+    """Env config"""
     toolkits: dict[str, ToolkitConfig] = Field(default_factory=dict)
+    """Toolkits config"""
     max_turns: int = 20
+    """Max turns"""
 
     planner_model: ModelConfigs = Field(default_factory=ModelConfigs)
+    """Planner model config"""
     planner_config: dict = Field(default_factory=dict)  # {examples_path}
+    """Planner config"""
     workers: dict[str, "AgentConfig"] = Field(default_factory=dict)
+    """Workers config"""
     workers_info: list[dict] = Field(default_factory=list)
+    """Workers info"""
     reporter_model: ModelConfigs = Field(default_factory=ModelConfigs)
+    """Reporter model config"""

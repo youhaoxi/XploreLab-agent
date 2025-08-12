@@ -18,6 +18,7 @@ def secure_repr(obj: ReprArgs) -> ReprArgs:
             yield k, v
 
 class ConfigBaseModel(BaseModel):
+    """Base model for config, with secure repr"""
     def __str__(self) -> str:
         return self.__repr__()
 

@@ -51,8 +51,6 @@ class ChatCompletionConverter(Converter):
             filtered_items.append(item)
         return filtered_items
 
-
-
     @classmethod
     def items_to_dict(cls, items: str|Iterable[TResponseInputItem]) -> list[dict]:
         """convert items to a list of dict which have {"role", "content"}"""
@@ -82,6 +80,7 @@ class ChatCompletionConverter(Converter):
 
 
 class AgentsUtils:
+    """Utils for openai-agents SDK"""
     @staticmethod
     def generate_group_id() -> str:
         """Generate a unique group ID. (Used in OpenAI tracing)

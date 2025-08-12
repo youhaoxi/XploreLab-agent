@@ -68,11 +68,21 @@ nav:
   - Quickstart: quickstart.md
   - Examples: examples.md
   - API Reference:
-    - ref/simple_agent.md
+    - Agents:
+      - ref/agents/simple_agent.md
+      - ref/agents/orchestra_agent.md
     - Tools:
       - ref/tool/base_toolkit.md
       - ref/tool/document_toolkit.md
       - ref/tool/image_toolkit.md
       - ref/tool/search_toolkit.md
       - ref/tool/video_toolkit.md
-
+    - Utils:
+      - ref/utils/openai_utils.md
+      - ref/utils/agents_utils.md
+    - Config:
+      - ref/config/base_config.md
+      - ref/config/loader.md
+      - ref/config/model_config.md
+      - ref/config/agent_config.md
+      - ref/config/eval_config.md

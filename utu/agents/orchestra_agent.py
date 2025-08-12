@@ -14,6 +14,7 @@ logger = get_logger(__name__)
 
 class OrchestraAgent:
     def __init__(self, config: AgentConfig|str):
+        """Initialize the orchestra agent"""
         if isinstance(config, str):
             config = ConfigLoader.load_agent_config(config)
         self.config = config
@@ -37,6 +38,7 @@ class OrchestraAgent:
 
     async def run(self, input: str) -> RunResult:
         """Run the orchestra agent
+
         1. plan
         2. sequentially execute subtasks
         3. report
@@ -60,6 +62,7 @@ class OrchestraAgent:
         )
 
     async def plan(self, task_recorder: TaskRecorder) -> CreatePlanResult:
+        """Step1: Plan"""
         with function_span("planner") as span_planner:
             plan = await self.planner_agent.create_plan(task_recorder)
             assert all(t.agent_name in self.worker_agents for t in plan.todo), f"agent_name in plan.todo must be in worker_agents, get {plan.todo}"
@@ -69,12 +72,14 @@ class OrchestraAgent:
         return plan
 
     async def work(self, task_recorder: TaskRecorder, task: Subtask) -> WorkerResult:
+        """Step2: Work"""
         worker_agent = self.worker_agents[task.agent_name]
         result = await worker_agent.work(task_recorder, task)
         task_recorder.add_worker_result(result)
         return result
 
     async def report(self, task_recorder: TaskRecorder) -> AnalysisResult:
+        """Step3: Report"""
         with function_span("report") as span_fn:
             analysis_result = await self.reporter_agent.report(task_recorder)
             task_recorder.add_reporter_result(analysis_result)
