@@ -124,7 +124,7 @@ def _execute_python_code_sync(code: str, workdir: str):
         os.chdir(original_dir)
 
 
-class PythonExecuteTool(AsyncBaseToolkit):
+class PythonExecutorTool(AsyncBaseToolkit):
     """
     A tool for executing Python code in a sandboxed environment.
     """
