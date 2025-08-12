@@ -51,11 +51,18 @@ class AgentConfig(ConfigBaseModel):
 
     planner_model: ModelConfigs = Field(default_factory=ModelConfigs)
     """Planner model config"""
-    planner_config: dict = Field(default_factory=dict)  # {examples_path}
-    """Planner config"""
+    planner_config: dict = Field(default_factory=dict)
+    """Planner config (dict)
+    
+    - `examples_path`: path to planner examples json file"""
     workers: dict[str, "AgentConfig"] = Field(default_factory=dict)
     """Workers config"""
     workers_info: list[dict] = Field(default_factory=list)
-    """Workers info"""
+    """Workers info, list of {name, desc, strengths, weaknesses}
+    
+    - `name`: worker name
+    - `desc`: worker description
+    - `strengths`: worker strengths
+    - `weaknesses`: worker weaknesses"""
     reporter_model: ModelConfigs = Field(default_factory=ModelConfigs)
     """Reporter model config"""

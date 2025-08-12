@@ -1,0 +1,77 @@
+[
+    {
+        "question": "哪位乌兹别克斯坦网球选手赢得了2016年在曲靖举行的首届ITF 2.5万美元赛事单打冠军，他出生于哪一年？",
+        "available_agents": [
+            {
+                "agent_name": "SearchAgent",
+                "description": "Web search, information retrieval, research material collection, API data fetching"
+            },
+            {
+                "agent_name": "DataAnalysisAgent",
+                "description": "Exploring and analyzing tabular data files (CSV, Excel, etc.), performing automated field extraction, statistical analysis, pattern discovery, and generating data insights"
+            },
+            {
+                "agent_name": "AnalysisAgent",
+                "description": "Analyzing search or data analysis results, extracting key information, summarizing findings, making connections between different pieces of information"
+            }
+        ],
+        "analysis": "这个问题需要找出2016年曲靖ITF赛事单打冠军的身份和出生年份。需要分步骤搜索：首先找到赛事信息，然后确认冠军身份，最后获取个人资料。由于涉及具体的赛事年份、地点和选手国籍，需要通过多个搜索步骤来获取准确信息。",
+        "plan": [
+            {"agent_name": "SearchAgent", "task": "搜索2016年曲靖ITF 2.5万美元网球赛事的相关信息和比赛结果", "completed": false},
+            {"agent_name": "SearchAgent", "task": "查找2016年曲靖ITF 2.5万美元赛事单打冠军获得者的详细信息", "completed": false},
+            {"agent_name": "SearchAgent", "task": "确认单打冠军选手的乌兹别克斯坦国籍身份", "completed": false},
+            {"agent_name": "SearchAgent", "task": "搜索乌兹别克斯坦单打冠军选手的个人资料和出生年份", "completed": false}
+        ]
+    },
+    {
+        "question": "分析位于`/workspace/data/sales_records.csv`的销售数据文件，找出2023年第四季度销售额最高的产品类别及其销售额。",
+        "available_agents": [
+            {
+                "agent_name": "SearchAgent",
+                "description": "Web search, information retrieval, research material collection, API data fetching"
+            },
+            {
+                "agent_name": "DataAnalysisAgent",
+                "description": "Exploring and analyzing tabular data files (CSV, Excel, etc.), performing automated field extraction, statistical analysis, pattern discovery, and generating data insights"
+            },
+            {
+                "agent_name": "AnalysisAgent",
+                "description": "Analyzing search or data analysis results, extracting key information, summarizing findings, making connections between different pieces of information"
+            }
+        ],
+        "analysis": "这是一个明确目标的数据分析任务，需要处理指定路径的销售数据文件。分析将分阶段进行：首先全面理解数据结构（字段含义、数据类型等），然后进行针对性分析。关键前提是确保对数据结构的准确理解，包括识别日期、产品类别和销售额等关键字段。",
+        "plan": [
+            {"agent_name": "DataAnalysisAgent", "task": "加载`/workspace/data/sales_records.csv`文件并提取所有字段信息（列名、数据类型、含义解释）", "completed": false},
+            {"agent_name": "DataAnalysisAgnt", "task": "验证数据结构完整性，确认包含日期、产品类别和销售额等必要字段", "completed": false},
+            {"agent_name": "DataAnalysisAgent", "task": "过滤出2023年第四季度（2023-10-01至2023-12-31）的销售记录", "completed": false},
+            {"agent_name": "DataAnalysisAgent", "task": "按产品类别分组计算季度总销售额", "completed": false},
+            {"agent_name": "DataAnalysisAgent", "task": "识别销售额最高的产品类别并提取具体数值", "completed": false}
+        ]
+    },
+    {
+        "question": "探索位于`/data/workspace/jobs/ww_agent/data/customer_feedback.xlsx`的客户反馈数据，从中提取有价值的信息并提出改进建议。",
+        "available_agents": [
+            {
+                "agent_name": "SearchAgent",
+                "description": "Web search, information retrieval, research material collection, API data fetching"
+            },
+            {
+                "agent_name": "DataAnalysisAgent",
+                "description": "Exploring and analyzing tabular data files (CSV, Excel, etc.), performing automated field extraction, statistical analysis, pattern discovery, and generating data insights"
+            },
+            {
+                "agent_name": "AnalysisAgent",
+                "description": "Analyzing search or data analysis results, extracting key information, summarizing findings, making connections between different pieces of information"
+            }
+        ],
+        "analysis": "这是一个开放式数据探索任务，需要先建立对数据结构的全面理解。分析将采用分阶段方法：从字段提取和语义理解开始，确保掌握所有可用维度的含义，然后进行多角度探索以发现潜在洞见。此外可能还需要结合外部信息，辅助最后的结论分析与建议生成。",
+        "plan": [
+            {"agent_name": "DataAnalysisAgent", "task": "加载`/data/workspace/jobs/ww_agent/data/customer_feedback.xlsx`文件并提取所有字段信息（列名、数据类型、含义解释）", "completed": false},
+            {"agent_name": "DataAnalysisAgent", "task": "检查数据质量（缺失值、异常值等）并理解各字段的业务含义", "completed": false},
+            {"agent_name": "DataAnalysisAgent", "task": "进行基础统计分析：比如各个字段相关的分布信息，可以是反馈数量分布、反馈渠道分布等", "completed": false},
+            {"agent_name": "DataAnalysisAgent", "task": "进行复杂分析：执行探索性分析以发现数据中的关键洞察，尤其是关于负面反馈的关键分析", "completed": false},
+            {"agent_name": "SearchAgent", "task": "搜索相关客户问题的最佳实践解决方案", "completed": false},
+            {"agent_name": "AnalysisAgent", "task": "综合数据分析和搜索结果，生成优先改进建议", "completed": false}
+        ]
+    }
+]

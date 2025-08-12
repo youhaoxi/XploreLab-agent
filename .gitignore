@@ -38,6 +38,7 @@ ___*
 _SESSION_DATA
 .cache/
 /data/
+/examples/data_analysis/data
 output/
 workspace/
 
