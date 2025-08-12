@@ -29,7 +29,7 @@ class ModelParamsConfig(ConfigBaseModel):
 
 
 class ModelConfigs(ConfigBaseModel):
-    model_provider: ModelProviderConfig
+    model_provider: ModelProviderConfig = Field(default_factory=ModelProviderConfig)
     # for agent's model settings
     model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
     # for basic model usage, e.g. `query_one` in tools / judger

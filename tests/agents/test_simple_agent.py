@@ -18,4 +18,4 @@ async def test_chat_streamed(agent: SimpleAgent):
 
 async def test_chat(agent: SimpleAgent):
     run_result = await agent.chat("That's the weather in Beijing today?")
-    print(json.dumps(run_result.to_input_list(), ensure_ascii=False))
+    print(json.dumps(run_result.to_input_list(), ensure_ascii=False, indent=2))

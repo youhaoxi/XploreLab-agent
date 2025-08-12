@@ -20,6 +20,7 @@ from agents import (
     ToolCallItem, FunctionTool,
     ToolCallOutputItem,
 )
+from agents.tracing import gen_trace_id
 from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEvent, RunItemStreamEvent
 from agents.models.chatcmpl_converter import Converter
 
@@ -87,6 +88,10 @@ class AgentsUtils:
         Ref: https://openai.github.io/openai-agents-python/tracing/
         """
         return uuid.uuid4().hex[:16]
+
+    @staticmethod
+    def gen_trace_id() -> str:
+        return gen_trace_id()
 
     @staticmethod
     def get_agents_model(
