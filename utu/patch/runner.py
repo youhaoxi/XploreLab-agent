@@ -1,4 +1,6 @@
 import asyncio
+import logging
+import json
 
 from agents.run import AgentRunner, AgentToolUseTracker, SingleStepResult
 from agents import (
@@ -10,8 +12,10 @@ from agents.util import _coro
 
 from ..context import BaseContextManager
 
+logger = logging.getLogger(__name__)
 
 class UTUAgentRunner(AgentRunner):
+    # TODO: also add context_manager to _run_single_turn_streamed for .run_streamed
     @classmethod
     async def _run_single_turn(
         cls,
@@ -49,10 +53,10 @@ class UTUAgentRunner(AgentRunner):
         input.extend([generated_item.to_input_item() for generated_item in generated_items])
 
         # FIXME: set context manage as a hook?
+        # ADD: context manager
         context_manager: BaseContextManager|None = context_wrapper.context.get("context_manager", None)
-        # ADD: preprocess
         if context_manager:
-            input = context_manager.preprocess(input)
+            input = context_manager.preprocess(input, context_wrapper)
         new_response = await cls._get_new_response(
             agent,
             system_prompt,
@@ -66,6 +70,9 @@ class UTUAgentRunner(AgentRunner):
             previous_response_id,
             prompt_config,
         )
+
+        # ADD: response logging
+        # print(json.dumps([item.model_dump() for item in new_response.output], ensure_ascii=False))
 
         single_turn_result = await cls._get_single_step_result_from_response(
             agent=agent,

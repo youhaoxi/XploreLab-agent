@@ -1,11 +1,12 @@
 import abc
+import asyncio
 from typing import Callable
 
 from agents import FunctionTool, function_tool
 import mcp.types as types
 
 from ..config import ToolkitConfig
-from ..utils import ChatCompletionConverter
+from ..utils import ChatCompletionConverter, get_event_loop
 
 
 class MCPConverter:
@@ -27,6 +28,7 @@ class AsyncBaseToolkit(abc.ABC):
             config = config or {}
             config = ToolkitConfig(config=config, name=self.__class__.__name__)
         self.config = config
+        self._built = False
 
     async def __aenter__(self):
         await self.build()
@@ -36,10 +38,12 @@ class AsyncBaseToolkit(abc.ABC):
         await self.cleanup()
 
     async def build(self):
-        pass
+        if self._built:
+            return
+        self._built = True
 
     async def cleanup(self):
-        pass
+        self._built = False
 
 
     @abc.abstractmethod
@@ -81,3 +85,23 @@ class AsyncBaseToolkit(abc.ABC):
             raise ValueError(f"Tool {name} not found")
         tool = tools_map[name]
         return await tool(**arguments)
+
+
+    # -------------------------------------------------------------------------------------------------------------
+    def get_tools_map_sync(self) -> dict[str, Callable]:
+        if self.tools_map is None:
+            loop = get_event_loop()
+            if not self._built:
+                loop.run_until_complete(self.build())
+            self.tools_map = loop.run_until_complete(self.get_tools_map_func())
+        return self.tools_map
+    
+    def get_tools_in_agents_sync(self) -> list[FunctionTool]:
+        tools_map = self.get_tools_map_sync()
+        tools = []
+        for tool_name, tool in tools_map.items():
+            tools.append(function_tool(
+                tool, 
+                strict_mode=False  # turn off strict mode
+            ))
+        return tools

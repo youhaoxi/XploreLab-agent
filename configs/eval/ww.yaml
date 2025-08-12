@@ -12,10 +12,13 @@ agent:
   # type: simple_env  # not used now
   model:
     model_provider:
-      model: ${oc.env:UTU_MODEL}
-      base_url: ${oc.env:UTU_BASE_URL}
-      api_key: ${oc.env:UTU_API_KEY}
-    # model_settings:
+      type: ${oc.env:UTU_LLM_TYPE}
+      model: ${oc.env:UTU_LLM_MODEL}
+      base_url: ${oc.env:UTU_LLM_BASE_URL}
+      api_key: ${oc.env:UTU_LLM_API_KEY}
+    model_settings:
+      reasoning:
+        effort: high
     # #   # for ds-v3
     # #   temperature: 0.3
     # #   top_p: 0.95
@@ -49,21 +52,26 @@ agent:
       name: search
       mode: builtin
       activated_tools: null
-      config: {
-        "summary_token_limit": 1_000,
-      }
+      config:
+        summary_token_limit: 10_000
+        SERPER_API_KEY: ${oc.env:SERPER_API_KEY}
+        JINA_API_KEY: ${oc.env:JINA_API_KEY}
       config_llm:
-        model: ${oc.env:UTU_MODEL}
-        base_url: ${oc.env:UTU_BASE_URL}
-        api_key: ${oc.env:UTU_API_KEY}
+        model_provider:
+          type: ${oc.env:UTU_LLM_TYPE}
+          model: ${oc.env:UTU_LLM_MODEL}
+          base_url: ${oc.env:UTU_LLM_BASE_URL}
+          api_key: ${oc.env:UTU_LLM_API_KEY}
   max_turns: 20
 
 concurrency: 50
 
-judge_model: ${oc.env:JUDGE_MODEL}
-judge_api_key: ${oc.env:JUDGE_API_KEY}
-judge_model_base_url: ${oc.env:JUDGE_MODEL_BASE_URL}
+judge_model:
+  model_provider:
+    type: ${oc.env:JUDGE_LLM_TYPE}
+    model: ${oc.env:JUDGE_LLM_MODEL}
+    base_url: ${oc.env:JUDGE_LLM_BASE_URL}
+    api_key: ${oc.env:JUDGE_LLM_API_KEY}
+  model_params:
+    temperature: 0.5
 judge_concurrency: 64
-judge_max_tokens: 4096
-
-

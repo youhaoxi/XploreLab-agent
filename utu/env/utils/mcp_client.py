@@ -60,10 +60,10 @@ class MCPClient:
     async def get_mcp_client(cls, url: str) -> AsyncGenerator[ClientSession, None]:
         match cls.get_url_type(url):
             case "http":
-                async with cls(url).start_http_session(url) as session:
+                async with cls().start_http_session(url) as session:
                     yield session
             case "sse":
-                async with cls(url).start_sse_session(url) as session:
+                async with cls().start_sse_session(url) as session:
                     yield session
             case _:
                 raise ValueError(f"Unknown url type: {url}")

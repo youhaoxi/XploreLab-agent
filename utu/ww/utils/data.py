@@ -34,14 +34,17 @@ class NextTaskResult:
         for i,task in enumerate(self.todo, 1):
             todos_str.append(f"{i}. {task.task} ({task.agent_name})")
         todos_str = "\n".join(todos_str)
-        return [{"role": "assistant", "content": f"[planner]\n{todos_str}"}]
+        return {
+            "agent": "planner",
+            "trajectory": [{"role": "assistant", "content": todos_str}]
+        }
 
 
 @dataclass
 class SearchResult:
     task: str
     output: str
-    trajectory: list[dict]
+    trajectory: dict
     search_results: list[dict] = field(default_factory=list)
 
 
@@ -51,4 +54,7 @@ class AnalysisResult:
 
     @property
     def trajectory(self):
-        return [{"role": "assistant", "content": f"[analysis] {self.output}"}]
+        return {
+            "agent": "analysis",
+            "trajectory": [{"role": "assistant", "content": self.output}]
+        }

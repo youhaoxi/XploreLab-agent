@@ -11,14 +11,14 @@ import asyncio
 from ..utils import Base, SearchResult
 from ...config import AgentConfig, ConfigLoader
 from ...tools import TOOLKIT_MAP
+from ...utils import AgentsUtils
 from ...agents.simple_agent import SimpleAgent
-from ...eval.common import get_trajectory_from_agent_result
 
 
 class SimpleSearcherAgent(Base):
     def __init__(self, config: AgentConfig):
         super().__init__(config)
-        self.agent = SimpleAgent(config)  # v0
+        self.agent = SimpleAgent(config=config)
 
     async def build(self):
         await self.agent.build()
@@ -29,7 +29,7 @@ class SimpleSearcherAgent(Base):
         return SearchResult(
             task=subtask,
             output=run_result.final_output,
-            trajectory=get_trajectory_from_agent_result(run_result),
+            trajectory=AgentsUtils.get_trajectory_from_agent_result(run_result),
         )
 
 
@@ -264,4 +264,7 @@ class SearcherAgent(Base):
         
         :return: A list of dictionaries representing the trajectory
         """
-        return self.trajectory
+        return {
+            "agent": "SearchAgent",
+            "trajectory": self.trajectory
+        }

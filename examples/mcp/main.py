@@ -13,7 +13,7 @@ queries = [
 
 async def main():
     async with SimpleAgent(
-        "examples/mcp",
+        config="examples/mcp",
         name="example-mcp-agent",
     ) as agent:
         for query in queries:

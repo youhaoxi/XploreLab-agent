@@ -20,14 +20,17 @@ dependencies = [
     "jinja2>=3.1.6",
     "matplotlib>=3.10.3",
     "mcp>=1.12.3",
-    "openai-agents>=0.1.0",
+    # https://github.com/openai/openai-agents-python/issues/1395
+    "openai==1.97.1",
+    "openai-agents==0.2.5",
+    # https://github.com/Arize-ai/openinference/tree/main/python/instrumentation/openinference-instrumentation-openai
     "openinference-instrumentation-openai>=0.1.30",
-    "openinference-instrumentation-openai-agents>=0.1.14",
+    "openinference-instrumentation-openai-agents>=1.1.1",
     "openpyxl>=3.1.5",
     "pandas>=2.3.0",
     "pexpect>=4.9.0",
-    "pillow>=11.2.1",
     "psycopg2-binary>=2.9.10",
+    "rich>=14.1.0",
     "sqlmodel>=0.0.24",
     "tiktoken>=0.9.0",
     "toml>=0.10.2",
@@ -61,7 +64,7 @@ log_cli_level = "INFO"
 log_cli_format = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 addopts = [
-    "-v", "-s"
+    "-v", "-s",
 ]
 
 [tool.uv]

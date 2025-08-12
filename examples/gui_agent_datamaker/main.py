@@ -61,7 +61,7 @@ async def main():
     workspace_path = pathlib.Path(__file__).parent / "data"
     config.toolkits["bash"].config["workspace_root"] = str(workspace_path)
 
-    async with SimpleAgent(config, name="gui-agent-toolmaker", instructions=instructions) as agent:
+    async with SimpleAgent(config=config, name="gui-agent-toolmaker", instructions=instructions) as agent:
         await agent.chat_streamed(query)
 
 if __name__ == "__main__":

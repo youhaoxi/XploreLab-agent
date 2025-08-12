@@ -5,13 +5,12 @@ import time
 from tqdm import tqdm
 from agents.tracing import gen_trace_id
 
-from ...utils import get_logger, setup_logging
+from ...utils import get_logger, setup_logging, AgentsUtils
 
 from ...config import EvalConfig, ConfigLoader
 from ...agents import SimpleAgent
 from ..data import DBDataManager, EvaluationSample, EvaluationResult
 from ..processer import PROCESSER_FACTORY, BaseProcesser
-from ..common import get_trajectory_from_agent_result
 
 setup_logging()
 logger = get_logger(__name__)
@@ -19,7 +18,6 @@ logger = get_logger(__name__)
 
 class BaseBenchmark:
     dataset: DBDataManager
-    total_tokens: int = 0
     _source_to_processer: dict[str, BaseProcesser] = {}
     _source_to_agent: dict[str, SimpleAgent] = {}
 
@@ -89,27 +87,24 @@ class BaseBenchmark:
         start_time = time.time()
         result = await agent.run(sample.augmented_question, trace_id=trace_id)
         end_time = time.time()
-        predicted_answer = result.final_output
 
         # Update the sample with the predicted answer and trajectory
-        trajectory = get_trajectory_from_agent_result(result)
+        trajectory = [AgentsUtils.get_trajectory_from_agent_result(result)]
         sample.update(
             trace_id=trace_id,
-            response=predicted_answer,
+            response=result.final_output,
             time_cost=end_time - start_time,
-            trajectory=json.dumps(trajectory, ensure_ascii=False),
+            trajectories=json.dumps(trajectory, ensure_ascii=False),
             stage="rollout"  # update stage to rollout!
         )
         self.dataset.save(sample)
-        # update the total tokens
-        self.total_tokens += sum([step.get("usage", {}).get("total_tokens", 0) for step in trajectory])
         return sample
 
     async def _get_agent(self, source) -> SimpleAgent:
         if source not in self._source_to_agent:
             instructions = self._get_processer(source).get_instructions()
             # SP: configed instructions + processer instructions
-            agent = SimpleAgent(self.config.agent, name=f"{source}-agent", instructions=f"{self.config.agent.agent.instructions}\n\n{instructions}")
+            agent = SimpleAgent(config=self.config.agent, name=f"{source}-agent", instructions=f"{self.config.agent.agent.instructions}\n\n{instructions}")
             await agent.build()
             self._source_to_agent[source] = agent
         return self._source_to_agent[source]

@@ -1,5 +1,5 @@
 
-from utu.agents.ww_background_gen import ModuleGenBackground
+from utu.ww.utils.background_gen import ModuleGenBackground
 
 background_gen = ModuleGenBackground()
 

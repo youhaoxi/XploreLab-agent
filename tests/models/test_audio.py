@@ -4,7 +4,7 @@ from utu.utils import SimplifiedAsyncOpenAI
 from utu.config import ConfigLoader
 
 
-config = ConfigLoader.load_model_config("v00")
+config = ConfigLoader.load_model_config("base")
 client = SimplifiedAsyncOpenAI(**config.model_provider.model_dump())
 
 
@@ -17,7 +17,7 @@ async def test_audio_input():
     wav_data = response.content
     encoded_string = base64.b64encode(wav_data).decode('utf-8')
 
-    completion = await client.chat_completion(
+    completion = await client.chat_completions_create(
         model="gpt-4o-audio-preview",
         modalities=["text", "audio"],
         # voice: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, and shimmer

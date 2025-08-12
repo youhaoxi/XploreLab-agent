@@ -2,19 +2,21 @@ import os
 import json
 import uuid
 import logging
+from typing import Literal
 from collections.abc import AsyncIterator, Iterable
 
 from openai import AsyncOpenAI
-from openai.types.responses import ResponseFunctionToolCall
+from openai.types.responses import ResponseFunctionToolCall, FunctionToolParam
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 
 from agents import (
     HandoffOutputItem, TResponseInputItem, 
     ItemHelpers,
     MessageOutputItem,
-    OpenAIChatCompletionsModel,
+    OpenAIChatCompletionsModel, OpenAIResponsesModel,
     RunItem, ModelSettings, ModelTracing,
     StreamEvent,
+    RunResult,
     ToolCallItem, FunctionTool,
     ToolCallOutputItem,
 )
@@ -22,9 +24,61 @@ from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEven
 from agents.models.chatcmpl_converter import Converter
 
 from .print_utils import PrintUtils
-from .openai_utils import OpenAIChatCompletionParams
+from .openai_utils import OpenAIChatCompletionParams, OpenAIUtils
 
 logger = logging.getLogger(__name__)
+
+
+
+class ChatCompletionConverter(Converter):
+    @classmethod
+    def items_to_messages(cls, items: str|Iterable[TResponseInputItem]) -> list[ChatCompletionMessageParam]:
+        # skip reasoning, see chatcmpl_converter.Converter.items_to_messages()
+        # agents.exceptions.UserError: Unhandled item type or structure: {'id': '__fake_id__', 'summary': [{'text': '...', 'type': 'summary_text'}], 'type': 'reasoning'}
+        if not isinstance(items, str):  # TODO: check it!
+            items = cls.filter_items(items)
+        return Converter.items_to_messages(items)
+
+    @classmethod
+    def filter_items(cls, items: str|Iterable[TResponseInputItem]) -> str|list[TResponseInputItem]:
+        if isinstance(items, str):
+            return items
+        filtered_items = []
+        for item in items:
+            if item.get("type", None) == "reasoning":
+                continue
+            filtered_items.append(item)
+        return filtered_items
+
+
+
+    @classmethod
+    def items_to_dict(cls, items: str|Iterable[TResponseInputItem]) -> list[dict]:
+        """convert items to a list of dict which have {"role", "content"}"""
+        if isinstance(items, str):
+            return [{"role": "user", "content": items}]
+        result = []
+        for item in items:
+            if msg := Converter.maybe_easy_input_message(item): result.append(msg)
+            elif msg := Converter.maybe_input_message(item): result.append(msg)
+            elif msg := Converter.maybe_response_output_message(item): result.append(msg)
+            elif msg := Converter.maybe_file_search_call(item):
+                msg.update({"role": "tool", "content": msg["results"]})
+                result.append(msg)
+            elif msg := Converter.maybe_function_tool_call(item):
+                msg.update({"role": "assistant", "content": f"{msg['name']}({msg['arguments']})"})
+                result.append(msg)
+            elif msg := Converter.maybe_function_tool_call_output(item):
+                msg.update({"role": "tool", "content": msg["output"], "tool_call_id": msg["call_id"]})
+                result.append(msg)
+            elif msg := Converter.maybe_reasoning_message(item):
+                msg.update({"role": "assistant", "content": msg["summary"]})
+                result.append(msg)
+            else:
+                logger.warning(f"Unknown message type: {item}")
+                result.append({"role": "assistant", "content": f"Unknown message type: {item}"})
+        return result
+
 
 class AgentsUtils:
     @staticmethod
@@ -36,18 +90,34 @@ class AgentsUtils:
 
     @staticmethod
     def get_agents_model(
+        type: Literal["responses", "chat.completions"] = None,
         model: str = None,
-        api_key: str = None,
         base_url: str = None,
-        # mode: Literal["responses", "chat.completions"] = "chat.completions",
-    ) -> OpenAIChatCompletionsModel:
-        model = model or os.getenv("UTU_MODEL")
-        api_key = api_key or os.getenv("UTU_API_KEY")
-        base_url = base_url or os.getenv("UTU_BASE_URL")
+        api_key: str = None,
+    ) -> OpenAIChatCompletionsModel | OpenAIResponsesModel:
+        type = type or os.getenv("UTU_LLM_TYPE", "chat.completions")
+        model = model or os.getenv("UTU_LLM_MODEL")
+        base_url = base_url or os.getenv("UTU_LLM_BASE_URL")
+        api_key = api_key or os.getenv("UTU_LLM_API_KEY")
         if not api_key or not base_url:
-            raise ValueError("UTU_API_KEY and UTU_BASE_URL must be set")
-        openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
-        return OpenAIChatCompletionsModel(model=model, openai_client=openai_client)
+            raise ValueError("UTU_LLM_API_KEY and UTU_LLM_BASE_URL must be set")
+        openai_client = AsyncOpenAI(
+            api_key=api_key, base_url=base_url,
+            timeout=100,
+        )
+        if type == "chat.completions":
+            return OpenAIChatCompletionsModel(model=model, openai_client=openai_client)
+        elif type == "responses":
+            return OpenAIResponsesModel(model=model, openai_client=openai_client)
+        else:
+            raise ValueError("Invalid type: " + type)
+
+    @staticmethod
+    def get_trajectory_from_agent_result(agent_result: RunResult) -> dict:
+        return {
+            "agent": agent_result.last_agent.name,
+            "trajectory": ChatCompletionConverter.items_to_dict(agent_result.to_input_list()),
+        }
 
     @staticmethod
     def print_new_items(new_items: list[RunItem]) -> None:
@@ -141,26 +211,6 @@ class AgentsUtils:
             params_json_schema=tool["function"].get("parameters", None),
             on_invoke_tool=None,
         )
-
-class ChatCompletionConverter(Converter):
-    @classmethod
-    def items_to_messages(cls, items: str|Iterable[TResponseInputItem]) -> list[ChatCompletionMessageParam]:
-        # skip reasoning, see chatcmpl_converter.Converter.items_to_messages()
-        # agents.exceptions.UserError: Unhandled item type or structure: {'id': '__fake_id__', 'summary': [{'text': '...', 'type': 'summary_text'}], 'type': 'reasoning'}
-        if not isinstance(items, str):
-            items = cls.filter_items(items)
-        return Converter.items_to_messages(items)
-
-    @classmethod
-    def filter_items(cls, items: str|Iterable[TResponseInputItem]) -> str|list[TResponseInputItem]:
-        if isinstance(items, str):
-            return items
-        filtered_items = []
-        for item in items:
-            if item.get("type", None) == "reasoning":
-                continue
-            filtered_items.append(item)
-        return filtered_items
 
 
 class SimplifiedOpenAIChatCompletionsModel(OpenAIChatCompletionsModel):

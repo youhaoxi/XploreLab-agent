@@ -45,7 +45,8 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     trace_url: Optional[str] = Field(default=None)
     response: Optional[str] = Field(default=None)
     time_cost: Optional[float] = Field(default=None)  # time cost in seconds
-    trajectory: Optional[str] = Field(default=None)  # the agent's reasoning process, a list of messages
+    trajectory: Optional[str] = Field(default=None)  # deprecated, use trajectories instead for multi-agents
+    trajectories: Optional[str] = Field(default=None)
     # 3) judgement
     extracted_final_answer: Optional[str] = Field(default=None)
     judged_response: Optional[str] = Field(default=None)
@@ -59,7 +60,7 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     def model_dump(self, *args, **kwargs):
         keys = [
             "source", "raw_question", "level", "augmented_question", "correct_answer", "file_name", "stage", "trace_id", "response",
-            "time_cost", "trajectory", "extracted_final_answer", "judged_response", "reasoning", "correct", "confidence",
+            "time_cost", "trajectories", "extracted_final_answer", "judged_response", "reasoning", "correct", "confidence",
             "exp_id"
         ]
         return {

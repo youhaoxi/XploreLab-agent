@@ -1,12 +1,11 @@
 import re
 import abc
 import string
-from openai import AsyncOpenAI
 
 from ...config import EvalConfig
 from ..data import EvaluationSample, EvaluationResult
 from .prompts import get_benchmark_templates
-from ...utils import get_logger
+from ...utils import get_logger, SimplifiedAsyncOpenAI
 
 logger = get_logger(__name__)
 
@@ -25,9 +24,11 @@ class BaseProcesser:
     JUDGE_TEMPLATE: str = None
     # concurrency limit
     name: str = None
+    config: EvalConfig = None
 
     def __init__(self, config: EvalConfig) -> None:
         self._load_templates()
+        self.config = config
     
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
         """ Preprocess a single sample. """
@@ -80,24 +81,11 @@ class BaseProcesser:
 
 class BaseLLMJudgeProcesser(BaseProcesser):
     """ Base class for processers that use LLM for judging. """
-    # judge model config
-    judge_model: str = None
-    judge_client: AsyncOpenAI = None
-
-    max_tokens: int = None
-    temperature: float = 0.5
-    retries: int = 3
-
     name = "default"
 
     def __init__(self, config: EvalConfig) -> None:
         super().__init__(config)
-        self.judge_model = config.judge_model
-        self.judge_client = AsyncOpenAI(
-            api_key=config.judge_api_key,
-            base_url=config.judge_model_base_url,
-        )
-        self.max_tokens = config.judge_max_tokens
+        self.judge_client = SimplifiedAsyncOpenAI(**config.judge_model.model_provider.model_dump())
 
     async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
         """ Judge a single sample. """
@@ -122,23 +110,11 @@ class BaseLLMJudgeProcesser(BaseProcesser):
             response=response,
             correct_answer=correct_answer
         )
-        content, parsed_content = "", {}
-        for attempt in range(self.retries):
-            try:
-                result = await self.judge_client.chat.completions.create(
-                    model=self.judge_model,
-                    messages=messages,
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature
-                )
-                content = result.choices[0].message.content.strip()
-                parsed_content = self._parse_judge_response(content)
-                break
-            except Exception as e:
-                logger.error(f"Error during judging: {e}, retrying {attempt + 1}/{self.retries}...", exc_info=True)
-                continue
-        else:
-            raise RuntimeError("Failed to judge after multiple retries.")
+        content = await self.judge_client.query_one(
+            messages=messages,
+            **self.config.judge_model.model_params.model_dump()
+        )
+        parsed_content = self._parse_judge_response(content)
 
         data.judged_response = content
         # update the return data with parsed content
@@ -227,15 +203,6 @@ class BaseLLMJudgeProcesser(BaseProcesser):
 
 class BaseMatchProcesser(BaseProcesser):
     """ Base class for processers that use match-based judging. """
-    
-    async def judge(self, samples: list[EvaluationSample]) -> list[EvaluationSample]:
-        """ Judge if the agent's predictions match ground truth. """
-        judged_data = []
-        for data in samples:
-            result_data = await self.judge_one(data)
-            judged_data.append(result_data)
-
-        return judged_data
     
     async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
         """ Judge a single sample. """

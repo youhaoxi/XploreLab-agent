@@ -1,4 +1,3 @@
-import os
 import re
 import asyncio
 from typing import Callable
@@ -50,15 +49,15 @@ class SearchToolkit(AsyncBaseToolkit):
         super().__init__(config)
         self.jina_url_template = r"https://r.jina.ai/{url}"
         self.jina_header = {
-            "Authorization": f"Bearer {os.getenv('JINA_API_KEY')}"
+            "Authorization": f"Bearer {self.config.config.get('JINA_API_KEY')}"
         }
         self.serper_url = r"https://google.serper.dev/search"
         self.serper_header = {
-            "X-API-KEY": os.getenv('SERPER_API_KEY'),
+            "X-API-KEY": self.config.config.get('SERPER_API_KEY'),
             'Content-Type': 'application/json'
         }
         # config
-        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump() if self.config.config_llm else {})
+        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_provider.model_dump() if self.config.config_llm else {})
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
     @async_file_cache(expire_time=None)
@@ -147,10 +146,10 @@ class SearchToolkit(AsyncBaseToolkit):
 
     async def _qa(self, content: str, query: str) -> str:
         template = TEMPLATE_QA.format(content=content, query=query)
-        return await self.llm.query_one(messages=[{"role": "user", "content": template}])
+        return await self.llm.query_one(messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump())
     async def _extract_links(self, content: str, query: str) -> str:
         template = TEMPLATE_LINKS.format(content=content, query=query)
-        return await self.llm.query_one(messages=[{"role": "user", "content": template}])
+        return await self.llm.query_one(messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump())
 
     async def get_tools_map(self) -> dict[str, Callable]:
         return {

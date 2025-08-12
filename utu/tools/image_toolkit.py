@@ -30,7 +30,7 @@ SP_INSTRUCTION = """Answer questions about images by:
 class ImageToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
+        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_provider.model_dump())
 
     def _load_image(self, image_path: str) -> str:
         parsed = urlparse(image_path)
@@ -74,14 +74,14 @@ class ImageToolkit(AsyncBaseToolkit):
                 {"role": "system", "content": SP_DESCRIPTION},
                 {"role": "user", "content": [{"type": "image_url", "image_url": {"url": image_str}}]}
             ]
-            output = await self.llm.query_one(messages=messages)
+            output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
             output = f"You did not provide a particular question, so here is a detailed caption for the image: {output}"
         else:
             messages = [
                 {"role": "system", "content": SP_DESCRIPTION},
                 {"role": "user", "content": [{"type": "text", "text": question}, {"type": "image_url", "image_url": {"url": image_str}}]}
             ]
-            output = await self.llm.query_one(messages=messages)
+            output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         return output
 
     async def get_tools_map(self) -> dict[str, Callable]:

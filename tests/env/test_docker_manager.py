@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from utu.env import DockerManager, MCPClient
 
@@ -7,37 +8,20 @@ docker_manager = DockerManager()
 
 async def test_mcp():
     try:
-        container_info = await docker_manager.start_container("test_11")
+        id = "test"
+        res = await docker_manager.find_all(stop=True)
+        print(res)
+        container_info = await docker_manager.start_container(id)
         print(f"container_info: {container_info}")
-        await asyncio.sleep(5)
-        # client = MCPClient(container_info["mcp_url"])
-        # # try:
-        # #     async with client:
-        # #         res = await client.list_tools()
-        # #         print(res)
-        # # except BaseException as e:
-        # #     print(f"async with error: {e}")
-        # await client.start()
-        # res = await client.list_tools()
-        # print(res)
-        # await client.cleanup()
         async with MCPClient.get_mcp_client(container_info["mcp_url"]) as client:
             res = await client.list_tools()
             print(res)
             res = await client.call_tool("go_to_url", {"url": "https://github.com/modelcontextprotocol/python-sdk/issues/79"})
             print(res)
     except Exception as e:
-        print(f"except: {e}")
-    except BaseExceptionGroup as e:
-        print(f"BaseExceptionGroup: {e}")
-    # finally:
-    #     print("finally")
-    #     try:
-    #         docker_manager.cleanup()
-    #     except BaseException as e:
-    #         print(f"finally error: {e}")
-    #     except BaseExceptionGroup as e:
-    #         print(f"BaseExceptionGroup: {e}")
+        logging.error(f"except: {e}", exc_info=True)
+    finally:
+        await docker_manager.stop_container(id)
 
 async def test_concurrency():
     try:
@@ -53,6 +37,13 @@ async def test_concurrency():
     finally:
         docker_manager.cleanup()
 
+async def test_find():
+    res = await docker_manager.find_all()
+    print(res)
+    ids = [c["docker_id"] for c in res["found_containers"]]
+    res = await docker_manager.stop_all_by_cid(ids)
+    print(res)
+
 
 if __name__ == "__main__":
-    asyncio.run(test_mcp())
+    asyncio.run(test_find())

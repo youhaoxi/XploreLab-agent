@@ -19,7 +19,7 @@ async def main():
         for tool_name in args.tools:
             config.toolkits[tool_name] = ConfigLoader.load_toolkit_config(tool_name)
 
-    async with SimpleAgent(config) as agent:
+    async with SimpleAgent(config=config) as agent:
         while True:
             user_input = input("> ")
             if user_input.lower() in ["exit", "quit", "q"]:

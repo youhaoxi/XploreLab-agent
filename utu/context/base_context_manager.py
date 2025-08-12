@@ -1,6 +1,4 @@
-import abc
-
-from agents import TResponseInputItem
+from agents import TResponseInputItem, TContext, RunContextWrapper
 from agents.run import SingleStepResult
 
 from ..utils import get_logger, ChatCompletionConverter
@@ -9,13 +7,16 @@ logger = get_logger(__name__)
 
 
 class BaseContextManager:
-    def preprocess(self, input: str|list[TResponseInputItem]) -> str|list[TResponseInputItem]:
-        return ChatCompletionConverter.filter_items(input)
+    def preprocess(self, input: str|list[TResponseInputItem], run_context: RunContextWrapper[TContext]=None) -> str|list[TResponseInputItem]:
+        return input
 
-    @abc.abstractmethod
-    def process(self, single_step_result: SingleStepResult) -> SingleStepResult:
-        raise NotImplementedError
+    def process(self, single_step_result: SingleStepResult, run_context: RunContextWrapper[TContext]=None) -> SingleStepResult:
+        return single_step_result
 
 class DummyContextManager(BaseContextManager):
-    def process(self, single_step_result: SingleStepResult) -> SingleStepResult:
-        return single_step_result
+    def preprocess(self, input: str|list[TResponseInputItem], run_context: RunContextWrapper[TContext]=None) -> str|list[TResponseInputItem]:
+        # return ChatCompletionConverter.filter_items(input)
+        return input
+
+    # def process(self, single_step_result: SingleStepResult, run_context: RunContextWrapper[TContext]=None) -> SingleStepResult:
+    #     return single_step_result

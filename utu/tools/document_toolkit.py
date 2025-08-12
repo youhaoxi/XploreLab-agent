@@ -3,7 +3,6 @@ https://github.com/lumina-ai-inc/chunkr
 """
 
 from typing import Optional, Callable
-import os
 
 from chunkr_ai import Chunkr
 from chunkr_ai.models import Configuration
@@ -25,12 +24,12 @@ INSTRUCTION_SUMMARY = r"""Please provide a structured description of the documen
 class DocumentToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        self.chunkr = Chunkr(api_key=os.getenv("CHUNKR_API_KEY"))
+        self.chunkr = Chunkr(api_key=self.config.config.get("CHUNKR_API_KEY"))
         self.chunkr.config = Configuration(
             high_resolution=self.config.config.get("high_resolution", True),
         )
         self.text_limit = self.config.config.get("text_limit", 100_000)
-        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
+        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_provider.model_dump())
         self.md5_to_path = {}
     
     @async_file_cache(expire_time=None)
@@ -81,7 +80,7 @@ class DocumentToolkit(AsyncBaseToolkit):
             messages.append({"role": "user", "content": INSTRUCTION_QA.format(question=question)})
         else:
             messages.append({"role": "user", "content": INSTRUCTION_SUMMARY})
-        output = await self.llm.query_one(messages=messages)
+        output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         if not question:
             output = f"You did not provide a particular question, so here is a detailed caption for the document: {output}"
         return output

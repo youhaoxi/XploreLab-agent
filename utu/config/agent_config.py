@@ -1,32 +1,14 @@
 from typing import Callable, Optional
 from typing_extensions import Literal
 
-from pydantic import Field, ConfigDict
-from agents import ModelSettings
+from pydantic import Field
 
 from .base_config import ConfigBaseModel
+from .model_config import ModelConfigs
 
 
 DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
 
-
-class ModelProviderConfig(ConfigBaseModel):
-    model: str
-    base_url: str | None = None
-    api_key: str | None = "xxx"
-
-
-class ModelSettingsConfig(ConfigBaseModel, ModelSettings):
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True
-    )
-
-    # parallel_tool_calls: bool | None = False  # default to False?
-
-
-class ModelConfigs(ConfigBaseModel):
-    model_provider: ModelProviderConfig
-    model_settings: ModelSettingsConfig = Field(default_factory=ModelSettingsConfig)
 
 class ProfileConfig(ConfigBaseModel):
     name: Optional[str] = "default"
@@ -38,16 +20,22 @@ class ToolkitConfig(ConfigBaseModel):
     name: str | None = None
     activated_tools: list[str] | None = None
     config: dict | None = Field(default_factory=dict)
-    config_llm: ModelProviderConfig | None = None
+    config_llm: ModelConfigs | None = None
 
 class ContextManagerConfig(ConfigBaseModel):
     name: str | None = None
     config: dict | None = Field(default_factory=dict)
+
+class EnvConfig(ConfigBaseModel):
+    name: str | None = None
+    config: dict | None = Field(default_factory=dict)
+
 
 class AgentConfig(ConfigBaseModel):
     type: Literal["simple", "simple_env"] = "simple"  # FIXME: 
     model: ModelConfigs = Field(default_factory=ModelConfigs)
     agent: ProfileConfig = Field(default_factory=ProfileConfig)
     context_manager: ContextManagerConfig = Field(default_factory=ContextManagerConfig)
+    env: EnvConfig = Field(default_factory=EnvConfig)
     toolkits: dict[str, ToolkitConfig] = Field(default_factory=dict)
     max_turns: int = 20

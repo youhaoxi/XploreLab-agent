@@ -49,3 +49,4 @@ logs/
 uv.lock
 .env
 test.yaml
+requirements.txt
