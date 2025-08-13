@@ -2,7 +2,8 @@
 @ii-agent/src/ii_agent/tools/memory/
 """
 
-from typing import Callable, Literal
+from collections.abc import Callable
+from typing import Literal
 
 from ..config import ToolkitConfig
 from ..utils import get_logger

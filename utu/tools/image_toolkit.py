@@ -5,8 +5,8 @@ https://platform.openai.com/docs/guides/images-vision?api-mode=chat
 """
 
 import base64
+from collections.abc import Callable
 from io import BytesIO
-from typing import Callable, Optional
 from urllib.parse import urlparse
 
 import requests
@@ -52,7 +52,7 @@ class ImageToolkit(AsyncBaseToolkit):
                 image = Image.open(image_path).convert("RGB")
             except Exception as e:
                 logger.error(f"Image loading failed: {e}")
-                raise ValueError(f"Invalid image file: {e}")
+                raise ValueError(f"Invalid image file: {image_path}") from e
         # Convert the image to a base64 string
         buffer = BytesIO()
         image.save(buffer, format="JPEG")  # Use the appropriate format (e.g., JPEG, PNG)
@@ -62,7 +62,7 @@ class ImageToolkit(AsyncBaseToolkit):
         image_string = f"data:image/jpeg;base64,{base64_image}"
         return image_string
 
-    async def image_qa(self, image_path: str, question: Optional[str] = None) -> str:
+    async def image_qa(self, image_path: str, question: str | None = None) -> str:
         """Generate textual description or answer questions about attached image.
 
         Args:

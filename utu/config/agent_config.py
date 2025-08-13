@@ -1,7 +1,7 @@
-from typing import Callable, Optional
+from collections.abc import Callable
+from typing import Literal
 
 from pydantic import Field
-from typing_extensions import Literal
 
 from .base_config import ConfigBaseModel
 from .model_config import ModelConfigs
@@ -10,8 +10,8 @@ DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
 
 
 class ProfileConfig(ConfigBaseModel):
-    name: Optional[str] = "default"
-    instructions: Optional[str | Callable] = DEFAULT_INSTRUCTIONS
+    name: str | None = "default"
+    instructions: str | Callable | None = DEFAULT_INSTRUCTIONS
 
 
 class ToolkitConfig(ConfigBaseModel):

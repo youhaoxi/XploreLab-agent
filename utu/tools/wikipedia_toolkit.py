@@ -6,7 +6,7 @@ https://www.mediawiki.org/wiki/API:Main_page
 
 import calendar
 import datetime
-from typing import Callable
+from collections.abc import Callable
 
 import requests
 

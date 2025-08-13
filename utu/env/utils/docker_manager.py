@@ -3,7 +3,6 @@ import logging
 import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Optional
 
 import docker
 import docker.errors
@@ -26,11 +25,11 @@ class ContainerStatus(Enum):
 @dataclass
 class ContainerInfo:
     id: int
-    container_id: Optional[str] = None
-    port: Optional[int] = None
-    mcp_url: Optional[str] = None
+    container_id: str | None = None
+    port: int | None = None
+    mcp_url: str | None = None
     status: ContainerStatus = ContainerStatus.STOPPED
-    error_msg: Optional[str] = None
+    error_msg: str | None = None
 
 
 class DockerManager:
@@ -54,7 +53,7 @@ class DockerManager:
             raise
 
         self.port_manager = PortManager()
-        self.containers: Dict[str, ContainerInfo] = {}
+        self.containers: dict[str, ContainerInfo] = {}
         self.lock = asyncio.Lock()
 
     #     if num_preload > 0:
@@ -129,7 +128,7 @@ class DockerManager:
 
                 logger.info(f"等待容器 {id} 服务就绪，检查 {ping_url}")
 
-                for attempt in range(max_retries):
+                for _ in range(max_retries):
                     try:
                         response = requests.get(ping_url, timeout=2)
                         if response.status_code == 200:

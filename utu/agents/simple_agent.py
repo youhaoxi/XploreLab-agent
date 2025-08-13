@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from contextlib import AsyncExitStack
-from typing import Any, Callable
+from typing import Any
 
 from agents import (
     Agent,
@@ -120,7 +121,7 @@ class SimpleAgent(BaseAgent):
         tools_list: list[Tool] = []
         tools_list += await self.env.get_tools()  # add env tools
         # TODO: handle duplicate tool names
-        for toolkit_name, toolkit_config in self.config.toolkits.items():
+        for _, toolkit_config in self.config.toolkits.items():
             if toolkit_config.mode == "mcp":
                 await self._load_mcp_server(toolkit_config)
             elif toolkit_config.mode == "builtin":

@@ -30,7 +30,7 @@ def get_toolkits() -> dict[str, AsyncBaseToolkit]:
 async def get_tools() -> dict[str, AnyFunction]:
     tools_fn = {}
     tools_agents = []
-    for name, toolkit in get_toolkits().items():
+    for _, toolkit in get_toolkits().items():
         tools_fn.update(await toolkit.get_tools_map())
         tools_agents.extend(await toolkit.get_tools_in_agents())
     save_tools_info(tools_agents)

@@ -1,5 +1,6 @@
 # import logging
-from typing import Any, Collection, cast
+from collections.abc import Collection
+from typing import Any, cast
 
 from openinference.instrumentation import OITracer, TraceConfig
 from openinference.instrumentation.openai_agents.package import _instruments

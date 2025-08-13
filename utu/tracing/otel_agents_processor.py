@@ -9,8 +9,9 @@ from __future__ import annotations
 import json
 import logging
 from collections import OrderedDict
-from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Iterable, Iterator, Mapping, Optional, Union
+from collections.abc import Iterable, Iterator, Mapping
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any, assert_never
 
 from agents import MCPListToolsSpanData
 from agents.tracing import Span, Trace, TracingProcessor
@@ -63,7 +64,6 @@ from opentelemetry.trace import (
     set_span_in_context,
 )
 from opentelemetry.util.types import AttributeValue
-from typing_extensions import assert_never
 
 logger = logging.getLogger(__name__)
 
@@ -186,7 +186,7 @@ class OpenInferenceTracingProcessor(TracingProcessor):
             if parent_node := self._reverse_handoffs_dict.pop(key, None):
                 otel_span.set_attribute(GRAPH_NODE_PARENT_ID, parent_node)
 
-        end_time: Optional[int] = None
+        end_time: int | None = None
         if span.ended_at:
             try:
                 end_time = _as_utc_nano(datetime.fromisoformat(span.ended_at))
@@ -207,7 +207,7 @@ class OpenInferenceTracingProcessor(TracingProcessor):
 
 
 def _as_utc_nano(dt: datetime) -> int:
-    return int(dt.astimezone(timezone.utc).timestamp() * 1_000_000_000)
+    return int(dt.astimezone(UTC).timestamp() * 1_000_000_000)
 
 
 def _get_span_name(obj: Span[Any]) -> str:
@@ -295,11 +295,7 @@ def _get_attributes_from_input(
 
 
 def _get_attributes_from_message_param(
-    obj: Union[
-        EasyInputMessageParam,
-        Message,
-        ResponseOutputMessageParam,
-    ],
+    obj: EasyInputMessageParam | Message | ResponseOutputMessageParam,
     prefix: str = "",
 ) -> Iterator[tuple[str, AttributeValue]]:
     yield f"{prefix}{MESSAGE_ROLE}", obj["role"]
@@ -352,7 +348,7 @@ def _get_attributes_from_mcp_list_tool_span_data(
 
 
 def _get_attributes_from_chat_completions_input(
-    obj: Optional[Iterable[Mapping[str, Any]]],
+    obj: Iterable[Mapping[str, Any]] | None,
 ) -> Iterator[tuple[str, AttributeValue]]:
     if not obj:
         return
@@ -368,7 +364,7 @@ def _get_attributes_from_chat_completions_input(
 
 
 def _get_attributes_from_chat_completions_output(
-    obj: Optional[Iterable[Mapping[str, Any]]],
+    obj: Iterable[Mapping[str, Any]] | None,
 ) -> Iterator[tuple[str, AttributeValue]]:
     if not obj:
         return
@@ -412,7 +408,7 @@ def _get_attributes_from_chat_completions_message_dicts(
 
 
 def _get_attributes_from_chat_completions_message_content(
-    obj: Union[str, Iterable[Mapping[str, Any]]],
+    obj: str | Iterable[Mapping[str, Any]],
     prefix: str = "",
 ) -> Iterator[tuple[str, AttributeValue]]:
     if isinstance(obj, str):
@@ -451,7 +447,7 @@ def _get_attributes_from_chat_completions_tool_call_dict(
 
 
 def _get_attributes_from_chat_completions_usage(
-    obj: Optional[Mapping[str, Any]],
+    obj: Mapping[str, Any] | None,
 ) -> Iterator[tuple[str, AttributeValue]]:
     if not obj:
         return
@@ -462,7 +458,7 @@ def _get_attributes_from_chat_completions_usage(
 
 
 # convert dict, tuple, etc into one of these types ['bool', 'str', 'bytes', 'int', 'float']
-def _convert_to_primitive(value: Any) -> Union[bool, str, bytes, int, float]:
+def _convert_to_primitive(value: Any) -> bool | str | bytes | int | float:
     if isinstance(value, (bool, str, bytes, int, float)):
         return value
     if isinstance(value, (list, tuple)):
@@ -486,7 +482,7 @@ def _get_attributes_from_function_span_data(
 
 
 def _get_attributes_from_message_content_list(
-    obj: Iterable[Union[ResponseInputContentParam, Content]],
+    obj: Iterable[ResponseInputContentParam | Content],
     prefix: str = "",
 ) -> Iterator[tuple[str, AttributeValue]]:
     for i, item in enumerate(obj):
@@ -523,7 +519,7 @@ def _get_attributes_from_response(obj: Response) -> Iterator[tuple[str, Attribut
 
 
 def _get_attributes_from_tools(
-    tools: Optional[Iterable[Tool]],
+    tools: Iterable[Tool] | None,
 ) -> Iterator[tuple[str, AttributeValue]]:
     if not tools:
         return
@@ -552,7 +548,7 @@ def _get_attributes_from_response_output(
     msg_idx: int = 0,
 ) -> Iterator[tuple[str, AttributeValue]]:
     tool_call_idx = 0
-    for i, item in enumerate(obj):
+    for _, item in enumerate(obj):
         if item.type == "message":
             prefix = f"{LLM_OUTPUT_MESSAGES}.{msg_idx}."
             yield from _get_attributes_from_message(item, prefix)
@@ -587,7 +583,7 @@ def _get_attributes_from_response_output(
 
 
 def _get_attributes_from_response_instruction(
-    instructions: Optional[str],
+    instructions: str | None,
 ) -> Iterator[tuple[str, AttributeValue]]:
     if not instructions:
         return
@@ -622,7 +618,7 @@ def _get_attributes_from_message(
 
 
 def _get_attributes_from_usage(
-    obj: Optional[ResponseUsage],
+    obj: ResponseUsage | None,
 ) -> Iterator[tuple[str, AttributeValue]]:
     if not obj:
         return

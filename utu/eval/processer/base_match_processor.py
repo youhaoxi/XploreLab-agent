@@ -34,7 +34,7 @@ class BaseMatchProcesser(BaseLLMJudgeProcesser):
 
             # compare each element as float or str
             comparisons = []
-            for ma_elem, gt_elem in zip(ma_elems, gt_elems):
+            for ma_elem, gt_elem in zip(ma_elems, gt_elems, strict=False):
                 if self._is_float(gt_elem):
                     normalized_ma_elem = self._normalize_number_str(ma_elem)
                     comparisons.append(normalized_ma_elem == float(gt_elem))

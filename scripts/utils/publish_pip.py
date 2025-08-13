@@ -64,7 +64,7 @@ def extract_project_info():
 
     try:
         # 使用toml库解析文件
-        with open(pyproject_file, "r") as f:
+        with open(pyproject_file) as f:
             pyproject_data = toml.load(f)
 
         name = pyproject_data.get("project", {}).get("name")

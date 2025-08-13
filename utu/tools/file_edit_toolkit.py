@@ -4,9 +4,9 @@ by @ianxxu
 
 import re
 import shutil
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
 
 from ..config import ToolkitConfig
 from ..utils import get_logger
@@ -96,7 +96,7 @@ class FileEditToolkit(AsyncBaseToolkit):
         self._create_backup(resolved_path)
 
         try:
-            with open(resolved_path, "r", encoding=self.default_encoding) as f:
+            with open(resolved_path, encoding=self.default_encoding) as f:
                 content = f.read()
             modified_content = content
             pattern = r"<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE"

@@ -23,7 +23,7 @@ def upload_dataset(file_path: str, dataset_name: str):
     with Session(engine) as session:
         print(f"Uploading datapoints from {file_path} to dataset '{dataset_name}'...")
 
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             for i, line in enumerate(f):
                 try:
                     data: dict = json.loads(line.strip())

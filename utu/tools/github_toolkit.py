@@ -2,7 +2,7 @@
 https://docs.github.com/en/rest?apiVersion=2022-11-28
 """
 
-from typing import Callable
+from collections.abc import Callable
 from urllib.parse import urlparse
 
 import requests

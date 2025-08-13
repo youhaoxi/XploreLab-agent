@@ -205,10 +205,8 @@ class ReactConverter:
             except json.JSONDecodeError:
                 try:
                     action = eval(text_output)
-                except SyntaxError:
-                    raise ValueError(f"Invalid action: {text_output}")
-                except Exception:
-                    raise ValueError(f"Invalid action: {text_output}")
+                except Exception as e:
+                    raise ValueError(f"Invalid action: {text_output}") from e
             assert "name" in action and "arguments" in action
             function = Function(name=action["name"], arguments=json.dumps(action["arguments"], ensure_ascii=False))
             message = ChatCompletionMessage(

@@ -40,7 +40,7 @@ class DataManager(BaseDataManager):
         """Load raw data from the specified dataset."""
         data_path = self._get_data_path()
         samples = []
-        with open(data_path, "r", encoding="utf-8") as f:
+        with open(data_path, encoding="utf-8") as f:
             for line in f:
                 data = json.loads(line.strip())
                 # assert "source" in data, f"Missing source in data: {data}"

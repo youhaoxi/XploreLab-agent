@@ -1,5 +1,6 @@
 import os
-from typing import Any, Callable, Dict, Optional
+from collections.abc import Callable
+from typing import Any
 
 import httpx
 
@@ -12,14 +13,14 @@ class SerperToolkit(AsyncBaseToolkit):
     A toolkit for interacting with the Serper API (google.serper.dev).
     """
 
-    def __init__(self, config: Optional[ToolkitConfig] = None) -> None:
+    def __init__(self, config: ToolkitConfig | None = None) -> None:
         super().__init__(config)
         self.api_key = os.getenv("SERPER_API_KEY")
         if not self.api_key:
             raise ValueError("SERPER_API_KEY environment variable is required")
         self.async_client = httpx.AsyncClient()
 
-    async def _search(self, endpoint: str, payload: dict) -> Dict[str, Any]:
+    async def _search(self, endpoint: str, payload: dict) -> dict[str, Any]:
         """
         Helper function to make requests to the Serper API.
         """
@@ -41,8 +42,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search the web using Google Search.
 
@@ -81,7 +82,7 @@ class SerperToolkit(AsyncBaseToolkit):
 
     async def autocomplete(
         self, query: str, location: str = "China", gl: str = "cn", hl: str = "zh-cn"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get autocomplete suggestions for a given query.
 
@@ -110,7 +111,7 @@ class SerperToolkit(AsyncBaseToolkit):
             "status": "success",
         }
 
-    async def google_lens(self, url: str, gl: str = "cn", hl: str = "zh-cn", num: int = 10) -> Dict[str, Any]:
+    async def google_lens(self, url: str, gl: str = "cn", hl: str = "zh-cn", num: int = 10) -> dict[str, Any]:
         """
         Analyze an image using Google Lens.
 
@@ -145,8 +146,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search for images using Google Images.
 
@@ -182,13 +183,13 @@ class SerperToolkit(AsyncBaseToolkit):
         self,
         query: str,
         hl: str = "zh-cn",
-        latitude: Optional[float] = None,
-        longitude: Optional[float] = None,
-        zoom: Optional[int] = 18,
-        place_id: Optional[str] = None,
-        cid: Optional[str] = None,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        zoom: int | None = 18,
+        place_id: str | None = None,
+        cid: str | None = None,
         num: int = 10,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Search for locations using Google Maps.
 
@@ -242,8 +243,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search for news articles using Google News.
 
@@ -285,8 +286,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search for places using Google Places.
 
@@ -321,7 +322,7 @@ class SerperToolkit(AsyncBaseToolkit):
 
     async def scholar_search(
         self, query: str, location: str = "China", gl: str = "cn", hl: str = "zh-cn", num: int = 10
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Search for academic papers using Google Scholar.
 
@@ -365,8 +366,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search for videos using Google Videos.
 

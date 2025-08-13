@@ -32,7 +32,7 @@ def setup_phoenix_tracing(
     endpoint = endpoint or os.getenv("PHOENIX_ENDPOINT")
     project_name = project_name or os.getenv("PHOENIX_PROJECT_NAME")
     if not endpoint or not project_name:
-        warnings.warn("PHOENIX_ENDPOINT or PHOENIX_PROJECT_NAME is not set")
+        warnings.warn("PHOENIX_ENDPOINT or PHOENIX_PROJECT_NAME is not set", stacklevel=2)
         return
     PHOENIX_TRACING_PROVIDER = register(
         endpoint=endpoint,

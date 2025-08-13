@@ -1,7 +1,7 @@
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any, TypeAlias
 
 from pydantic import BaseModel
-from typing_extensions import TypeAlias
 
 ReprArgs: TypeAlias = Iterable[tuple[str | None, Any]]
 

@@ -1,12 +1,11 @@
 import socket
-from typing import Optional, Set
 
 
 class PortManager:
     def __init__(self, port_range: tuple = (9000, 9999)):
         self.port_start, self.port_end = port_range
-        self.used_ports: Set[int] = set()
-        self.reserved_ports: Set[int] = set()
+        self.used_ports: set[int] = set()
+        self.reserved_ports: set[int] = set()
 
     def is_port_available(self, port: int) -> bool:
         try:
@@ -17,7 +16,7 @@ class PortManager:
         except Exception:
             return False
 
-    def allocate_port(self) -> Optional[int]:
+    def allocate_port(self) -> int | None:
         for port in range(self.port_start, self.port_end + 1):
             if port not in self.used_ports and port not in self.reserved_ports:
                 if self.is_port_available(port):

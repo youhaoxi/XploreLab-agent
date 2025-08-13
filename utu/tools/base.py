@@ -1,5 +1,5 @@
 import abc
-from typing import Callable
+from collections.abc import Callable
 
 import mcp.types as types
 from agents import FunctionTool, function_tool
@@ -64,7 +64,7 @@ class AsyncBaseToolkit(abc.ABC):
         """Convert tools to @agents format."""
         tools_map = await self.get_tools_map_func()
         tools = []
-        for tool_name, tool in tools_map.items():
+        for _, tool in tools_map.items():
             tools.append(
                 function_tool(
                     tool,
@@ -100,7 +100,7 @@ class AsyncBaseToolkit(abc.ABC):
     def get_tools_in_agents_sync(self) -> list[FunctionTool]:
         tools_map = self.get_tools_map_sync()
         tools = []
-        for tool_name, tool in tools_map.items():
+        for _, tool in tools_map.items():
             tools.append(
                 function_tool(
                     tool,

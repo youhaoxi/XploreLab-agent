@@ -5,7 +5,7 @@ import os
 import pathlib
 import time
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Literal
 
 from sqlmodel import Session, create_engine, select
 
@@ -24,7 +24,7 @@ engine = create_engine(
 
 
 def async_file_cache(
-    cache_dir: str | pathlib.Path = DIR_CACHE, expire_time: Optional[int] = None, mode: Literal["db", "file"] = "db"
+    cache_dir: str | pathlib.Path = DIR_CACHE, expire_time: int | None = None, mode: Literal["db", "file"] = "db"
 ):
     """Decorator to cache async function results to local files.
     Args:
@@ -46,7 +46,7 @@ def async_file_cache(
             cache_file.parent.mkdir(exist_ok=True, parents=True)
 
             if cache_file.exists():
-                with open(cache_file, "r") as f:
+                with open(cache_file) as f:
                     cache_data = json.load(f)
 
                 if expire_time is None or (time.time() - cache_data["metadata"]["timestamp"]) < expire_time:

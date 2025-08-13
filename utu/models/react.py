@@ -2,7 +2,7 @@
 doc: https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNRgjuRgV7TQ2phu2p?scode=AJEAIQdfAAoS38Jv0GAcMATAZtAPI
 """
 
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
 
 from agents import (
     AgentOutputSchema,

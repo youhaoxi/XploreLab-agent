@@ -2,7 +2,7 @@
 https://github.com/lumina-ai-inc/chunkr
 """
 
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from chunkr_ai import Chunkr
 from chunkr_ai.models import Configuration
@@ -67,7 +67,7 @@ class DocumentToolkit(AsyncBaseToolkit):
         self.md5_to_path[md5] = path  # record md5 to map
         return md5
 
-    async def document_qa(self, document_path: str, question: Optional[str] = None) -> str:
+    async def document_qa(self, document_path: str, question: str | None = None) -> str:
         """Get file content summary or answer questions about attached document.
         Supported file types: pdf, docx, pptx, xlsx, xls, ppt, doc
 

@@ -3,7 +3,7 @@ https://github.com/googleapis/python-genai
 https://ai.google.dev/gemini-api/docs/api-key
 """
 
-from typing import Callable
+from collections.abc import Callable
 
 from google import genai
 from google.genai.types import HttpOptions, Part

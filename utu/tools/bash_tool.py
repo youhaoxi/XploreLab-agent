@@ -15,7 +15,7 @@ Run commands in a bash shell\n
 """
 
 import re
-from typing import Callable
+from collections.abc import Callable
 
 import pexpect
 

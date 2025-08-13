@@ -54,7 +54,7 @@ class PlannerAgent:
             examples_path = pathlib.Path(examples_path)
         else:
             examples_path = pathlib.Path(__file__).parent / "data" / "planner_examples.json"
-        with open(examples_path, "r", encoding="utf-8") as f:
+        with open(examples_path, encoding="utf-8") as f:
             return json.load(f)
 
     def _load_available_agents(self) -> list[AgentInfo]:

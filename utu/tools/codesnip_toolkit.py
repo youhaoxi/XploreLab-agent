@@ -3,7 +3,7 @@ https://github.com/bytedance/SandboxFusion
 https://bytedance.github.io/SandboxFusion/docs/docs/get-started
 """
 
-from typing import Callable
+from collections.abc import Callable
 
 import requests
 

@@ -27,7 +27,7 @@ class XBenchProcesser(BaseLLMJudgeProcesser):
             else:
                 level_bin[level]["wrong"] += 1
         # calculate overall metrics
-        for level, counts in level_bin.items():
+        for _, counts in level_bin.items():
             total = counts["correct"] + counts["wrong"]
             if total > 0:
                 counts["accuracy"] = round(counts["correct"] / total * 100, 4)

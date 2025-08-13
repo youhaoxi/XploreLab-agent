@@ -17,5 +17,5 @@ def get_jinja_env(directory: str) -> Environment:
 
 
 def get_jinja_template(template_path: str) -> Template:
-    with open(template_path, "r", encoding="utf-8") as f:
+    with open(template_path, encoding="utf-8") as f:
         return Template(f.read())

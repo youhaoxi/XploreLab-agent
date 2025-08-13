@@ -39,7 +39,7 @@ async def test_get_content(search_toolkit: SearchToolkit):
 
 
 async def test_cache(search_toolkit: SearchToolkit):
-    for i in range(2):
+    for _ in range(2):
         res = await search_toolkit.get_content(test_url)
         hash = hashlib.md5(res.encode()).hexdigest()
         print(hash)

@@ -4,7 +4,7 @@ from typing import Any
 from .common import TaskRecorder
 
 
-class BaseAgent(abc.ABC):
+class BaseAgent:
     @abc.abstractmethod
     async def run(self, input: Any, trace_id: str = None, **kwargs) -> TaskRecorder:
         raise NotImplementedError

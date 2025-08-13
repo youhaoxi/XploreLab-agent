@@ -27,7 +27,7 @@ def convert_data(data: dict) -> ToolCacheModel:
 
 # walk through DIR_CACHE
 total = 0
-for root, dirs, files in os.walk(DIR_CACHE):
+for root, _, files in os.walk(DIR_CACHE):
     for file in files:
         if file.endswith(".json"):
             cached_data = json.load(open(os.path.join(root, file)))

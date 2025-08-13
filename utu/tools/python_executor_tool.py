@@ -162,7 +162,7 @@ class PythonExecutorTool(AsyncBaseToolkit):
                 ),
                 timeout=timeout,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return {
                 "success": False,
                 "message": f"Code execution timed out ({timeout} seconds)",

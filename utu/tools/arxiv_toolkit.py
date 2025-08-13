@@ -6,7 +6,7 @@ https://info.arxiv.org/help/api/index.html
 https://github.com/lukasschwab/arxiv.py
 """
 
-from typing import Callable, Dict, Generator, List, Optional
+from collections.abc import Callable, Generator
 
 import arxiv
 
@@ -25,8 +25,8 @@ class ArxivToolkit(AsyncBaseToolkit):
     def _get_search_results(
         self,
         query: str,
-        paper_ids: Optional[List[str]] = None,
-        max_results: Optional[int] = 5,
+        paper_ids: list[str] | None = None,
+        max_results: int | None = 5,
     ) -> Generator[arxiv.Result, None, None]:
         paper_ids = paper_ids or []
         search_query = arxiv.Search(
@@ -40,9 +40,9 @@ class ArxivToolkit(AsyncBaseToolkit):
     async def search_papers(
         self,
         query: str,
-        paper_ids: Optional[List[str]] = None,
-        max_results: Optional[int] = 5,
-    ) -> List[Dict[str, str]]:
+        paper_ids: list[str] | None = None,
+        max_results: int | None = 5,
+    ) -> list[dict[str, str]]:
         r"""Searches for academic papers on arXiv using a query string and optional paper IDs.
 
         Args:
@@ -92,9 +92,9 @@ class ArxivToolkit(AsyncBaseToolkit):
     async def download_papers(
         self,
         query: str,
-        paper_ids: Optional[List[str]] = None,
-        max_results: Optional[int] = 5,
-        output_dir: Optional[str] = "./",
+        paper_ids: list[str] | None = None,
+        max_results: int | None = 5,
+        output_dir: str | None = "./",
     ) -> str:
         r"""Downloads PDFs of academic papers from arXiv based on the provided query.
 

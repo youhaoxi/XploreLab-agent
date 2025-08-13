@@ -1,4 +1,3 @@
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -17,7 +16,7 @@ class AgentInfo(BaseModel):
 class Subtask(BaseModel):
     agent_name: str
     task: str
-    completed: Optional[bool] = None
+    completed: bool | None = None
 
 
 class CreatePlanResult(BaseModel):
@@ -79,6 +78,6 @@ class OrchestraTaskRecorder(TaskRecorder):
         return "\n".join(
             [
                 f"<subtask>{t.task}</subtask>\n<output>{r.output}</output>"
-                for i, (r, t) in enumerate(zip(self.task_records, self.plan.todo), 1)
+                for i, (r, t) in enumerate(zip(self.task_records, self.plan.todo, strict=False), 1)
             ]
         )

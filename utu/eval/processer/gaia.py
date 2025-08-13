@@ -48,7 +48,7 @@ class GAIAProcesser(BaseLLMJudgeProcesser):
                     "\n\nYou have been given a zip archive of supporting files. We extracted it into a directory: "
                     "find the extracted files at the following paths:\n"
                 )
-                for root, dirs, files in os.walk(folder_name):
+                for root, _, files in os.walk(folder_name):
                     for file in files:
                         file_path = os.path.join(root, file)
                         prompt_use_files += f"- {file_path}\n"

@@ -39,7 +39,7 @@ class MetricsUtils:
                 level_bin[level]["correct"] += 1
             else:
                 level_bin[level]["wrong"] += 1
-        for level, counts in level_bin.items():
+        for _, counts in level_bin.items():
             total = counts["correct"] + counts["wrong"]
             if total > 0:
                 counts["accuracy"] = round(counts["correct"] / total * 100, 4)
@@ -52,9 +52,10 @@ class MetricsUtils:
     @staticmethod
     def calculate_calibration(
         samples: list[EvaluationSample],
-        CONFIDENCE_BINS: list[tuple[int, int]] = [(0, 20), (20, 40), (40, 60), (60, 80), (80, 101)],
+        CONFIDENCE_BINS: list[tuple[int, int]] = None,
     ) -> dict:
         """Calculate calibration statistics"""
+        CONFIDENCE_BINS = CONFIDENCE_BINS or [(0, 20), (20, 40), (40, 60), (60, 80), (80, 101)]
         calibration = [{"samples": 0, "correct": 0, "conf_sum": 0} for _ in CONFIDENCE_BINS]
         for record in samples:
             if record.judged_response == "invalid":
