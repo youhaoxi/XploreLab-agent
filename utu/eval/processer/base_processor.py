@@ -36,4 +36,4 @@ class BaseProcesser:
 
     async def stat(self, samples: list[EvaluationSample]) -> dict:
         metrics = self.calculate_metrics(samples)
-        return dict(benchmark=self.name, metrics=metrics)
+        return {"benchmark": self.name, "metrics": metrics}

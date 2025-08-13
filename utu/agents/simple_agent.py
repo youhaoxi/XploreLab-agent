@@ -173,14 +173,14 @@ class SimpleAgent(BaseAgent):
         logger.info(f"> trace_id: {trace_id}")
 
         task_recorder = TaskRecorder(input, trace_id)
-        run_kwargs = dict(
-            starting_agent=self.current_agent,
-            input=input,
-            context=self._get_context(),
-            max_turns=self.config.max_turns,
-            hooks=self._run_hooks,
-            run_config=self._get_run_config(),
-        )
+        run_kwargs = {
+            "starting_agent": self.current_agent,
+            "input": input,
+            "context": self._get_context(),
+            "max_turns": self.config.max_turns,
+            "hooks": self._run_hooks,
+            "run_config": self._get_run_config(),
+        }
         if AgentsUtils.get_current_trace():
             run_result = await Runner.run(**run_kwargs)
         else:
@@ -195,14 +195,14 @@ class SimpleAgent(BaseAgent):
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
-        run_kwargs = dict(
-            starting_agent=self.current_agent,
-            input=input,
-            context=self._get_context(),
-            max_turns=self.config.max_turns,
-            hooks=self._run_hooks,
-            run_config=self._get_run_config(),
-        )
+        run_kwargs = {
+            "starting_agent": self.current_agent,
+            "input": input,
+            "context": self._get_context(),
+            "max_turns": self.config.max_turns,
+            "hooks": self._run_hooks,
+            "run_config": self._get_run_config(),
+        }
         if AgentsUtils.get_current_trace():
             return Runner.run_streamed(**run_kwargs)
         else:
