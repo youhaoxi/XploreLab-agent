@@ -16,7 +16,7 @@ def count() -> int:
 
 
 queries = [
-    "Use the count tool for 20 times, and give me the sum of the results. Note that you can only use one tool per turn.",
+    "Use the count tool for 20 times, and give me the sum of the results. You can only use one tool per turn.",
 ]
 
 

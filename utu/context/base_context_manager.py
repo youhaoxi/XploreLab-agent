@@ -1,7 +1,7 @@
 from agents import RunContextWrapper, TContext, TResponseInputItem
 from agents.run import SingleStepResult
 
-from ..utils import ChatCompletionConverter, get_logger
+from ..utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -24,6 +24,3 @@ class DummyContextManager(BaseContextManager):
     ) -> str | list[TResponseInputItem]:
         # return ChatCompletionConverter.filter_items(input)
         return input
-
-    # def process(self, single_step_result: SingleStepResult, run_context: RunContextWrapper[TContext]=None) -> SingleStepResult:
-    #     return single_step_result

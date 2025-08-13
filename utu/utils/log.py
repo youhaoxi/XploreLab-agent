@@ -73,6 +73,6 @@ def get_logger(name: str) -> logging.Logger:
 def oneline_object(obj: object, limit: int = 100) -> str:
     try:
         s = json.dumps(obj, ensure_ascii=False)
-    except:
+    except TypeError:
         s = json.dumps(str(obj), ensure_ascii=False)
     return f"{s[:limit]}..." if len(s) > limit else s

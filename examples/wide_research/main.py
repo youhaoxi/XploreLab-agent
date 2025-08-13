@@ -1,3 +1,6 @@
+# pylint: disable=line-too-long
+# ruff: noqa: E501
+
 import asyncio
 
 from agents import function_tool

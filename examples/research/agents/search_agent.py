@@ -21,5 +21,4 @@ search_agent = SimpleAgent(
     name="Search agent",
     instructions=INSTRUCTIONS,
     tools=get_tools(),
-    # model_settings=ModelSettingsConfig(tool_choice="required"),  # "Only 'auto' tool_choice is supported in response API None"
 )

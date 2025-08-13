@@ -98,14 +98,14 @@ class OpenAIUtils:
                 case "local_shell_call":
                     PrintUtils.print_info(f"<{item.type}>(action={item.action})")
                 case "mcp_list_tools":
-                    PrintUtils.print_info(f"<{item.type}>(server_label={item.server_label}) -> {item.tools}")
+                    PrintUtils.print_info(f"<{item.type}>(server={item.server_label}) -> {item.tools}")
                 case "mcp_call":
                     PrintUtils.print_info(
-                        f"<{item.type}>(server_label={item.server_label}) {item.name}({item.arguments}) -> {item.output}"
+                        f"<{item.type}>(server={item.server_label}) {item.name}({item.arguments}) -> {item.output}"
                     )
                 case "mcp_approval_request":
                     PrintUtils.print_info(
-                        f"<{item.type}>(server_label={item.server_label}) {item.name}({item.arguments})"
+                        f"<{item.type}>(server={item.server_label}) {item.name}({item.arguments})"
                     )
                 case _:
                     PrintUtils.print_error(f"Unknown item type: {item.type}\n{item}")

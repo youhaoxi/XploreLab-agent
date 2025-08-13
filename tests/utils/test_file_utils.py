@@ -6,10 +6,10 @@ local_url = "/Users/frankshi/Downloads/02.mp3"
 
 def test_ext():
     assert FileUtils.get_file_ext(web_url) == ".mp3"
-    assert FileUtils.is_web_url(web_url) == True
+    assert FileUtils.is_web_url(web_url)
 
     assert FileUtils.get_file_ext(local_url) == ".mp3"
-    assert FileUtils.is_web_url(local_url) == False
+    assert not FileUtils.is_web_url(local_url)
 
 
 def test_md5():

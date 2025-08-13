@@ -100,6 +100,3 @@ class MCPClient:
 
     # async def list_tools(self) -> types.ListToolsResult:
     #     return await self.session.list_tools()
-
-    # async def call_tool(self, name: str, arguments: dict[str, Any] | None = None, read_timeout_seconds: timedelta | None = None) -> types.CallToolResult:
-    #     return await self.session.call_tool(name, arguments, read_timeout_seconds)

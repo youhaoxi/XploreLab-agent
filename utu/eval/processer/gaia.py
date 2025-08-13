@@ -36,7 +36,10 @@ class GAIAProcesser(BaseLLMJudgeProcesser):
                 shutil.unpack_archive(file_name, folder_name)
 
                 # Convert the extracted files
-                prompt_use_files = "\n\nYou have been given a zip archive of supporting files. We extracted it into a directory: find the extracted files at the following paths:\n"
+                prompt_use_files = (
+                    "\n\nYou have been given a zip archive of supporting files. We extracted it into a directory: "
+                    "find the extracted files at the following paths:\n"
+                )
                 for root, dirs, files in os.walk(folder_name):
                     for file in files:
                         file_path = os.path.join(root, file)

@@ -3,7 +3,7 @@
 """
 
 import asyncio
-import json
+import pathlib
 
 import jinja2
 from openai.types.chat import (
@@ -12,7 +12,7 @@ from openai.types.chat import (
     ChatCompletionToolParam,
 )
 
-from utu.utils import SimplifiedAsyncOpenAI
+from utu.utils import SimplifiedAsyncOpenAI, get_jinja_template
 
 simplified_openai = SimplifiedAsyncOpenAI()
 jinja_env = jinja2.Environment()
@@ -35,7 +35,7 @@ tools: dict[str, ChatCompletionToolParam] = {
         "type": "function",
         "function": {
             "name": "search_google_api",
-            "description": "Search the query via Google api, the query should be a search query like humans search in Google, concrete and not vague or super long. More the single most important items.",
+            "description": "Search the query via Google api, the query should be a search query like humans search in Google, concrete and not vague or super long. More the single most important items.",  # pylint: disable=line-too-long
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -106,7 +106,9 @@ tasks_multi = [
                             {
                                 "id": "2",
                                 "title": "Introducing smolagents: A Lightweight Library for Building ...",
-                                "url": "https://medium.com/thedeephub/introducing-smolagents-a-lightweight-library-for-building-powerful-agents-a8791a60b5b1",
+                                "url": (
+                                    "https://medium.com/thedeephub/introducing-smolagents-a-lightweight-library-for-building-powerful-agents-a8791a60b5b1"  # pylint: disable=line-too-long
+                                ),
                             },
                         ]
                     }
@@ -130,7 +132,7 @@ def process_messages(messages: list[ChatCompletionMessageParam]) -> list[ChatCom
     for message in messages:
         if message["role"] == "tool":
             content = f"Observation: {message['content']}"
-            # Constraint from openai SDK: the message before role="tool" must be role="assistant" with corresponding tool_call
+            # from openai SDK: the message before role="tool" must be role="assistant" with corresponding tool_call
             result.append({"role": "user", "content": content})
         elif message["role"] == "assistant":
             # FIXME: content? no-FC?
@@ -150,75 +152,12 @@ def process_messages(messages: list[ChatCompletionMessageParam]) -> list[ChatCom
 
 
 # from https://github.com/huggingface/smolagents/blob/main/src/smolagents/prompts/toolcalling_agent.yaml
-TEMPLATE = r"""
-You are an expert assistant who can solve any task using tool calls. You will be given a task to solve as best you can.
-To do so, you have been given access to some tools.
-
-The tool call you write is an action: after the tool is executed, you will get the result of the tool call as an "observation".
-This Action/Observation can repeat N times, you should take several steps when needed.
-
-Here are a few examples using notional tools:
----
-Task: "Generate an image of the oldest person in this document."
-
-Action:
-{
-    "name": "document_qa",
-    "arguments": {"document": "document.pdf", "question": "Who is the oldest person mentioned?"}
-}
-Observation: "The oldest person in the document is John Doe, a 55 year old lumberjack living in Newfoundland."
-
-Action:
-{
-    "name": "image_generator",
-    "arguments": {"prompt": "A portrait of John Doe, a 55-year-old man living in Canada."}
-}
-Observation: "image.png"
-
-Action:
-{
-    "name": "final_answer",
-    "arguments": "image.png"
-}
-
----
-Task: "What is the result of the following operation: 5 + 3 + 1294.678?"
-
-Action:
-{
-    "name": "python_interpreter",
-    "arguments": {"code": "5 + 3 + 1294.678"}
-}
-Observation: 1302.678
-
-Action:
-{
-    "name": "final_answer",
-    "arguments": "1302.678"
-}
-
-Above example were using notional tools that might not exist for you. You only have access to these tools:
-{%- for tool in tools %}
-- {{ tool.function.name }}: {{ tool.function.description }}
-    Takes inputs: {{tool.function.parameters}}
-{%- endfor %}
-
-{%- if managed_agents and managed_agents.values() | list %}
-You can also give tasks to team members.
-Calling a team member works the same as for calling a tool: simply, the only argument you can give in the call is 'task', a long string explaining your task.
-Given that this team member is a real human, you should be very verbose in your task.
-Here is a list of the team members that you can call:
-{%- for agent in managed_agents.values() %}
-- {{ agent.name }}: {{ agent.description }}
-{%- endfor %}
-{%- endif %}
-""".strip()
+TEMPLATE = get_jinja_template(pathlib.Path(__file__).parent / "react_sp.j2")
 
 
 def process(task: dict) -> dict:
     # 1. sp
-    template = jinja_env.from_string(TEMPLATE)
-    sp = template.render(tools=task["tools"])
+    sp = TEMPLATE.render(tools=task["tools"])
     # 2. messages
     messages = process_messages(task["messages"])
     return {"messages": [{"role": "system", "content": sp}, *messages], "stop": ["Observation:"]}

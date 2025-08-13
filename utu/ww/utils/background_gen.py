@@ -1,4 +1,5 @@
-"""from @ian"""
+# pylint: disable=line-too-long
+# ruff: noqa: E501
 
 import asyncio
 import json
