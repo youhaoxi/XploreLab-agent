@@ -50,7 +50,7 @@ class ImageToolkit(AsyncBaseToolkit):
             logger.debug(f"Loading local image: {image_path}")
             try:
                 image = Image.open(image_path).convert("RGB")
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logger.error(f"Image loading failed: {e}")
                 raise ValueError(f"Invalid image file: {image_path}") from e
         # Convert the image to a base64 string

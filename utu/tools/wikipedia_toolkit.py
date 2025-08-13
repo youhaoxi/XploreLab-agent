@@ -79,7 +79,7 @@ class WikipediaSearchTool(AsyncBaseToolkit):
 
             return f"✅ **Wikipedia Page:** {title}\n\n**Content:** {text}\n\n🔗 **Read more:** {url}"
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             return f"Error fetching Wikipedia summary: {str(e)}"
 
     async def search_wikipedia_revisions(self, entity: str, year: int, month: int) -> str:

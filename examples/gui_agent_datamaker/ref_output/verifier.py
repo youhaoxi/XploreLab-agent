@@ -34,8 +34,7 @@ def verify(file_path: str) -> int:
     return 1
 
 
-# 测试验证脚本
-if __name__ == "__main__":
+def main():
     # 测试初始文件（应返回0）
     initial_result = verify("3/Dublin_Zoo_Intro.docx")
     print(f"初始文件验证结果: {initial_result} (应为0)")
@@ -43,3 +42,8 @@ if __name__ == "__main__":
     # 测试期待文件（应返回1）
     expected_result = verify("expected.docx")
     print(f"期待文件验证结果: {expected_result} (应为1)")
+
+
+if __name__ == "__main__":
+    main()
+

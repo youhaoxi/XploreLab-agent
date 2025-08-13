@@ -7,10 +7,10 @@ import pathlib
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
 
-instructions = """You are an expert in agentic data construction and verification.
+INSTRUCTION = """You are an expert in agentic data construction and verification.
 You should used tools to generate files that meet the user's requirements."""
 
-_verify_fn = r"""def compare_font_names(docx_file, rules: List[Dict[str, Any]]):
+VERIFY_FN = r"""def compare_font_names(docx_file, rules: List[Dict[str, Any]]):
     \"\"\"
     检查DOCX文档中所有文本是否使用指定字体
 
@@ -52,7 +52,7 @@ query = f"""背景：我需要构造大量数据用于训练我的gui agent，�
 
 这是参考的验证函数:
 ```py
-{_verify_fn}
+{VERIFY_FN}
 ```
 
 下面, 开始任务!
@@ -66,7 +66,7 @@ async def main():
     workspace_path = pathlib.Path(__file__).parent / "data"
     config.toolkits["bash"].config["workspace_root"] = str(workspace_path)
 
-    async with SimpleAgent(config=config, name="gui-agent-toolmaker", instructions=instructions) as agent:
+    async with SimpleAgent(config=config, name="gui-agent-toolmaker", instructions=INSTRUCTION) as agent:
         await agent.chat_streamed(query)
 
 

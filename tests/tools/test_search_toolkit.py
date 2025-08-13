@@ -21,12 +21,12 @@ async def test_tool_schema(search_toolkit: SearchToolkit):
 
 
 # test filter of huggingface.co
-test_query = "Illuvium Zero testnet launch date iOS Google Play"
-test_query = "南京工业大学计算机与信息工程学院 更名 报道"
+# TEST_QUERY = "Illuvium Zero testnet launch date iOS Google Play"
+TEST_QUERY = "南京工业大学计算机与信息工程学院 更名 报道"
 
 
 async def test_search_google_api(search_toolkit: SearchToolkit):
-    result = await search_toolkit.search_google_api(test_query, num_results=10)
+    result = await search_toolkit.search_google_api(TEST_QUERY, num_results=10)
     print(result)
 
 

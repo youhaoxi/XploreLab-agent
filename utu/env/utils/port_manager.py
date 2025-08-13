@@ -13,7 +13,7 @@ class PortManager:
                 sock.settimeout(1)
                 result = sock.connect_ex(("localhost", port))
                 return result != 0
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             return False
 
     def allocate_port(self) -> int | None:

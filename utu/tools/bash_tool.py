@@ -103,7 +103,7 @@ class BashTool(AsyncBaseToolkit):
         try:
             echo_result = run_command(self.child, self.custom_prompt, "echo hello")
             assert echo_result.strip() == "hello"
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self.child, self.custom_prompt = start_persistent_shell(self.timeout)
 
         # 3) Execute the command and capture output
@@ -114,7 +114,7 @@ class BashTool(AsyncBaseToolkit):
                     "command output": result,
                 }
             )
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             return str(
                 {
                     "error": str(e),

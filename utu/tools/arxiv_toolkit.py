@@ -113,7 +113,7 @@ class ArxivToolkit(AsyncBaseToolkit):
             for paper in search_results:
                 paper.download_pdf(dirpath=output_dir, filename=f"{paper.title}" + ".pdf")
             return "papers downloaded successfully"
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             return f"An error occurred: {e}"
 
     async def get_tools_map(self) -> dict[str, Callable]:

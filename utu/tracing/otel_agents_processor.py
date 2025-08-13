@@ -355,7 +355,7 @@ def _get_attributes_from_chat_completions_input(
     try:
         yield INPUT_VALUE, safe_json_dumps(obj)
         yield INPUT_MIME_TYPE, JSON
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         pass
     yield from _get_attributes_from_chat_completions_message_dicts(
         obj,
@@ -371,7 +371,7 @@ def _get_attributes_from_chat_completions_output(
     try:
         yield OUTPUT_VALUE, safe_json_dumps(obj)
         yield OUTPUT_MIME_TYPE, JSON
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         pass
     yield from _get_attributes_from_chat_completions_message_dicts(
         obj,

@@ -14,7 +14,7 @@ from utu.tracing import setup_phoenix_tracing
 
 setup_phoenix_tracing(project_name="test_phoenix")
 
-test_len = 100_000
+TEST_LEN = 100_000
 
 
 async def mock_function(output_len: int):
@@ -49,8 +49,8 @@ async def exp(idx: int = 0):
     ):
         with agent_span("agent"):
             # span_agent.start(mark_as_current=True)  # mark start
-            await mock_llm(input_len=test_len)
-            await mock_function(output_len=test_len)
+            await mock_llm(input_len=TEST_LEN)
+            await mock_function(output_len=TEST_LEN)
             # span_agent.finish(reset_current=True)
         return f"Finished {idx}"
 

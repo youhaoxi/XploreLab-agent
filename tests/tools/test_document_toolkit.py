@@ -10,15 +10,15 @@ def document_toolkit() -> DocumentToolkit:
     return DocumentToolkit(config=config)
 
 
-document_url1 = "https://arxiv.org/pdf/2107.14339.pdf"
-document_path = "/Users/frankshi/LProjects/Agents/uTu-agent/data/gaia/files/3cc53dbf-1ab9-4d21-a56a-fc0151c10f89.xlsx"
+DOCUMENT_URL = "https://arxiv.org/pdf/2107.14339.pdf"
+DOCUMENT_PATH = "/Users/frankshi/LProjects/Agents/uTu-agent/data/gaia/files/3cc53dbf-1ab9-4d21-a56a-fc0151c10f89.xlsx"
 tasks = (
     (
-        document_url1,
+        DOCUMENT_URL,
         "There is a diagram of an X-ray time profile in this document. How long is the time profile (in seconds)?",
     ),
-    (document_url1,),
-    (document_path,),
+    (DOCUMENT_URL,),
+    (DOCUMENT_PATH,),
 )
 
 

@@ -111,7 +111,7 @@ def _execute_python_code_sync(code: str, workdir: str):
             "files": new_files,
             "error": stderr_result.strip() if stderr_result.strip() else "",
         }
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         return {
             "success": False,
             "message": f"Code execution failed, error message:\n{str(e)}",

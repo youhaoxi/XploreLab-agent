@@ -52,7 +52,7 @@ class BrowserEnv(BaseEnv):
                             return f"Error: {res.content[0].text}"
                         self.browser_state = res.content[1].text  # DISCUSS: record the web actions?
                         return res.content[0].text
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     logger.error(f"except: {e}", exc_info=True)
                     return f"Error: {e}"
 

@@ -45,7 +45,7 @@ async def test_get_repo_info(github_toolkit: GitHubToolkit):
     print(result)
 
 
-diff = """<<<<<<< SEARCH
+DIFF = """<<<<<<< SEARCH
 line 1
 =======
 line 1 edited!
@@ -53,7 +53,7 @@ line 1 edited!
 
 
 async def test_edit_file(file_edit_toolkit: FileEditToolkit):
-    result = await file_edit_toolkit.edit_file("test.txt", diff)
+    result = await file_edit_toolkit.edit_file("test.txt", DIFF)
     print(result)
 
 

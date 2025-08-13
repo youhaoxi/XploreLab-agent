@@ -48,7 +48,7 @@ class DockerManager:
             self.client = docker.from_env()
             self.client.ping()
             logger.info("Docker连接成功")
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             logger.error(f"Docker连接失败: {e}")
             raise
 
@@ -149,7 +149,7 @@ class DockerManager:
                     container_info.error_msg = "服务未能在规定时间内就绪，/ping 未返回 200 状态码"
                     try:
                         container.stop(timeout=5)
-                    except Exception as e:
+                    except Exception as e:  # pylint: disable=broad-except
                         logger.error(f"停止未就绪容器 {id} 时出错: {e}")
 
                     if container_info.port:
@@ -169,7 +169,7 @@ class DockerManager:
                     "container_id": container.id,
                 }
 
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 if container_info.port:
                     self.port_manager.release_port(container_info.port)
 
@@ -202,7 +202,7 @@ class DockerManager:
                         logger.info(f"容器 {id} 停止成功")
                     except docker.errors.NotFound:
                         logger.warning(f"容器 {id} 的Docker实例不存在，可能已被删除")
-                    except Exception as e:
+                    except Exception as e:  # pylint: disable=broad-except
                         logger.error(f"停止容器 {id} 时出错: {e}")
 
                 if container_info.port:
@@ -215,7 +215,7 @@ class DockerManager:
 
                 return {"success": True, "message": "容器停止成功", "id": id}
 
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 container_info.status = ContainerStatus.ERROR
                 container_info.error_msg = str(e)
 
@@ -233,7 +233,7 @@ class DockerManager:
         except docker.errors.NotFound:
             logger.warning(f"容器 {cid} 的Docker实例不存在，可能已被删除")
             return {"success": False, "error": "容器不存在", "id": cid}
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             logger.error(f"停止容器 {cid} 时出错: {e}")
             return {"success": False, "error": f"停止容器失败: {str(e)}", "id": cid}
 
@@ -303,7 +303,7 @@ class DockerManager:
                 "found_containers": found_containers,
             }
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             logger.error(f"查找容器时出错: {e}")
             return {"success": False, "error": f"查找容器时出错: {str(e)}"}
 
@@ -366,7 +366,7 @@ class DockerManager:
                     self.port_manager.release_port(container_info.port)
                     container_info.port = None
                 container_info.container_id = None
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logger.error(f"检查容器 {id} 状态时出错: {e}")
 
         return {
@@ -396,7 +396,7 @@ class DockerManager:
                 try:
                     container = self.client.containers.get(container_info.container_id)
                     container.stop(timeout=5)
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     logger.error(f"清理容器时出错: {e}")
 
             # 释放端口

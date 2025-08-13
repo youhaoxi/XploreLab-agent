@@ -117,7 +117,7 @@ class FileEditToolkit(AsyncBaseToolkit):
             with open(resolved_path, "w", encoding=self.default_encoding) as f:
                 f.write(modified_content)
             logger.info(f"Successfully edited file: {resolved_path}")
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             logger.error(f"Error editing file {resolved_path}: {str(e)}")
 
     async def get_tools_map(self) -> dict[str, Callable]:

@@ -44,14 +44,14 @@ def build_planner():
     )
 
 
-task = (
+TASK = (
     "Find the outstanding papers of ACL 2025, extract their title, author list, keywords, and abstract in one sentence."
 )
 
 
 async def main():
     async with build_planner() as agent:
-        result = await agent.run(task)
+        result = await agent.run(TASK)
         print(result.final_output)
 
 

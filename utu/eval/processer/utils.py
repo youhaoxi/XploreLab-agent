@@ -52,16 +52,16 @@ class MetricsUtils:
     @staticmethod
     def calculate_calibration(
         samples: list[EvaluationSample],
-        CONFIDENCE_BINS: list[tuple[int, int]] = None,
+        confidence_bins: list[tuple[int, int]] = None,
     ) -> dict:
         """Calculate calibration statistics"""
-        CONFIDENCE_BINS = CONFIDENCE_BINS or [(0, 20), (20, 40), (40, 60), (60, 80), (80, 101)]
-        calibration = [{"samples": 0, "correct": 0, "conf_sum": 0} for _ in CONFIDENCE_BINS]
+        confidence_bins = confidence_bins or [(0, 20), (20, 40), (40, 60), (60, 80), (80, 101)]
+        calibration = [{"samples": 0, "correct": 0, "conf_sum": 0} for _ in confidence_bins]
         for record in samples:
             if record.judged_response == "invalid":
                 continue
             confidence = record.confidence or 0
-            bin_idx = min(confidence // 20, len(CONFIDENCE_BINS) - 1)
+            bin_idx = min(confidence // 20, len(confidence_bins) - 1)
             bin_stats = calibration[bin_idx]
             bin_stats["samples"] += 1
             bin_stats["conf_sum"] += confidence

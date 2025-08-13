@@ -205,7 +205,7 @@ class ReactConverter:
             except json.JSONDecodeError:
                 try:
                     action = eval(text_output)
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     raise ValueError(f"Invalid action: {text_output}") from e
             assert "name" in action and "arguments" in action
             function = Function(name=action["name"], arguments=json.dumps(action["arguments"], ensure_ascii=False))

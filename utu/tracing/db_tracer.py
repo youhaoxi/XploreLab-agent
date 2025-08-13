@@ -24,10 +24,10 @@ class DBTracingProcessor(TracingProcessor):
         self.engine = create_engine(os.getenv("DB_URL"), pool_size=300, max_overflow=500, pool_timeout=30)
         SQLModel.metadata.create_all(self.engine)
 
-    def on_trace_start(self, trace: "Trace") -> None:
+    def on_trace_start(self, trace: Trace) -> None:
         pass
 
-    def on_trace_end(self, trace: "Trace") -> None:
+    def on_trace_end(self, trace: Trace) -> None:
         pass
 
     def on_span_start(self, span: Span[Any]) -> None:

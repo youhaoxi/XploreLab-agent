@@ -2,7 +2,7 @@
 open-inference: https://github.com/Arize-ai/openinference
 https://github.com/Arize-ai/openinference/tree/main/python/instrumentation/openinference-instrumentation-openai-agents
 TODO: rewrite openinference-instrumentation-openai-agents to support
-    1. session-level tracing in @phoenix https://arize.com/docs/phoenix/tracing/how-to-tracing/setup-tracing/setup-sessions
+    session-level tracing in @phoenix https://arize.com/docs/phoenix/tracing/how-to-tracing/setup-tracing/setup-sessions
     ref: test_tracing.py
 """
 

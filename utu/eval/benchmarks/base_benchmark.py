@@ -70,7 +70,7 @@ class BaseBenchmark:
             async with semaphore:
                 try:
                     return await self.rollout_one(item)
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     logger.error(
                         f">>>>>>>>>>>>>\nError running rollout on sample '{item.raw_question}': {e}\n<<<<<<<<<<<<<",
                         exc_info=True,
@@ -119,7 +119,7 @@ class BaseBenchmark:
             async with semaphore:
                 try:
                     return await self.judge_one(item)
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     logger.error(f">>>>>>>>>>>>>\nError judging sample '{item}': {e}\n<<<<<<<<<<<<<", exc_info=True)
                     return None
 
