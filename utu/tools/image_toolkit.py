@@ -67,7 +67,7 @@ class ImageToolkit(AsyncBaseToolkit):
 
         Args:
             image_path (str): Local path or URL to an image.
-            question (str, optional): The question to answer. If not provided, a description of the image will be generated.
+            question (str, optional): The question to answer. If not provided, return a description of the image.
         """
         image_str = self._load_image(image_path)
         if not question:

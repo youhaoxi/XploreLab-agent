@@ -97,7 +97,7 @@ def _execute_python_code_sync(code: str, workdir: str):
                 shell.history_manager.enabled = False
                 shell.history_manager.end_session = lambda: None
             InteractiveShell.clear_instance()
-        except:
+        except:  # pylint: disable=bare-except
             pass
 
         return {

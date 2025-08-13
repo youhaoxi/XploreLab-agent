@@ -1,7 +1,7 @@
 from ...config import AgentConfig
 from ...utils import AgentsUtils
 from ..simple_agent import SimpleAgent
-from .common import Subtask, OrchestraTaskRecorder, WorkerResult
+from .common import OrchestraTaskRecorder, Subtask, WorkerResult
 
 
 class BaseWorkerAgent:

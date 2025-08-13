@@ -13,7 +13,6 @@ from .search_toolkit import SearchToolkit
 from .serper_toolkit import SerperToolkit
 from .video_toolkit import VideoToolkit
 from .wikipedia_toolkit import WikipediaSearchTool
-from .ww_searcher_tools import DecomposeQueryToolkit, SummarizeToolkit, WebSearchToolkit
 
 TOOLKIT_MAP = {
     "search": SearchToolkit,
@@ -30,7 +29,4 @@ TOOLKIT_MAP = {
     "video": VideoToolkit,
     "audio": AudioToolkit,
     "serper": SerperToolkit,
-    "query_decomposer": DecomposeQueryToolkit,
-    "summarizer": SummarizeToolkit,
-    "web_searcher": WebSearchToolkit,
 }

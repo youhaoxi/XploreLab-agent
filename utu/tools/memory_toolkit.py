@@ -33,7 +33,10 @@ class SimpleMemoryToolkit(AsyncBaseToolkit):
         if self.full_memory:
             previous = self.full_memory
             self.full_memory = content
-            return f"Warning: Overwriting existing content. Previous content was:\n{previous}\n\nMemory has been updated successfully."
+            return (
+                f"Warning: Overwriting existing content. Previous content was:\n{previous}\n\n"
+                "Memory has been updated successfully."
+            )
         self.full_memory = content
         return "Memory updated successfully."
 
@@ -46,7 +49,10 @@ class SimpleMemoryToolkit(AsyncBaseToolkit):
         count = old_memory.count(old_string)
 
         if count > 1:
-            return f"Warning: Found {count} occurrences of '{old_string}'. Please confirm which occurrence to replace or use more specific context."
+            return {
+                f"Warning: Found {count} occurrences of '{old_string}'. "
+                "Please confirm which occurrence to replace or use more specific context."
+            }
 
         self.full_memory = self.full_memory.replace(old_string, new_string)
         return "Edited memory: 1 occurrence replaced."
@@ -106,7 +112,7 @@ class CompactifyMemoryToolkit(AsyncBaseToolkit):
         self,
     ) -> str:
         """Compactifies the conversation memory using the configured context management strategy.
-        Use this tool when the conversation is getting long and you need to free up context space while preserving important information.
+        Use this tool when the conversation is long and you need to free up context space.
         Helps maintain conversation continuity while staying within token limits.
         """
         raise NotImplementedError

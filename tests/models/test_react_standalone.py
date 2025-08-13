@@ -1,3 +1,6 @@
+# pylint: disable=line-too-long
+# ruff: noqa: E501
+
 """Standalone test for ReAct mode (ReactConverter)
 > see final version in [test_react_model.py]
 """

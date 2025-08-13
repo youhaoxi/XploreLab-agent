@@ -16,13 +16,16 @@ from .base import AsyncBaseToolkit
 
 class WikipediaSearchTool(AsyncBaseToolkit):
     """
-    WikipediaSearchTool searches Wikipedia and returns a summary or full text of the given topic, along with the page URL.
+    WikipediaSearchTool searches Wikipedia and returns a summary or full text of the given topic.
 
     Attributes:
-        user_agent (str): A custom user-agent string to identify the project. This is required as per Wikipedia API policies, read more here: http://github.com/martin-majlis/Wikipedia-API/blob/master/README.rst
+        user_agent (str): A custom user-agent string to identify the project. 
+            This is required as per Wikipedia API policies, read more here: 
+            http://github.com/martin-majlis/Wikipedia-API/blob/master/README.rst
         language (str): The language in which to retrieve Wikipedia articles.
-                http://meta.wikimedia.org/wiki/List_of_Wikipedias
-        content_type (str): Defines the content to fetch. Can be "summary" for a short summary or "text" for the full article.
+            http://meta.wikimedia.org/wiki/List_of_Wikipedias
+        content_type (str): Defines the content to fetch. 
+            Can be "summary" for a short summary or "text" for the full article.
         extract_format (str): Defines the output format. Can be `"WIKI"` or `"HTML"`.
     """
 

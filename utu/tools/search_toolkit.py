@@ -12,7 +12,9 @@ logger = get_logger(__name__)
 
 
 # TODO: ref @smolagents -- to keep rich context info
-TEMPLATE_QA = r"""You are a webpage analysis agent that extract relevant information from the given webpage content to answer the given query. NOTE:
+TEMPLATE_QA = r"""
+You are a webpage analysis agent that extract relevant information from the given webpage content to answer the query. 
+NOTE:
 1. Be concise, do not extract too long or irrelevant information.
 2. Before give your conclusion, you can summarize user's query if necessary.
 3. Use language same as query.
@@ -23,7 +25,7 @@ TEMPLATE_QA = r"""You are a webpage analysis agent that extract relevant informa
 <content>
 {content}
 </content>
-"""
+""".strip()
 TEMPLATE_LINKS = r"""You are a webpage analysis agent that extract relevant links to the given query. NOTE:
 1. You should extract the most relevant links to the query. Do not include the url of given webpage.
 2. You can only output urls that exist in following webpage.

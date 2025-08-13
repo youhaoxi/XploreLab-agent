@@ -1,3 +1,6 @@
+# pylint: disable=line-too-long
+# ruff: noqa: E501
+
 import json
 from copy import deepcopy
 from dataclasses import dataclass, field
@@ -203,10 +206,9 @@ class ReactConverter:
             except json.JSONDecodeError:
                 try:
                     action = eval(text_output)
-                except:
+                except:  # pylint: disable=bare-except
                     raise ValueError(f"Invalid action: {text_output}")
             assert "name" in action and "arguments" in action
-            # return [ResponseFunctionToolCall(name=action["name"], arguments=json.dumps(action["arguments"], ensure_ascii=False), call_id="FAKE_CALL_ID", type="function_call")]
             function = Function(name=action["name"], arguments=json.dumps(action["arguments"], ensure_ascii=False))
             message = ChatCompletionMessage(
                 role="assistant",

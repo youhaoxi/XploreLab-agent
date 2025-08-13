@@ -4,7 +4,7 @@ import re
 
 from ...config import AgentConfig
 from ...utils import SimplifiedAsyncOpenAI, get_jinja_env
-from .common import AgentInfo, CreatePlanResult, Subtask, OrchestraTaskRecorder
+from .common import AgentInfo, CreatePlanResult, OrchestraTaskRecorder, Subtask
 
 
 class OutputParser:

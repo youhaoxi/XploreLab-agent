@@ -1,7 +1,7 @@
+from ..config import AgentConfig
+from .base_agent import BaseAgent
 from .orchestra_agent import OrchestraAgent
 from .simple_agent import SimpleAgent
-from .base_agent import BaseAgent
-from ..config import AgentConfig
 
 
 def get_agent(config: AgentConfig) -> BaseAgent:

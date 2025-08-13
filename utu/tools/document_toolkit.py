@@ -17,9 +17,11 @@ logger = get_logger(__name__)
 # ref @smolagents
 SP = """You will have to write a short caption for this file, then answer question based on the file content."""
 
-INSTRUCTION_QA = r"""Now answer the question below. Use these three headings: '1. Short answer', '2. Extremely detailed answer', '3. Additional Context on the document and question asked'.
+INSTRUCTION_QA = r"""Now answer the question below. Use these three headings: 
+'1. Short answer', '2. Extremely detailed answer', '3. Additional Context on the document and question asked'.
 Question: {question}"""
-INSTRUCTION_SUMMARY = r"""Please provide a structured description of the document, including important informations, e.g. author, date, title, keywords, summary, key points, etc."""
+INSTRUCTION_SUMMARY = r"""Please provide a structured description of the document, including important informations, 
+e.g. author, date, title, keywords, summary, key points, etc."""
 
 
 class DocumentToolkit(AsyncBaseToolkit):
@@ -67,7 +69,7 @@ class DocumentToolkit(AsyncBaseToolkit):
 
         Args:
             document_path (str): Local path or URL to a document.
-            question (str, optional): The question to answer. If not provided, a description of the document will be generated.
+            question (str, optional): The question to answer. If not provided, return a summary of the document.
         """
         md5 = self.handle_path(document_path)
         document_markdown = await self.parse_document(md5)

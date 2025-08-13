@@ -23,7 +23,7 @@ from agents import (
 )
 from agents.models.chatcmpl_converter import Converter
 from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEvent, RunItemStreamEvent
-from agents.tracing import gen_trace_id, get_current_trace, Trace
+from agents.tracing import Trace, gen_trace_id, get_current_trace
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 from openai.types.responses import FunctionToolParam, ResponseFunctionToolCall
@@ -38,7 +38,8 @@ class ChatCompletionConverter(Converter):
     @classmethod
     def items_to_messages(cls, items: str | Iterable[TResponseInputItem]) -> list[ChatCompletionMessageParam]:
         # skip reasoning, see chatcmpl_converter.Converter.items_to_messages()
-        # agents.exceptions.UserError: Unhandled item type or structure: {'id': '__fake_id__', 'summary': [{'text': '...', 'type': 'summary_text'}], 'type': 'reasoning'}
+        # agents.exceptions.UserError: Unhandled item type or structure: 
+        # {'id': '__fake_id__', 'summary': [{'text': '...', 'type': 'summary_text'}], 'type': 'reasoning'}
         if not isinstance(items, str):  # TODO: check it!
             items = cls.filter_items(items)
         return Converter.items_to_messages(items)
@@ -147,7 +148,7 @@ class AgentsUtils:
             elif isinstance(new_item, ToolCallItem):
                 assert isinstance(new_item.raw_item, ResponseFunctionToolCall)  # DONOT use openai's built-in tools
                 PrintUtils.print_info(
-                    f"{agent_name}: Calling a tool: {new_item.raw_item.name}({json.loads(new_item.raw_item.arguments)})"  # node that API always return the json string
+                    f"{agent_name}: Calling a tool: {new_item.raw_item.name}({json.loads(new_item.raw_item.arguments)})"
                 )
             elif isinstance(new_item, ToolCallOutputItem):
                 PrintUtils.print_tool(f"Tool call output: {new_item.output}")
@@ -180,7 +181,7 @@ class AgentsUtils:
                 if item.type == "message_output_item":
                     PrintUtils.print_bot(f"<{item.agent.name}> {ItemHelpers.text_message_output(item).strip()}")
                 # elif item.type == "handoff_call_item":  # same as `ToolCallItem`
-                #     PrintUtils.print_bot(f"<{item.agent.name}> [handoff_call] {item.raw_item.name}({item.raw_item.arguments})")
+                #     PrintUtils.print_bot(f"[handoff_call] {item.raw_item.name}({item.raw_item.arguments})")
                 # elif item.type == "handoff_output_item":
                 #     PrintUtils.print_info(f">> Handoff from {item.source_agent.name} to {item.target_agent.name}")
                 elif item.type == "tool_call_item":
