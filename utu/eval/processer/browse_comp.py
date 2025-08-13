@@ -1,7 +1,7 @@
 import re
 
 from ..data import EvaluationSample as Datapoint
-from .base import BaseLLMJudgeProcesser
+from .base_llm_processor import BaseLLMJudgeProcesser
 from .utils import MetricsUtils
 
 
@@ -24,3 +24,17 @@ class BrowseCompProcesser(BaseLLMJudgeProcesser):
         if not match or not match.group(1):
             return ""
         return match.group(1).strip()
+
+
+class BrowseCompZHProcesser(BrowseCompProcesser):
+    """Processer for BrowseCompZH evaluation."""
+
+    name: str = "BrowseComp_ZH"
+
+    def calculate_metrics(self, samples: list[Datapoint]) -> dict:
+        """Calculate metrics from the judged data."""
+        return {
+            **MetricsUtils.calculate_overall_metrics(samples),
+            **MetricsUtils.calculate_calibration(samples),
+            **MetricsUtils.calculate_level_metrics(samples),
+        }

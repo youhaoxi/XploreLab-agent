@@ -81,12 +81,3 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
             "confidence",
         ]
         return {k: getattr(self, k) for k in keys if getattr(self, k) is not None}
-
-
-class EvaluationResult(UTUBaseModel):
-    """
-    A data class to represent the result of an evaluation.
-    """
-
-    benchmark: str
-    metrics: dict

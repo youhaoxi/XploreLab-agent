@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 # TODO: ref @smolagents -- to keep rich context info
 TEMPLATE_QA = r"""
-You are a webpage analysis agent that extract relevant information from the given webpage content to answer the query. 
+You are a webpage analysis agent that extract relevant information from the given webpage content to answer the query.
 NOTE:
 1. Be concise, do not extract too long or irrelevant information.
 2. Before give your conclusion, you can summarize user's query if necessary.

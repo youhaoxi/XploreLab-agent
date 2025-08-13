@@ -7,17 +7,17 @@ import pathlib
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
 
-instructions = """You are an expert in agentic data construction and verification. 
+instructions = """You are an expert in agentic data construction and verification.
 You should used tools to generate files that meet the user's requirements."""
 
 _verify_fn = r"""def compare_font_names(docx_file, rules: List[Dict[str, Any]]):
     \"\"\"
     检查DOCX文档中所有文本是否使用指定字体
-    
+
     参数:
         docx_file: DOCX文件路径
         rules: 包含期望字体名称的规则字典
-    
+
     返回:
         int: 如果所有文本使用指定字体返回1，否则返回0
     \"\"\"
@@ -50,7 +50,7 @@ query = f"""背景：我需要构造大量数据用于训练我的gui agent，�
 3. 验证脚本：1）参考我提供的可验证函数，可以直接拿来用，也可以做适当的修改，但千万不能偏离验证函数的本意；2）假如要对提供的参考验证函数进行修改，千万别修改函数的形式参数，例如，如果参考函数是提供对比结果文件和期待文件来实现验证，那就不要改变这个验证思路。
 4. 当你生成完（指令、期待文件、验证脚本）以后，你需要用初始文件和期待文件分别验证一下你的验证脚本是否按照预期work，按照预期的话初始文件应该返回0，期待文件返回1。如果验证没通过，你得找出问题并且修正，直到完成任务
 
-这是参考的验证函数: 
+这是参考的验证函数:
 ```py
 {_verify_fn}
 ```

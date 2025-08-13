@@ -53,7 +53,7 @@ class SimpleAgent(BaseAgent):
         self.output_type: type[Any] | AgentOutputSchemaBase | None = output_type
         self.context_manager: BaseContextManager = None
         self.env: BaseEnv = None
-        self.current_agent: Agent[TContext] = None       # move to task recorder?
+        self.current_agent: Agent[TContext] = None  # move to task recorder?
         self.input_items: list[TResponseInputItem] = []
 
         self._run_hooks: RunHooks = None

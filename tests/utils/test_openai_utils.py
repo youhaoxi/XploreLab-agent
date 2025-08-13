@@ -5,9 +5,7 @@ from utu.utils import OpenAIUtils, SimplifiedAsyncOpenAI
 
 config = ConfigLoader.load_model_config("base")
 openai_client = SimplifiedAsyncOpenAI(**config.model_provider.model_dump())
-print(
-    f"Testing {config.model_provider.model} [{config.model_provider.type}], {config.model_provider.base_url}"
-)
+print(f"Testing {config.model_provider.model} [{config.model_provider.type}], {config.model_provider.base_url}")
 # messages = [{"role": "user", "content": "Tell a joke. And what is the weather like in Bogotá and Shanghai?"}]
 messages = [{"role": "user", "content": "给我讲两个笑话, 然后帮我查一下北京天津的天气"}]
 tools = [

@@ -24,8 +24,7 @@ def update_indices():
         return
 
     engine = create_engine(db_url)
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    session = sessionmaker(bind=engine)()
 
     # Step 1: Add the 'index' column if it doesn't exist
     try:

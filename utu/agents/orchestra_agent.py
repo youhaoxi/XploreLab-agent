@@ -92,9 +92,12 @@ class OrchestraAgent(BaseAgent):
         with function_span("report") as span_fn:
             analysis_result = await self.reporter_agent.report(task_recorder)
             task_recorder.add_reporter_result(analysis_result)
-            span_fn.span_data.input = json.dumps({
-                "input": task_recorder.task,
-                "task_records": [{"task": r.task, "output": r.output} for r in task_recorder.task_records],
-            }, ensure_ascii=False)
+            span_fn.span_data.input = json.dumps(
+                {
+                    "input": task_recorder.task,
+                    "task_records": [{"task": r.task, "output": r.output} for r in task_recorder.task_records],
+                },
+                ensure_ascii=False,
+            )
             span_fn.span_data.output = analysis_result.model_dump()
         return analysis_result

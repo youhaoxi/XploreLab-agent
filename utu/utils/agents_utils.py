@@ -57,7 +57,9 @@ class ChatCompletionConverter(Converter):
 
     @classmethod
     def items_to_dict(cls, items: str | Iterable[TResponseInputItem]) -> list[dict]:
-        """convert items to a list of dict which have {"role", "content"}"""
+        """convert items to a list of dict which have {"role", "content"}
+        WIP!
+        """
         if isinstance(items, str):
             return [{"role": "user", "content": items}]
         result = []
@@ -133,7 +135,7 @@ class AgentsUtils:
     def get_trajectory_from_agent_result(agent_result: RunResult) -> dict:
         return {
             "agent": agent_result.last_agent.name,
-            "trajectory": ChatCompletionConverter.items_to_dict(agent_result.to_input_list()),
+            "trajectory": ChatCompletionConverter.items_to_messages(agent_result.to_input_list()),
         }
 
     @staticmethod

@@ -1,7 +1,7 @@
 import re
 
 from ..data import EvaluationSample as Datapoint
-from .base import BaseLLMJudgeProcesser
+from .base_llm_processor import BaseLLMJudgeProcesser
 
 
 class XBenchProcesser(BaseLLMJudgeProcesser):

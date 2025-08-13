@@ -12,7 +12,7 @@ class BaseWorkerAgent:
         raise NotImplementedError
 
 
-TEMPLATE_SEARCH = r"""Original Problem:
+TEMPLATE = r"""Original Problem:
 {problem}
 
 Plan:
@@ -37,7 +37,7 @@ class SimpleWorkerAgent(BaseWorkerAgent):
         """search webpages for a specific subtask, return a report"""
         str_plan = task_recorder.get_plan_str()
         str_traj = task_recorder.get_trajectory_str()
-        str_task = TEMPLATE_SEARCH.format(
+        str_task = TEMPLATE.format(
             problem=task_recorder.task,
             plan=str_plan,
             trajectory=str_traj,

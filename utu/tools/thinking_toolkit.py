@@ -11,7 +11,7 @@ Before taking any action or responding to the user after receiving tool results,
 - List the specific rules that apply to the current request
 - Check if all required information is collected
 - Verify that the planned action complies with all policies
-- Iterate over tool results for correctness 
+- Iterate over tool results for correctness
 
 Here are some examples of what to iterate over inside the think tool:
 <think_tool_example_1>

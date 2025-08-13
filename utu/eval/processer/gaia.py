@@ -1,7 +1,9 @@
 import os
 
 from ...utils import DIR_ROOT
-from .base import BaseLLMJudgeProcesser
+from ..data import EvaluationSample
+from .base_llm_processor import BaseLLMJudgeProcesser
+from .prompts import AUGMENTATION_PROMPTS
 
 
 class GAIAProcesser(BaseLLMJudgeProcesser):
@@ -9,7 +11,14 @@ class GAIAProcesser(BaseLLMJudgeProcesser):
 
     name: str = "GAIA"
 
-    # def calculate_metrics(self, samples: list[Datapoint]) -> dict:
+    def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
+        """Preprocess a single sample."""
+        question_with_files = sample.raw_question + self._get_file_prompt(sample.file_name)
+        augmented_question = AUGMENTATION_PROMPTS["GAIA"].format(question=question_with_files)
+        sample.update(
+            augmented_question=augmented_question,
+        )
+        return sample
 
     def _get_file_prompt(self, file_name: str) -> str:
         """

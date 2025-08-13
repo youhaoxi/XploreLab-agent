@@ -30,7 +30,7 @@ def wide_research(task: str, subtasks: list[str], output_schema: dict) -> str:
     print(f"task: {task}\nsubtasks: {subtasks}\noutput_schema: {output_schema}")
 
 
-SP = """You are a helpful research assistant. 
+SP = """You are a helpful research assistant.
 - If the task contains homogeneous subtasks that can be handled in parallel, use the wide_research tool.
 - After gathering enough information, response to the user directly.
 """

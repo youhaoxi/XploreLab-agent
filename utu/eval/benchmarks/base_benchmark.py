@@ -8,7 +8,7 @@ from tqdm import tqdm
 from ...agents import BaseAgent, get_agent
 from ...config import ConfigLoader, EvalConfig
 from ...utils import get_logger, setup_logging
-from ..data import DBDataManager, EvaluationResult, EvaluationSample
+from ..data import DBDataManager, EvaluationSample
 from ..processer import PROCESSER_FACTORY, BaseProcesser
 
 setup_logging()
@@ -146,14 +146,13 @@ class BaseBenchmark:
         logger.info(f"Stat from {len(judged_samples)} samples:")
 
         data_by_benchmark = self._group_data_by_benchmark(judged_samples)
-        overall_results: list[EvaluationResult] = []
+        overall_results: list[dict] = []
         for benchmark, data in data_by_benchmark.items():
             evaluator = self._get_processer(benchmark)
             result = await evaluator.stat(data)
-            result.update(benchmark=benchmark)
             overall_results.append(result)
 
-        logger.info(json.dumps([r.as_dict() for r in overall_results], indent=4, ensure_ascii=False))
+        logger.info(json.dumps(overall_results, indent=4, ensure_ascii=False))
 
     def _get_processer(self, source: str) -> BaseProcesser:
         if source not in self._source_to_processer:

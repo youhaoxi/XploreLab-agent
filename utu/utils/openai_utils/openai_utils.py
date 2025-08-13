@@ -99,9 +99,7 @@ class OpenAIUtils:
                         f"<{item.type}>(server={item.server_label}) {item.name}({item.arguments}) -> {item.output}"
                     )
                 case "mcp_approval_request":
-                    PrintUtils.print_info(
-                        f"<{item.type}>(server={item.server_label}) {item.name}({item.arguments})"
-                    )
+                    PrintUtils.print_info(f"<{item.type}>(server={item.server_label}) {item.name}({item.arguments})")
                 case _:
                     PrintUtils.print_error(f"Unknown item type: {item.type}\n{item}")
 
