@@ -9,44 +9,7 @@ class GAIAProcesser(BaseLLMJudgeProcesser):
     """ Processer for GAIA evaluation. """
     name: str = "GAIA"
 
-    def calculate_metrics(self, samples: list[Datapoint]) -> dict:
-        # 1. calculate level metrics
-        level_bin = {}
-        invalid_count = 0
-        for item in samples:
-            level = item.level
-            if level not in level_bin:
-                level_bin[level] = {"correct": 0, "wrong": 0, "unknown": 0}
-            if item.judged_response == "invalid":
-                level_bin[level]["unknown"] += 1
-                invalid_count += 1
-                continue
-            if item.correct:
-                level_bin[level]["correct"] += 1
-            else:
-                level_bin[level]["wrong"] += 1
-        # calculate overall metrics
-        for level, counts in level_bin.items():
-            total = counts["correct"] + counts["wrong"]
-            if total > 0:
-                counts["accuracy"] = round(counts["correct"] / total * 100, 4)
-            else:
-                counts["accuracy"] = 0.0
-        # 2. calculate overall accuracy
-        total = len(samples)
-        correct_count = sum(item.correct for item in samples)
-        incorrect_count = total - correct_count - invalid_count
-
-        return {
-            "Accuracy (%)": round(correct_count / total * 100, 4),
-            "Details": {
-                "correct": correct_count,
-                "wrong": incorrect_count,
-                "unknown": invalid_count,
-                "total": total,
-                "level_metrics": level_bin
-            } 
-        }
+    # def calculate_metrics(self, samples: list[Datapoint]) -> dict:
 
     def _get_file_prompt(self, file_name: str) -> str:
         """

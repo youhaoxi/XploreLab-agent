@@ -59,9 +59,9 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
 
     def model_dump(self, *args, **kwargs):
         keys = [
-            "source", "raw_question", "level", "augmented_question", "correct_answer", "file_name", "stage", "trace_id", "response",
-            "time_cost", "trajectories", "extracted_final_answer", "judged_response", "reasoning", "correct", "confidence",
-            "exp_id"
+            "exp_id", "dataset", "dataset_index", "source", "level", "raw_question", "correct_answer", "file_name", 
+            "stage", "trace_id", "response", "time_cost", "trajectory", "trajectories", 
+            "judged_response", "correct", "confidence",
         ]
         return {
             k: getattr(self, k) for k in keys if getattr(self, k) is not None

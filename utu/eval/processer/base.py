@@ -3,9 +3,10 @@ import abc
 import string
 
 from ...config import EvalConfig
+from ...utils import get_logger, SimplifiedAsyncOpenAI
 from ..data import EvaluationSample, EvaluationResult
 from .prompts import get_benchmark_templates
-from ...utils import get_logger, SimplifiedAsyncOpenAI
+from .utils import MetricsUtils
 
 logger = get_logger(__name__)
 
@@ -101,8 +102,7 @@ class BaseLLMJudgeProcesser(BaseProcesser):
         
         # if exact match, return directly(maybe extract exact answer from response first)
         if self._extract_exact_answer(response) == correct_answer:
-            data.update(judged_response="Exact match",
-                               correct=True)
+            data.update(judged_response="Exact match", correct=True)
             return data
         
         messages = self._get_judge_messages(
@@ -123,44 +123,11 @@ class BaseLLMJudgeProcesser(BaseProcesser):
 
     def calculate_metrics(self, samples: list[EvaluationSample]) -> dict:
         """ Caculate metrics from the judged data. """
-        # 1. calculate level metrics
-        level_bin = {}
-        invalid_count = 0
-        for item in samples:
-            level = item.level
-            if level not in level_bin:
-                level_bin[level] = {"correct": 0, "wrong": 0, "unknown": 0}
-            if item.judged_response == "invalid":
-                level_bin[level]["unknown"] += 1
-                invalid_count += 1
-                continue
-            if item.correct:
-                level_bin[level]["correct"] += 1
-            else:
-                level_bin[level]["wrong"] += 1
-        # calculate overall metrics
-        for level, counts in level_bin.items():
-            total = counts["correct"] + counts["wrong"]
-            if total > 0:
-                counts["accuracy"] = round(counts["correct"] / total * 100, 4)
-            else:
-                counts["accuracy"] = 0.0
-        # 2. calculate overall accuracy
-        total = len(samples)
-        correct_count = sum(item.correct for item in samples)
-        incorrect_count = total - correct_count - invalid_count
-
         return {
-            "Accuracy (%)": round(correct_count / total * 100, 4),
-            "Details": {
-                "correct": correct_count,
-                "wrong": incorrect_count,
-                "unknown": invalid_count,
-                "total": total,
-                "level_metrics": level_bin
-            },
+            **MetricsUtils.calculate_overall_metrics(samples),
+            **MetricsUtils.calculate_level_metrics(samples),
         }
-    
+
     def _get_judge_messages(self, question: str, response: str, correct_answer: str) -> list:
         """ Get the judge messages. """
         input = self.JUDGE_TEMPLATE.format(
@@ -173,7 +140,7 @@ class BaseLLMJudgeProcesser(BaseProcesser):
             {"role": "user", "content": input}
         ]
 
-    def _parse_judge_response(elf, response: str) -> dict:
+    def _parse_judge_response(self, response: str) -> dict:
         """ Parse the judge response into a structured format. """
         pattern = re.compile(
             r"(?=.*?extracted_final_answer:\s*(?P<extracted_final_answer>.*?)(?=\n\s*\w+:|$))?"
@@ -192,7 +159,7 @@ class BaseLLMJudgeProcesser(BaseProcesser):
         return {
             "extracted_final_answer": match.group("extracted_final_answer").strip() if match.group("extracted_final_answer") else "",
             "reasoning": match.group("reasoning").strip() if match.group("reasoning") else "",
-            "correct":match.group("correct").strip().lower() == "yes" if match.group("correct") else False,
+            "correct": match.group("correct").strip().lower() == "yes" if match.group("correct") else False,
             "confidence": int(match.group("confidence")) if match.group("confidence") else None
         }
 
