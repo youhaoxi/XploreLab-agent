@@ -1,10 +1,10 @@
-import json
 import argparse
+import json
 
 import pandas as pd
 
-from utu.eval.data import DBDataManager
 from utu.config import ConfigLoader, EvalConfig
+from utu.eval.data import DBDataManager
 
 
 def get_stat(config: EvalConfig):

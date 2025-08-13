@@ -1,7 +1,7 @@
 import asyncio
+
 from utu.agents.ww_searcher import SearcherAgent
 from utu.config import ConfigLoader
-
 
 search_config = ConfigLoader.load_agent_config("search_agent")
 search_agent = SearcherAgent(search_config)

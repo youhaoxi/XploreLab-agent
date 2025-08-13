@@ -2,8 +2,8 @@ import abc
 import asyncio
 from typing import Callable
 
-from agents import FunctionTool, function_tool
 import mcp.types as types
+from agents import FunctionTool, function_tool
 
 from ..config import ToolkitConfig
 from ..utils import ChatCompletionConverter, get_event_loop

@@ -6,14 +6,14 @@ Workflow based implementation of a search agent
   4. query summarization
 """
 
-import json
 import asyncio
+import json
 
-from ..utils import Base, SearchResult
+from ...agents.simple_agent import SimpleAgent
 from ...config import AgentConfig, ConfigLoader
 from ...tools import TOOLKIT_MAP
 from ...utils import AgentsUtils
-from ...agents.simple_agent import SimpleAgent
+from ..utils import Base, SearchResult
 
 
 class SimpleSearcherAgent(Base):

@@ -3,8 +3,9 @@ https://docs.github.com/en/rest?apiVersion=2022-11-28
 """
 
 from typing import Callable
-import requests
 from urllib.parse import urlparse
+
+import requests
 
 from .base import AsyncBaseToolkit
 

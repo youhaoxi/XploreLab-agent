@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from utu.config import ConfigLoader
 from utu.agents import SimpleAgent
+from utu.config import ConfigLoader
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
-import re
 import json
-from typing import Dict, List, Optional, Union
+import re
 from dataclasses import dataclass
+from typing import Dict, List, Optional, Union
 
 
 @dataclass

@@ -1,9 +1,10 @@
 import asyncio
+
 from agents import function_tool
 
-from utu.config import ModelSettingsConfig, ConfigLoader
-from utu.tools import SearchToolkit
 from utu.agents import SimpleAgent
+from utu.config import ConfigLoader, ModelSettingsConfig
+from utu.tools import SearchToolkit
 
 
 def get_tools():

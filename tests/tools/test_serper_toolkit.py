@@ -1,4 +1,5 @@
 import pytest
+
 from utu.tools.serper_toolkit import SerperToolkit
 
 

@@ -2,14 +2,16 @@
 > see final version in [test_react_model.py]
 """
 
-import json
 import asyncio
+import json
+
 import jinja2
 from openai.types.chat import (
-    ChatCompletionToolParam,
-    ChatCompletionMessageParam,
     ChatCompletion,
+    ChatCompletionMessageParam,
+    ChatCompletionToolParam,
 )
+
 from utu.utils import SimplifiedAsyncOpenAI
 
 simplified_openai = SimplifiedAsyncOpenAI()

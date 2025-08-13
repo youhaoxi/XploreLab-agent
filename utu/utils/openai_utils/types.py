@@ -1,12 +1,12 @@
-from typing import TypedDict, Union, Optional, Literal, Iterable
+from typing import Iterable, Literal, Optional, TypedDict, Union
 
 import httpx
-from openai._types import Headers, Query, Body, NotGiven, NOT_GIVEN
-from openai.types.shared import ChatModel, ResponsesModel, Reasoning, ReasoningEffort
+from openai._types import NOT_GIVEN, Body, Headers, NotGiven, Query
+from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 from openai.types.chat.completion_create_params import ResponseFormat
-from openai.types.responses.response_create_params import ToolChoice
-from openai.types.chat import ChatCompletionToolParam, ChatCompletionMessageParam
 from openai.types.responses import ResponseInputParam, ResponseTextConfigParam, ToolParam
+from openai.types.responses.response_create_params import ToolChoice
+from openai.types.shared import ChatModel, Reasoning, ReasoningEffort, ResponsesModel
 
 
 class OpenAICreateBaseParams(TypedDict):

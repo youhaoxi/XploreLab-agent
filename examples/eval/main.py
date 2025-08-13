@@ -3,12 +3,12 @@ Example evaluation script, with async rollout and concurrency control.
 """
 
 import asyncio
-import pathlib
 import copy
 import json
+import pathlib
 
-from utu.utils import ChatCompletionConverter
 from utu.agents import SimpleAgent
+from utu.utils import ChatCompletionConverter
 
 flock = asyncio.Lock()
 ofn = pathlib.Path(__file__).parent / "eval_result.jsonl"

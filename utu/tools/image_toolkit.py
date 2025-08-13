@@ -4,17 +4,17 @@
 https://platform.openai.com/docs/guides/images-vision?api-mode=chat
 """
 
-from typing import Optional, Callable
-from io import BytesIO
-import requests
 import base64
-
+from io import BytesIO
+from typing import Callable, Optional
 from urllib.parse import urlparse
+
+import requests
 from PIL import Image
 
-from .base import AsyncBaseToolkit
-from ..utils import SimplifiedAsyncOpenAI, get_logger
 from ..config import ToolkitConfig
+from ..utils import SimplifiedAsyncOpenAI, get_logger
+from .base import AsyncBaseToolkit
 
 logger = get_logger(__name__)
 

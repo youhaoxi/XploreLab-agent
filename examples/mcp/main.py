@@ -1,6 +1,6 @@
 import asyncio
-from utu.agents import SimpleAgent
 
+from utu.agents import SimpleAgent
 
 # from https://en.wikipedia.org/wiki/Anthropic
 doc = """Anthropic PBC is an American artificial intelligence (AI) startup company founded in 2021. Anthropic has developed a family of large language models (LLMs) named Claude as a competitor to OpenAI's ChatGPT and Google's Gemini.[5] According to the company, it researches and develops AI to "study their safety properties at the technological frontier" and use this research to deploy safe models for the public.[6][7]

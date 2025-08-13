@@ -1,22 +1,22 @@
 import logging
-from typing import AsyncIterator, Any
+from typing import Any, AsyncIterator
 
-from pydantic import BaseModel
 from openai.types.chat import (
     ChatCompletion,
     ChatCompletionChunk,
-    ChatCompletionMessageToolCall,
     ChatCompletionMessage,
+    ChatCompletionMessageToolCall,
     ChatCompletionToolParam,
 )
 from openai.types.responses import (
+    FunctionToolParam,
     Response,
-    ResponseStreamEvent,
     ResponseInputParam,
+    ResponseStreamEvent,
     ResponseTextConfigParam,
     ToolParam,
-    FunctionToolParam,
 )
+from pydantic import BaseModel
 
 from ..print_utils import PrintUtils
 

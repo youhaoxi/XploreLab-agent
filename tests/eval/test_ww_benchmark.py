@@ -1,5 +1,5 @@
-from utu.ww.ww_benchmark import WWBenchmark
 from utu.config import ConfigLoader
+from utu.ww.ww_benchmark import WWBenchmark
 
 config = ConfigLoader.load_eval_config("ww")
 print(f"> config: {config}")

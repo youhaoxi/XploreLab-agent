@@ -1,11 +1,10 @@
 from typing import Callable, Optional
-from typing_extensions import Literal
 
 from pydantic import Field
+from typing_extensions import Literal
 
 from .base_config import ConfigBaseModel
 from .model_config import ModelConfigs
-
 
 DEFAULT_INSTRUCTIONS = "You are a helpful assistant."
 

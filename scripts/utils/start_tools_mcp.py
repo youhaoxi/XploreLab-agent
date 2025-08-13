@@ -5,14 +5,16 @@
 """
 
 import asyncio
+
 import pandas as pd
-from mcp.types import AnyFunction
-from mcp.server.fastmcp import FastMCP
 from agents import Tool
+from mcp.server.fastmcp import FastMCP
+from mcp.types import AnyFunction
+
 from utu.config import ConfigLoader
 from utu.tools import (
-    AsyncBaseToolkit,
     TOOLKIT_MAP,
+    AsyncBaseToolkit,
 )
 
 

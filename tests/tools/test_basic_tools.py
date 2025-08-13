@@ -2,12 +2,12 @@ import pytest
 
 from utu.config import ConfigLoader
 from utu.tools import (
-    GitHubToolkit,
-    FileEditToolkit,
-    WikipediaSearchTool,
-    CodesnipToolkit,
-    BashTool,
     BashRemoteToolkit,
+    BashTool,
+    CodesnipToolkit,
+    FileEditToolkit,
+    GitHubToolkit,
+    WikipediaSearchTool,
 )
 
 

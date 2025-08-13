@@ -1,9 +1,9 @@
 import asyncio
+
 from agents import function_tool
 
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
-
 
 COUNT = 0
 

@@ -1,12 +1,12 @@
-import os
 import logging
+import os
 from datetime import datetime
 
-from openai import AsyncOpenAI
 from agents import Agent, Runner, function_tool, trace
+from openai import AsyncOpenAI
 
-from utu.utils.agents_utils import AgentsUtils, SimplifiedOpenAIChatCompletionsModel
 from utu.config import ConfigLoader
+from utu.utils.agents_utils import AgentsUtils, SimplifiedOpenAIChatCompletionsModel
 
 
 @function_tool

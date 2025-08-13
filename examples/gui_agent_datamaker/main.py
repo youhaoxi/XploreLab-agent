@@ -1,8 +1,8 @@
 import asyncio
 import pathlib
+
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
-
 
 instructions = "You are an expert in agentic data construction and verification. You should used tools to generate files that meet the user's requirements."
 

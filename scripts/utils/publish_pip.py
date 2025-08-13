@@ -5,9 +5,10 @@ see https://mirrors.tencent.com/#/private/pypi/
 """
 
 import os
-import sys
 import subprocess
+import sys
 import urllib.parse
+
 import requests
 import toml
 

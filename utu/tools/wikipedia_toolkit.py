@@ -10,8 +10,8 @@ from typing import Callable
 
 import requests
 
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from .base import AsyncBaseToolkit
 
 
 class WikipediaSearchTool(AsyncBaseToolkit):

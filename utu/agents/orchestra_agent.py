@@ -2,19 +2,19 @@ from agents import trace
 from agents.tracing import function_span
 
 from ..config import AgentConfig, ConfigLoader
-from ..utils import get_logger, AgentsUtils
 from ..tracing import setup_tracing
+from ..utils import AgentsUtils, get_logger
 from .orchestra import (
+    AnalysisResult,
+    BaseWorkerAgent,
+    CreatePlanResult,
     PlannerAgent,
     ReporterAgent,
-    BaseWorkerAgent,
+    RunResult,
     SimpleWorkerAgent,
     Subtask,
-    AnalysisResult,
-    WorkerResult,
-    CreatePlanResult,
-    RunResult,
     TaskRecorder,
+    WorkerResult,
 )
 
 logger = get_logger(__name__)

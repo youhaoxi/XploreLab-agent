@@ -1,12 +1,11 @@
-import os
-import json
 import hashlib
+import json
+import os
 
-from sqlmodel import create_engine, Session
+from sqlmodel import Session, create_engine
 
 from utu.db import ToolCacheModel
 from utu.utils.tool_cache import DIR_CACHE
-
 
 engine = create_engine(os.getenv("DB_URL"))
 

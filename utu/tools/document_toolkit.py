@@ -2,14 +2,14 @@
 https://github.com/lumina-ai-inc/chunkr
 """
 
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 from chunkr_ai import Chunkr
 from chunkr_ai.models import Configuration
 
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
-from ..utils import async_file_cache, SimplifiedAsyncOpenAI, FileUtils, DIR_ROOT, get_logger
+from ..utils import DIR_ROOT, FileUtils, SimplifiedAsyncOpenAI, async_file_cache, get_logger
+from .base import AsyncBaseToolkit
 
 logger = get_logger(__name__)
 

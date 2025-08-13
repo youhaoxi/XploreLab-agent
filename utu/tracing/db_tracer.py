@@ -18,9 +18,9 @@ from agents.tracing.span_data import (
     ResponseSpanData,
     SpanData,
 )
-from sqlmodel import create_engine, Session, SQLModel
+from sqlmodel import Session, SQLModel, create_engine
 
-from ..db import ToolTracingModel, GenerationTracingModel
+from ..db import GenerationTracingModel, ToolTracingModel
 from ..utils import OpenAIUtils
 
 

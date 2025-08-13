@@ -4,12 +4,11 @@ from typing import Literal
 
 from jinja2 import Environment, FileSystemLoader
 
-from ..utils import Base, NextTaskResult, Task
 from ...config import AgentConfig
 from ...utils import SimplifiedAsyncOpenAI
-from .session_manager import SessionManager
+from ..utils import Base, NextTaskResult, Task
 from .output_parser import PlannerOutputParser
-
+from .session_manager import SessionManager
 
 PROMPT_DIR = pathlib.Path(__file__).parent / "config"
 

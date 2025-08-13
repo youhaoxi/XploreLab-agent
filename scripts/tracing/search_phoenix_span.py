@@ -6,9 +6,9 @@ import argparse
 
 import tqdm
 
-from utu.tracing import PhoenixUtils
-from utu.eval import DBDataManager
 from utu.config import ConfigLoader
+from utu.eval import DBDataManager
+from utu.tracing import PhoenixUtils
 
 project_name = "uTu-WebWalker"
 phoenix_utils = PhoenixUtils(project_name=project_name)

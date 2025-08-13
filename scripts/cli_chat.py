@@ -1,8 +1,8 @@
 import argparse
 import asyncio
 
-from utu.config import ConfigLoader, AgentConfig
 from utu.agents import SimpleAgent
+from utu.config import AgentConfig, ConfigLoader
 
 
 async def main():

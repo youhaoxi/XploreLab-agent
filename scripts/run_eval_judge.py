@@ -1,7 +1,7 @@
 import asyncio
 
-from utu.ww.ww_benchmark import WWBenchmark
 from utu.eval.utils import parse_eval_config
+from utu.ww.ww_benchmark import WWBenchmark
 
 
 async def main():

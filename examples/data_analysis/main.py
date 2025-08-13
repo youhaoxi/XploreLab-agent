@@ -1,9 +1,9 @@
+import asyncio
 import json
 import pathlib
-import asyncio
 
-from utu.config import ConfigLoader
 from utu.agents import OrchestraAgent
+from utu.config import ConfigLoader
 
 
 async def main():

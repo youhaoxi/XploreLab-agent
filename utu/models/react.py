@@ -3,34 +3,34 @@ doc: https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNRgjuRgV7TQ2phu2p?scode=AJEAIQ
 """
 
 import logging
-from typing import AsyncIterator
 from dataclasses import asdict
+from typing import AsyncIterator
 
-from openai import AsyncOpenAI
-from openai.types.responses.response_prompt_param import ResponsePromptParam
-from openai.types.responses import (
-    # Response,
-    ResponseOutputItem,
-    ResponseCompletedEvent,
-    ResponseOutputItemDoneEvent,
-    ResponseOutputMessage,
-    ResponseFunctionToolCall,
-)
 from agents import (
-    OpenAIChatCompletionsModel,
-    ModelSettings,
     AgentOutputSchema,
     AgentOutputSchemaBase,
-    ModelResponse,
     Handoff,
+    ModelResponse,
+    ModelSettings,
     ModelTracing,
-    TResponseInputItem,
+    OpenAIChatCompletionsModel,
     Tool,
+    TResponseInputItem,
 )
 from agents.items import TResponseStreamEvent
+from openai import AsyncOpenAI
+from openai.types.responses import (
+    ResponseCompletedEvent,
+    ResponseFunctionToolCall,
+    # Response,
+    ResponseOutputItem,
+    ResponseOutputItemDoneEvent,
+    ResponseOutputMessage,
+)
+from openai.types.responses.response_prompt_param import ResponsePromptParam
 
 from ..utils import get_logger
-from .react_converter import ReactConverter, ConverterPreprocessInput
+from .react_converter import ConverterPreprocessInput, ReactConverter
 
 logger = get_logger(__name__)
 

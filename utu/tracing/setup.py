@@ -8,14 +8,15 @@ TODO: rewrite openinference-instrumentation-openai-agents to support
 
 import os
 import warnings
+
 from agents import add_trace_processor
-from phoenix.otel import register, TracerProvider
 from openinference.instrumentation.openai import OpenAIInstrumentor
+from phoenix.otel import TracerProvider, register
+
+from .db_tracer import DBTracingProcessor
 
 # from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 from .otel_agents_instrumentor import OpenAIAgentsInstrumentor
-from .db_tracer import DBTracingProcessor
-
 
 PHOENIX_TRACING_PROVIDER: TracerProvider | None = None
 DB_TRACING_PROCESSOR: DBTracingProcessor | None = None

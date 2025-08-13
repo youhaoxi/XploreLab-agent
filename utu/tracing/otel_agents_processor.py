@@ -42,17 +42,6 @@ from openai.types.responses import (
 )
 from openai.types.responses.response_input_item_param import FunctionCallOutput, Message
 from openai.types.responses.response_output_message_param import Content
-from opentelemetry.context import attach, detach
-from opentelemetry.trace import Span as OtelSpan
-from opentelemetry.trace import (
-    Status,
-    StatusCode,
-    Tracer,
-    set_span_in_context,
-)
-from opentelemetry.util.types import AttributeValue
-from typing_extensions import assert_never
-
 from openinference.instrumentation import safe_json_dumps
 from openinference.semconv.trace import (
     MessageAttributes,
@@ -65,6 +54,16 @@ from openinference.semconv.trace import (
     ToolAttributes,
     ToolCallAttributes,
 )
+from opentelemetry.context import attach, detach
+from opentelemetry.trace import (
+    Span as OtelSpan,
+    Status,
+    StatusCode,
+    Tracer,
+    set_span_in_context,
+)
+from opentelemetry.util.types import AttributeValue
+from typing_extensions import assert_never
 
 logger = logging.getLogger(__name__)
 

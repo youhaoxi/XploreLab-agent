@@ -1,12 +1,12 @@
-from .base import BaseProcesser, BaseLLMJudgeProcesser, BaseMatchProcesser
-from .gaia import GAIAProcesser
+from utu.config import EvalConfig
+
+from ...utils import DIR_ROOT
+from .base import BaseLLMJudgeProcesser, BaseMatchProcesser, BaseProcesser
 from .browse_comp import BrowseCompProcesser
 from .browse_comp_zh import BrowseCompZHProcesser
-from .xbench import XBenchProcesser
+from .gaia import GAIAProcesser
 from .web_walker import WebWalkerProcesser
-from ...utils import DIR_ROOT
-
-from utu.config import EvalConfig
+from .xbench import XBenchProcesser
 
 
 # factory class for evaluation

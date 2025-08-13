@@ -1,7 +1,7 @@
 import pytest
 
-from utu.tools import ImageToolkit
 from utu.config import ConfigLoader
+from utu.tools import ImageToolkit
 
 
 @pytest.fixture

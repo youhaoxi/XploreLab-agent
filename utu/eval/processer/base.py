@@ -1,10 +1,10 @@
-import re
 import abc
+import re
 import string
 
 from ...config import EvalConfig
-from ...utils import get_logger, SimplifiedAsyncOpenAI
-from ..data import EvaluationSample, EvaluationResult
+from ...utils import SimplifiedAsyncOpenAI, get_logger
+from ..data import EvaluationResult, EvaluationSample
 from .prompts import get_benchmark_templates
 from .utils import MetricsUtils
 

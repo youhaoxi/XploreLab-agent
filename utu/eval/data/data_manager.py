@@ -3,12 +3,12 @@ import json
 import pathlib
 from typing import Literal
 
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlmodel import Session, SQLModel, create_engine, select
 
 from ...config import EvalConfig
-from ...db import EvaluationSample, DatasetSample
-from ..processer import BUILTIN_BENCHMARKS
+from ...db import DatasetSample, EvaluationSample
 from ...utils import get_logger
+from ..processer import BUILTIN_BENCHMARKS
 
 logger = get_logger(__name__)
 

@@ -1,8 +1,8 @@
-from typing import Optional, Any, Dict, Mapping, Sequence, Literal
+from typing import Any, Dict, Literal, Mapping, Optional, Sequence
 
 # from agents.tracing import FunctionSpanData, GenerationSpanData
 from sqlalchemy import JSON
-from sqlmodel import SQLModel, Field, Column, String
+from sqlmodel import Column, Field, SQLModel, String
 
 
 # FunctionSpanData

@@ -1,8 +1,9 @@
-import pathlib
 import hashlib
+import pathlib
 import tempfile
-import requests
 from urllib.parse import urlparse
+
+import requests
 
 
 def get_package_path() -> pathlib.Path:

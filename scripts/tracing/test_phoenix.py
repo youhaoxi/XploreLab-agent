@@ -3,12 +3,12 @@
 - concurrency:
 """
 
-import tqdm
-import random
 import asyncio
+import random
 
-from agents.tracing import agent_span, function_span, generation_span
+import tqdm
 from agents._run_impl import TraceCtxManager
+from agents.tracing import agent_span, function_span, generation_span
 
 from utu.tracing import setup_phoenix_tracing
 

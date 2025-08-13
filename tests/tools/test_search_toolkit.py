@@ -1,9 +1,10 @@
 import hashlib
 import json
+
 import pytest
 
-from utu.tools import SearchToolkit
 from utu.config import ConfigLoader
+from utu.tools import SearchToolkit
 
 
 @pytest.fixture

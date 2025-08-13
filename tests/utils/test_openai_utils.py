@@ -1,8 +1,7 @@
 from pydantic import BaseModel
 
-from utu.utils import SimplifiedAsyncOpenAI, OpenAIUtils
 from utu.config import ConfigLoader
-
+from utu.utils import OpenAIUtils, SimplifiedAsyncOpenAI
 
 config = ConfigLoader.load_model_config("base")
 openai_client = SimplifiedAsyncOpenAI(**config.model_provider.model_dump())

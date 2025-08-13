@@ -1,7 +1,7 @@
 import pytest
 
-from utu.tools import VideoToolkit
 from utu.config import ConfigLoader
+from utu.tools import VideoToolkit
 
 
 @pytest.fixture

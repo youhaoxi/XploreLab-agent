@@ -1,7 +1,7 @@
 from agents import Agent, function_tool
 from agents.mcp import MCPServerStdioParams
 
-from ..utils import oneline_object, get_logger
+from ..utils import get_logger, oneline_object
 
 logger = get_logger(__name__)
 

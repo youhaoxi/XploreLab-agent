@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from utu.config import ConfigLoader
 from utu.agents import OrchestraAgent
+from utu.config import ConfigLoader
 
 
 @pytest.fixture

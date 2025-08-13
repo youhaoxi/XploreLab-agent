@@ -1,5 +1,5 @@
 import socket
-from typing import Set, Optional
+from typing import Optional, Set
 
 
 class PortManager:

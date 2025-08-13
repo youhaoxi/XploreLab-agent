@@ -2,8 +2,8 @@ import json
 import os
 
 import pandas as pd
-from sqlmodel import create_engine, Session, select
 from datasets import load_dataset
+from sqlmodel import Session, create_engine, select
 
 from utu.db.eval_datapoint import DatasetSample
 

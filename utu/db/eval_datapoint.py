@@ -1,7 +1,7 @@
-from typing import Optional, Any
 from datetime import datetime
+from typing import Any, Optional
 
-from sqlmodel import SQLModel, Field, JSON, Column
+from sqlmodel import JSON, Column, Field, SQLModel
 
 from .utu_basemodel import UTUBaseModel
 

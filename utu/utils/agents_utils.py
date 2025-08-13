@@ -1,36 +1,35 @@
-import os
 import json
-import uuid
 import logging
-from typing import Literal
+import os
+import uuid
 from collections.abc import AsyncIterator, Iterable
-
-from openai import AsyncOpenAI
-from openai.types.responses import ResponseFunctionToolCall, FunctionToolParam
-from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
+from typing import Literal
 
 from agents import (
+    FunctionTool,
     HandoffOutputItem,
-    TResponseInputItem,
     ItemHelpers,
     MessageOutputItem,
+    ModelSettings,
+    ModelTracing,
     OpenAIChatCompletionsModel,
     OpenAIResponsesModel,
     RunItem,
-    ModelSettings,
-    ModelTracing,
-    StreamEvent,
     RunResult,
+    StreamEvent,
     ToolCallItem,
-    FunctionTool,
     ToolCallOutputItem,
+    TResponseInputItem,
 )
-from agents.tracing import gen_trace_id
-from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEvent, RunItemStreamEvent
 from agents.models.chatcmpl_converter import Converter
+from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEvent, RunItemStreamEvent
+from agents.tracing import gen_trace_id
+from openai import AsyncOpenAI
+from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
+from openai.types.responses import FunctionToolParam, ResponseFunctionToolCall
 
-from .print_utils import PrintUtils
 from .openai_utils import OpenAIChatCompletionParams, OpenAIUtils
+from .print_utils import PrintUtils
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
-from utu.eval.benchmarks import BaseBenchmark
 from utu.config import ConfigLoader
+from utu.eval.benchmarks import BaseBenchmark
 
 config = ConfigLoader.load_eval_config("v00")
 benchmark = BaseBenchmark(config)

@@ -1,16 +1,15 @@
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 
 from agents import gen_trace_id
-from agents.tracing import function_span, trace, agent_span
+from agents.tracing import agent_span, function_span, trace
 
 from ..config import AgentConfig, ConfigLoader
-from ..utils import get_logger
 from ..tracing import setup_tracing
-from .utils import NextTaskResult, SearchResult, AnalysisResult, ModuleGenBackground
-
+from ..utils import get_logger
+from .analyst import AnalysisAgent
 from .planner import PlannerAgent
 from .searcher import SimpleSearcherAgent as SearcherAgent
-from .analyst import AnalysisAgent
+from .utils import AnalysisResult, ModuleGenBackground, NextTaskResult, SearchResult
 
 logger = get_logger(__name__)
 

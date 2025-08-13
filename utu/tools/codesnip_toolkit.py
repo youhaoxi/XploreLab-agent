@@ -7,9 +7,9 @@ from typing import Callable, Optional
 
 import requests
 
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
-from ..utils import oneline_object, get_logger
+from ..utils import get_logger, oneline_object
+from .base import AsyncBaseToolkit
 
 logger = get_logger(__name__)
 

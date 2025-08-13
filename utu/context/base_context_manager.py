@@ -1,7 +1,7 @@
-from agents import TResponseInputItem, TContext, RunContextWrapper
+from agents import RunContextWrapper, TContext, TResponseInputItem
 from agents.run import SingleStepResult
 
-from ..utils import get_logger, ChatCompletionConverter
+from ..utils import ChatCompletionConverter, get_logger
 
 logger = get_logger(__name__)
 

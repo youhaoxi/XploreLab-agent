@@ -3,10 +3,11 @@ Clear error cache files
 """
 
 import json
-from tqdm import tqdm
 import os
-import subprocess
 import pathlib
+import subprocess
+
+from tqdm import tqdm
 
 cache_dir = pathlib.Path(__file__).parent.parent.joinpath(".cache").resolve()
 

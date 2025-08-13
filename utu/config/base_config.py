@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from typing import Any, Iterable
+
+from pydantic import BaseModel
 from typing_extensions import TypeAlias
 
 ReprArgs: TypeAlias = Iterable[tuple[str | None, Any]]

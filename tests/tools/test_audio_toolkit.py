@@ -1,7 +1,7 @@
 import pytest
 
-from utu.tools import AudioToolkit
 from utu.config import ConfigLoader
+from utu.tools import AudioToolkit
 
 
 @pytest.fixture

@@ -1,21 +1,21 @@
-import os
+import asyncio
+import base64
+import contextlib
+import glob
 import html
 import io
-import contextlib
-import base64
-import glob
+import os
 import re
 import sys
-import asyncio
-from IPython.core.interactiveshell import InteractiveShell
+
 import matplotlib
+from IPython.core.interactiveshell import InteractiveShell
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
-
+from .base import AsyncBaseToolkit
 
 # Used to clean ANSI escape sequences
 ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]")

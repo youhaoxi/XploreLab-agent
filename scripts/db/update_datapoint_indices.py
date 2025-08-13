@@ -3,10 +3,11 @@ EvaluationSample: add index column
 """
 
 import os
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import ProgrammingError
 from collections import defaultdict
+
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.orm import sessionmaker
 
 from utu.db import EvaluationSample
 

@@ -1,6 +1,6 @@
 from datetime import datetime
-from utu.ww.planner import PlannerAgent
 
+from utu.ww.planner import PlannerAgent
 
 planner = PlannerAgent()
 

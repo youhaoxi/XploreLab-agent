@@ -1,10 +1,9 @@
 import json
-import pathlib
 import logging
+import pathlib
 from logging.handlers import TimedRotatingFileHandler
 
 from colorlog import ColoredFormatter
-
 
 DIR_LOGS = pathlib.Path(__file__).parent.parent.parent / "logs"
 DIR_LOGS.mkdir(exist_ok=True)

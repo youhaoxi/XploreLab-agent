@@ -2,14 +2,13 @@ import asyncio
 import json
 import time
 
-from tqdm import tqdm
 from agents.tracing import gen_trace_id
+from tqdm import tqdm
 
-from ...utils import get_logger, setup_logging, AgentsUtils
-
-from ...config import EvalConfig, ConfigLoader
 from ...agents import SimpleAgent
-from ..data import DBDataManager, EvaluationSample, EvaluationResult
+from ...config import ConfigLoader, EvalConfig
+from ...utils import AgentsUtils, get_logger, setup_logging
+from ..data import DBDataManager, EvaluationResult, EvaluationSample
 from ..processer import PROCESSER_FACTORY, BaseProcesser
 
 setup_logging()

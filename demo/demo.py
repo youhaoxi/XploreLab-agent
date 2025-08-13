@@ -1,9 +1,11 @@
 import asyncio
+import logging
+
+import agents as ag
+import gradio as gr
+
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
-import gradio as gr
-import agents as ag
-import logging
 
 logging.basicConfig(level=logging.INFO)
 
@@ -93,7 +95,7 @@ with gr.Blocks() as demo:
                 break
             if isinstance(event, ag.RawResponsesStreamEvent):
                 if event.data.type == "response.output_text.delta":
-                    if history and history[-1]["role"] == "assistant" and not ("metadata" in history[-1]):
+                    if history and history[-1]["role"] == "assistant" and "metadata" not in history[-1]:
                         history[-1]["content"] += event.data.delta
                     else:
                         history.append({"role": "assistant", "content": event.data.delta})

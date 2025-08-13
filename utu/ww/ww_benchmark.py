@@ -1,5 +1,5 @@
-import time
 import json
+import time
 
 from ..eval.benchmarks.base_benchmark import BaseBenchmark
 from ..eval.data import EvaluationSample

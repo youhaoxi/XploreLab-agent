@@ -1,6 +1,7 @@
 import uuid
-from utu.eval import DBDataManager
+
 from utu.config import ConfigLoader
+from utu.eval import DBDataManager
 
 config = ConfigLoader.load_eval_config("v00")
 config.exp_id = f"test_{uuid.uuid4()}"  # ensure unique

@@ -1,8 +1,9 @@
 import base64
-import requests
-from utu.utils import SimplifiedAsyncOpenAI
-from utu.config import ConfigLoader
 
+import requests
+
+from utu.config import ConfigLoader
+from utu.utils import SimplifiedAsyncOpenAI
 
 config = ConfigLoader.load_model_config("base")
 client = SimplifiedAsyncOpenAI(**config.model_provider.model_dump())

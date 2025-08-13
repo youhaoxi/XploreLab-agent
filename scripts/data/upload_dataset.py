@@ -2,7 +2,8 @@ import argparse
 import json
 import os
 import sys
-from sqlmodel import create_engine, Session
+
+from sqlmodel import Session, create_engine
 
 from utu.db.eval_datapoint import DatasetSample
 

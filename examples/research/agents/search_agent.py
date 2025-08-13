@@ -1,5 +1,5 @@
 from utu.agents import SimpleAgent
-from utu.config import ModelSettingsConfig, ConfigLoader
+from utu.config import ConfigLoader, ModelSettingsConfig
 from utu.tools import SearchToolkit
 
 

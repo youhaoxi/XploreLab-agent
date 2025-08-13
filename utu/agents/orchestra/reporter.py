@@ -1,8 +1,8 @@
 import pathlib
 
-from .common import AnalysisResult, TaskRecorder
 from ...config import AgentConfig
 from ...utils import SimplifiedAsyncOpenAI, get_jinja_template
+from .common import AnalysisResult, TaskRecorder
 
 
 class ReporterAgent:

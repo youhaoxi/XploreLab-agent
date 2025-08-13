@@ -3,19 +3,18 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 
 import jinja2
-from agents import Tool, Handoff, TResponseInputItem, AgentOutputSchema, ModelSettings
+from agents import AgentOutputSchema, Handoff, ModelSettings, Tool, TResponseInputItem
 
 # FIXME: change to ChatCompletionConverter
 from agents.models.chatcmpl_converter import Converter
-from openai.types.responses import (
-    ResponseOutputItem,
-    ResponseOutputMessage,
-    ResponseFunctionToolCall,
-    EasyInputMessageParam,
-)
 from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageToolCall
 from openai.types.chat.chat_completion_message_tool_call import Function
-
+from openai.types.responses import (
+    EasyInputMessageParam,
+    ResponseFunctionToolCall,
+    ResponseOutputItem,
+    ResponseOutputMessage,
+)
 
 # TODO: handle handoffs: list[Handoff]
 TEMPLATE_SP = r"""
