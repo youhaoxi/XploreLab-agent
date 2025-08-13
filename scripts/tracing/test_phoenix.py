@@ -43,11 +43,11 @@ async def exp(idx: int = 0):
     with TraceCtxManager(
         workflow_name="test_phoenix",
         trace_id=f"trace_phoenix_{idx}",
-        group_id=f"trace_phoenix",
+        group_id="trace_phoenix",
         metadata={"idx": str(idx)},
         disabled=False,
     ):
-        with agent_span("agent") as span_agent:
+        with agent_span("agent"):
             # span_agent.start(mark_as_current=True)  # mark start
             await mock_llm(input_len=test_len)
             await mock_function(output_len=test_len)
@@ -64,7 +64,7 @@ async def test_concurrency(concurrency: int = 10, total: int = 100):
 
     tasks = [exp_with_semaphore(i) for i in range(total)]
     for task in tqdm.tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Testing concurrency"):
-        res = await task
+        _ = await task
         # print(res)
 
 

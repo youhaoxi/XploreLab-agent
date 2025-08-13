@@ -161,7 +161,7 @@ class BaseMatchProcesser(BaseProcesser):
 
     async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
         """Judge a single sample."""
-        question = data.raw_question
+        # question = data.raw_question
         response = data.response
         correct_answer = data.correct_answer or "unknown"
 
@@ -222,8 +222,10 @@ class BaseMatchProcesser(BaseProcesser):
             print(f"String {s} cannot be normalized to number str.")
             return float("inf")
 
-    def _split_string(self, s: str, char_list: list[str] = [",", ";"]) -> list[str]:
+    def _split_string(self, s: str, char_list: list[str] = None) -> list[str]:
         """Split a string by a list of characters."""
+        if char_list is None:
+            char_list = [",", ";"]
         pattern = f"[{''.join(char_list)}]"
         return re.split(pattern, s)
 

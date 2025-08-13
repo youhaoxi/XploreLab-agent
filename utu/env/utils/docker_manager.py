@@ -249,7 +249,7 @@ class DockerManager:
 
         return {
             "success": True,
-            "message": f"批量停止完成",
+            "message": "批量停止完成",
             "total_count": len(container_ids),
             "stopped_count": success_count,
             "results": results,
@@ -272,7 +272,7 @@ class DockerManager:
 
         return {
             "success": True,
-            "message": f"批量停止完成",
+            "message": "批量停止完成",
             "total_count": len(container_ids),
             "stopped_count": success_count,
             "results": results,

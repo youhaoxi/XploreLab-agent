@@ -1,7 +1,7 @@
 import json
 
 from agents._run_impl import TraceCtxManager
-from agents.tracing import agent_span, function_span, generation_span, response_span
+from agents.tracing import function_span, response_span
 
 from utu.tracing import setup_db_tracing
 from utu.utils import SimplifiedAsyncOpenAI

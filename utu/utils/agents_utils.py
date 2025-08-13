@@ -26,9 +26,9 @@ from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEven
 from agents.tracing import Trace, gen_trace_id, get_current_trace
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
-from openai.types.responses import FunctionToolParam, ResponseFunctionToolCall
+from openai.types.responses import ResponseFunctionToolCall
 
-from .openai_utils import OpenAIChatCompletionParams, OpenAIUtils
+from .openai_utils import OpenAIChatCompletionParams
 from .print_utils import PrintUtils
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class ChatCompletionConverter(Converter):
     @classmethod
     def items_to_messages(cls, items: str | Iterable[TResponseInputItem]) -> list[ChatCompletionMessageParam]:
         # skip reasoning, see chatcmpl_converter.Converter.items_to_messages()
-        # agents.exceptions.UserError: Unhandled item type or structure: 
+        # agents.exceptions.UserError: Unhandled item type or structure:
         # {'id': '__fake_id__', 'summary': [{'text': '...', 'type': 'summary_text'}], 'type': 'reasoning'}
         if not isinstance(items, str):  # TODO: check it!
             items = cls.filter_items(items)

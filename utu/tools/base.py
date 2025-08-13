@@ -1,5 +1,4 @@
 import abc
-import asyncio
 from typing import Callable
 
 import mcp.types as types

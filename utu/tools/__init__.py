@@ -1,6 +1,6 @@
 from .arxiv_toolkit import ArxivToolkit
 from .audio_toolkit import AudioToolkit
-from .base import AsyncBaseToolkit
+from .base import AsyncBaseToolkit as AsyncBaseToolkit
 from .bash_remote_tool import BashRemoteToolkit
 from .bash_tool import BashTool
 from .codesnip_toolkit import CodesnipToolkit

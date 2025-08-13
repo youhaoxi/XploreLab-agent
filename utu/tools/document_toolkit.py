@@ -41,7 +41,7 @@ class DocumentToolkit(AsyncBaseToolkit):
         logger.info(f"[tool] parse_document: {self.md5_to_path[md5]}")
         task = await self.chunkr.upload(self.md5_to_path[md5])
 
-        logger.info(f"  getting results...")
+        logger.info("  getting results...")
         markdown = task.markdown()
         # html = task.html()
         # content = task.content()

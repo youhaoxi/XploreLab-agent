@@ -67,6 +67,6 @@ async def test_simplified_openai_chat_completions_model():
     base_url = os.getenv("UTU_LLM_BASE_URL")
     openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
     simplified_openai_model = SimplifiedOpenAIChatCompletionsModel(model=model, openai_client=openai_client)
-    with trace(workflow_name="test_agent") as trace_ctx:
+    with trace(workflow_name="test_agent"):
         res = await simplified_openai_model.query_one(messages=messages, tools=tools, model=model)
         print(res)

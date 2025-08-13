@@ -1,7 +1,7 @@
 import logging
 from contextlib import AsyncExitStack, asynccontextmanager
 from datetime import timedelta
-from typing import Any, AsyncGenerator, Literal
+from typing import AsyncGenerator, Literal
 
 from mcp.client.session import ClientSession
 from mcp.client.sse import sse_client

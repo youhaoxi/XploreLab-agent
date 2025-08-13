@@ -56,7 +56,7 @@ def build_and_publish(username, password):
 
 def extract_project_info():
     """从pyproject.toml提取项目信息"""
-    pyproject_file = f"pyproject.toml"
+    pyproject_file = "pyproject.toml"
 
     if not os.path.isfile(pyproject_file):
         print(f"Error: {pyproject_file} not found")
@@ -137,12 +137,12 @@ def main():
         f"project_description:{project_description}"
     )
     if not project_name or not project_version:
-        print(f"Failed to get project_name or project_version, exit!")
+        print("Failed to get project_name or project_version, exit!")
         sys.exit(1)
 
     # 构建和发布项目
     if not build_and_publish(username, password):
-        print(f"Failed to build_and_publish, exit!")
+        print("Failed to build_and_publish, exit!")
         sys.exit(1)
 
 

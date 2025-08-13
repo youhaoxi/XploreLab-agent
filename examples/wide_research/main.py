@@ -6,7 +6,7 @@ import asyncio
 from agents import function_tool
 
 from utu.agents import SimpleAgent
-from utu.config import ConfigLoader, ModelSettingsConfig
+from utu.config import ConfigLoader
 from utu.tools import SearchToolkit
 
 

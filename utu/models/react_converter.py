@@ -14,7 +14,6 @@ from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageToolCa
 from openai.types.chat.chat_completion_message_tool_call import Function
 from openai.types.responses import (
     EasyInputMessageParam,
-    ResponseFunctionToolCall,
     ResponseOutputItem,
     ResponseOutputMessage,
 )
@@ -150,7 +149,7 @@ class ReactConverter:
                 # content: str | List[ResponseInputContentParam] -- do not convert now!
                 results.append(deepcopy(item))
             # type == "message" & role == "assistant"
-            elif resp_msg := Converter.maybe_response_output_message(item):
+            elif _ := Converter.maybe_response_output_message(item):
                 print(f">> [WARNING] got response_output_message: {item}")
                 results.append(deepcopy(item))
             # type == "function_call"

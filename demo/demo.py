@@ -154,7 +154,7 @@ with gr.Blocks() as demo:
                             {
                                 "role": "assistant",
                                 "content": event.data.delta,
-                                "metadata": {"title": f"🛠️ tool_call", "type": "tool_call"},
+                                "metadata": {"title": "🛠️ tool_call", "type": "tool_call"},
                             }
                         )
                 elif event.data.type == "response.function_call_arguments.done":

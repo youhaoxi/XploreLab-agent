@@ -2,7 +2,6 @@ import logging
 from typing import Any, AsyncIterator
 
 from openai.types.chat import (
-    ChatCompletion,
     ChatCompletionChunk,
     ChatCompletionMessage,
     ChatCompletionMessageToolCall,
@@ -11,10 +10,6 @@ from openai.types.chat import (
 from openai.types.responses import (
     FunctionToolParam,
     Response,
-    ResponseInputParam,
-    ResponseStreamEvent,
-    ResponseTextConfigParam,
-    ToolParam,
 )
 from pydantic import BaseModel
 

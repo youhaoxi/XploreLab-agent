@@ -1,4 +1,4 @@
-from typing import Type, TypeVar
+from typing import TypeVar
 
 from hydra import compose, initialize
 from omegaconf import DictConfig, OmegaConf

@@ -20,7 +20,7 @@ def download_dataset(dataset_name: str, output_path: str):
 
     engine = create_engine(db_url)
 
-    print(f"Connecting to the database...")
+    print("Connecting to the database...")
     with Session(engine) as session:
         print(f"Fetching datapoints for dataset: '{dataset_name}'...")
 

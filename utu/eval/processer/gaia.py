@@ -1,7 +1,6 @@
 import os
 
 from ...utils import DIR_ROOT
-from ..data import EvaluationSample as Datapoint
 from .base import BaseLLMJudgeProcesser
 
 
@@ -21,7 +20,7 @@ class GAIAProcesser(BaseLLMJudgeProcesser):
         if file_name:
             if ".MOV" in file_name:
                 return ""
-            prompt_use_files += f"\n\nTo answer the question above, you will have to use these attached files:"
+            prompt_use_files += "\n\nTo answer the question above, you will have to use these attached files:"
             if file_name.split(".")[-1] in ["pdf", "xlsx"]:
                 image_path = file_name.split(".")[0] + ".png"
                 if os.path.exists(image_path):

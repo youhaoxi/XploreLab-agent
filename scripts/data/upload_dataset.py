@@ -19,7 +19,7 @@ def upload_dataset(file_path: str, dataset_name: str):
 
     engine = create_engine(db_url)
 
-    print(f"Connecting to the database...")
+    print("Connecting to the database...")
     with Session(engine) as session:
         print(f"Uploading datapoints from {file_path} to dataset '{dataset_name}'...")
 

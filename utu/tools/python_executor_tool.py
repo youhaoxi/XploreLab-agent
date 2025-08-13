@@ -2,14 +2,11 @@ import asyncio
 import base64
 import contextlib
 import glob
-import html
 import io
 import os
 import re
-import sys
 
 import matplotlib
-from IPython.core.interactiveshell import InteractiveShell
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt

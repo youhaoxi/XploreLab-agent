@@ -35,9 +35,9 @@ class BaseBenchmark:
         self.preprocess()
         await self.rollout()
         await self.judge()
-        logger.info(f"> Running stat...")
+        logger.info("> Running stat...")
         await self.stat()
-        logger.info(f"> Cleaning up...")
+        logger.info("> Cleaning up...")
         await self.cleanup()
 
     def preprocess(self) -> None:

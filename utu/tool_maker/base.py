@@ -1,4 +1,4 @@
-from agents import Agent, function_tool
+from agents import function_tool
 from agents.mcp import MCPServerStdioParams
 
 from ..utils import get_logger, oneline_object

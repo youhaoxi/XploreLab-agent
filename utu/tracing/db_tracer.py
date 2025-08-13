@@ -9,14 +9,9 @@ from typing import Any
 
 from agents.tracing import Span, Trace, TracingProcessor, get_current_trace
 from agents.tracing.span_data import (
-    AgentSpanData,
-    CustomSpanData,
     FunctionSpanData,
     GenerationSpanData,
-    GuardrailSpanData,
-    HandoffSpanData,
     ResponseSpanData,
-    SpanData,
 )
 from sqlmodel import Session, SQLModel, create_engine
 

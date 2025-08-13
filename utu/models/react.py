@@ -2,8 +2,6 @@
 doc: https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNRgjuRgV7TQ2phu2p?scode=AJEAIQdfAAoS38Jv0GAcMATAZtAPI
 """
 
-import logging
-from dataclasses import asdict
 from typing import AsyncIterator
 
 from agents import (
@@ -23,7 +21,6 @@ from openai.types.responses import (
     ResponseCompletedEvent,
     ResponseFunctionToolCall,
     # Response,
-    ResponseOutputItem,
     ResponseOutputItemDoneEvent,
     ResponseOutputMessage,
 )
