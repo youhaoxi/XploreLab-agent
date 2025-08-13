@@ -1,10 +1,5 @@
 import asyncio
 import threading
-from dataclasses import asdict, dataclass
-
-from agents import RunResult
-
-from ..utils import ChatCompletionConverter
 
 
 # 限制并发数量的装饰器

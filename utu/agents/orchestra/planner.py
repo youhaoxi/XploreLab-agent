@@ -4,7 +4,7 @@ import re
 
 from ...config import AgentConfig
 from ...utils import SimplifiedAsyncOpenAI, get_jinja_env
-from .common import AgentInfo, CreatePlanResult, Subtask, TaskRecorder
+from .common import AgentInfo, CreatePlanResult, Subtask, OrchestraTaskRecorder
 
 
 class OutputParser:
@@ -66,7 +66,7 @@ class PlannerAgent:
     async def build(self):
         pass
 
-    async def create_plan(self, task_recorder: TaskRecorder) -> CreatePlanResult:
+    async def create_plan(self, task_recorder: OrchestraTaskRecorder) -> CreatePlanResult:
         sp = self.jinja_env.get_template("planner_sp.j2").render(
             planning_examples=self._format_planner_examples(self.planner_examples)
         )

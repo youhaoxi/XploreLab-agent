@@ -1,10 +1,9 @@
-from .common import AnalysisResult, CreatePlanResult, RunResult, Subtask, TaskRecorder, WorkerResult
+from .common import AnalysisResult, CreatePlanResult, Subtask, OrchestraTaskRecorder, WorkerResult
 from .planner import PlannerAgent
 from .reporter import ReporterAgent
 from .worker import BaseWorkerAgent, SimpleWorkerAgent
 
 __all__ = [
-    "RunResult",
     "CreatePlanResult",
     "WorkerResult",
     "AnalysisResult",
@@ -12,6 +11,6 @@ __all__ = [
     "ReporterAgent",
     "BaseWorkerAgent",
     "SimpleWorkerAgent",
-    "TaskRecorder",
+    "OrchestraTaskRecorder",
     "Subtask",
 ]

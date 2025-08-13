@@ -2,11 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-
-class RunResult(BaseModel):
-    final_output: str
-    trajectory: list[dict]  # [{"agent": "SearchAgent", "trajectory": [{"role": "user", "content": "..."}, ...]}, ...]
-    trace_id: str = ""
+from ..common import TaskRecorder
 
 
 class AgentInfo(BaseModel):
@@ -58,13 +54,12 @@ class AnalysisResult(BaseModel):
         return {"agent": "analysis", "trajectory": [{"role": "assistant", "content": self.output}]}
 
 
-class TaskRecorder:
+class OrchestraTaskRecorder(TaskRecorder):
     def __init__(self, task: str, trace_id: str):
-        self.task = task
-        self.trace_id = trace_id
-        self.trajectories: list = []
-        self.task_records: list[WorkerResult] = []
+        super().__init__(task, trace_id)
+
         self.plan: CreatePlanResult = None
+        self.task_records: list[WorkerResult] = []
 
     def set_plan(self, plan: CreatePlanResult):
         self.plan = plan

@@ -1,14 +1,14 @@
 from ...config import AgentConfig
 from ...utils import AgentsUtils
 from ..simple_agent import SimpleAgent
-from .common import Subtask, TaskRecorder, WorkerResult
+from .common import Subtask, OrchestraTaskRecorder, WorkerResult
 
 
 class BaseWorkerAgent:
     async def build(self):
         pass
 
-    async def work(self, task_recorder: TaskRecorder, subtask: Subtask) -> WorkerResult:
+    async def work(self, task_recorder: OrchestraTaskRecorder, subtask: Subtask) -> WorkerResult:
         raise NotImplementedError
 
 
@@ -33,7 +33,7 @@ class SimpleWorkerAgent(BaseWorkerAgent):
     async def build(self):
         await self.agent.build()
 
-    async def work(self, task_recorder: TaskRecorder, subtask: Subtask) -> WorkerResult:
+    async def work(self, task_recorder: OrchestraTaskRecorder, subtask: Subtask) -> WorkerResult:
         """search webpages for a specific subtask, return a report"""
         str_plan = task_recorder.get_plan_str()
         str_traj = task_recorder.get_trajectory_str()
@@ -43,9 +43,9 @@ class SimpleWorkerAgent(BaseWorkerAgent):
             trajectory=str_traj,
             task=subtask.task,
         )
-        run_result = await self.agent.run(str_task, trace_id=task_recorder.trace_id)
+        recorder = await self.agent.run(str_task, trace_id=task_recorder.trace_id)
         return WorkerResult(
             task=subtask.task,
-            output=run_result.final_output,
-            trajectory=AgentsUtils.get_trajectory_from_agent_result(run_result),
+            output=recorder.final_output,
+            trajectory=AgentsUtils.get_trajectory_from_agent_result(recorder.get_run_result()),
         )

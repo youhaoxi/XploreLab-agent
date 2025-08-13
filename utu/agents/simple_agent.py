@@ -14,9 +14,9 @@ from agents import (
     TContext,
     Tool,
     TResponseInputItem,
+    trace,
 )
 from agents.mcp import MCPServer, MCPServerStdio
-from agents.tracing import gen_trace_id, get_current_trace
 
 from ..config import AgentConfig, ConfigLoader, ToolkitConfig
 from ..context import BaseContextManager, build_context_manager
@@ -24,11 +24,13 @@ from ..env import BaseEnv, get_env
 from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
 from ..tracing import setup_tracing
 from ..utils import AgentsUtils, get_logger
+from .base_agent import BaseAgent
+from .common import TaskRecorder
 
 logger = get_logger(__name__)
 
 
-class SimpleAgent:
+class SimpleAgent(BaseAgent):
     """A simple agent with env, tools, mcps, and context manager, wrapped on openai-agents."""
 
     def __init__(
@@ -51,13 +53,12 @@ class SimpleAgent:
         self.output_type: type[Any] | AgentOutputSchemaBase | None = output_type
         self.context_manager: BaseContextManager = None
         self.env: BaseEnv = None
-        self.current_agent: Agent[TContext] = None
+        self.current_agent: Agent[TContext] = None       # move to task recorder?
         self.input_items: list[TResponseInputItem] = []
 
         self._run_hooks: RunHooks = None
         self._mcp_servers: list[MCPServer] = []
         self._toolkits: list[AsyncBaseToolkit] = []
-        self._trace_id: str = None
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
 
@@ -88,9 +89,8 @@ class SimpleAgent:
 
     async def build(self):
         """Build the agent"""
-        self.env = await get_env(self.config, self._trace_id)  # FIXME: trace_id
+        self.env = await get_env(self.config, "None")  # FIXME: trace_id
         await self.env.build()
-        # model & agent
         self.current_agent = Agent(
             name=self.config.agent.name,
             instructions=self.config.agent.instructions,
@@ -151,19 +151,10 @@ class SimpleAgent:
         self._mcp_servers.append(server)
         return server
 
-    # RunnerMixin apis
-    def _get_trace_id(self) -> str:
-        if not self._trace_id:
-            current_trace = get_current_trace()
-            self._trace_id = gen_trace_id() if current_trace is None else current_trace.trace_id
-        logger.info(f"> trace_id: {self._trace_id}")
-        return self._trace_id
-
     def _get_run_config(self) -> RunConfig:
         run_config = RunConfig(
             model=self.current_agent.model,
             model_settings=self.config.model.model_settings,
-            trace_id=self._get_trace_id(),
             workflow_name=self.config.agent.name,
         )
         return run_config
@@ -175,38 +166,55 @@ class SimpleAgent:
         }
 
     # wrap `Runner` apis in @openai-agents
-    async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResult:
+    async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> TaskRecorder:
         setup_tracing()
-        if trace_id:
-            self._trace_id = trace_id
-        return await Runner.run(
-            self.current_agent,
-            input,
+        trace_id = trace_id or AgentsUtils.gen_trace_id()
+        logger.info(f"> trace_id: {trace_id}")
+
+        task_recorder = TaskRecorder(input, trace_id)
+        run_kwargs = dict(
+            starting_agent=self.current_agent,
+            input=input,
             context=self._get_context(),
             max_turns=self.config.max_turns,
             hooks=self._run_hooks,
             run_config=self._get_run_config(),
         )
+        if AgentsUtils.get_current_trace():
+            run_result = await Runner.run(**run_kwargs)
+        else:
+            with trace(workflow_name="simple_agent", trace_id=trace_id):
+                run_result = await Runner.run(**run_kwargs)
+        task_recorder.add_run_result(run_result)
+        task_recorder.set_final_output(run_result.final_output)
+        return task_recorder
 
     def run_streamed(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResultStreaming:
         setup_tracing()
-        if trace_id:
-            self._trace_id = trace_id
-        return Runner.run_streamed(
-            self.current_agent,
-            input,
+        trace_id = trace_id or AgentsUtils.gen_trace_id()
+        logger.info(f"> trace_id: {trace_id}")
+
+        run_kwargs = dict(
+            starting_agent=self.current_agent,
+            input=input,
             context=self._get_context(),
             max_turns=self.config.max_turns,
             hooks=self._run_hooks,
             run_config=self._get_run_config(),
         )
+        if AgentsUtils.get_current_trace():
+            return Runner.run_streamed(**run_kwargs)
+        else:
+            with trace(workflow_name="simple_agent", trace_id=trace_id):
+                return Runner.run_streamed(**run_kwargs)
 
     # util apis
     async def chat(self, input: str) -> RunResult:
         # TODO: support multi-modal input -- `def add_input(...)`
         # TODO: set "session-level" tracing for multi-turn chat
         self.input_items.append({"content": input, "role": "user"})
-        run_result = await self.run(self.input_items)
+        recorder = await self.run(self.input_items)
+        run_result = recorder.get_run_result()
         AgentsUtils.print_new_items(run_result.new_items)
         self.input_items = run_result.to_input_list()
         self.current_agent = run_result.last_agent

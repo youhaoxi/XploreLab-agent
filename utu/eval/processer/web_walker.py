@@ -10,10 +10,13 @@ class WebWalkerProcesser(BaseLLMJudgeProcesser):
 
     name: str = "WebWalker"
 
-    # def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
-    #     aug_question = f"{sample.raw_question}\nReference url: {sample.meta['root_url']}"
-    #     sample.update(augmented_question=aug_question)
-    #     return sample
+    def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
+        # MODE 1: use root_url
+        # aug_question = f"{sample.raw_question}\nReference url: {sample.meta['root_url']}"
+        # MODE 2: w/o
+        aug_question = sample.raw_question
+        sample.update(augmented_question=aug_question)
+        return sample
 
     def calculate_metrics(self, samples: list[EvaluationSample]) -> dict:
         """Calculate metrics from the judged data."""

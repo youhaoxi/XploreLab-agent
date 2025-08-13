@@ -90,7 +90,7 @@ class DBDataManager(DataManager):
             datapoints = session.exec(
                 select(DatasetSample).where(DatasetSample.dataset == self.config.data.dataset)
             ).all()
-
+            logger.info(f"Loaded {len(datapoints)} samples from {self.config.data.dataset}.")
             samples = []
             for dp in datapoints:
                 sample = EvaluationSample(

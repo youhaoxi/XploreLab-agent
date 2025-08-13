@@ -56,7 +56,7 @@ class BaseProcesser:
         """Calculate metrics from the judged data."""
         pass
 
-    def get_instructions(self) -> str:
+    def get_instructions(self) -> str:  # TODO: remove this!
         """Get the instruction for the processer."""
         return self.INSTRUCTION if self.INSTRUCTION else ""
 

@@ -12,10 +12,10 @@ class MetricsUtils:
         total = len(samples)
         correct_count = sum(item.correct for item in samples)
         incorrect_count = total - correct_count - invalid_count
-        confidence_scores = [item.confidence for item in samples if item.judged_response != "invalid"]
+        # confidence_scores = [item.confidence for item in samples if item.judged_response != "invalid"]
         return {
             "Accuracy (%)": round(correct_count / total * 100, 2),
-            "Average Confidence (%)": round(sum(confidence_scores) / total, 2),
+            # "Average Confidence (%)": round(sum(confidence_scores) / total, 2),
             "Details": {
                 "correct": correct_count,
                 "wrong": incorrect_count,

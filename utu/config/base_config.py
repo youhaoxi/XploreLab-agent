@@ -9,7 +9,7 @@ SECURE_FIELDS = ("api_key", "base_url")
 
 
 def if_need_secure(key: str) -> bool:
-    return any(f in key for f in SECURE_FIELDS)
+    return any(f in key.lower() for f in SECURE_FIELDS)
 
 
 def secure_repr(obj: ReprArgs) -> ReprArgs:

@@ -23,7 +23,7 @@ from agents import (
 )
 from agents.models.chatcmpl_converter import Converter
 from agents.stream_events import AgentUpdatedStreamEvent, RawResponsesStreamEvent, RunItemStreamEvent
-from agents.tracing import gen_trace_id
+from agents.tracing import gen_trace_id, get_current_trace, Trace
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 from openai.types.responses import FunctionToolParam, ResponseFunctionToolCall
@@ -98,6 +98,10 @@ class AgentsUtils:
     @staticmethod
     def gen_trace_id() -> str:
         return gen_trace_id()
+
+    @staticmethod
+    def get_current_trace() -> Trace:
+        return get_current_trace()
 
     @staticmethod
     def get_agents_model(

@@ -5,9 +5,9 @@ import time
 from agents.tracing import gen_trace_id
 from tqdm import tqdm
 
-from ...agents import SimpleAgent
+from ...agents import BaseAgent, get_agent
 from ...config import ConfigLoader, EvalConfig
-from ...utils import AgentsUtils, get_logger, setup_logging
+from ...utils import get_logger, setup_logging
 from ..data import DBDataManager, EvaluationResult, EvaluationSample
 from ..processer import PROCESSER_FACTORY, BaseProcesser
 
@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 class BaseBenchmark:
     dataset: DBDataManager
     _source_to_processer: dict[str, BaseProcesser] = {}
-    _source_to_agent: dict[str, SimpleAgent] = {}
+    _source_to_agent: dict[str, BaseAgent] = {}
 
     def __init__(self, config: EvalConfig | str) -> None:
         # config
@@ -86,36 +86,23 @@ class BaseBenchmark:
         return results
 
     async def rollout_one(self, sample: EvaluationSample) -> EvaluationSample:
-        agent = await self._get_agent(sample.source)
+        agent = get_agent(self.config.agent)
+        await agent.build()
         trace_id = gen_trace_id()
         start_time = time.time()
         result = await agent.run(sample.augmented_question, trace_id=trace_id)
         end_time = time.time()
 
         # Update the sample with the predicted answer and trajectory
-        trajectory = [AgentsUtils.get_trajectory_from_agent_result(result)]
         sample.update(
             trace_id=trace_id,
             response=result.final_output,
             time_cost=end_time - start_time,
-            trajectories=json.dumps(trajectory, ensure_ascii=False),
+            trajectories=json.dumps(result.trajectories, ensure_ascii=False),
             stage="rollout",  # update stage to rollout!
         )
         self.dataset.save(sample)
         return sample
-
-    async def _get_agent(self, source) -> SimpleAgent:
-        if source not in self._source_to_agent:
-            instructions = self._get_processer(source).get_instructions()
-            # SP: configed instructions + processer instructions
-            agent = SimpleAgent(
-                config=self.config.agent,
-                name=f"{source}-agent",
-                instructions=f"{self.config.agent.agent.instructions}\n\n{instructions}",
-            )
-            await agent.build()
-            self._source_to_agent[source] = agent
-        return self._source_to_agent[source]
 
     async def judge(self, stage: str | None = "rollout") -> list[EvaluationSample]:
         """Judge samples.
