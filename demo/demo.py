@@ -1,11 +1,11 @@
 import asyncio
-from utu.agents import SimpleAgent
-from utu.config import ConfigLoader
-import gradio as gr
-import agents as ag
 import logging
 
-logging.basicConfig(level=logging.INFO)
+import agents as ag
+import gradio as gr
+
+from utu.agents import SimpleAgent
+from utu.config import ConfigLoader
 
 @ag.function_tool
 def fibonacci(n: int) -> int:
@@ -165,4 +165,7 @@ with gr.Blocks() as demo:
     cancel_button.click(cancel_response, inputs=[], outputs=[])
     user_input.submit(respond, inputs=[user_input, chatbot], outputs=[chatbot])
 
-demo.launch(share=False)
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+    logging.info("Starting Gradio demo...")
+    demo.launch(share=False)
