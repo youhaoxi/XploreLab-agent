@@ -1,4 +1,4 @@
-""" 
+"""
 camel/toolkits/arxiv_toolkit.py
 https://info.arxiv.org/help/api/index.html
 https://github.com/lukasschwab/arxiv.py
@@ -32,7 +32,7 @@ class ArxivToolkit(AsyncBaseToolkit):
             query=query,
             id_list=paper_ids,
             max_results=max_results,
-            sort_by=arxiv.SortCriterion.Relevance,      # TODO: configurable, support advanced search
+            sort_by=arxiv.SortCriterion.Relevance,  # TODO: configurable, support advanced search
         )
         return self.client.results(search_query)
 
@@ -59,9 +59,7 @@ class ArxivToolkit(AsyncBaseToolkit):
         # https://info.arxiv.org/help/api/user-manual.html#query_details
         # Returns:
         #     List[Dict[str, str]]: A list of dictionaries, each containing information about a paper, including title, published date, authors, entry ID, summary.
-        search_results = self._get_search_results(
-            query, paper_ids, max_results
-        )
+        search_results = self._get_search_results(query, paper_ids, max_results)
         papers_data = []
 
         for paper in search_results:
@@ -109,14 +107,10 @@ class ArxivToolkit(AsyncBaseToolkit):
             str: Status message indicating success or failure.
         """
         try:
-            search_results = self._get_search_results(
-                query, paper_ids, max_results
-            )
+            search_results = self._get_search_results(query, paper_ids, max_results)
 
             for paper in search_results:
-                paper.download_pdf(
-                    dirpath=output_dir, filename=f"{paper.title}" + ".pdf"
-                )
+                paper.download_pdf(dirpath=output_dir, filename=f"{paper.title}" + ".pdf")
             return "papers downloaded successfully"
         except Exception as e:
             return f"An error occurred: {e}"

@@ -1,4 +1,4 @@
-""" from @ian """
+"""from @ian"""
 
 import re
 import json
@@ -70,9 +70,7 @@ class ModuleGenBackground:
     def _extract_and_load_json(self, text: str) -> dict:
         try:
             extracted_json = (
-                re.search(r"\{.*\}", text, re.DOTALL).group(0)
-                if re.search(r"\{.*\}", text, re.DOTALL)
-                else None
+                re.search(r"\{.*\}", text, re.DOTALL).group(0) if re.search(r"\{.*\}", text, re.DOTALL) else None
             )
             try_load_json = json.loads(extracted_json)
             assert "queries" in try_load_json
@@ -89,7 +87,7 @@ class ModuleGenBackground:
                 f"<search results for '{query}'>\n"
                 + "\n".join(
                     [
-                        f"[web_{serp_no+1}]\nweb title: {serp_i['title']}\nweb snippet: {serp_i.get('snippet', 'None')}"
+                        f"[web_{serp_no + 1}]\nweb title: {serp_i['title']}\nweb snippet: {serp_i.get('snippet', 'None')}"
                         for serp_no, serp_i in enumerate(serp[query])
                     ]
                 )
@@ -123,16 +121,16 @@ class ModuleGenBackground:
 
     async def exec_step2(self, queries, num_results=5):
         """执行搜索"""
-        tasks = (
-            self.search_tool_instance.search_google(query=query)
-            for query in queries
-        )
+        tasks = (self.search_tool_instance.search_google(query=query) for query in queries)
         search_results = await asyncio.gather(*tasks)
-        serp = {query: search_result.get("organic", [])[:num_results] for query, search_result in zip(queries, search_results)}
+        serp = {
+            query: search_result.get("organic", [])[:num_results]
+            for query, search_result in zip(queries, search_results)
+        }
         serp_prompt = self._format_serp(serp)
         logger.debug(f">>> QUERIES: {oneline_object(queries)}")
         logger.debug(f">>> SERP Prompt: {oneline_object(serp_prompt)}")
-        
+
         response = await self.model.query_one(
             messages=[
                 {

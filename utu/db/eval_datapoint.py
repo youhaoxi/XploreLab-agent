@@ -5,9 +5,10 @@ from sqlmodel import SQLModel, Field, JSON, Column
 
 from .utu_basemodel import UTUBaseModel
 
+
 class DatasetSample(SQLModel, table=True):
-    __tablename__ = 'data'
-    
+    __tablename__ = "data"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     dataset: str = ""  # dataset name, for exp
     index: Optional[int] = Field(default=None)  # The index of the datapoint in the dataset, starting from 1
@@ -20,12 +21,14 @@ class DatasetSample(SQLModel, table=True):
     level: Optional[str] = ""
     file_name: Optional[str] = ""  # for GAIA
 
-    meta: Optional[Any] = Field(default=None, sa_column=Column(JSON))  # e.g. annotator_metadata in GAIA, extra_info in WebWalker
+    meta: Optional[Any] = Field(
+        default=None, sa_column=Column(JSON)
+    )  # e.g. annotator_metadata in GAIA, extra_info in WebWalker
 
 
 class EvaluationSample(UTUBaseModel, SQLModel, table=True):
-    __tablename__ = 'evaluation_data'
-    
+    __tablename__ = "evaluation_data"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
@@ -59,17 +62,31 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
 
     def model_dump(self, *args, **kwargs):
         keys = [
-            "exp_id", "dataset", "dataset_index", "source", "level", "raw_question", "correct_answer", "file_name", 
-            "stage", "trace_id", "response", "time_cost", "trajectory", "trajectories", 
-            "judged_response", "correct", "confidence",
+            "exp_id",
+            "dataset",
+            "dataset_index",
+            "source",
+            "level",
+            "raw_question",
+            "correct_answer",
+            "file_name",
+            "stage",
+            "trace_id",
+            "response",
+            "time_cost",
+            "trajectory",
+            "trajectories",
+            "judged_response",
+            "correct",
+            "confidence",
         ]
-        return {
-            k: getattr(self, k) for k in keys if getattr(self, k) is not None
-        }
+        return {k: getattr(self, k) for k in keys if getattr(self, k) is not None}
+
 
 class EvaluationResult(UTUBaseModel):
     """
     A data class to represent the result of an evaluation.
     """
+
     benchmark: str
     metrics: dict

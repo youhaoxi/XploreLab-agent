@@ -37,14 +37,14 @@ def main():
     parser.add_argument("--clear_records", action="store_true", help="Clear records from db.")
     parser.add_argument("--limit", type=int, default=None, help="Limit the number of samples to dump.")
     args = parser.parse_args()
-    
+
     config = ConfigLoader.load_eval_config(args.config_name)
     if args.exp_id:
         config.exp_id = args.exp_id
 
     if not args.output_file:
         args.output_file = f"data/output_{config.exp_id}.jsonl"
-    
+
     match args.op:
         case "stat":
             get_stat(config)

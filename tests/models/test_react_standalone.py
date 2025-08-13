@@ -1,6 +1,7 @@
-""" Standalone test for ReAct mode (ReactConverter)
+"""Standalone test for ReAct mode (ReactConverter)
 > see final version in [test_react_model.py]
 """
+
 import json
 import asyncio
 import jinja2
@@ -23,17 +24,11 @@ tools: dict[str, ChatCompletionToolParam] = {
             "description": "Get the current time",
             "parameters": {
                 "type": "object",
-                "properties": {
-                    "timezone": {
-                        "type": "string",
-                        "description": "The timezone to get the time in"
-                    }
-                },
-                "required": ["timezone"]
-            }
-        }
+                "properties": {"timezone": {"type": "string", "description": "The timezone to get the time in"}},
+                "required": ["timezone"],
+            },
+        },
     },
-
     "search_google_api": {
         "type": "function",
         "function": {
@@ -42,18 +37,15 @@ tools: dict[str, ChatCompletionToolParam] = {
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "The query to search for."
-                    },
+                    "query": {"type": "string", "description": "The query to search for."},
                     "num_results": {
                         "type": "integer",
-                        "description": "The number of results to return. Defaults to 20."
-                    }
+                        "description": "The number of results to return. Defaults to 20.",
+                    },
                 },
-                "required": ["query"]
-            }
-        }
+                "required": ["query"],
+            },
+        },
     },
     "web_qa": {
         "type": "function",
@@ -63,41 +55,63 @@ tools: dict[str, ChatCompletionToolParam] = {
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "url": {
-                        "type": "string",
-                        "description": "The url to get content from."
-                    },
+                    "url": {"type": "string", "description": "The url to get content from."},
                     "query": {
                         "type": "string",
-                        "description": "The query to search for. If not given, return the original content of the url."
-                    }
+                        "description": "The query to search for. If not given, return the original content of the url.",
+                    },
                 },
-                "required": ["url"]
-            }
-        }
-    }
+                "required": ["url"],
+            },
+        },
+    },
 }
 
 tasks_single = [
-    {
-        "messages": [{"role": "user", "content": "What's the time now in Shanghai?"}],
-        "tools": [tools["get_time"]]
-    }
+    {"messages": [{"role": "user", "content": "What's the time now in Shanghai?"}], "tools": [tools["get_time"]]}
 ]
 tasks_multi = [
     {
         "messages": [
             {"role": "user", "content": "Introduce the smolagents package."},
-            {"role": "assistant", "content": "", "tool_calls": [
-                {"id": "0", "type": "function", "function": {"name": "search_google_api", "arguments": str({"query": "smolagents package"})}}
-            ]},
-            {"role": "tool", "tool_call_id": "0", "content": str({"results": [
-                {"id": "0", "title": "smolagents: a barebones library for agents that think in code.", "url": "https://github.com/huggingface/smolagents/"},
-                {"id": "1", "title": "smolagents", "url": "https://huggingface.co/docs/smolagents/en/index"},
-                {"id": "2", "title": "Introducing smolagents: A Lightweight Library for Building ...", "url": "https://medium.com/thedeephub/introducing-smolagents-a-lightweight-library-for-building-powerful-agents-a8791a60b5b1"},
-            ]})}
+            {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                    {
+                        "id": "0",
+                        "type": "function",
+                        "function": {"name": "search_google_api", "arguments": str({"query": "smolagents package"})},
+                    }
+                ],
+            },
+            {
+                "role": "tool",
+                "tool_call_id": "0",
+                "content": str(
+                    {
+                        "results": [
+                            {
+                                "id": "0",
+                                "title": "smolagents: a barebones library for agents that think in code.",
+                                "url": "https://github.com/huggingface/smolagents/",
+                            },
+                            {
+                                "id": "1",
+                                "title": "smolagents",
+                                "url": "https://huggingface.co/docs/smolagents/en/index",
+                            },
+                            {
+                                "id": "2",
+                                "title": "Introducing smolagents: A Lightweight Library for Building ...",
+                                "url": "https://medium.com/thedeephub/introducing-smolagents-a-lightweight-library-for-building-powerful-agents-a8791a60b5b1",
+                            },
+                        ]
+                    }
+                ),
+            },
         ],
-        "tools": [tools["search_google_api"], tools["web_qa"]]
+        "tools": [tools["search_google_api"], tools["web_qa"]],
     }
 ]
 
@@ -107,6 +121,8 @@ TEMPLATE_ACTION = r"""Action:
   "arguments": {{action_arguments}}
 }"""
 template_action = jinja_env.from_string(TEMPLATE_ACTION)
+
+
 def process_messages(messages: list[ChatCompletionMessageParam]) -> list[ChatCompletionMessageParam]:
     result = []
     for message in messages:
@@ -118,7 +134,9 @@ def process_messages(messages: list[ChatCompletionMessageParam]) -> list[ChatCom
             # FIXME: content? no-FC?
             if message.get("tool_calls"):
                 tool_call = message["tool_calls"][0]
-                tool_call_str = template_action.render(action_name=tool_call["function"]["name"], action_arguments=tool_call["function"]["arguments"])
+                tool_call_str = template_action.render(
+                    action_name=tool_call["function"]["name"], action_arguments=tool_call["function"]["arguments"]
+                )
             content = message.get("content", "")
             assert any([content, tool_call_str]), "content or tool_call cannot be empty"
             new_content = "\n".join([content, tool_call_str]) if content else tool_call_str
@@ -193,33 +211,29 @@ Here is a list of the team members that you can call:
 {%- endfor %}
 {%- endif %}
 """.strip()
+
+
 def process(task: dict) -> dict:
     # 1. sp
     template = jinja_env.from_string(TEMPLATE)
     sp = template.render(tools=task["tools"])
     # 2. messages
     messages = process_messages(task["messages"])
-    return {
-        "messages": [
-            {"role": "system", "content": sp},
-            *messages
-        ],
-        "stop": ["Observation:"]
-    }
+    return {"messages": [{"role": "system", "content": sp}, *messages], "stop": ["Observation:"]}
+
 
 async def main():
     def print_chat_completion(result: ChatCompletion):
         messages = result.choices[0].message
         content = messages.content
-        tool_calls =[tc.function.model_dump() for tc in messages.tool_calls] if messages.tool_calls else []
+        tool_calls = [tc.function.model_dump() for tc in messages.tool_calls] if messages.tool_calls else []
         return {"content": content, "tool_calls": tool_calls}
-        
-        
+
     tasks = tasks_multi
     for i, task in enumerate(tasks):
         result_fc = await simplified_openai.chat_completions_create(**task)
         result_react = await simplified_openai.chat_completions_create(**process(task))
-        print(f"[{i+1:02d}/{len(tasks):02d}] {task['messages'][0]['content']}")
+        print(f"[{i + 1:02d}/{len(tasks):02d}] {task['messages'][0]['content']}")
         print(f"FC: {print_chat_completion(result_fc)}")
         print(f"React: {print_chat_completion(result_react)}")
 

@@ -6,7 +6,8 @@ from .base import BaseLLMJudgeProcesser
 
 
 class GAIAProcesser(BaseLLMJudgeProcesser):
-    """ Processer for GAIA evaluation. """
+    """Processer for GAIA evaluation."""
+
     name: str = "GAIA"
 
     # def calculate_metrics(self, samples: list[Datapoint]) -> dict:
@@ -21,14 +22,15 @@ class GAIAProcesser(BaseLLMJudgeProcesser):
             if ".MOV" in file_name:
                 return ""
             prompt_use_files += f"\n\nTo answer the question above, you will have to use these attached files:"
-            if file_name.split('.')[-1] in ['pdf', 'xlsx']:
-                image_path = file_name.split('.')[0] + '.png'
+            if file_name.split(".")[-1] in ["pdf", "xlsx"]:
+                image_path = file_name.split(".")[0] + ".png"
                 if os.path.exists(image_path):
                     prompt_use_files += f"\nAttached image: {image_path}"
                 else:
                     prompt_use_files += f"\nAttached file: {file_name}"
-            elif file_name.split('.')[-1] == "zip":
+            elif file_name.split(".")[-1] == "zip":
                 import shutil
+
                 folder_name = file_name.replace(".zip", "")
                 os.makedirs(folder_name, exist_ok=True)
                 shutil.unpack_archive(file_name, folder_name)
@@ -39,9 +41,9 @@ class GAIAProcesser(BaseLLMJudgeProcesser):
                     for file in files:
                         file_path = os.path.join(root, file)
                         prompt_use_files += f"- {file_path}\n"
-            elif file_name.split('.')[-1] in ['png', 'jpg', 'jpeg']:
+            elif file_name.split(".")[-1] in ["png", "jpg", "jpeg"]:
                 prompt_use_files += f"\nAttached image: {file_name}"
-            elif file_name.split('.')[-1] in ['mp3', 'm4a', 'wav']:
+            elif file_name.split(".")[-1] in ["mp3", "m4a", "wav"]:
                 prompt_use_files += f"\nAttached audio: {file_name}"
             else:
                 prompt_use_files += f"\nAttached file: {file_name}"
@@ -51,7 +53,7 @@ class GAIAProcesser(BaseLLMJudgeProcesser):
         return prompt_use_files
 
     def _formulate_file_path(self, file_name: str) -> str:
-        """ Formulate the file name to the absolute path of the file. """
+        """Formulate the file name to the absolute path of the file."""
         if not file_name:
             return ""
         dataset_dir = DIR_ROOT / "data" / "gaia"

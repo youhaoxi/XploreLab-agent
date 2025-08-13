@@ -21,5 +21,6 @@ async def main():
     with open(fn.parent / "result.json", "w", encoding="utf-8") as f:
         json.dump(result.model_dump(), f, ensure_ascii=False, indent=4)
 
+
 if __name__ == "__main__":
     asyncio.run(main())

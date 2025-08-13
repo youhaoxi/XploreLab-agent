@@ -1,9 +1,11 @@
 import pytest
 from utu.tools.serper_toolkit import SerperToolkit
 
+
 @pytest.fixture
 def serper_toolkit():
     return SerperToolkit()
+
 
 @pytest.mark.asyncio
 async def test_google_search(serper_toolkit: SerperToolkit):
@@ -13,6 +15,7 @@ async def test_google_search(serper_toolkit: SerperToolkit):
     assert result["query"] == query
     assert "results" in result
 
+
 @pytest.mark.asyncio
 async def test_autocomplete(serper_toolkit: SerperToolkit):
     query = "te"
@@ -20,6 +23,7 @@ async def test_autocomplete(serper_toolkit: SerperToolkit):
     assert result["status"] == "success"
     assert result["query"] == query
     assert "suggestions" in result
+
 
 @pytest.mark.asyncio
 async def test_google_lens(serper_toolkit: SerperToolkit):
@@ -29,6 +33,7 @@ async def test_google_lens(serper_toolkit: SerperToolkit):
     assert result["url"] == url
     assert "results" in result
 
+
 @pytest.mark.asyncio
 async def test_image_search(serper_toolkit: SerperToolkit):
     query = "test image"
@@ -36,6 +41,7 @@ async def test_image_search(serper_toolkit: SerperToolkit):
     assert result["status"] == "success"
     assert result["query"] == query
     assert "results" in result
+
 
 @pytest.mark.asyncio
 async def test_map_search(serper_toolkit: SerperToolkit):
@@ -45,6 +51,7 @@ async def test_map_search(serper_toolkit: SerperToolkit):
     assert result["query"] == query
     assert "results" in result
 
+
 @pytest.mark.asyncio
 async def test_news_search(serper_toolkit: SerperToolkit):
     query = "test news"
@@ -52,6 +59,7 @@ async def test_news_search(serper_toolkit: SerperToolkit):
     assert result["status"] == "success"
     assert result["query"] == query
     assert "results" in result
+
 
 @pytest.mark.asyncio
 async def test_place_search(serper_toolkit: SerperToolkit):
@@ -61,6 +69,7 @@ async def test_place_search(serper_toolkit: SerperToolkit):
     assert result["query"] == query
     assert "results" in result
 
+
 @pytest.mark.asyncio
 async def test_scholar_search(serper_toolkit: SerperToolkit):
     query = "test scholar"
@@ -69,10 +78,11 @@ async def test_scholar_search(serper_toolkit: SerperToolkit):
     assert result["query"] == query
     assert "results" in result
 
+
 @pytest.mark.asyncio
 async def test_video_search(serper_toolkit: SerperToolkit):
     query = "test video"
     result = await serper_toolkit.video_search(query)
     assert result["status"] == "success"
     assert result["query"] == query
-    assert "results" in result 
+    assert "results" in result

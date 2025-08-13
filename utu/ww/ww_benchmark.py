@@ -7,7 +7,8 @@ from .ww_agent import WWAgent
 
 
 class WWBenchmark(BaseBenchmark):
-    """ 复用现有逻辑, 重写 agent, process, rollout 逻辑 """
+    """复用现有逻辑, 重写 agent, process, rollout 逻辑"""
+
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
         # MODE 1: use root_url
         # aug_question = f"{sample.raw_question}\nReference url: {sample.meta['root_url']}"
@@ -37,7 +38,7 @@ class WWBenchmark(BaseBenchmark):
             response=result.final_output,
             time_cost=end_time - start_time,
             trajectories=result.trajectory,
-            stage="rollout"  # update stage to rollout!
+            stage="rollout",  # update stage to rollout!
         )
         self.dataset.save(sample)
         # update the total tokens

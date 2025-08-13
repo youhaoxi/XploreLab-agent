@@ -22,9 +22,11 @@ class ToolkitConfig(ConfigBaseModel):
     config: dict | None = Field(default_factory=dict)
     config_llm: ModelConfigs | None = None
 
+
 class ContextManagerConfig(ConfigBaseModel):
     name: str | None = None
     config: dict | None = Field(default_factory=dict)
+
 
 class EnvConfig(ConfigBaseModel):
     name: str | None = None
@@ -33,6 +35,7 @@ class EnvConfig(ConfigBaseModel):
 
 class AgentConfig(ConfigBaseModel):
     """Overall agent config"""
+
     type: Literal["simple", "orchestra"] = "simple"
     """Agent type, "simple" or "orchestra"""
 

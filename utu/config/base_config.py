@@ -4,21 +4,24 @@ from typing_extensions import TypeAlias
 
 ReprArgs: TypeAlias = Iterable[tuple[str | None, Any]]
 
-SECURE_FIELDS = ('api_key', 'base_url')
+SECURE_FIELDS = ("api_key", "base_url")
 
 
 def if_need_secure(key: str) -> bool:
     return any(f in key for f in SECURE_FIELDS)
 
+
 def secure_repr(obj: ReprArgs) -> ReprArgs:
-    for k,v in obj:
+    for k, v in obj:
         if if_need_secure(k):
             yield k, "***"
         else:
             yield k, v
 
+
 class ConfigBaseModel(BaseModel):
     """Base model for config, with secure repr"""
+
     def __str__(self) -> str:
         return self.__repr__()
 

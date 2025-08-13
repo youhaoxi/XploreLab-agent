@@ -1,8 +1,9 @@
-""" 
+"""
 from @QBAgentsExtension by @charlesshen
 
 see https://mirrors.tencent.com/#/private/pypi/
 """
+
 import os
 import sys
 import subprocess
@@ -16,7 +17,7 @@ def build_and_publish(username, password):
     print("Syncing dependencies...")
     # backup uv.lock! restore after publish
     os.system("cp uv.lock uv.lock.bak")
-    
+
     result = subprocess.run(["uv", "sync"], capture_output=True, text=True)
     if result.returncode != 0:
         print(f"Error: Failed to sync dependencies\n{result.stderr}")
@@ -39,7 +40,7 @@ def build_and_publish(username, password):
     result = subprocess.run(
         ["uv", "publish", "--username", username, "--password", password, "--publish-url", publish_url],
         capture_output=True,
-        text=True
+        text=True,
     )
     if result.returncode != 0:
         print(f"Error: Project publish failed\n{result.stderr}")
@@ -62,13 +63,13 @@ def extract_project_info():
 
     try:
         # 使用toml库解析文件
-        with open(pyproject_file, 'r') as f:
+        with open(pyproject_file, "r") as f:
             pyproject_data = toml.load(f)
 
-        name = pyproject_data.get('project', {}).get('name')
-        version = pyproject_data.get('project', {}).get('version')
-        authors = pyproject_data.get('project', {}).get('authors')
-        description = pyproject_data.get('project', {}).get('description')
+        name = pyproject_data.get("project", {}).get("name")
+        version = pyproject_data.get("project", {}).get("version")
+        authors = pyproject_data.get("project", {}).get("authors")
+        description = pyproject_data.get("project", {}).get("description")
 
         if not name or not version:
             print(f"Error: Failed to extract project information(name version authors) from {pyproject_file}")
@@ -117,7 +118,7 @@ def main():
     print(f"> using username:{username}!")
 
     # 获取Git根目录
-    git_root = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8').strip()
+    git_root = subprocess.check_output(["git", "rev-parse", "--show-toplevel"]).decode("utf-8").strip()
     print(f"git_root:{git_root} ")
 
     try:
@@ -128,10 +129,12 @@ def main():
         sys.exit(1)
 
     project_name, project_version, project_authors, project_description = extract_project_info()
-    print(f"project_name:{project_name}\n"
-          f"project_version:{project_version}\n"
-          f"project_authors:{project_authors}\n"
-          f"project_description:{project_description}")
+    print(
+        f"project_name:{project_name}\n"
+        f"project_version:{project_version}\n"
+        f"project_authors:{project_authors}\n"
+        f"project_description:{project_description}"
+    )
     if not project_name or not project_version:
         print(f"Failed to get project_name or project_version, exit!")
         sys.exit(1)

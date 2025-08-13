@@ -5,16 +5,19 @@ from utu.config import ModelSettingsConfig, ConfigLoader
 from utu.tools import SearchToolkit
 from utu.agents import SimpleAgent
 
+
 def get_tools():
     toolkit = SearchToolkit(ConfigLoader.load_toolkit_config("search"))
     return toolkit.get_tools_in_agents_sync()
 
+
 search_tools = get_tools()
+
 
 @function_tool(strict_mode=False)
 def wide_research(task: str, subtasks: list[str], output_schema: dict) -> str:
     """Perform wide research on a given task. Given a task with several subtasks, this tool will complete the subtasks simultaneously.
-    
+
     Args:
         task (str): The root task to perform research on.
         subtasks (list[str]): Subtasks contained in the root task. They should be homogeneous that can be completed by the same procedure.
@@ -27,6 +30,8 @@ SP = """You are a helpful research assistant.
 - If the task contains homogeneous subtasks that can be handled in parallel, use the wide_research tool.
 - After gathering enough information, response to the user directly.
 """
+
+
 def build_planner():
     return SimpleAgent(
         name="PlannerAgent",
@@ -34,12 +39,17 @@ def build_planner():
         tools=[wide_research] + search_tools,
     )
 
-task = "Find the outstanding papers of ACL 2025, extract their title, author list, keywords, and abstract in one sentence."
+
+task = (
+    "Find the outstanding papers of ACL 2025, extract their title, author list, keywords, and abstract in one sentence."
+)
+
 
 async def main():
     async with build_planner() as agent:
         result = await agent.run(task)
         print(result.final_output)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

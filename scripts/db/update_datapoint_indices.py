@@ -1,7 +1,6 @@
-""" 
+"""
 EvaluationSample: add index column
 """
-
 
 import os
 from sqlalchemy import create_engine, text
@@ -10,6 +9,7 @@ from sqlalchemy.exc import ProgrammingError
 from collections import defaultdict
 
 from utu.db import EvaluationSample
+
 
 def update_indices():
     """
@@ -62,7 +62,7 @@ def update_indices():
                 # Check if index needs updating to avoid unnecessary writes
                 if dp.index != i + 1:
                     dp.index = i + 1
-        
+
         print("Committing index updates to the database...")
         session.commit()
         print("Successfully updated all datapoint indices.")
@@ -72,6 +72,7 @@ def update_indices():
         session.rollback()
     finally:
         session.close()
+
 
 if __name__ == "__main__":
     update_indices()

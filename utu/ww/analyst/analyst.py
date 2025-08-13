@@ -37,8 +37,7 @@ class AnalysisAgent(Base):
     async def analyze(self, input: str, task_records: list[SearchResult], trace_id: str = None) -> AnalysisResult:
         """analyze the result of a subtask, return a report"""
         query = TEMPLATE.format(
-            question=input,
-            trajectory="\n".join([f"{record.task}\n{record.output}" for record in task_records])
+            question=input, trajectory="\n".join([f"{record.task}\n{record.output}" for record in task_records])
         )
         response = await self.llm.query_one(messages=query)
         return AnalysisResult(output=response)

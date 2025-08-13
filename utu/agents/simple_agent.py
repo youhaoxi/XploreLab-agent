@@ -2,10 +2,18 @@ from contextlib import AsyncExitStack
 from typing import Any, Callable
 
 from agents import (
-    Tool, TContext, TResponseInputItem, 
-    Model, ModelSettings,
-    RunResult, RunResultStreaming, 
-    Agent, Runner, RunHooks, RunConfig, AgentOutputSchemaBase,
+    Tool,
+    TContext,
+    TResponseInputItem,
+    Model,
+    ModelSettings,
+    RunResult,
+    RunResultStreaming,
+    Agent,
+    Runner,
+    RunHooks,
+    RunConfig,
+    AgentOutputSchemaBase,
 )
 from agents.tracing import gen_trace_id, get_current_trace
 from agents.mcp import MCPServerStdio, MCPServer
@@ -24,15 +32,15 @@ class SimpleAgent:
     """A simple agent with env, tools, mcps, and context manager, wrapped on openai-agents."""
 
     def __init__(
-        self, 
+        self,
         *,
-        config: AgentConfig|str|None = None,  # use config to pass agent configs
-        name: str|None = None,
-        instructions: str|Callable|None = None,
-        model: str|Model|None = None,
-        model_settings: ModelSettings|None = None,
+        config: AgentConfig | str | None = None,  # use config to pass agent configs
+        name: str | None = None,
+        instructions: str | Callable | None = None,
+        model: str | Model | None = None,
+        model_settings: ModelSettings | None = None,
         tools: list[Tool] = None,
-        output_type: type[Any]|AgentOutputSchemaBase|None = None,
+        output_type: type[Any] | AgentOutputSchemaBase | None = None,
     ):
         self.config = self._get_config(config)
         self.name = name or self.config.agent.name
@@ -40,7 +48,7 @@ class SimpleAgent:
         self.model = self._get_model(self.config, model)
         self.model_settings = self._get_model_settings(self.config, model_settings)
         self.tools: list[Tool] = tools or []
-        self.output_type: type[Any]|AgentOutputSchemaBase|None = output_type
+        self.output_type: type[Any] | AgentOutputSchemaBase | None = output_type
         self.context_manager: BaseContextManager = None
         self.env: BaseEnv = None
         self.current_agent: Agent[TContext] = None
@@ -53,18 +61,22 @@ class SimpleAgent:
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
 
-    def _get_config(self, config: AgentConfig|str|None) -> AgentConfig:
-        if isinstance(config, AgentConfig): return config
+    def _get_config(self, config: AgentConfig | str | None) -> AgentConfig:
+        if isinstance(config, AgentConfig):
+            return config
         return ConfigLoader.load_agent_config(config or "base")
 
-    def _get_model(self, config: AgentConfig, model: str|Model|None = None) -> Model:
-        if isinstance(model, Model): return model
+    def _get_model(self, config: AgentConfig, model: str | Model | None = None) -> Model:
+        if isinstance(model, Model):
+            return model
         model_provider_config = config.model.model_provider.model_dump()
-        if isinstance(model, str): model_provider_config["model"] = model
+        if isinstance(model, str):
+            model_provider_config["model"] = model
         return AgentsUtils.get_agents_model(**model_provider_config)
-    
-    def _get_model_settings(self, config: AgentConfig, model_settings: ModelSettings|None = None) -> ModelSettings:
-        if isinstance(model_settings, ModelSettings): return model_settings
+
+    def _get_model_settings(self, config: AgentConfig, model_settings: ModelSettings | None = None) -> ModelSettings:
+        if isinstance(model_settings, ModelSettings):
+            return model_settings
         return config.model.model_settings
 
     async def __aenter__(self):
@@ -75,7 +87,7 @@ class SimpleAgent:
         await self.cleanup()
 
     async def build(self):
-        """ Build the agent """
+        """Build the agent"""
         self.env = await get_env(self.config, self._trace_id)  # FIXME: trace_id
         await self.env.build()
         # model & agent
@@ -91,7 +103,7 @@ class SimpleAgent:
         self.context_manager = build_context_manager(self.config)
 
     async def cleanup(self):
-        """ Cleanup """
+        """Cleanup"""
         logger.info("Cleaning up MCP servers...")
         await self._mcps_exit_stack.aclose()
         self._mcp_servers = []
@@ -104,7 +116,7 @@ class SimpleAgent:
     async def get_tools(self) -> list[Tool]:
         if self.tools:
             return self.tools
-        
+
         tools_list: list[Tool] = []
         tools_list += await self.env.get_tools()  # add env tools
         # TODO: handle duplicate tool names
@@ -123,9 +135,7 @@ class SimpleAgent:
 
     async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
-        toolkit = await self._tools_exit_stack.enter_async_context(
-            TOOLKIT_MAP[toolkit_config.name](toolkit_config)
-        )
+        toolkit = await self._tools_exit_stack.enter_async_context(TOOLKIT_MAP[toolkit_config.name](toolkit_config))
         self._toolkits.append(toolkit)
         return toolkit
 
@@ -167,26 +177,28 @@ class SimpleAgent:
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResult:
         setup_tracing()
-        if trace_id: self._trace_id = trace_id
+        if trace_id:
+            self._trace_id = trace_id
         return await Runner.run(
-            self.current_agent, 
-            input, 
+            self.current_agent,
+            input,
             context=self._get_context(),
             max_turns=self.config.max_turns,
             hooks=self._run_hooks,
-            run_config=self._get_run_config(), 
+            run_config=self._get_run_config(),
         )
 
     def run_streamed(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResultStreaming:
         setup_tracing()
-        if trace_id: self._trace_id = trace_id
+        if trace_id:
+            self._trace_id = trace_id
         return Runner.run_streamed(
-            self.current_agent, 
-            input, 
+            self.current_agent,
+            input,
             context=self._get_context(),
             max_turns=self.config.max_turns,
             hooks=self._run_hooks,
-            run_config=self._get_run_config(), 
+            run_config=self._get_run_config(),
         )
 
     # util apis
@@ -199,7 +211,7 @@ class SimpleAgent:
         self.input_items = run_result.to_input_list()
         self.current_agent = run_result.last_agent
         return run_result
-    
+
     async def chat_streamed(self, input: str):
         self.input_items.append({"content": input, "role": "user"})
         run_result_streaming = self.run_streamed(self.input_items)

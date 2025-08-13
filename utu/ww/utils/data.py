@@ -22,6 +22,7 @@ class Task:
     task: str
     completed: Optional[bool] = None
 
+
 @dataclass
 class NextTaskResult:
     task: Task = None
@@ -31,13 +32,10 @@ class NextTaskResult:
     @property
     def trajectory(self):
         todos_str = []
-        for i,task in enumerate(self.todo, 1):
+        for i, task in enumerate(self.todo, 1):
             todos_str.append(f"{i}. {task.task} ({task.agent_name})")
         todos_str = "\n".join(todos_str)
-        return {
-            "agent": "planner",
-            "trajectory": [{"role": "assistant", "content": todos_str}]
-        }
+        return {"agent": "planner", "trajectory": [{"role": "assistant", "content": todos_str}]}
 
 
 @dataclass
@@ -54,7 +52,4 @@ class AnalysisResult:
 
     @property
     def trajectory(self):
-        return {
-            "agent": "analysis",
-            "trajectory": [{"role": "assistant", "content": self.output}]
-        }
+        return {"agent": "analysis", "trajectory": [{"role": "assistant", "content": self.output}]}

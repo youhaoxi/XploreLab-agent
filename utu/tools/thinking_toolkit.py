@@ -1,4 +1,4 @@
-""" 
+"""
 https://github.com/sierra-research/tau-bench/
 https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking
 """

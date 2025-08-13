@@ -2,10 +2,11 @@ from utu.agents import SimpleAgent
 from utu.config import ModelSettingsConfig, ConfigLoader
 from utu.tools import SearchToolkit
 
+
 def get_tools():
     toolkit = SearchToolkit(ConfigLoader.load_toolkit_config("search"))
     return toolkit.get_tools_in_agents_sync()
-    
+
 
 INSTRUCTIONS = (
     "You are a research assistant. Given a search term, you search the web for that term and "

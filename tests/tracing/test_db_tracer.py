@@ -9,23 +9,20 @@ setup_db_tracing()
 
 client = SimplifiedAsyncOpenAI()
 input = [{"role": "user", "content": "给我讲两个笑话, 然后帮我查一下北京天津的天气"}]
-tools = [{
-    "type": "function",
-    "name": "get_weather",
-    "description": "Get current temperature for a given location.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "location": {
-                "type": "string",
-                "description": "City and country e.g. Bogotá, Colombia"
-            }
+tools = [
+    {
+        "type": "function",
+        "name": "get_weather",
+        "description": "Get current temperature for a given location.",
+        "parameters": {
+            "type": "object",
+            "properties": {"location": {"type": "string", "description": "City and country e.g. Bogotá, Colombia"}},
+            "required": ["location"],
+            "additionalProperties": False,
         },
-        "required": ["location"],
-        "additionalProperties": False
-    },
-    "strict": True
-}]
+        "strict": True,
+    }
+]
 
 
 async def mock_function():
@@ -34,6 +31,7 @@ async def mock_function():
         input=json.dumps({"input": "mock_function_input"}),  # str
     ) as span:
         span.span_data.output = {"output": "mock_function_output"}
+
 
 async def test_function_span():
     with TraceCtxManager(
@@ -52,6 +50,7 @@ async def mock_response():
         span.span_data.input = input
         span.span_data.response = response
         print(response)
+
 
 async def test_response_span():
     with TraceCtxManager(

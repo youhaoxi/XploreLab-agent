@@ -5,11 +5,12 @@ from utu.utils import DIR_ROOT
 FN = DIR_ROOT / "data" / "WebWalker.jsonl"
 
 
-def main(n:int=50):
+def main(n: int = 50):
     # set random seed
     import random
+
     random.seed(42)
-    
+
     df = pd.read_json(FN, lines=True)
     print(df.columns)
     print(df.shape)
@@ -34,7 +35,8 @@ def main(n:int=50):
     df_sampled["index"] = range(1, len(df_sampled) + 1)
 
     # save to jsonl
-    df_sampled.to_json(FN.parent / f"WebWalker_{3*n}.jsonl", lines=True, orient="records", force_ascii=False)
+    df_sampled.to_json(FN.parent / f"WebWalker_{3 * n}.jsonl", lines=True, orient="records", force_ascii=False)
+
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,8 @@
-""" 
+"""
 https://github.com/googleapis/python-genai
 https://ai.google.dev/gemini-api/docs/api-key
 """
+
 from typing import Callable
 
 from google import genai
@@ -18,8 +19,7 @@ class VideoToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
         self.client = genai.Client(
-            api_key=self.config.config.get("google_api_key"),
-            http_options=HttpOptions(api_version="v1alpha")
+            api_key=self.config.config.get("google_api_key"), http_options=HttpOptions(api_version="v1alpha")
         )
         self.model = self.config.config.get("google_model")
 
@@ -27,7 +27,7 @@ class VideoToolkit(AsyncBaseToolkit):
         r"""Asks a question about the video.
 
         Args:
-            video_path (str): The path or URL to the video file. 
+            video_path (str): The path or URL to the video file.
             question (str): The question to ask about the video.
         """
         if not video_url.startswith("http"):
@@ -48,7 +48,7 @@ class VideoToolkit(AsyncBaseToolkit):
 
         logger.debug(f"Video analysis response from gemini: {response.text}")
         return response.text
-    
+
     async def get_tools_map(self) -> dict[str, Callable]:
         return {
             "video_qa": self.video_qa,

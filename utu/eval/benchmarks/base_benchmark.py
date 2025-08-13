@@ -21,15 +21,15 @@ class BaseBenchmark:
     _source_to_processer: dict[str, BaseProcesser] = {}
     _source_to_agent: dict[str, SimpleAgent] = {}
 
-    def __init__(self, config: EvalConfig|str) -> None:
+    def __init__(self, config: EvalConfig | str) -> None:
         # config
-        if isinstance(config, str): config = ConfigLoader.load_eval_config(name=config)
+        if isinstance(config, str):
+            config = ConfigLoader.load_eval_config(name=config)
         self.config = config
-        
+
         # dataset
         self.dataset = DBDataManager(config)
         self.dataset.load()
-
 
     async def main(self):
         logger.info(f"> Running with config: \n{json.dumps(self.config.model_dump(), indent=2, ensure_ascii=False)}")
@@ -42,7 +42,7 @@ class BaseBenchmark:
         await self.cleanup()
 
     def preprocess(self) -> None:
-        """ Preprocess the dataset before rollout. """
+        """Preprocess the dataset before rollout."""
         samples = self.dataset.get_samples(stage="init")
         logger.info(f"Preprocessing {len(samples)} samples...")
         results = []
@@ -52,7 +52,7 @@ class BaseBenchmark:
                 results.append(processed_sample)
         logger.info(f"Successfully preprocessed {len(results)} samples. Updated to db.")
         return results
-    
+
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
         processer = self._get_processer(sample.source)
         processed_sample = processer.preprocess_one(sample)
@@ -66,12 +66,17 @@ class BaseBenchmark:
         logger.info(f"Rollout {len(samples)} samples...")
 
         semaphore = asyncio.Semaphore(self.config.concurrency)
+
         async def rollout_with_semaphore(item: EvaluationSample):
             async with semaphore:
                 try:
                     return await self.rollout_one(item)
                 except Exception as e:
-                    logger.error(f">>>>>>>>>>>>>\nError running rollout on sample '{item.raw_question}': {e}\n<<<<<<<<<<<<<", exc_info=True)
+                    logger.error(
+                        f">>>>>>>>>>>>>\nError running rollout on sample '{item.raw_question}': {e}\n<<<<<<<<<<<<<",
+                        exc_info=True,
+                    )
+
         tasks = [rollout_with_semaphore(item) for item in samples]
         results = []
         for task in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Rolling out"):
@@ -95,7 +100,7 @@ class BaseBenchmark:
             response=result.final_output,
             time_cost=end_time - start_time,
             trajectories=json.dumps(trajectory, ensure_ascii=False),
-            stage="rollout"  # update stage to rollout!
+            stage="rollout",  # update stage to rollout!
         )
         self.dataset.save(sample)
         return sample
@@ -104,14 +109,18 @@ class BaseBenchmark:
         if source not in self._source_to_agent:
             instructions = self._get_processer(source).get_instructions()
             # SP: configed instructions + processer instructions
-            agent = SimpleAgent(config=self.config.agent, name=f"{source}-agent", instructions=f"{self.config.agent.agent.instructions}\n\n{instructions}")
+            agent = SimpleAgent(
+                config=self.config.agent,
+                name=f"{source}-agent",
+                instructions=f"{self.config.agent.agent.instructions}\n\n{instructions}",
+            )
             await agent.build()
             self._source_to_agent[source] = agent
         return self._source_to_agent[source]
 
-    async def judge(self, stage: str|None = "rollout") -> list[EvaluationSample]:
+    async def judge(self, stage: str | None = "rollout") -> list[EvaluationSample]:
         """Judge samples.
-        
+
         Args:
             stage (str|None, optional): The stage of samples to judge. If set to None, you can rejudge all samples.
         """
@@ -119,6 +128,7 @@ class BaseBenchmark:
         logger.info(f"Judging {len(samples)} samples...")
 
         semaphore = asyncio.Semaphore(self.config.judge_concurrency)
+
         async def judge_with_semaphore(item: EvaluationSample):
             async with semaphore:
                 try:
@@ -126,6 +136,7 @@ class BaseBenchmark:
                 except Exception as e:
                     logger.error(f">>>>>>>>>>>>>\nError judging sample '{item}': {e}\n<<<<<<<<<<<<<", exc_info=True)
                     return None
+
         tasks = [judge_with_semaphore(item) for item in samples]
         results = []
         for task in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Judging"):
@@ -157,7 +168,7 @@ class BaseBenchmark:
             overall_results.append(result)
 
         logger.info(json.dumps([r.as_dict() for r in overall_results], indent=4, ensure_ascii=False))
-    
+
     def _get_processer(self, source: str) -> BaseProcesser:
         if source not in self._source_to_processer:
             processer = PROCESSER_FACTORY.get(source, self.config)

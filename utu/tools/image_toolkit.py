@@ -1,8 +1,9 @@
-""" 
+"""
 @smolagents/examples/open_deep_research/scripts/visual_qa.py
 @camel/camel/toolkits/image_analysis_toolkit.py
 https://platform.openai.com/docs/guides/images-vision?api-mode=chat
 """
+
 from typing import Optional, Callable
 from io import BytesIO
 import requests
@@ -63,7 +64,7 @@ class ImageToolkit(AsyncBaseToolkit):
 
     async def image_qa(self, image_path: str, question: Optional[str] = None) -> str:
         """Generate textual description or answer questions about attached image.
-        
+
         Args:
             image_path (str): Local path or URL to an image.
             question (str, optional): The question to answer. If not provided, a description of the image will be generated.
@@ -72,14 +73,20 @@ class ImageToolkit(AsyncBaseToolkit):
         if not question:
             messages = [
                 {"role": "system", "content": SP_DESCRIPTION},
-                {"role": "user", "content": [{"type": "image_url", "image_url": {"url": image_str}}]}
+                {"role": "user", "content": [{"type": "image_url", "image_url": {"url": image_str}}]},
             ]
             output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
             output = f"You did not provide a particular question, so here is a detailed caption for the image: {output}"
         else:
             messages = [
                 {"role": "system", "content": SP_DESCRIPTION},
-                {"role": "user", "content": [{"type": "text", "text": question}, {"type": "image_url", "image_url": {"url": image_str}}]}
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": question},
+                        {"type": "image_url", "image_url": {"url": image_str}},
+                    ],
+                },
             ]
             output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         return output

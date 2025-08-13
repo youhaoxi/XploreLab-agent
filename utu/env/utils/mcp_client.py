@@ -16,11 +16,12 @@ class MCPClient:
 
     - RuntimeError: Attempted to exit cancel scope in a different task than it was entered in with AsyncExitStack
     [github](https://github.com/modelcontextprotocol/python-sdk/issues/79)
-    
+
     Usage:
         async with MCPClient.get_mcp_client(mcp_url) as session:
             result = await session.call_tool("tool_name", {"arg": "value"})
     """
+
     # session: ClientSession | None = None
     # session_id: str | None = None
     # _exit_stack: AsyncExitStack | None = None
@@ -29,12 +30,14 @@ class MCPClient:
     async def start_http_session(self, url: str) -> AsyncGenerator[ClientSession, None]:
         async with AsyncExitStack() as stack:
             logger.info("Starting MCP with HTTP...")
-            read_stream, write_stream, get_session_id = await stack.enter_async_context(streamablehttp_client(
-                url=url,
-                timeout=timedelta(seconds=60*10),
-                sse_read_timeout=timedelta(seconds=60*10),
-                terminate_on_close=True,
-            ))
+            read_stream, write_stream, get_session_id = await stack.enter_async_context(
+                streamablehttp_client(
+                    url=url,
+                    timeout=timedelta(seconds=60 * 10),
+                    sse_read_timeout=timedelta(seconds=60 * 10),
+                    terminate_on_close=True,
+                )
+            )
             session = await stack.enter_async_context(ClientSession(read_stream, write_stream))
             await session.initialize()
             logger.info(f"HTTP session started, session_id: {get_session_id()}")
@@ -44,12 +47,14 @@ class MCPClient:
     async def start_sse_session(self, url: str) -> AsyncGenerator[ClientSession, None]:
         async with AsyncExitStack() as stack:
             logger.info("Starting MCP with SSE...")
-            read_stream, write_stream = await stack.enter_async_context(sse_client(
-                url=url,
-                headers={},
-                timeout=timedelta(seconds=60*10),  # Increased timeout
-                sse_read_timeout=timedelta(seconds=60*10)  # Increased read timeout
-            ))
+            read_stream, write_stream = await stack.enter_async_context(
+                sse_client(
+                    url=url,
+                    headers={},
+                    timeout=timedelta(seconds=60 * 10),  # Increased timeout
+                    sse_read_timeout=timedelta(seconds=60 * 10),  # Increased read timeout
+                )
+            )
             session = await stack.enter_async_context(ClientSession(read_stream, write_stream))
             await session.initialize()
             logger.info("SSE session started")

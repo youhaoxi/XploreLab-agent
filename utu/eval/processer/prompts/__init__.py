@@ -1,5 +1,6 @@
 from importlib import import_module
 
+
 def get_benchmark_templates(benchmark_name: str) -> dict:
     """Get the benchmark templates for a given benchmark name."""
     try:
@@ -17,6 +18,7 @@ def get_benchmark_templates(benchmark_name: str) -> dict:
             "augmented": getattr(module, "AUGMENTED_TEMPLATE", ""),
             "judge": getattr(module, "JUDGE_TEMPLATE", ""),
         }
+
 
 __all__ = [
     "get_benchmark_templates",

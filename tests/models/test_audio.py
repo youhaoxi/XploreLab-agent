@@ -15,7 +15,7 @@ async def test_audio_input():
     response = requests.get(url)
     response.raise_for_status()
     wav_data = response.content
-    encoded_string = base64.b64encode(wav_data).decode('utf-8')
+    encoded_string = base64.b64encode(wav_data).decode("utf-8")
 
     completion = await client.chat_completions_create(
         model="gpt-4o-audio-preview",
@@ -27,20 +27,11 @@ async def test_audio_input():
             {
                 "role": "user",
                 "content": [
-                    { 
-                        "type": "text",
-                        "text": "What is in this recording?"
-                    },
-                    {
-                        "type": "input_audio",
-                        "input_audio": {
-                            "data": encoded_string,
-                            "format": "wav"
-                        }
-                    }
-                ]
+                    {"type": "text", "text": "What is in this recording?"},
+                    {"type": "input_audio", "input_audio": {"data": encoded_string, "format": "wav"}},
+                ],
             },
-        ]
+        ],
     )
 
     print(completion.choices[0].message)
@@ -58,9 +49,6 @@ async def test_transcription():
 
     # model: gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1
     transcript = await client.audio.transcriptions.create(
-        model="whisper-1",
-        file=audio_file,
-        response_format="verbose_json",
-        timestamp_granularities=["segment"]
+        model="whisper-1", file=audio_file, response_format="verbose_json", timestamp_granularities=["segment"]
     )
     print(transcript)

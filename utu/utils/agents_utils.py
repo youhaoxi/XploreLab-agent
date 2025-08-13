@@ -10,14 +10,19 @@ from openai.types.responses import ResponseFunctionToolCall, FunctionToolParam
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionToolParam
 
 from agents import (
-    HandoffOutputItem, TResponseInputItem, 
+    HandoffOutputItem,
+    TResponseInputItem,
     ItemHelpers,
     MessageOutputItem,
-    OpenAIChatCompletionsModel, OpenAIResponsesModel,
-    RunItem, ModelSettings, ModelTracing,
+    OpenAIChatCompletionsModel,
+    OpenAIResponsesModel,
+    RunItem,
+    ModelSettings,
+    ModelTracing,
     StreamEvent,
     RunResult,
-    ToolCallItem, FunctionTool,
+    ToolCallItem,
+    FunctionTool,
     ToolCallOutputItem,
 )
 from agents.tracing import gen_trace_id
@@ -30,10 +35,9 @@ from .openai_utils import OpenAIChatCompletionParams, OpenAIUtils
 logger = logging.getLogger(__name__)
 
 
-
 class ChatCompletionConverter(Converter):
     @classmethod
-    def items_to_messages(cls, items: str|Iterable[TResponseInputItem]) -> list[ChatCompletionMessageParam]:
+    def items_to_messages(cls, items: str | Iterable[TResponseInputItem]) -> list[ChatCompletionMessageParam]:
         # skip reasoning, see chatcmpl_converter.Converter.items_to_messages()
         # agents.exceptions.UserError: Unhandled item type or structure: {'id': '__fake_id__', 'summary': [{'text': '...', 'type': 'summary_text'}], 'type': 'reasoning'}
         if not isinstance(items, str):  # TODO: check it!
@@ -41,7 +45,7 @@ class ChatCompletionConverter(Converter):
         return Converter.items_to_messages(items)
 
     @classmethod
-    def filter_items(cls, items: str|Iterable[TResponseInputItem]) -> str|list[TResponseInputItem]:
+    def filter_items(cls, items: str | Iterable[TResponseInputItem]) -> str | list[TResponseInputItem]:
         if isinstance(items, str):
             return items
         filtered_items = []
@@ -52,15 +56,18 @@ class ChatCompletionConverter(Converter):
         return filtered_items
 
     @classmethod
-    def items_to_dict(cls, items: str|Iterable[TResponseInputItem]) -> list[dict]:
+    def items_to_dict(cls, items: str | Iterable[TResponseInputItem]) -> list[dict]:
         """convert items to a list of dict which have {"role", "content"}"""
         if isinstance(items, str):
             return [{"role": "user", "content": items}]
         result = []
         for item in items:
-            if msg := Converter.maybe_easy_input_message(item): result.append(msg)
-            elif msg := Converter.maybe_input_message(item): result.append(msg)
-            elif msg := Converter.maybe_response_output_message(item): result.append(msg)
+            if msg := Converter.maybe_easy_input_message(item):
+                result.append(msg)
+            elif msg := Converter.maybe_input_message(item):
+                result.append(msg)
+            elif msg := Converter.maybe_response_output_message(item):
+                result.append(msg)
             elif msg := Converter.maybe_file_search_call(item):
                 msg.update({"role": "tool", "content": msg["results"]})
                 result.append(msg)
@@ -81,6 +88,7 @@ class ChatCompletionConverter(Converter):
 
 class AgentsUtils:
     """Utils for openai-agents SDK"""
+
     @staticmethod
     def generate_group_id() -> str:
         """Generate a unique group ID. (Used in OpenAI tracing)
@@ -106,7 +114,8 @@ class AgentsUtils:
         if not api_key or not base_url:
             raise ValueError("UTU_LLM_API_KEY and UTU_LLM_BASE_URL must be set")
         openai_client = AsyncOpenAI(
-            api_key=api_key, base_url=base_url,
+            api_key=api_key,
+            base_url=base_url,
             timeout=100,
         )
         if type == "chat.completions":
@@ -153,10 +162,14 @@ class AgentsUtils:
                 elif event.data.type in ("response.output_text.done",):
                     PrintUtils.print_info("")
                 elif event.data.type in (
-                    "response.created", "response.completed", "response.in_progress",
-                    "response.content_part.added", "response.content_part.done"
-                    "response.output_item.added", "response.output_item.done",
-                    "response.function_call_arguments.delta", "response.function_call_arguments.done",
+                    "response.created",
+                    "response.completed",
+                    "response.in_progress",
+                    "response.content_part.added",
+                    "response.content_part.doneresponse.output_item.added",
+                    "response.output_item.done",
+                    "response.function_call_arguments.delta",
+                    "response.function_call_arguments.done",
                 ):
                     pass
             elif isinstance(event, RunItemStreamEvent):
@@ -168,11 +181,18 @@ class AgentsUtils:
                 # elif item.type == "handoff_output_item":
                 #     PrintUtils.print_info(f">> Handoff from {item.source_agent.name} to {item.target_agent.name}")
                 elif item.type == "tool_call_item":
-                    PrintUtils.print_bot(f"<{item.agent.name}> [tool_call] {item.raw_item.name}({item.raw_item.arguments})")
+                    PrintUtils.print_bot(
+                        f"<{item.agent.name}> [tool_call] {item.raw_item.name}({item.raw_item.arguments})"
+                    )
                 elif item.type == "tool_call_output_item":
                     PrintUtils.print_tool(f"<{item.agent.name}> [tool_output] {item.output}")  # item.raw_item
                 else:
-                    assert event.type in ("reasoning_item", "mcp_list_tools_item", "mcp_approval_request_item", "mcp_approval_response_item")
+                    assert event.type in (
+                        "reasoning_item",
+                        "mcp_list_tools_item",
+                        "mcp_approval_request_item",
+                        "mcp_approval_response_item",
+                    )
                     PrintUtils.print_info(f"  >>> Skipping item: {item.__class__.__name__}")
             elif isinstance(event, AgentUpdatedStreamEvent):
                 PrintUtils.print_info(f">> new agent: {event.new_agent.name}")
@@ -199,7 +219,9 @@ class AgentsUtils:
         )
 
     @staticmethod
-    def convert_sp_input(messages: list[ChatCompletionMessageParam]) -> tuple[str|None, str|list[TResponseInputItem]]:
+    def convert_sp_input(
+        messages: list[ChatCompletionMessageParam],
+    ) -> tuple[str | None, str | list[TResponseInputItem]]:
         if isinstance(messages, str):
             return None, messages
         if messages[0].get("role", None) == "system":
@@ -218,9 +240,10 @@ class AgentsUtils:
 
 
 class SimplifiedOpenAIChatCompletionsModel(OpenAIChatCompletionsModel):
-    """ extend OpenAIChatCompletionsModel to support basic api 
+    """extend OpenAIChatCompletionsModel to support basic api
     - enable tracing based on SimplifiedAsyncOpenAI
     """
+
     async def query_one(self, **kwargs) -> str:
         system_instructions, input = AgentsUtils.convert_sp_input(kwargs["messages"])
         model_settings = AgentsUtils.convert_model_settings(kwargs)
@@ -230,9 +253,11 @@ class SimplifiedOpenAIChatCompletionsModel(OpenAIChatCompletionsModel):
             input=input,
             model_settings=model_settings,
             tools=tools,
-            output_schema=None, handoffs=[],
+            output_schema=None,
+            handoffs=[],
             tracing=ModelTracing.ENABLED,
-            previous_response_id=None, prompt=None,
+            previous_response_id=None,
+            prompt=None,
         )
         return ChatCompletionConverter.items_to_messages(response.to_input_items())
         # with generation_span(

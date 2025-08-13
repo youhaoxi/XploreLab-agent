@@ -1,4 +1,4 @@
-""" 
+"""
 https://github.com/lumina-ai-inc/chunkr
 """
 
@@ -21,6 +21,7 @@ INSTRUCTION_QA = r"""Now answer the question below. Use these three headings: '1
 Question: {question}"""
 INSTRUCTION_SUMMARY = r"""Please provide a structured description of the document, including important informations, e.g. author, date, title, keywords, summary, key points, etc."""
 
+
 class DocumentToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
@@ -31,7 +32,7 @@ class DocumentToolkit(AsyncBaseToolkit):
         self.text_limit = self.config.config.get("text_limit", 100_000)
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_provider.model_dump())
         self.md5_to_path = {}
-    
+
     @async_file_cache(expire_time=None)
     async def parse_document(self, md5: str) -> str:
         # https://docs.chunkr.ai/sdk/data-operations/create#supported-file-types
@@ -63,7 +64,7 @@ class DocumentToolkit(AsyncBaseToolkit):
     async def document_qa(self, document_path: str, question: Optional[str] = None) -> str:
         """Get file content summary or answer questions about attached document.
         Supported file types: pdf, docx, pptx, xlsx, xls, ppt, doc
-        
+
         Args:
             document_path (str): Local path or URL to a document.
             question (str, optional): The question to answer. If not provided, a description of the document will be generated.
@@ -71,7 +72,7 @@ class DocumentToolkit(AsyncBaseToolkit):
         md5 = self.handle_path(document_path)
         document_markdown = await self.parse_document(md5)
         if len(document_markdown) > self.text_limit:
-            document_markdown = document_markdown[:self.text_limit] + "\n..."
+            document_markdown = document_markdown[: self.text_limit] + "\n..."
         messages = [
             {"role": "system", "content": SP},
             {"role": "user", "content": document_markdown},
@@ -82,7 +83,9 @@ class DocumentToolkit(AsyncBaseToolkit):
             messages.append({"role": "user", "content": INSTRUCTION_SUMMARY})
         output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         if not question:
-            output = f"You did not provide a particular question, so here is a detailed caption for the document: {output}"
+            output = (
+                f"You did not provide a particular question, so here is a detailed caption for the document: {output}"
+            )
         return output
 
     async def get_tools_map(self) -> dict[str, Callable]:

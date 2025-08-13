@@ -16,12 +16,15 @@ async def test_mcp():
         async with MCPClient.get_mcp_client(container_info["mcp_url"]) as client:
             res = await client.list_tools()
             print(res)
-            res = await client.call_tool("go_to_url", {"url": "https://github.com/modelcontextprotocol/python-sdk/issues/79"})
+            res = await client.call_tool(
+                "go_to_url", {"url": "https://github.com/modelcontextprotocol/python-sdk/issues/79"}
+            )
             print(res)
     except Exception as e:
         logging.error(f"except: {e}", exc_info=True)
     finally:
         await docker_manager.stop_container(id)
+
 
 async def test_concurrency():
     try:
@@ -36,6 +39,7 @@ async def test_concurrency():
         print(e)
     finally:
         docker_manager.cleanup()
+
 
 async def test_find():
     res = await docker_manager.find_all()

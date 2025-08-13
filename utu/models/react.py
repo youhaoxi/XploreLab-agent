@@ -1,6 +1,7 @@
-""" 
+"""
 doc: https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNRgjuRgV7TQ2phu2p?scode=AJEAIQdfAAoS38Jv0GAcMATAZtAPI
 """
+
 import logging
 from typing import AsyncIterator
 from dataclasses import asdict
@@ -8,17 +9,23 @@ from dataclasses import asdict
 from openai import AsyncOpenAI
 from openai.types.responses.response_prompt_param import ResponsePromptParam
 from openai.types.responses import (
-    # Response, 
+    # Response,
     ResponseOutputItem,
     ResponseCompletedEvent,
     ResponseOutputItemDoneEvent,
     ResponseOutputMessage,
-    ResponseFunctionToolCall
+    ResponseFunctionToolCall,
 )
 from agents import (
-    OpenAIChatCompletionsModel, ModelSettings, 
-    AgentOutputSchema, AgentOutputSchemaBase, ModelResponse, 
-    Handoff, ModelTracing, TResponseInputItem, Tool
+    OpenAIChatCompletionsModel,
+    ModelSettings,
+    AgentOutputSchema,
+    AgentOutputSchemaBase,
+    ModelResponse,
+    Handoff,
+    ModelTracing,
+    TResponseInputItem,
+    Tool,
 )
 from agents.items import TResponseStreamEvent
 
@@ -28,8 +35,8 @@ from .react_converter import ReactConverter, ConverterPreprocessInput
 logger = get_logger(__name__)
 
 
-
 converter = ReactConverter()
+
 
 class ReactModel(OpenAIChatCompletionsModel):
     # def __init__(
@@ -45,7 +52,7 @@ class ReactModel(OpenAIChatCompletionsModel):
     #     )
     #     self._context = context
     #     self._preprocessors = preprocessors
-    
+
     async def get_response(
         self,
         system_instructions: str | None,
@@ -58,10 +65,14 @@ class ReactModel(OpenAIChatCompletionsModel):
         previous_response_id: str | None,
         prompt: ResponsePromptParam | None = None,
     ) -> ModelResponse:
-        preprocess_input = ConverterPreprocessInput(system_instructions, input, tools, output_schema, handoffs, model_settings)
+        preprocess_input = ConverterPreprocessInput(
+            system_instructions, input, tools, output_schema, handoffs, model_settings
+        )
         preprocess_input = converter.preprocess(preprocess_input)
         model_response = await super().get_response(
-            tracing=tracing, previous_response_id=previous_response_id, prompt=prompt,
+            tracing=tracing,
+            previous_response_id=previous_response_id,
+            prompt=prompt,
             system_instructions=preprocess_input.system_instructions,
             input=preprocess_input.input,
             tools=preprocess_input.tools,
@@ -84,18 +95,22 @@ class ReactModel(OpenAIChatCompletionsModel):
         previous_response_id: str | None,
         prompt: ResponsePromptParam | None = None,
     ) -> AsyncIterator[TResponseStreamEvent]:
-        """ 
+        """
         yield:
             1. All events will be wrapped in RawResponsesStreamEvent(data=event) and sent to `_event_queue`
             2. ResponseCompletedEvent: used in AgentRunner._run_single_turn_streamed()
         Here, we only yield the final event
         """
-        preprocess_input = ConverterPreprocessInput(system_instructions, input, tools, output_schema, handoffs, model_settings)
+        preprocess_input = ConverterPreprocessInput(
+            system_instructions, input, tools, output_schema, handoffs, model_settings
+        )
         preprocess_input = converter.preprocess(preprocess_input)
         content = ""
         final_event: ResponseCompletedEvent | None = None
         async for event in super().stream_response(
-            tracing=tracing, previous_response_id=previous_response_id, prompt=prompt,
+            tracing=tracing,
+            previous_response_id=previous_response_id,
+            prompt=prompt,
             system_instructions=preprocess_input.system_instructions,
             input=preprocess_input.input,
             tools=preprocess_input.tools,

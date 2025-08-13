@@ -14,6 +14,7 @@ async def test_rollout_one():
     # print(f"trace_id: {res.trace_id}. response: {res.response}")
     print(res)
 
+
 async def test_judge_one():
     sample = benchmark.dataset.get_samples(stage="rollout", limit=1)[0]
     res = await benchmark.judge_one(sample)

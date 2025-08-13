@@ -28,12 +28,17 @@ class BrowserEnv(BaseEnv):
 
     async def get_tools(self) -> list[Tool]:
         activated_tools = (
-            "search_google", "go_to_url", "go_back",
+            "search_google",
+            "go_to_url",
+            "go_back",
             # "wait",
-            "click_element", "input_text", 
-            "switch_tab", "open_tab",
-            "scroll_down", "scroll_up",
-            "download_file"
+            "click_element",
+            "input_text",
+            "switch_tab",
+            "open_tab",
+            "scroll_down",
+            "scroll_up",
+            "download_file",
             # "search_google_api"
         )
         tools: list[Tool] = []
@@ -50,6 +55,7 @@ class BrowserEnv(BaseEnv):
                 except Exception as e:
                     logger.error(f"except: {e}", exc_info=True)
                     return f"Error: {e}"
+
             return on_invoke_tool
 
         async with MCPClient.get_mcp_client(self.mcp_url) as client:
@@ -59,10 +65,12 @@ class BrowserEnv(BaseEnv):
             for tool in res.tools:
                 if tool.name not in activated_tools:
                     continue
-                tools.append(FunctionTool(
-                    name=tool.name,
-                    description=tool.description,
-                    params_json_schema=tool.inputSchema,
-                    on_invoke_tool=create_on_invoke_tool(tool.name),
-                ))
+                tools.append(
+                    FunctionTool(
+                        name=tool.name,
+                        description=tool.description,
+                        params_json_schema=tool.inputSchema,
+                        on_invoke_tool=create_on_invoke_tool(tool.name),
+                    )
+                )
             return tools

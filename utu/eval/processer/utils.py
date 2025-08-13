@@ -21,7 +21,7 @@ class MetricsUtils:
                 "wrong": incorrect_count,
                 "unknown": invalid_count,
                 "total": total,
-            } 
+            },
         }
 
     @staticmethod
@@ -52,20 +52,20 @@ class MetricsUtils:
     @staticmethod
     def calculate_calibration(
         samples: list[EvaluationSample],
-        CONFIDENCE_BINS: list[tuple[int, int]] = [(0, 20), (20, 40), (40, 60), (60, 80), (80, 101)]
+        CONFIDENCE_BINS: list[tuple[int, int]] = [(0, 20), (20, 40), (40, 60), (60, 80), (80, 101)],
     ) -> dict:
         """Calculate calibration statistics"""
-        calibration = [{'samples':0, 'correct':0, 'conf_sum':0} for _ in CONFIDENCE_BINS]
+        calibration = [{"samples": 0, "correct": 0, "conf_sum": 0} for _ in CONFIDENCE_BINS]
         for record in samples:
             if record.judged_response == "invalid":
                 continue
             confidence = record.confidence or 0
             bin_idx = min(confidence // 20, len(CONFIDENCE_BINS) - 1)
             bin_stats = calibration[bin_idx]
-            bin_stats['samples'] += 1
-            bin_stats['conf_sum'] += confidence
-            if record.get('correct', False):
-                bin_stats['correct'] += 1
+            bin_stats["samples"] += 1
+            bin_stats["conf_sum"] += confidence
+            if record.get("correct", False):
+                bin_stats["correct"] += 1
         calibration_error = round(MetricsUtils._calculate_calibration(calibration, len(samples)), 2)
         return {
             "Calibration Error (%)": calibration_error,
@@ -73,13 +73,13 @@ class MetricsUtils:
 
     @staticmethod
     def _calculate_calibration(stats: list[dict], total: int) -> float:
-        """ calculate calibration statistics """
+        """calculate calibration statistics"""
         error = 0.0
         for bin_stats in stats:
-            samples = bin_stats['samples']
+            samples = bin_stats["samples"]
             if not samples:
                 continue
-            accuracy = bin_stats['correct'] / samples
-            avg_conf = bin_stats['conf_sum'] / samples / 100  # convert to 0-1 decimal
+            accuracy = bin_stats["correct"] / samples
+            avg_conf = bin_stats["conf_sum"] / samples / 100  # convert to 0-1 decimal
             error += (samples / total) * abs(accuracy - avg_conf)
         return error * 100  # convert to percentage

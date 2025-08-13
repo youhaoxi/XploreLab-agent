@@ -3,6 +3,7 @@ import pytest
 from utu.config import ConfigLoader
 from utu.tools import ArxivToolkit
 
+
 @pytest.fixture
 def arxiv_toolkit():
     config = ConfigLoader.load_toolkit_config("arxiv")

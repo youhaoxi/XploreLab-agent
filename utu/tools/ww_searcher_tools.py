@@ -42,35 +42,30 @@ Format your response as JSON:
 
 
 class DecomposeQueryToolkit(AsyncBaseToolkit):
-    """ 解析 query 为 sub-query 的 toolkit """
+    """解析 query 为 sub-query 的 toolkit"""
+
     def __init__(self, config: ToolkitConfig):
         super().__init__(config)
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
         self.num_sub_queries = self.config.config.get("num_sub_queries", 5)
-    
+
     async def run(self, query: str, background: str = "") -> list[str]:
-        """ Decompose a query into sub-queries using an LLM.
+        """Decompose a query into sub-queries using an LLM.
 
         Args:
             query: The main query to decompose.
             background: Optional background information to provide context for decomposition.
         """
-        prompt = DECOMPOSE_QUERY_PROMPT.format(
-            query=query,
-            background=background,
-            numSubQueries=self.num_sub_queries
-        )
+        prompt = DECOMPOSE_QUERY_PROMPT.format(query=query, background=background, numSubQueries=self.num_sub_queries)
         response = await self.llm.query_one(messages=[{"role": "user", "content": prompt}])
         # load json and extract subQueries from response string
-        response = response.replace('```json', '').replace('```', '').strip()
+        response = response.replace("```json", "").replace("```", "").strip()
         response_json = json.loads(response)
         return response_json.get("subQueries", [])
 
     async def get_tools_map(self) -> dict[str, Callable]:
-        """ Return a dictionary mapping tool names to tool functions. """
-        return {
-            "decompose_query": self.run
-        }
+        """Return a dictionary mapping tool names to tool functions."""
+        return {"decompose_query": self.run}
 
 
 """ ========== Web Search Toolkit ========= """
@@ -107,25 +102,17 @@ TEMPLATE_LINKS = r"""You are a webpage analysis agent that extract relevant link
 </content>
 """
 
-banned_sites = (
-    "https://huggingface.co/datasets/",
-    "https://grok.com/share/",
-    "https://modelscope.cn/datasets/"
-)
+banned_sites = ("https://huggingface.co/datasets/", "https://grok.com/share/", "https://modelscope.cn/datasets/")
 RE_MATCHED_SITES = re.compile(r"^(" + "|".join(banned_sites) + r")")
+
 
 class WebSearchToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None):
         super().__init__(config)
         self.jina_url_template = r"https://r.jina.ai/{url}"
-        self.jina_header = {
-            "Authorization": f"Bearer {os.getenv('JINA_API_KEY')}"
-        }
+        self.jina_header = {"Authorization": f"Bearer {os.getenv('JINA_API_KEY')}"}
         self.serper_url = r"https://google.serper.dev/search"
-        self.serper_header = {
-            "X-API-KEY": os.getenv('SERPER_API_KEY'),
-            'Content-Type': 'application/json'
-        }
+        self.serper_header = {"X-API-KEY": os.getenv("SERPER_API_KEY"), "Content-Type": "application/json"}
         # config
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
         self.num_result = self.config.config.get("num_result", 10)
@@ -155,12 +142,7 @@ class WebSearchToolkit(AsyncBaseToolkit):
 
     @async_file_cache(expire_time=None)
     async def search_google(self, query: str):
-        params = {
-            'q': query,
-            'gl': 'cn',
-            'hl': 'zh-cn',
-            'num': 100
-        }
+        params = {"q": query, "gl": "cn", "hl": "zh-cn", "num": 100}
         response = requests.request("POST", self.serper_url, headers=self.serper_header, json=params)
         results = response.json()
         return results
@@ -180,7 +162,7 @@ class WebSearchToolkit(AsyncBaseToolkit):
         # filter the search results
         results = self._filter_results(res["organic"], num_results)
         return results
-    
+
     def _filter_results(self, results: list[dict], limit: int) -> list[dict]:
         # can also use search operator `-site:huggingface.co`
         res = []
@@ -202,7 +184,7 @@ class WebSearchToolkit(AsyncBaseToolkit):
     # @async_file_cache(expire_time=None)
     async def web_qa(self, url: str, query: str = None, background: str = None) -> str:
         """Query information you interested from the specified url
-        
+
         Args:
             url (str): The url to get content from.
             query (str, optional): The query to search for. If not given, return the original content of the url.
@@ -210,31 +192,32 @@ class WebSearchToolkit(AsyncBaseToolkit):
         async with asyncio.Semaphore(self.max_concurrency):
             content = await self.get_content(url)
             query = query or "Summarize the content of this webpage."
-            res_summary, res_links = await asyncio.gather(self._qa(content, query, background), self._extract_links(content, query, background))
+            res_summary, res_links = await asyncio.gather(
+                self._qa(content, query, background), self._extract_links(content, query, background)
+            )
         result = f"Summary: {res_summary}\n\nRelated Links: {res_links}"
         return result
 
     async def _qa(self, content: str, query: str, background: str) -> str:
-        content = content[:self.max_chars]  # truncate content to max_chars
+        content = content[: self.max_chars]  # truncate content to max_chars
         template = TEMPLATE_QA.format(content=content, query=query, background=background)
         return await self.llm.query_one(messages=[{"role": "user", "content": template}])
+
     async def _extract_links(self, content: str, query: str, background: str) -> str:
-        content = content[:self.max_chars]  # truncate content to max_chars
+        content = content[: self.max_chars]  # truncate content to max_chars
         template = TEMPLATE_LINKS.format(content=content, query=query, background=background)
         return await self.llm.query_one(messages=[{"role": "user", "content": template}])
 
     async def get_tools_map(self) -> dict[str, Callable]:
-        return {
-            "web_search": self.run,
-            "web_qa": self.web_qa,
-            "search_google_api": self.search_google_api
-        }
+        return {"web_search": self.run, "web_qa": self.web_qa, "search_google_api": self.search_google_api}
 
 
 """ ========== Summarize Web Content Toolkit ========= """
+
+
 class SummarizeToolkit(AsyncBaseToolkit):
-    """ Toolkit for summarizing web content based on search results. """
-    
+    """Toolkit for summarizing web content based on search results."""
+
     def __init__(self, config: ToolkitConfig):
         super().__init__(config)
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_dump())
@@ -242,7 +225,7 @@ class SummarizeToolkit(AsyncBaseToolkit):
         self.max_concurrency = self.config.config.get("max_concurrency", 5)
 
     async def run(self, query: str, background: str, search_results: list[dict]) -> str:
-        """ Summarize web content based on search results.
+        """Summarize web content based on search results.
 
         Args:
             query (str): The original query that was used to perform the search.
@@ -250,27 +233,27 @@ class SummarizeToolkit(AsyncBaseToolkit):
         """
         formatted_search_result = self._get_formatted_search_result(search_results)
         prompt = SUMMARIZE_PROMPT.format(
-            background=background,
-            originalQuery=query,
-            formattedSearchResults=formatted_search_result
+            background=background, originalQuery=query, formattedSearchResults=formatted_search_result
         )
-        
+
         async with asyncio.Semaphore(self.max_concurrency):
             # Use the LLM to generate the summary
             response = await self.llm.query_one(messages=[{"role": "user", "content": prompt}])
         return response.strip()
-    
+
     def _get_formatted_search_result(self, search_results: list[dict]) -> str:
-        """ Format search results for the summarization prompt. """
+        """Format search results for the summarization prompt."""
         formatted_result = "<web_content>\n"
         for result_no, result in enumerate(search_results, start=1):
             try:
-                formatted_result += f"<web_content_{result_no}>\n{result['summary'][:self.max_chars]}\n</web_content_{result_no}>\n"
+                formatted_result += (
+                    f"<web_content_{result_no}>\n{result['summary'][: self.max_chars]}\n</web_content_{result_no}>\n"
+                )
             except:
                 pass
         formatted_result += "</web_content>"
         return formatted_result
-    
+
     async def get_tools_map(self) -> dict[str, Callable]:
         return {
             "summarize": self.run,

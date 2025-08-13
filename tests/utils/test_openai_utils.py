@@ -6,46 +6,50 @@ from utu.config import ConfigLoader
 
 config = ConfigLoader.load_model_config("base")
 openai_client = SimplifiedAsyncOpenAI(**config.model_provider.model_dump())
-print(f"Testing {config.model_provider.model} [{config.model_provider.type}], with base_url={config.model_provider.base_url}")
+print(
+    f"Testing {config.model_provider.model} [{config.model_provider.type}], with base_url={config.model_provider.base_url}"
+)
 # messages = [{"role": "user", "content": "Tell a joke. And what is the weather like in Bogotá and Shanghai?"}]
 messages = [{"role": "user", "content": "给我讲两个笑话, 然后帮我查一下北京天津的天气"}]
-tools = [{
-    "type": "function",
-    "function": {
-        "name": "get_weather",
-        "description": "Get current temperature for a given location.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "location": {
-                    "type": "string",
-                    "description": "City and country e.g. Bogotá, Colombia"
-                }
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get current temperature for a given location.",
+            "parameters": {
+                "type": "object",
+                "properties": {"location": {"type": "string", "description": "City and country e.g. Bogotá, Colombia"}},
+                "required": ["location"],
+                "additionalProperties": False,
             },
-            "required": ["location"],
-            "additionalProperties": False
+            "strict": True,
         },
-        "strict": True
     }
-}]
+]
 tools_response = [OpenAIUtils.tool_chatcompletion_to_responses(t) for t in tools]
+
 
 async def test_model():
     res = await openai_client.chat_completions_create(messages=messages, tools=tools, stream=False)
     print(res.choices[0].message)
+
 
 async def test_model_stream():
     stream = await openai_client.chat_completions_create(messages=messages, tools=tools, stream=True)
     async for chunk in stream:
         print(chunk.choices[0].delta)
 
+
 async def test_query_one():
     res = await openai_client.query_one(messages=messages, tools=tools, stream=False)
     print(res)
 
+
 async def test_print():
     res = await openai_client.chat_completions_create(messages=messages, tools=tools, stream=False)
     OpenAIUtils.print_message(res.choices[0].message)
+
 
 async def test_print_stream():
     stream = await openai_client.chat_completions_create(messages=messages, tools=tools, stream=True)
@@ -54,6 +58,7 @@ async def test_print_stream():
     print(message)
     print()
 
+
 # test responses -----------------------------------------------------------------------
 async def test_responses():
     res = await openai_client.responses_create(input=messages, tools=tools_response)
@@ -61,10 +66,12 @@ async def test_responses():
     for item in res.output:
         print(item)
 
+
 async def test_print_response():
     res = await openai_client.responses_create(input=messages, tools=tools_response)
     OpenAIUtils.print_response(res)
     print(OpenAIUtils.get_response_configs(res))
+
 
 async def test_output_schema():
     class ExtractedEvent(BaseModel):
@@ -83,28 +90,29 @@ async def test_output_schema():
     }
 
     input = "extract the event from the following text: Bob is going to have a birthday party on 2025-08-12."
-    res = await openai_client.responses.create(
-        input=input, text=response_format
-    )
+    res = await openai_client.responses.create(input=input, text=response_format)
     OpenAIUtils.print_response(res)
     print(OpenAIUtils.get_response_configs(res))
 
+
 # test extra bodys -----------------------------------------------------------------------
 async def test_retry():
-    res = await openai_client.chat_completions_create(messages=messages, tools=tools, stream=False,
+    res = await openai_client.chat_completions_create(
+        messages=messages,
+        tools=tools,
+        stream=False,
         # manually trigger retry with 500 (internal server error)
-        extra_body={
-            "return_status_code": 500,
-            "enable_format_check": True
-        }
+        extra_body={"return_status_code": 500, "enable_format_check": True},
     )
     print(res)
 
+
 async def test_parallel_tool_calls():
-    res = await openai_client.chat_completions_create(messages=messages, tools=tools, stream=False,
+    res = await openai_client.chat_completions_create(
+        messages=messages,
+        tools=tools,
+        stream=False,
         # manually trigger retry with 500 (internal server error)
-        extra_body={
-            "parallel_tool_calls": False
-        }
+        extra_body={"parallel_tool_calls": False},
     )
     print(res)

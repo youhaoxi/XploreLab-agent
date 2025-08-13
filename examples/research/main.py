@@ -71,9 +71,7 @@ class ResearchManager:
                 if result is not None:
                     results.append(result)
                 num_completed += 1
-                self.printer.update_item(
-                    "searching", f"Searching... {num_completed}/{len(tasks)} completed"
-                )
+                self.printer.update_item("searching", f"Searching... {num_completed}/{len(tasks)} completed")
             # results = await asyncio.gather(*tasks)
             self.printer.mark_item_done("searching")
             return results

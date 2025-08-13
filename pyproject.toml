@@ -43,6 +43,7 @@ dev = [
     "mkdocstrings[python]>=0.30.0",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.0.0",
+    "ruff>=0.12.8",
     "tencentcloud-sdk-python>=3.0.1425",
 ]
 
@@ -73,4 +74,19 @@ addopts = [
 index-url = "https://pypi.org/simple"
 extra-index-url = [
     "https://mirrors.tencent.com/repository/pypi/tencent_pypi/simple",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    # "W",  # pycodestyle warnings
+    # "F",  # pyflakes
+    # "I",  # isort
+    # "B",  # flake8-bugbear
+    # "C4", # flake8-comprehensions
+    # "UP", # pyupgrade
 ]

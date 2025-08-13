@@ -2,6 +2,7 @@
 https://github.com/Arize-ai/openinference/blob/main/python/instrumentation/openinference-instrumentation-openai-agents/src/openinference/instrumentation/openai_agents/_processor.py
 updated: @2025-07-31 0864c13
 """
+
 # from openinference.instrumentation.openai_agents._processor import OpenInferenceTracingProcessor
 from __future__ import annotations
 
@@ -117,11 +118,7 @@ class OpenInferenceTracingProcessor(TracingProcessor):
         if not span.started_at:
             return
         start_time = datetime.fromisoformat(span.started_at)
-        parent_span = (
-            self._otel_spans.get(span.parent_id)
-            if span.parent_id
-            else self._root_spans.get(span.trace_id)
-        )
+        parent_span = self._otel_spans.get(span.parent_id) if span.parent_id else self._root_spans.get(span.trace_id)
         context = set_span_in_context(parent_span) if parent_span else None
         span_name = _get_span_name(span)
         otel_span = self._tracer.start_span(
@@ -338,9 +335,7 @@ def _get_attributes_from_generation_span_data(
 ) -> Iterator[tuple[str, AttributeValue]]:
     if isinstance(model := obj.model, str):
         yield LLM_MODEL_NAME, model
-    if isinstance(obj.model_config, dict) and (
-        param := {k: v for k, v in obj.model_config.items() if v is not None}
-    ):
+    if isinstance(obj.model_config, dict) and (param := {k: v for k, v in obj.model_config.items() if v is not None}):
         yield LLM_INVOCATION_PARAMETERS, safe_json_dumps(param)
         if base_url := param.get("base_url"):
             if "api.openai.com" in base_url:
@@ -487,12 +482,7 @@ def _get_attributes_from_function_span_data(
         yield INPUT_MIME_TYPE, JSON
     if obj.output is not None:
         yield OUTPUT_VALUE, _convert_to_primitive(obj.output)
-        if (
-            isinstance(obj.output, str)
-            and len(obj.output) > 1
-            and obj.output[0] == "{"
-            and obj.output[-1] == "}"
-        ):
+        if isinstance(obj.output, str) and len(obj.output) > 1 and obj.output[0] == "{" and obj.output[-1] == "}":
             yield OUTPUT_MIME_TYPE, JSON
 
 
@@ -646,9 +636,7 @@ def _get_attributes_from_usage(
 
 def _get_span_status(obj: Span[Any]) -> Status:
     if error := getattr(obj, "error", None):
-        return Status(
-            status_code=StatusCode.ERROR, description=f"{error.get('message')}: {error.get('data')}"
-        )
+        return Status(status_code=StatusCode.ERROR, description=f"{error.get('message')}: {error.get('data')}")
     else:
         return Status(StatusCode.OK)
 
@@ -678,9 +666,7 @@ LLM_TOKEN_COUNT_COMPLETION = SpanAttributes.LLM_TOKEN_COUNT_COMPLETION
 LLM_TOKEN_COUNT_PROMPT = SpanAttributes.LLM_TOKEN_COUNT_PROMPT
 LLM_TOKEN_COUNT_TOTAL = SpanAttributes.LLM_TOKEN_COUNT_TOTAL
 LLM_TOKEN_COUNT_PROMPT_DETAILS_CACHE_READ = SpanAttributes.LLM_TOKEN_COUNT_PROMPT_DETAILS_CACHE_READ
-LLM_TOKEN_COUNT_COMPLETION_DETAILS_REASONING = (
-    SpanAttributes.LLM_TOKEN_COUNT_COMPLETION_DETAILS_REASONING
-)
+LLM_TOKEN_COUNT_COMPLETION_DETAILS_REASONING = SpanAttributes.LLM_TOKEN_COUNT_COMPLETION_DETAILS_REASONING
 LLM_TOOLS = SpanAttributes.LLM_TOOLS
 METADATA = SpanAttributes.METADATA
 OPENINFERENCE_SPAN_KIND = SpanAttributes.OPENINFERENCE_SPAN_KIND

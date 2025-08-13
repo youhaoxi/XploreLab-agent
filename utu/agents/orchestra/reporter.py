@@ -24,9 +24,6 @@ class ReporterAgent:
 
     async def report(self, task_recorder: TaskRecorder) -> AnalysisResult:
         """analyze the result of a subtask, return a report"""
-        query = self.template.render(
-            question=task_recorder.task,
-            trajectory=task_recorder.get_trajectory_str()
-        )
+        query = self.template.render(question=task_recorder.task, trajectory=task_recorder.get_trajectory_str())
         response = await self.llm.query_one(messages=query, **self.config.reporter_model.model_params.model_dump())
         return AnalysisResult(output=response)

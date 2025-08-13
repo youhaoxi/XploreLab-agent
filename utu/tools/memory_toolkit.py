@@ -1,4 +1,4 @@
-""" 
+"""
 @ii-agent/src/ii_agent/tools/memory/
 """
 
@@ -19,6 +19,7 @@ class SimpleMemoryToolkit(AsyncBaseToolkit):
     warnings when overwriting content or when edit operations would affect
     multiple occurrences.
     """
+
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
         self.full_memory = ""
@@ -50,9 +51,11 @@ class SimpleMemoryToolkit(AsyncBaseToolkit):
         self.full_memory = self.full_memory.replace(old_string, new_string)
         return "Edited memory: 1 occurrence replaced."
 
-    async def simple_memory(self, action: Literal["read", "write", "edit"], content: str = "", old_string: str = "", new_string: str = "") -> str:
+    async def simple_memory(
+        self, action: Literal["read", "write", "edit"], content: str = "", old_string: str = "", new_string: str = ""
+    ) -> str:
         """Tool for managing persistent text memory with read, write and edit operations.
-        
+
         MEMORY STORAGE GUIDANCE:
         Store information that needs to persist across agent interactions, including:
         - User context: Requirements, goals, preferences, and clarifications
@@ -61,12 +64,12 @@ class SimpleMemoryToolkit(AsyncBaseToolkit):
         - Research findings: Key facts, sources, URLs, and reference materials
         - Configuration: Settings, parameters, and environment details
         - Cross-session continuity: Information needed for future interactions
-        
+
         OPERATIONS:
         - Read: Retrieves full memory contents as a string
         - Write: Replaces entire memory (warns when overwriting existing data)
         - Edit: Performs targeted string replacement (warns on multiple matches)
-        
+
         Use structured formats (JSON, YAML, or clear sections) for complex data.
         Prioritize information that would be expensive to regenerate or re-research.
 
@@ -99,8 +102,10 @@ class CompactifyMemoryToolkit(AsyncBaseToolkit):
     This tool adapts to different context management approaches (summarization, simple truncation, etc.).
     """
 
-    async def compactify_memory(self, ) -> str:
-        """Compactifies the conversation memory using the configured context management strategy. 
+    async def compactify_memory(
+        self,
+    ) -> str:
+        """Compactifies the conversation memory using the configured context management strategy.
         Use this tool when the conversation is getting long and you need to free up context space while preserving important information.
         Helps maintain conversation continuity while staying within token limits.
         """

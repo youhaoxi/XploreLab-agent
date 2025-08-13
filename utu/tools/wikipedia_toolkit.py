@@ -1,8 +1,9 @@
-""" 
+"""
 @smolagents/src/smolagents/default_tools.py
 https://github.com/martin-majlis/Wikipedia-API
 https://www.mediawiki.org/wiki/API:Main_page
 """
+
 import calendar
 import datetime
 from typing import Callable
@@ -25,7 +26,7 @@ class WikipediaSearchTool(AsyncBaseToolkit):
         extract_format (str): Defines the output format. Can be `"WIKI"` or `"HTML"`.
     """
 
-    def __init__(self, config: ToolkitConfig|dict = None) -> None:
+    def __init__(self, config: ToolkitConfig | dict = None) -> None:
         super().__init__(config)
         try:
             import wikipediaapi
@@ -53,7 +54,7 @@ class WikipediaSearchTool(AsyncBaseToolkit):
 
     async def wikipedia_search(self, query: str) -> str:
         """Searches Wikipedia and returns a summary or full text of the given topic, along with the page URL.
-        
+
         Args:
             query (str): The topic to search on Wikipedia.
         """
@@ -77,7 +78,6 @@ class WikipediaSearchTool(AsyncBaseToolkit):
 
         except Exception as e:
             return f"Error fetching Wikipedia summary: {str(e)}"
-
 
     async def search_wikipedia_revisions(self, entity: str, year: int, month: int) -> str:
         """Get the revisions of a Wikipedia entity in a given month, return the revision url.
@@ -122,9 +122,7 @@ class WikipediaSearchTool(AsyncBaseToolkit):
                     timestamp = rev["timestamp"]
                     # Construct the revision url
                     rev_url = f"https://en.wikipedia.org/w/index.php?title={entity}&oldid={oldid}"
-                    revisions_list.append(
-                        {"timestamp": timestamp, "oldid": oldid, "url": rev_url}
-                    )
+                    revisions_list.append({"timestamp": timestamp, "oldid": oldid, "url": rev_url})
         return str(revisions_list)
 
     async def get_tools_map(self) -> dict[str, Callable]:

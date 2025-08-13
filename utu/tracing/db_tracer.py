@@ -1,8 +1,9 @@
-""" 
-useful: 
+"""
+useful:
     get_current_span, get_current_trace
     add_trace_processor
 """
+
 import os
 from typing import Any
 
@@ -22,6 +23,7 @@ from sqlmodel import create_engine, Session, SQLModel
 from ..db import ToolTracingModel, GenerationTracingModel
 from ..utils import OpenAIUtils
 
+
 class DBTracingProcessor(TracingProcessor):
     def __init__(self) -> None:
         self.engine = create_engine(os.getenv("DB_URL"), pool_size=300, max_overflow=500, pool_timeout=30)
@@ -40,44 +42,51 @@ class DBTracingProcessor(TracingProcessor):
         data = span.span_data
         if isinstance(data, GenerationSpanData):
             with Session(self.engine) as session:
-                session.add(GenerationTracingModel(
-                    trace_id=get_current_trace().trace_id,
-                    span_id=span.span_id,
-                    input=data.input,
-                    output=data.output,
-                    model=data.model,
-                    model_configs=data.model_config,
-                    usage=data.usage,
-                ))
+                session.add(
+                    GenerationTracingModel(
+                        trace_id=get_current_trace().trace_id,
+                        span_id=span.span_id,
+                        input=data.input,
+                        output=data.output,
+                        model=data.model,
+                        model_configs=data.model_config,
+                        usage=data.usage,
+                    )
+                )
                 session.commit()
         elif isinstance(data, ResponseSpanData):
             # print(f"> response_id={data.response.id}: {data.response.model_dump()}")
             with Session(self.engine) as session:
-                session.add(GenerationTracingModel(
-                    trace_id=get_current_trace().trace_id,
-                    span_id=span.span_id,
-                    input=data.input,
-                    output=OpenAIUtils.get_response_output(data.response),
-                    model=OpenAIUtils.maybe_basemodel_to_dict(data.response.model),
-                    model_configs=OpenAIUtils.get_response_configs(data.response),
-                    usage=OpenAIUtils.maybe_basemodel_to_dict(data.response.usage),
-                    type="responses",
-                    response_id=data.response.id,
-                ))
+                session.add(
+                    GenerationTracingModel(
+                        trace_id=get_current_trace().trace_id,
+                        span_id=span.span_id,
+                        input=data.input,
+                        output=OpenAIUtils.get_response_output(data.response),
+                        model=OpenAIUtils.maybe_basemodel_to_dict(data.response.model),
+                        model_configs=OpenAIUtils.get_response_configs(data.response),
+                        usage=OpenAIUtils.maybe_basemodel_to_dict(data.response.usage),
+                        type="responses",
+                        response_id=data.response.id,
+                    )
+                )
                 session.commit()
         elif isinstance(data, FunctionSpanData):
             with Session(self.engine) as session:
-                session.add(ToolTracingModel(
-                    name=data.name,
-                    input=data.input,
-                    output=data.output,
-                    mcp_data=data.mcp_data,
-                    trace_id=get_current_trace().trace_id,
-                    span_id=span.span_id,
-                ))
+                session.add(
+                    ToolTracingModel(
+                        name=data.name,
+                        input=data.input,
+                        output=data.output,
+                        mcp_data=data.mcp_data,
+                        trace_id=get_current_trace().trace_id,
+                        span_id=span.span_id,
+                    )
+                )
                 session.commit()
 
     def force_flush(self) -> None:
         pass
+
     def shutdown(self) -> None:
         pass

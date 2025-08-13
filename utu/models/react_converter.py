@@ -4,9 +4,15 @@ from dataclasses import dataclass, field
 
 import jinja2
 from agents import Tool, Handoff, TResponseInputItem, AgentOutputSchema, ModelSettings
+
 # FIXME: change to ChatCompletionConverter
 from agents.models.chatcmpl_converter import Converter
-from openai.types.responses import ResponseOutputItem, ResponseOutputMessage, ResponseFunctionToolCall, EasyInputMessageParam
+from openai.types.responses import (
+    ResponseOutputItem,
+    ResponseOutputMessage,
+    ResponseFunctionToolCall,
+    EasyInputMessageParam,
+)
 from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageToolCall
 from openai.types.chat.chat_completion_message_tool_call import Function
 
@@ -99,6 +105,7 @@ class ReactConverter:
     Agent output: Purely function_call! (cannot only return content)
         ONLY one function_call is allowed!
     """
+
     def __init__(self) -> None:
         self.jinja_env = jinja2.Environment()
         self.template_sp = self.jinja_env.from_string(TEMPLATE_SP)
@@ -115,7 +122,9 @@ class ReactConverter:
         converted_sp = self._handle_sp(input.system_instructions, input.tools, input.handoffs)
         converted_input = self._handle_input(input.system_instructions, input.input)
         converted_model_settings = self._handle_model_settings(input.model_settings)
-        return ConverterPreprocessInput(system_instructions=converted_sp, input=converted_input, model_settings=converted_model_settings)
+        return ConverterPreprocessInput(
+            system_instructions=converted_sp, input=converted_input, model_settings=converted_model_settings
+        )
 
     def _handle_sp(self, system_instructions: str | None, tools: list[Tool], handoffs: list[Handoff]) -> str | None:
         sp = self.template_sp.render(tools=tools, handoffs=handoffs)
@@ -123,9 +132,11 @@ class ReactConverter:
             sp = f"{system_instructions}\n\n{sp}"
         return sp
 
-    def _handle_input(self, system_instructions: str | None, input: str | list[TResponseInputItem]) -> str | list[TResponseInputItem]:
-        """ Basic conversion, see logic in Converter.items_to_messages()
-        
+    def _handle_input(
+        self, system_instructions: str | None, input: str | list[TResponseInputItem]
+    ) -> str | list[TResponseInputItem]:
+        """Basic conversion, see logic in Converter.items_to_messages()
+
         Rules:
         - tool outputs => InputMessage (role=user)
         - InputMessage (role=assistant) => remove tool_calls
@@ -144,16 +155,15 @@ class ReactConverter:
             elif func_call := Converter.maybe_function_tool_call(item):
                 message = EasyInputMessageParam(
                     role="assistant",
-                    content=self.template_action.render(action_name=func_call['name'], action_arguments=func_call['arguments'])
+                    content=self.template_action.render(
+                        action_name=func_call["name"], action_arguments=func_call["arguments"]
+                    ),
                 )
                 # print(f">> converted function_call to {message}")
                 results.append(message)
             # type == "function_call_output"
             elif func_output := Converter.maybe_function_tool_call_output(item):
-                message = EasyInputMessageParam(
-                    role="user",
-                    content=f"{self.observation_str}: {func_output['output']}"
-                )
+                message = EasyInputMessageParam(role="user", content=f"{self.observation_str}: {func_output['output']}")
                 # print(f">> converted function_call_output to {message}")
                 results.append(message)
             else:
@@ -167,7 +177,6 @@ class ReactConverter:
         model_settings.extra_args["stop"] = [self.observation_str]  # add stop tokens
         return model_settings
 
-
     def postprocess(self, items: list[ResponseOutputItem]) -> list[ResponseOutputItem]:
         """Parse FCs from text output"""
         text_output = ""
@@ -178,7 +187,7 @@ class ReactConverter:
                 assert len(item.content) == 1 and item.content[0].type == "output_text"
                 text_output += item.content[0].text
         return self._parse_react_output(text_output)
-        
+
     def _parse_react_output(self, text_output: str) -> list[ResponseOutputItem]:
         """Parse output text into list of ResponseOutputMessage|ResponseFunctionToolCall
 
@@ -187,7 +196,7 @@ class ReactConverter:
         """
         assert self.observation_str not in text_output
         if self.action_str in text_output:
-            # only one action is allowed for now! 
+            # only one action is allowed for now!
             assert text_output.count(self.action_str) == 1
             text_output = text_output.split(self.action_str)[1].strip()
             try:
@@ -203,12 +212,9 @@ class ReactConverter:
             message = ChatCompletionMessage(
                 role="assistant",
                 # TODO: also parse "Think" into content
-                tool_calls=[ChatCompletionMessageToolCall(function=function, id="FAKE_ID", type="function")]
+                tool_calls=[ChatCompletionMessageToolCall(function=function, id="FAKE_ID", type="function")],
             )
             return Converter.message_to_output_items(message)
         else:
-            message = ChatCompletionMessage(
-                role="assistant",
-                content=text_output
-            )
+            message = ChatCompletionMessage(role="assistant", content=text_output)
             return Converter.message_to_output_items(message)

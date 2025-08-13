@@ -10,6 +10,7 @@ from .eval_config import EvalConfig
 
 TConfig = TypeVar("TConfig", bound=BaseModel)
 
+
 class ConfigLoader:
     config_path = "../../configs"
     version_base = "1.3"

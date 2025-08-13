@@ -37,37 +37,26 @@ TEMPLATE_LINKS = r"""You are a webpage analysis agent that extract relevant link
 </content>
 """
 
-banned_sites = (
-    "https://huggingface.co/datasets/",
-    "https://grok.com/share/",
-    "https://modelscope.cn/datasets/"
-)
+banned_sites = ("https://huggingface.co/datasets/", "https://grok.com/share/", "https://modelscope.cn/datasets/")
 RE_MATCHED_SITES = re.compile(r"^(" + "|".join(banned_sites) + r")")
+
 
 class SearchToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None):
         super().__init__(config)
         self.jina_url_template = r"https://r.jina.ai/{url}"
-        self.jina_header = {
-            "Authorization": f"Bearer {self.config.config.get('JINA_API_KEY')}"
-        }
+        self.jina_header = {"Authorization": f"Bearer {self.config.config.get('JINA_API_KEY')}"}
         self.serper_url = r"https://google.serper.dev/search"
-        self.serper_header = {
-            "X-API-KEY": self.config.config.get('SERPER_API_KEY'),
-            'Content-Type': 'application/json'
-        }
+        self.serper_header = {"X-API-KEY": self.config.config.get("SERPER_API_KEY"), "Content-Type": "application/json"}
         # config
-        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_provider.model_dump() if self.config.config_llm else {})
+        self.llm = SimplifiedAsyncOpenAI(
+            **self.config.config_llm.model_provider.model_dump() if self.config.config_llm else {}
+        )
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
     @async_file_cache(expire_time=None)
     async def search_google(self, query: str):
-        params = {
-            'q': query,
-            'gl': 'cn',
-            'hl': 'zh-cn',
-            'num': 100
-        }
+        params = {"q": query, "gl": "cn", "hl": "zh-cn", "num": 100}
         async with aiohttp.ClientSession() as session:
             async with session.post(self.serper_url, headers=self.serper_header, json=params) as response:
                 response.raise_for_status()  # avoid cache error!
@@ -99,14 +88,14 @@ class SearchToolkit(AsyncBaseToolkit):
         formatted_results = []
         for i, r in enumerate(results, 1):
             formatted_results.append(f"{i}. {r['title']} ({r['link']})")
-            if 'snippet' in r:
+            if "snippet" in r:
                 formatted_results[-1] += f"\nsnippet: {r['snippet']}"
-            if 'sitelinks' in r:
+            if "sitelinks" in r:
                 formatted_results[-1] += f"\nsitelinks: {r['sitelinks']}"
-        msg = '\n'.join(formatted_results)
+        msg = "\n".join(formatted_results)
         logger.info(oneline_object(msg))
         return msg
-    
+
     def _filter_results(self, results: list[dict], limit: int) -> list[dict]:
         # can also use search operator `-site:huggingface.co`
         # ret: {title, link, snippet, position, | sitelinks}
@@ -117,7 +106,6 @@ class SearchToolkit(AsyncBaseToolkit):
             if len(res) >= limit:
                 break
         return res
-
 
     @async_file_cache(expire_time=None)
     async def get_content(self, url: str) -> str:
@@ -132,24 +120,31 @@ class SearchToolkit(AsyncBaseToolkit):
     # @async_file_cache(expire_time=None)
     async def web_qa(self, url: str, query: str = None) -> str:
         """Ask question to a webpage, you will get the answer and related links from the specified url.
-        
+
         Args:
             url (str): The url to ask question to.
             query (str, optional): The question to ask. If not given, return the summary of the webpage.
         """
         logger.info(f"[tool] web_qa: {oneline_object({url, query})}")
         content = await self.get_content(url)
-        query = query or "Summarize the content of this webpage, in the same language as the webpage."  # use the same language
+        query = (
+            query or "Summarize the content of this webpage, in the same language as the webpage."
+        )  # use the same language
         res_summary, res_links = await asyncio.gather(self._qa(content, query), self._extract_links(content, query))
         result = f"Summary: {res_summary}\n\nRelated Links: {res_links}"
         return result
 
     async def _qa(self, content: str, query: str) -> str:
         template = TEMPLATE_QA.format(content=content, query=query)
-        return await self.llm.query_one(messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump())
+        return await self.llm.query_one(
+            messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump()
+        )
+
     async def _extract_links(self, content: str, query: str) -> str:
         template = TEMPLATE_LINKS.format(content=content, query=query)
-        return await self.llm.query_one(messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump())
+        return await self.llm.query_one(
+            messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump()
+        )
 
     async def get_tools_map(self) -> dict[str, Callable]:
         return {

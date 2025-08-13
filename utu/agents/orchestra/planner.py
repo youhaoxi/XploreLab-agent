@@ -9,11 +9,11 @@ from ...utils import SimplifiedAsyncOpenAI, get_jinja_env
 
 class OutputParser:
     def __init__(self):
-        self.analysis_pattern = r'<analysis>(.*?)</analysis>'
-        self.plan_pattern = r'<plan>\s*\[(.*?)\]\s*</plan>'
+        self.analysis_pattern = r"<analysis>(.*?)</analysis>"
+        self.plan_pattern = r"<plan>\s*\[(.*?)\]\s*</plan>"
         # self.next_step_pattern = r'<next_step>\s*<agent>\s*(.*?)\s*</agent>\s*<task>\s*(.*?)\s*</task>\s*</next_step>'
         # self.task_finished_pattern = r'<task_finished>\s*</task_finished>'
-    
+
     def parse(self, output_text: str) -> CreatePlanResult:
         analysis = self._extract_analysis(output_text)
         plan = self._extract_plan(output_text)
@@ -34,12 +34,8 @@ class OutputParser:
         task_pattern = r'\{"agent_name":\s*"([^"]+)",\s*"task":\s*"([^"]+)",\s*"completed":\s*(true|false)\s*\}'
         task_matches = re.findall(task_pattern, plan_content, re.IGNORECASE)
         for agent_name, task_desc, completed_str in task_matches:
-            completed = completed_str.lower() == 'true'
-            tasks.append(Subtask(
-                agent_name=agent_name,
-                task=task_desc,
-                completed=completed
-            ))
+            completed = completed_str.lower() == "true"
+            tasks.append(Subtask(agent_name=agent_name, task=task_desc, completed=completed))
         return tasks
 
 
@@ -77,12 +73,9 @@ class PlannerAgent:
         up = self.jinja_env.get_template("planner_up.j2").render(
             available_agents=self._format_available_agents(self.available_agents),
             question=task_recorder.task,
-            background_info="",         # TODO: add background info?
+            background_info="",  # TODO: add background info?
         )
-        messages = [
-            {"role": "system", "content": sp},
-            {"role": "user", "content": up}
-        ]
+        messages = [{"role": "system", "content": sp}, {"role": "user", "content": up}]
         response = await self.llm.query_one(messages=messages, **self.config.planner_model.model_params.model_dump())
         return self.output_parser.parse(response)
 
@@ -102,8 +95,10 @@ class PlannerAgent:
         agents_str = []
         for agent in agents:
             agents_str.append(
-                f"- {agent.name}: {agent.desc}\n"
-                f"  Best for: {agent.strengths}\n" if agent.strengths else ""
-                f"  Weaknesses: {agent.weaknesses}\n" if agent.weaknesses else ""
+                f"- {agent.name}: {agent.desc}\n  Best for: {agent.strengths}\n"
+                if agent.strengths
+                else f"  Weaknesses: {agent.weaknesses}\n"
+                if agent.weaknesses
+                else ""
             )
         return "\n".join(agents_str)

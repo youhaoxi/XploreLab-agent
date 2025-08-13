@@ -1,7 +1,8 @@
-""" Test the performance of Phoenix
-- test_len: 
-- concurrency: 
+"""Test the performance of Phoenix
+- test_len:
+- concurrency:
 """
+
 import tqdm
 import random
 import asyncio
@@ -15,6 +16,7 @@ setup_phoenix_tracing(project_name="test_phoenix")
 
 test_len = 100_000
 
+
 async def mock_function(output_len: int):
     with function_span(
         name="mock_function",
@@ -22,6 +24,7 @@ async def mock_function(output_len: int):
     ) as span:
         output = "mock_function_output " * output_len
         span.span_data.output = output
+
 
 async def mock_llm(input_len: int):
     mocked_input = [{"role": "user", "content": "mock_llm_input " * input_len}]
@@ -34,6 +37,7 @@ async def mock_llm(input_len: int):
         output = [{"role": "assistant", "content": "mock_llm_output"}]
         span.span_data.output = output
         # span.span_data.usage = {"mock_llm_usage": "mock_llm_usage"}
+
 
 async def exp(idx: int = 0):
     with TraceCtxManager(
@@ -50,11 +54,14 @@ async def exp(idx: int = 0):
             # span_agent.finish(reset_current=True)
         return f"Finished {idx}"
 
+
 async def test_concurrency(concurrency: int = 10, total: int = 100):
     semaphore = asyncio.Semaphore(concurrency)
+
     async def exp_with_semaphore(idx: int):
         async with semaphore:
             return await exp(idx)
+
     tasks = [exp_with_semaphore(i) for i in range(total)]
     for task in tqdm.tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Testing concurrency"):
         res = await task

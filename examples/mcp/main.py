@@ -11,6 +11,7 @@ queries = [
     "Who are the founders of Anthropic?",
 ]
 
+
 async def main():
     async with SimpleAgent(
         config="examples/mcp",

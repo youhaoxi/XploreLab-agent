@@ -1,4 +1,4 @@
-""" 
+"""
 by @ianxxu
 
 --- https://www.anthropic.com/engineering/swe-bench-sonnet ---
@@ -75,8 +75,7 @@ class FileEditToolkit(AsyncBaseToolkit):
         self.default_encoding = self.config.config.get("default_encoding", "utf-8")
         self.backup_enabled = self.config.config.get("backup_enabled", True)
         logger.info(
-            f"FileEditToolkit initialized with output directory"
-            f": {self.work_dir}, encoding: {self.default_encoding}"
+            f"FileEditToolkit initialized with output directory: {self.work_dir}, encoding: {self.default_encoding}"
         )
 
     def _sanitize_filename(self, filename: str) -> str:
@@ -92,7 +91,7 @@ class FileEditToolkit(AsyncBaseToolkit):
             str: The sanitized filename with disallowed characters replaced by
                 underscores.
         """
-        safe = re.sub(r'[^\w\-.]', '_', filename)
+        safe = re.sub(r"[^\w\-.]", "_", filename)
         return safe
 
     def _resolve_filepath(self, file_path: str) -> Path:
@@ -149,33 +148,31 @@ class FileEditToolkit(AsyncBaseToolkit):
         self._create_backup(resolved_path)
 
         try:
-            with open(resolved_path, 'r', encoding=self.default_encoding) as f:
+            with open(resolved_path, "r", encoding=self.default_encoding) as f:
                 content = f.read()
             modified_content = content
-            pattern = r'<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE'
+            pattern = r"<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE"
             # Use re.DOTALL to make '.' match newlines as well
             matches = re.findall(pattern, diff, re.DOTALL)
-            
+
             if not matches:
                 logger.warning("No valid diff blocks found in the provided diff")
                 return
-            
+
             # Apply each search/replace pair
             for search_text, replace_text in matches:
                 if search_text in modified_content:
                     modified_content = modified_content.replace(search_text, replace_text)
                 else:
                     logger.warning(f"Search text not found in file: {search_text[:50]}...")
-            
-            with open(resolved_path, 'w', encoding=self.default_encoding) as f:
+
+            with open(resolved_path, "w", encoding=self.default_encoding) as f:
                 f.write(modified_content)
             logger.info(f"Successfully edited file: {resolved_path}")
         except Exception as e:
             logger.error(f"Error editing file {resolved_path}: {str(e)}")
 
-
     async def get_tools_map(self) -> dict[str, Callable]:
         return {
             "edit_file": self.edit_file,
         }
-

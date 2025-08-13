@@ -12,13 +12,14 @@ logger = get_logger(__name__)
 
 
 class BaseProcesser:
-    """ Base class for processers in evaluation tasks. 
-    
+    """Base class for processers in evaluation tasks.
+
     Each processer implements the following evaluation phases:
       - load: load and process data (if necessary)
       - judge: judge the correctness of a batch of predictions
-      - stat: get metrics. 
+      - stat: get metrics.
     """
+
     # prompt templates
     INSTRUCTION: str = None
     AUGMENTED_TEMPLATE: str = None
@@ -30,9 +31,9 @@ class BaseProcesser:
     def __init__(self, config: EvalConfig) -> None:
         self._load_templates()
         self.config = config
-    
+
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
-        """ Preprocess a single sample. """
+        """Preprocess a single sample."""
         augmented_question = self._augment_question(sample.raw_question, sample.file_name)
         sample.update(
             augmented_question=augmented_question,
@@ -42,46 +43,44 @@ class BaseProcesser:
     @abc.abstractmethod
     async def stat(self, samples: list[EvaluationSample]) -> EvaluationResult:
         metrics = self.calculate_metrics(samples)
-        eval_result = EvaluationResult(
-            benchmark=self.name,
-            metrics=metrics
-        )
+        eval_result = EvaluationResult(benchmark=self.name, metrics=metrics)
         return eval_result
-    
+
     @abc.abstractmethod
     async def judge_one(self, sample: EvaluationSample) -> EvaluationSample:
-        """ Judge a single sample. """
+        """Judge a single sample."""
         pass
 
     @abc.abstractmethod
     def calculate_metrics(self, samples: list[EvaluationSample]) -> dict:
-        """ Calculate metrics from the judged data. """
+        """Calculate metrics from the judged data."""
         pass
 
     def get_instructions(self) -> str:
-        """ Get the instruction for the processer. """
+        """Get the instruction for the processer."""
         return self.INSTRUCTION if self.INSTRUCTION else ""
-    
+
     def _load_templates(self):
-        """ Load templates of current processer. """
+        """Load templates of current processer."""
         templates = get_benchmark_templates(self.name)
         self.INSTRUCTION = templates["system"]
         self.AUGMENTED_TEMPLATE = templates.get("augmented", None)
         self.JUDGE_TEMPLATE = templates.get("judge", None)
-    
+
     def _augment_question(self, question: str, file_name: str = None) -> str:
-        """ Augment the question with additional context or instructions. """
+        """Augment the question with additional context or instructions."""
         input_prompt = self.AUGMENTED_TEMPLATE.format(question=question) if self.AUGMENTED_TEMPLATE else question
         file_prompt = self._get_file_prompt(file_name)
         return input_prompt + file_prompt
-    
+
     def _get_file_prompt(self, file_name: str) -> str:
-        """ Get file prompt if applicable. """
+        """Get file prompt if applicable."""
         return ""
 
 
 class BaseLLMJudgeProcesser(BaseProcesser):
-    """ Base class for processers that use LLM for judging. """
+    """Base class for processers that use LLM for judging."""
+
     name = "default"
 
     def __init__(self, config: EvalConfig) -> None:
@@ -89,30 +88,24 @@ class BaseLLMJudgeProcesser(BaseProcesser):
         self.judge_client = SimplifiedAsyncOpenAI(**config.judge_model.model_provider.model_dump())
 
     async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
-        """ Judge a single sample. """
+        """Judge a single sample."""
         question = data.raw_question
         response = data.response
         correct_answer = data.correct_answer or "unknown"
 
         if correct_answer == "unknown":
             # if correct answer is unknown, we cannot judge
-            data.update(judged_response="invalid",
-                               correct=False)
+            data.update(judged_response="invalid", correct=False)
             return data
-        
+
         # if exact match, return directly(maybe extract exact answer from response first)
         if self._extract_exact_answer(response) == correct_answer:
             data.update(judged_response="Exact match", correct=True)
             return data
-        
-        messages = self._get_judge_messages(
-            question=question,
-            response=response,
-            correct_answer=correct_answer
-        )
+
+        messages = self._get_judge_messages(question=question, response=response, correct_answer=correct_answer)
         content = await self.judge_client.query_one(
-            messages=messages,
-            **self.config.judge_model.model_params.model_dump()
+            messages=messages, **self.config.judge_model.model_params.model_dump()
         )
         parsed_content = self._parse_judge_response(content)
 
@@ -122,32 +115,25 @@ class BaseLLMJudgeProcesser(BaseProcesser):
         return data
 
     def calculate_metrics(self, samples: list[EvaluationSample]) -> dict:
-        """ Caculate metrics from the judged data. """
+        """Caculate metrics from the judged data."""
         return {
             **MetricsUtils.calculate_overall_metrics(samples),
             **MetricsUtils.calculate_level_metrics(samples),
         }
 
     def _get_judge_messages(self, question: str, response: str, correct_answer: str) -> list:
-        """ Get the judge messages. """
-        input = self.JUDGE_TEMPLATE.format(
-            question=question,
-            response=response,
-            correct_answer=correct_answer
-        )
-        return [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": input}
-        ]
+        """Get the judge messages."""
+        input = self.JUDGE_TEMPLATE.format(question=question, response=response, correct_answer=correct_answer)
+        return [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": input}]
 
     def _parse_judge_response(self, response: str) -> dict:
-        """ Parse the judge response into a structured format. """
+        """Parse the judge response into a structured format."""
         pattern = re.compile(
             r"(?=.*?extracted_final_answer:\s*(?P<extracted_final_answer>.*?)(?=\n\s*\w+:|$))?"
             r"(?=.*?reasoning:\s*(?P<reasoning>.*?)(?=\n\s*\w+:|$))?"
             r"(?=.*?correct:\s*(?P<correct>.*?)(?=\n\s*\w+:|$))?"
             r"(?=.*?confidence:\s*(?P<confidence>\d+)\s*%?(?=\n\s*\w+:|$))?",
-            re.DOTALL
+            re.DOTALL,
         )
         # remove the bold formatting
         response = response.replace("**", "")
@@ -155,24 +141,26 @@ class BaseLLMJudgeProcesser(BaseProcesser):
         match = pattern.search(response)
         if not match:
             raise ValueError("Invalid judge response format.")
-        
+
         return {
-            "extracted_final_answer": match.group("extracted_final_answer").strip() if match.group("extracted_final_answer") else "",
+            "extracted_final_answer": match.group("extracted_final_answer").strip()
+            if match.group("extracted_final_answer")
+            else "",
             "reasoning": match.group("reasoning").strip() if match.group("reasoning") else "",
             "correct": match.group("correct").strip().lower() == "yes" if match.group("correct") else False,
-            "confidence": int(match.group("confidence")) if match.group("confidence") else None
+            "confidence": int(match.group("confidence")) if match.group("confidence") else None,
         }
 
     def _extract_exact_answer(self, response: str) -> str:
-        """ Extract the exact answer from the response. """
+        """Extract the exact answer from the response."""
         return response.strip() if response else ""
-    
+
 
 class BaseMatchProcesser(BaseProcesser):
-    """ Base class for processers that use match-based judging. """
-    
+    """Base class for processers that use match-based judging."""
+
     async def judge_one(self, data: EvaluationSample) -> EvaluationSample:
-        """ Judge a single sample. """
+        """Judge a single sample."""
         question = data.raw_question
         response = data.response
         correct_answer = data.correct_answer or "unknown"
@@ -181,7 +169,7 @@ class BaseMatchProcesser(BaseProcesser):
         # if gt is a number
         if self._is_float(correct_answer):
             normalized_answer = self._normalize_number_str(str(response))
-            if_correct = (normalized_answer == float(correct_answer))
+            if_correct = normalized_answer == float(correct_answer)
 
         # if gt is a list
         elif any(char in correct_answer for char in [",", ";"]):
@@ -217,35 +205,35 @@ class BaseMatchProcesser(BaseProcesser):
         return data
 
     def _is_float(self, s: str) -> bool:
-        """ Check if a string is a float. """
+        """Check if a string is a float."""
         try:
             float(s)
             return True
         except ValueError:
-            return False    
-    
+            return False
+
     def _normalize_number_str(self, s: str) -> float:
-        """ Normalize a number string to a float. """
+        """Normalize a number string to a float."""
         for char in ["$", "%", ","]:
-           s = s.replace(char, "")
+            s = s.replace(char, "")
         try:
             return float(s)
         except ValueError:
             print(f"String {s} cannot be normalized to number str.")
             return float("inf")
-    
+
     def _split_string(self, s: str, char_list: list[str] = [",", ";"]) -> list[str]:
-        """ Split a string by a list of characters. """
+        """Split a string by a list of characters."""
         pattern = f"[{''.join(char_list)}]"
         return re.split(pattern, s)
-    
+
     def _normalize_str(self, s: str, remove_punct: bool = True) -> str:
         """
         Normalize a string by:
         - Removing all white spaces
         - Optionally removing punctuation (if remove_punct is True)
         - Converting to lowercase
-        
+
         Parameters:
         - input_str: str, the string to normalize
         - remove_punct: bool, whether to remove punctuation (default: True)

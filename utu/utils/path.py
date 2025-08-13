@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 def get_package_path() -> pathlib.Path:
     return pathlib.Path(__file__).parent.parent.parent
 
+
 DIR_ROOT = get_package_path()
 
 
@@ -24,7 +25,7 @@ class FileUtils:
         return pathlib.Path(file_path).suffix
 
     @staticmethod
-    def download_file(url: str, save_path: str=None) -> str:
+    def download_file(url: str, save_path: str = None) -> str:
         """Download file from web. Return the saved path"""
         # if not save_path, use tempfile
         if not save_path:

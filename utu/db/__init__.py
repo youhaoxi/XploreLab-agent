@@ -3,10 +3,9 @@ from .tracing_model import ToolTracingModel, GenerationTracingModel
 from .eval_datapoint import EvaluationSample, EvaluationResult, DatasetSample
 
 __all__ = [
-    "ToolCacheModel", 
-    "ToolTracingModel", 
-    "GenerationTracingModel", 
-    "DatasetSample"
-    "EvaluationSample", 
+    "ToolCacheModel",
+    "ToolTracingModel",
+    "GenerationTracingModel",
+    "DatasetSampleEvaluationSample",
     "EvaluationResult",
 ]

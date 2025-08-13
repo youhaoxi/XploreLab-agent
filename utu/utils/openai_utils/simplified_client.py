@@ -10,7 +10,7 @@ from .types import (
     OpenAIChatCompletionParams,
     OpenAIChatCompletionParamsKeys,
     OpenAIResponsesParams,
-    OpenAIResponsesParamsKeys
+    OpenAIResponsesParamsKeys,
 )
 
 logger = logging.getLogger(__name__)
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class SimplifiedAsyncOpenAI(AsyncOpenAI):
     """Simplified OpenAI client for chat.completions and responses API, with default config"""
+
     def __init__(
         self,
         *,
@@ -30,11 +31,12 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
     ) -> None:
         print(f"> type: {type}, base_url: {base_url}, kwargs: {kwargs}")
         super().__init__(
-            api_key=api_key or os.getenv("UTU_LLM_API_KEY") or "xxx",
-            base_url=base_url or os.getenv("UTU_LLM_BASE_URL")
+            api_key=api_key or os.getenv("UTU_LLM_API_KEY") or "xxx", base_url=base_url or os.getenv("UTU_LLM_BASE_URL")
         )
         self.type = type or os.getenv("UTU_LLM_TYPE", "chat.completions")
-        self.type_create_params = OpenAIChatCompletionParamsKeys if self.type == "chat.completions" else OpenAIResponsesParamsKeys
+        self.type_create_params = (
+            OpenAIChatCompletionParamsKeys if self.type == "chat.completions" else OpenAIResponsesParamsKeys
+        )
         self.default_config = self._process_kwargs(kwargs)
 
     def _process_kwargs(self, kwargs: dict) -> dict:
@@ -72,21 +74,24 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
 
     async def responses_create(self, **kwargs) -> Response | AsyncStream[ResponseStreamEvent]:
         unknown_params = self.check_known_keys(kwargs, self.type_create_params)
-        if unknown_params - {"messages"}:  #ignore
+        if unknown_params - {"messages"}:  # ignore
             logger.warning(f"Unknown parameters: {unknown_params} for {self.type} API!")
         assert self.type == "responses", "`responses_create` is not supported for chat.completions API"
         kwargs = self.process_responses_params(kwargs, self.default_config)
         return await self.responses.create(**kwargs)
 
-
-    def process_chat_completion_params(self, kwargs: OpenAIChatCompletionParams, default_config: OpenAIChatCompletionParams) -> OpenAIChatCompletionParams:
+    def process_chat_completion_params(
+        self, kwargs: OpenAIChatCompletionParams, default_config: OpenAIChatCompletionParams
+    ) -> OpenAIChatCompletionParams:
         """Process chat completion params, convert str to list of messages, merge default config"""
         assert "messages" in kwargs
         if isinstance(kwargs["messages"], str):
             kwargs["messages"] = [{"role": "user", "content": kwargs["messages"]}]
         return self._merge_default_config(kwargs, default_config)
 
-    def process_responses_params(self, kwargs: OpenAIResponsesParams, default_config: OpenAIResponsesParams) -> OpenAIResponsesParams:
+    def process_responses_params(
+        self, kwargs: OpenAIResponsesParams, default_config: OpenAIResponsesParams
+    ) -> OpenAIResponsesParams:
         """Process responses params, convert str to list of messages, merge default config"""
         if "input" not in kwargs:
             # try parse query for chat.completions
@@ -112,4 +117,3 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
         """Check if all keys in kwargs are in known_keys"""
         unknown_keys = set(kwargs.keys()) - known_keys
         return unknown_keys
-

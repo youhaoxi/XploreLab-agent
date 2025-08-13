@@ -5,6 +5,7 @@ Workflow based implementation of a search agent
   3. web result summarization
   4. query summarization
 """
+
 import json
 import asyncio
 
@@ -24,7 +25,7 @@ class SimpleSearcherAgent(Base):
         await self.agent.build()
 
     async def research(self, subtask: str, trace_id: str = None) -> SearchResult:
-        """search webpages for a specific subtask, return a report """
+        """search webpages for a specific subtask, return a report"""
         run_result = await self.agent.run(subtask, trace_id=trace_id)
         return SearchResult(
             task=subtask,
@@ -33,12 +34,12 @@ class SimpleSearcherAgent(Base):
         )
 
 
-
 class SearcherAgent(Base):
     """
     A worklfow-based search agent that decomposes a query, searches the web for sub-queries,
     summarizes the results, and provides a final analysis.
     """
+
     trajectory: list[dict] = None  # Track tool calls and results
 
     def __init__(self, config: AgentConfig):
@@ -47,7 +48,7 @@ class SearcherAgent(Base):
         self.config = ConfigLoader.load_agent_config("search_agent")
 
     async def build(self):
-        """ Build tools for the search agent. """
+        """Build tools for the search agent."""
         for tool_name, tool_config in self.config.toolkits.items():
             if tool_name in TOOLKIT_MAP:
                 tool_class = TOOLKIT_MAP[tool_name]
@@ -58,8 +59,8 @@ class SearcherAgent(Base):
 
     # TODO: add background information
     async def research(self, query: str, background: str = None, trace_id: str = None) -> SearchResult:
-        """ Run the search agent with a given query.
-        
+        """Run the search agent with a given query.
+
         This method will:
         1. Decompose the query into sub-queries
         2. Perform web searches for each sub-query
@@ -89,7 +90,7 @@ class SearcherAgent(Base):
             sub_answers.append(sub_answer)
             # Merge sub-trajectories in order
             task_id = f"sub_query_{task_index}"
-            if hasattr(self, '_sub_trajectories') and task_id in self._sub_trajectories:
+            if hasattr(self, "_sub_trajectories") and task_id in self._sub_trajectories:
                 self.trajectory.extend(self._sub_trajectories[task_id])
 
         # 3. Summarize and analyze the search results
@@ -99,32 +100,29 @@ class SearcherAgent(Base):
         self._cleanup_sub_trajectories()
 
         return SearchResult(
-            task=query,
-            output=final_output,
-            trajectory=self._get_trajectory(),
-            search_results=search_results
+            task=query, output=final_output, trajectory=self._get_trajectory(), search_results=search_results
         )
-    
+
     async def research_one(self, sub_query: str, background: str, index: int) -> tuple[list[dict], dict, int]:
-        """ Research a single sub-query and return the search results and summary.
-        
+        """Research a single sub-query and return the search results and summary.
+
         :param sub_query: The sub-query to research
         :param background: The background information to use for the search
         :param index: The index to maintain order
         :return: A tuple containing search results, summary, index
         """
         task_id = f"sub_query_{index}"
-        
+
         # Perform web search for the sub-query with asyncio.Semaphore
         search_results = await self.perform_web_search(sub_query, background, task_id)
         # Summarize the search results
         summary = await self.summarize_sub_search_results(sub_query, background, search_results, task_id)
-        
+
         return search_results, {"sub_query": sub_query, "summary": summary}, index
-    
+
     async def _call_tool(self, tool_name: str, method_name: str, arguments: dict, task_id: str = None, *args, **kwargs):
-        """ Universal tool calling method with trajectory recording.
-        
+        """Universal tool calling method with trajectory recording.
+
         :param tool_name: Name of the tool attribute
         :param method_name: Name of the method to call
         :param arguments: Arguments dict for trajectory logging
@@ -136,49 +134,46 @@ class SearcherAgent(Base):
         # Record tool call
         tool_call = {
             "role": "assistant",
-            "tool_calls": [{"name": method_name, "arguments": json.dumps(arguments, ensure_ascii=False)}]
+            "tool_calls": [{"name": method_name, "arguments": json.dumps(arguments, ensure_ascii=False)}],
         }
         self._add_to_trajectory(tool_call, task_id)
-        
+
         # Check if tool exists and call it
         if hasattr(self, tool_name):
             tool = getattr(self, tool_name)
             result = await tool.run(*args, **kwargs)
-            
+
             tool_result = {
                 "role": "tool",
-                "content": result if isinstance(result, str) else json.dumps(result, ensure_ascii=False)
+                "content": result if isinstance(result, str) else json.dumps(result, ensure_ascii=False),
             }
             self._add_to_trajectory(tool_result, task_id)
-            
+
             return result
         else:
             error_msg = f"{method_name} tool is not available."
-            tool_result = {
-                "role": "tool",
-                "content": f"Error: {error_msg}"
-            }
+            tool_result = {"role": "tool", "content": f"Error: {error_msg}"}
             self._add_to_trajectory(tool_result, task_id)
             raise NotImplementedError(error_msg)
 
     async def decompose_query(self, query: str, background: str) -> list[str]:
-        """ Decompose the query into sub-queries.
-        
+        """Decompose the query into sub-queries.
+
         :param query: The query to decompose
         :param background: The background information to use for decomposition
         :return: A list of sub-queries
         """
         return await self._call_tool(
             tool_name="query_decomposer",
-            method_name="decompose_query", 
+            method_name="decompose_query",
             arguments={"query": query},
             query=query,
-            background=background
+            background=background,
         )
 
     async def perform_web_search(self, sub_query: str, background: str, task_id: str = None) -> list[str]:
-        """ Perform a web search for the given sub-query.
-        
+        """Perform a web search for the given sub-query.
+
         :param sub_query: The sub-query to search for
         :param background: The background information to use for the search
         :param task_id: Task identifier for trajectory ordering
@@ -190,12 +185,14 @@ class SearcherAgent(Base):
             arguments={"query": sub_query},
             task_id=task_id,
             query=sub_query,
-            background=background
+            background=background,
         )
 
-    async def summarize_sub_search_results(self, sub_query: str, background: str, search_results: list[str], task_id: str = None) -> str:
-        """ Summarize the search results for a sub-query.
-        
+    async def summarize_sub_search_results(
+        self, sub_query: str, background: str, search_results: list[str], task_id: str = None
+    ) -> str:
+        """Summarize the search results for a sub-query.
+
         :param sub_query: The sub-query
         :param background: The background information to use for summarization
         :param search_results: The list of search results to summarize
@@ -209,12 +206,12 @@ class SearcherAgent(Base):
             task_id=task_id,
             query=sub_query,
             background=background,
-            search_results=search_results
+            search_results=search_results,
         )
-    
+
     async def summarize_final_output(self, query: str, background: str, sub_answers: list[str]) -> str:
-        """ Summarize the final output based on sub-answers.
-        
+        """Summarize the final output based on sub-answers.
+
         :param query: The original query
         :param background: The background information to use for summarization
         :param sub_answers: The list of summaries from sub-queries
@@ -226,31 +223,31 @@ class SearcherAgent(Base):
             arguments={"query": query, "sub_answers_count": len(sub_answers)},
             query=query,
             background=background,
-            search_results=sub_answers
+            search_results=sub_answers,
         )
-    
+
     def _init_sub_trajectories(self, num_sub_queries: int):
-        """ Pre-create sub-trajectory structure """
+        """Pre-create sub-trajectory structure"""
         self._sub_trajectories = {}
         for i in range(num_sub_queries):
             task_id = f"sub_query_{i}"
             self._sub_trajectories[task_id] = []
-    
+
     def _cleanup_sub_trajectories(self):
-        """ Clean up temporary sub-trajectories """
-        if hasattr(self, '_sub_trajectories'):
-            delattr(self, '_sub_trajectories')
-    
+        """Clean up temporary sub-trajectories"""
+        if hasattr(self, "_sub_trajectories"):
+            delattr(self, "_sub_trajectories")
+
     def _add_to_trajectory(self, item: dict, task_id: str = None):
-        """ Add an item to the appropriate trajectory based on task_id.
-        
+        """Add an item to the appropriate trajectory based on task_id.
+
         :param item: The trajectory item to add
         :param task_id: Task identifier, if None or "main", adds to main trajectory
         """
         # Add task_id if not present
         if "task_id" not in item:
             item["task_id"] = task_id or "main"
-        
+
         # Determine where to store the item
         if task_id and task_id != "main":
             # Store in sub-trajectory (structure already created)
@@ -258,13 +255,10 @@ class SearcherAgent(Base):
         else:
             # Store in main trajectory
             self.trajectory.append(item)
-    
+
     def _get_trajectory(self) -> list[dict]:
-        """ Get the trajectory of the search agent.
-        
+        """Get the trajectory of the search agent.
+
         :return: A list of dictionaries representing the trajectory
         """
-        return {
-            "agent": "SearchAgent",
-            "trajectory": self.trajectory
-        }
+        return {"agent": "SearchAgent", "trajectory": self.trajectory}

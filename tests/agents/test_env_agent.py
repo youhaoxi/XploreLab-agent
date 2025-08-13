@@ -12,8 +12,9 @@ async def agent():
     yield agent
     await agent.cleanup()
 
+
 async def test_chat_streamed(agent: SimpleAgent):
     tools = await agent.get_tools()
     logging.info(f"Loaded {len(tools)} tools: {tools}")
-    
+
     await agent.chat("That's the weather in Beijing today?")

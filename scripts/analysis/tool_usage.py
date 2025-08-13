@@ -1,7 +1,8 @@
-""" 
+"""
 - [ ] log the tool usage into a seperate table? (w/ toocalling id)
 - [x] analysis, on the axis of exp -> this script
 """
+
 import argparse
 import json
 from collections import defaultdict
@@ -17,14 +18,14 @@ def get_args():
     parser.add_argument("--config_name", type=str, default="v00", help="Configuration name for evaluation.")
     parser.add_argument("--exp_id", type=str, default=None, help="Experiment ID.")
     args = parser.parse_args()
-    
+
     config = ConfigLoader.load_eval_config(args.config_name)
     if args.exp_id:
         config.exp_id = args.exp_id
     return config
 
 
-def stat_trajectory(t: str|dict) -> dict:
+def stat_trajectory(t: str | dict) -> dict:
     """stat tool usage in single trajectory"""
     stat = {
         "turns_total": 0,
@@ -46,6 +47,7 @@ def stat_trajectory(t: str|dict) -> dict:
     stat["avg_tool_calls"] = stat["num_tool_calls"] / stat["turns_assistant"]
     return stat
 
+
 def aggregate_stats(stats_series: pd.Series) -> dict:
     """Aggregate statistics across all trajectories."""
     # Initialize aggregated stats
@@ -58,27 +60,29 @@ def aggregate_stats(stats_series: pd.Series) -> dict:
         "avg_tool_calls_per_assistant_turn": 0,
         "tool_usage": defaultdict(int),
     }
-    
+
     # Aggregate stats
     for stat in stats_series:
         agg_stats["total_turns"] += stat["turns_total"]
         agg_stats["total_assistant_turns"] += stat["turns_assistant"]
         agg_stats["total_tool_calls"] += stat["num_tool_calls"]
-        
+
         # Aggregate tool usage counts
         for tool_name, count in stat["tool_calls"].items():
             agg_stats["tool_usage"][tool_name] += count
-    
+
     # Calculate averages
     if agg_stats["total_trajectories"] > 0:
         agg_stats["avg_tool_calls_per_trajectory"] = agg_stats["total_tool_calls"] / agg_stats["total_trajectories"]
-    
+
     if agg_stats["total_assistant_turns"] > 0:
-        agg_stats["avg_tool_calls_per_assistant_turn"] = agg_stats["total_tool_calls"] / agg_stats["total_assistant_turns"]
-    
+        agg_stats["avg_tool_calls_per_assistant_turn"] = (
+            agg_stats["total_tool_calls"] / agg_stats["total_assistant_turns"]
+        )
+
     # Sort tool usage by frequency
     agg_stats["tool_usage"] = dict(sorted(agg_stats["tool_usage"].items(), key=lambda x: x[1], reverse=True))
-    
+
     return agg_stats
 
 
@@ -91,7 +95,7 @@ def print_stats_summary(agg_stats: dict):
     print(f"Total tool calls: {agg_stats['total_tool_calls']}")
     print(f"Average tool calls per trajectory: {agg_stats['avg_tool_calls_per_trajectory']:.2f}")
     print(f"Average tool calls per assistant turn: {agg_stats['avg_tool_calls_per_assistant_turn']:.2f}")
-    
+
     print("\nTool usage breakdown:")
     for tool_name, count in agg_stats["tool_usage"].items():
         percentage = (count / agg_stats["total_tool_calls"] * 100) if agg_stats["total_tool_calls"] > 0 else 0
@@ -102,9 +106,9 @@ def main(config: EvalConfig):
     db = DBDataManager(config)
     samples = db.get_samples()  # get samples from specific exp_id
     df = pd.DataFrame([sample.as_dict() for sample in samples])
-    
+
     # remove empty trajectory
-    series_trajectory = df['trajectory'].dropna()
+    series_trajectory = df["trajectory"].dropna()
     stats_series = series_trajectory.apply(stat_trajectory)
     agg_stats = aggregate_stats(stats_series)
     print_stats_summary(agg_stats)

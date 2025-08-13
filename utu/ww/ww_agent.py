@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass, asdict
 
 from agents import gen_trace_id
@@ -38,11 +37,11 @@ Current Task:
 
 
 class WWAgent:
-    def __init__(self, config: AgentConfig|str):
+    def __init__(self, config: AgentConfig | str):
         if isinstance(config, str):
             config = ConfigLoader.load_agent_config(config)
         self.config = config
-        
+
         # init subagents
         self.planner_agent = PlannerAgent(config)
         self.search_agent = SearcherAgent(config)
@@ -68,7 +67,7 @@ class WWAgent:
         with trace(workflow_name="ww_agent", trace_id=trace_id):
             # input_background = await self.background_gen.generate_background_info(input)
             # aug_input = f"{input}\n\nBackgrounds maybe helpful: {input_background['background']}"
-            
+
             # aug_input = input
             # while True:
             #     next_task = await self.plan(aug_input, trace_id=trace_id)
@@ -81,12 +80,13 @@ class WWAgent:
             trajectory.append(plan.trajectory)
             for task in plan.todo:
                 if task.agent_name == "SearchAgent":
-                    str_plan = "\n".join([
-                        f"{i}. {t.task}" for i, t in enumerate(plan.todo, 1)
-                    ])
-                    str_traj = "\n".join([
-                        f"<subtask>{t.task}</subtask>\n<output>{r.output}</output>" for i, (r, t) in enumerate(zip(task_records, plan.todo), 1)
-                    ])
+                    str_plan = "\n".join([f"{i}. {t.task}" for i, t in enumerate(plan.todo, 1)])
+                    str_traj = "\n".join(
+                        [
+                            f"<subtask>{t.task}</subtask>\n<output>{r.output}</output>"
+                            for i, (r, t) in enumerate(zip(task_records, plan.todo), 1)
+                        ]
+                    )
                     result = await self.search_agent.research(
                         TEMPLATE_SEARCH.format(
                             problem=input,
@@ -94,7 +94,7 @@ class WWAgent:
                             trajectory=str_traj,
                             task=task.task,
                         ),
-                        trace_id=trace_id
+                        trace_id=trace_id,
                     )
                     task_records.append(result)
                     trajectory.append(result.trajectory)
@@ -114,7 +114,9 @@ class WWAgent:
             trace_id=trace_id,
         )
 
-    async def plan(self, input: str, prev_task: str = None, prev_subtask_result: str = None, trace_id: str = None) -> NextTaskResult:
+    async def plan(
+        self, input: str, prev_task: str = None, prev_subtask_result: str = None, trace_id: str = None
+    ) -> NextTaskResult:
         with function_span("planner") as span_planner:
             next_task = await self.planner_agent.get_next_task(input, prev_task, prev_subtask_result, trace_id)
             span_planner.span_data.input = {"input": input, "prev_subtask_result": prev_subtask_result}
@@ -124,6 +126,9 @@ class WWAgent:
     async def analyze(self, input: str, task_records: list[SearchResult], trace_id: str = None) -> AnalysisResult:
         with function_span("analysis") as span_fn:
             analysis_result = await self.analysis_agent.analyze(input, task_records, trace_id=trace_id)
-            span_fn.span_data.input = {"input": input, "task_records": [{"task": r.task, "output": r.output} for r in task_records]}
+            span_fn.span_data.input = {
+                "input": input,
+                "task_records": [{"task": r.task, "output": r.output} for r in task_records],
+            }
             span_fn.span_data.output = asdict(analysis_result)
         return analysis_result

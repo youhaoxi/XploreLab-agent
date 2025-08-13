@@ -25,6 +25,7 @@ Current Task:
 {task}
 """.strip()
 
+
 class SimpleWorkerAgent(BaseWorkerAgent):
     def __init__(self, config: AgentConfig):
         self.agent = SimpleAgent(config=config)
@@ -33,7 +34,7 @@ class SimpleWorkerAgent(BaseWorkerAgent):
         await self.agent.build()
 
     async def work(self, task_recorder: TaskRecorder, subtask: Subtask) -> WorkerResult:
-        """search webpages for a specific subtask, return a report """
+        """search webpages for a specific subtask, return a report"""
         str_plan = task_recorder.get_plan_str()
         str_traj = task_recorder.get_trajectory_str()
         str_task = TEMPLATE_SEARCH.format(

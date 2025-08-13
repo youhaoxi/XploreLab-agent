@@ -54,6 +54,7 @@ query = f"""背景：我需要构造大量数据用于训练我的gui agent，�
 下面, 开始任务!
 """
 
+
 async def main():
     config = ConfigLoader.load_agent_config("examples/gui_agent_datamaker")
     # setup worksapce
@@ -63,6 +64,7 @@ async def main():
 
     async with SimpleAgent(config=config, name="gui-agent-toolmaker", instructions=instructions) as agent:
         await agent.chat_streamed(query)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -6,7 +6,8 @@ from .utils import MetricsUtils
 
 
 class WebWalkerProcesser(BaseLLMJudgeProcesser):
-    """ Processer for WebWalker evaluation. """
+    """Processer for WebWalker evaluation."""
+
     name: str = "WebWalker"
 
     # def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
@@ -15,25 +16,25 @@ class WebWalkerProcesser(BaseLLMJudgeProcesser):
     #     return sample
 
     def calculate_metrics(self, samples: list[EvaluationSample]) -> dict:
-        """ Calculate metrics from the judged data. """
+        """Calculate metrics from the judged data."""
         return {
             **MetricsUtils.calculate_overall_metrics(samples),
             **MetricsUtils.calculate_level_metrics(samples),
         }
-    
+
     def _parse_judge_response(self, response: str) -> dict:
-        """ Parse the judge response into a structured format. """
+        """Parse the judge response into a structured format."""
         pattern = re.compile(
             r"(?=.*?EXPLANATION:\s*(?P<reasoning>.*?)(?=\n\s*\w+:|$))?"
             r"(?=.*?GRADE:\s*(?P<correct>.*?)(?=\n\s*\w+:|$))?",
-            re.DOTALL
+            re.DOTALL,
         )
         # remove the bold formatting
         response = response.replace("**", "")
         match = pattern.search(response)
         if not match:
             raise ValueError("Invalid judge response format.")
-        
+
         return {
             "reasoning": match.group("reasoning").strip() if match.group("reasoning") else "",
             "correct": match.group("correct").strip() == "CORRECT" if match.group("correct") else False,

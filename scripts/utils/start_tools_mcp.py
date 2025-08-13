@@ -1,4 +1,4 @@
-""" Utils to inspect tools
+"""Utils to inspect tools
 - load all tools in TOOLKIT_MAP;
 - save the tool infos into .xlsx;
 - start a MCP server with all tools (can be checked with @modelcontextprotocol/inspector)
@@ -11,8 +11,10 @@ from mcp.server.fastmcp import FastMCP
 from agents import Tool
 from utu.config import ConfigLoader
 from utu.tools import (
-    AsyncBaseToolkit, TOOLKIT_MAP, 
+    AsyncBaseToolkit,
+    TOOLKIT_MAP,
 )
+
 
 def get_toolkits() -> dict[str, AsyncBaseToolkit]:
     toolkits = {}
@@ -21,7 +23,7 @@ def get_toolkits() -> dict[str, AsyncBaseToolkit]:
         config = ConfigLoader.load_toolkit_config(name)
         toolkits[name] = toolkit(config=config)
     return toolkits
-    
+
 
 async def get_tools() -> dict[str, AnyFunction]:
     tools_fn = {}
@@ -32,18 +34,22 @@ async def get_tools() -> dict[str, AnyFunction]:
     save_tools_info(tools_agents)
     return tools_fn
 
+
 def save_tools_info(tools: list[Tool]):
     tools_schema = []
     for tool in tools:
-        tools_schema.append({
-            "name": tool.name,
-            "description": tool.description,
-            "schema": tool.params_json_schema,
-        })
+        tools_schema.append(
+            {
+                "name": tool.name,
+                "description": tool.description,
+                "schema": tool.params_json_schema,
+            }
+        )
     df = pd.DataFrame(tools_schema)
     # df.to_csv("tools.csv", index=False)
     df.to_excel("tools.xlsx", index=False)
     print(df)
+
 
 def main():
     mcp = FastMCP(

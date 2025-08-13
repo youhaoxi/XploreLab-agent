@@ -8,7 +8,7 @@ from sqlmodel import SQLModel, Field, Column, String
 # FunctionSpanData
 class ToolTracingModel(SQLModel, table=True):
     __tablename__ = "tracing_tool"
-    
+
     id: Optional[int] = Field(default=None, primary_key=True)
     trace_id: str = ""
     span_id: str = ""
@@ -22,7 +22,7 @@ class ToolTracingModel(SQLModel, table=True):
 # GenerationSpanData
 class GenerationTracingModel(SQLModel, table=True):
     __tablename__ = "tracing_generation"
-    
+
     id: Optional[int] = Field(default=None, primary_key=True)
     trace_id: str = ""
     span_id: str = ""

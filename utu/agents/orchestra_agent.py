@@ -5,15 +5,23 @@ from ..config import AgentConfig, ConfigLoader
 from ..utils import get_logger, AgentsUtils
 from ..tracing import setup_tracing
 from .orchestra import (
-    PlannerAgent, ReporterAgent, BaseWorkerAgent, SimpleWorkerAgent, Subtask,
-    AnalysisResult, WorkerResult, CreatePlanResult, RunResult, TaskRecorder
+    PlannerAgent,
+    ReporterAgent,
+    BaseWorkerAgent,
+    SimpleWorkerAgent,
+    Subtask,
+    AnalysisResult,
+    WorkerResult,
+    CreatePlanResult,
+    RunResult,
+    TaskRecorder,
 )
 
 logger = get_logger(__name__)
 
 
 class OrchestraAgent:
-    def __init__(self, config: AgentConfig|str):
+    def __init__(self, config: AgentConfig | str):
         """Initialize the orchestra agent"""
         if isinstance(config, str):
             config = ConfigLoader.load_agent_config(config)
@@ -65,7 +73,9 @@ class OrchestraAgent:
         """Step1: Plan"""
         with function_span("planner") as span_planner:
             plan = await self.planner_agent.create_plan(task_recorder)
-            assert all(t.agent_name in self.worker_agents for t in plan.todo), f"agent_name in plan.todo must be in worker_agents, get {plan.todo}"
+            assert all(t.agent_name in self.worker_agents for t in plan.todo), (
+                f"agent_name in plan.todo must be in worker_agents, get {plan.todo}"
+            )
             task_recorder.set_plan(plan)
             span_planner.span_data.input = {"input": task_recorder.task}
             span_planner.span_data.output = plan.model_dump()
@@ -83,6 +93,9 @@ class OrchestraAgent:
         with function_span("report") as span_fn:
             analysis_result = await self.reporter_agent.report(task_recorder)
             task_recorder.add_reporter_result(analysis_result)
-            span_fn.span_data.input = {"input": task_recorder.task, "task_records": [{"task": r.task, "output": r.output} for r in task_recorder.task_records]}
+            span_fn.span_data.input = {
+                "input": task_recorder.task,
+                "task_records": [{"task": r.task, "output": r.output} for r in task_recorder.task_records],
+            }
             span_fn.span_data.output = analysis_result.model_dump()
         return analysis_result
