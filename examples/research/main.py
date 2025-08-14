@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import asyncio
 
-from rich.console import Console
-
 from agents import custom_span, gen_trace_id, trace
+from rich.console import Console
 
 from .agents.planner_agent import WebSearchItem, WebSearchPlan, planner_agent
 from .agents.search_agent import search_agent
@@ -55,10 +54,10 @@ class ResearchManager:
         )
         self.printer.update_item(
             "planning",
-            f"Will perform {len(result.final_output.searches)} searches",
+            f"Will perform {len(result.get_run_result().final_output.searches)} searches",
             is_done=True,
         )
-        return result.final_output_as(WebSearchPlan)
+        return result.get_run_result().final_output_as(WebSearchPlan)
 
     async def _perform_searches(self, search_plan: WebSearchPlan) -> list[str]:
         with custom_span("Search the web"):
@@ -71,9 +70,7 @@ class ResearchManager:
                 if result is not None:
                     results.append(result)
                 num_completed += 1
-                self.printer.update_item(
-                    "searching", f"Searching... {num_completed}/{len(tasks)} completed"
-                )
+                self.printer.update_item("searching", f"Searching... {num_completed}/{len(tasks)} completed")
             # results = await asyncio.gather(*tasks)
             self.printer.mark_item_done("searching")
             return results
@@ -85,7 +82,7 @@ class ResearchManager:
                 input,
             )
             return str(result.final_output)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             return None
 
     async def _write_report(self, query: str, search_results: list[str]) -> ReportData:
@@ -95,7 +92,7 @@ class ResearchManager:
             input,
         )
         self.printer.mark_item_done("writing")
-        return result.final_output_as(ReportData)
+        return result.get_run_result().final_output_as(ReportData)
 
 
 async def main() -> None:

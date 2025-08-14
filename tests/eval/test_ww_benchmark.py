@@ -1,5 +1,5 @@
-from utu.ww.ww_benchmark import WWBenchmark
 from utu.config import ConfigLoader
+from utu.ww.ww_benchmark import WWBenchmark
 
 config = ConfigLoader.load_eval_config("ww")
 print(f"> config: {config}")
@@ -13,6 +13,7 @@ async def test_rollout_one():
     res = await benchmark.rollout_one(sample)
     # print(f"trace_id: {res.trace_id}. response: {res.response}")
     print(res)
+
 
 async def test_judge_one():
     sample = benchmark.dataset.get_samples(stage="rollout", limit=1)[0]

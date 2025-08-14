@@ -1,16 +1,12 @@
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
-
-class RunResult(BaseModel):
-    final_output: str
-    trajectory: list[dict]  # [{"agent": "SearchAgent", "trajectory": [{"role": "user", "content": "..."}, ...]}, ...]
-    trace_id: str = ""
+from ..common import TaskRecorder
 
 
 class AgentInfo(BaseModel):
     """Subagent information (for planner)"""
+
     name: str
     desc: str
     strengths: str
@@ -20,7 +16,8 @@ class AgentInfo(BaseModel):
 class Subtask(BaseModel):
     agent_name: str
     task: str
-    completed: Optional[bool] = None
+    completed: bool | None = None
+
 
 class CreatePlanResult(BaseModel):
     analysis: str = ""
@@ -29,15 +26,15 @@ class CreatePlanResult(BaseModel):
     @property
     def trajectory(self):
         todos_str = []
-        for i,subtask in enumerate(self.todo, 1):
+        for i, subtask in enumerate(self.todo, 1):
             todos_str.append(f"{i}. {subtask.task} ({subtask.agent_name})")
         todos_str = "\n".join(todos_str)
         return {
             "agent": "planner",
             "trajectory": [
                 {"role": "assistant", "content": self.analysis},
-                {"role": "assistant", "content": todos_str}
-            ]
+                {"role": "assistant", "content": todos_str},
+            ],
         }
 
 
@@ -53,19 +50,15 @@ class AnalysisResult(BaseModel):
 
     @property
     def trajectory(self):
-        return {
-            "agent": "analysis",
-            "trajectory": [{"role": "assistant", "content": self.output}]
-        }
+        return {"agent": "analysis", "trajectory": [{"role": "assistant", "content": self.output}]}
 
 
-class TaskRecorder:
+class OrchestraTaskRecorder(TaskRecorder):
     def __init__(self, task: str, trace_id: str):
-        self.task = task
-        self.trace_id = trace_id
-        self.trajectories: list = []
-        self.task_records: list[WorkerResult] = []
+        super().__init__(task, trace_id)
+
         self.plan: CreatePlanResult = None
+        self.task_records: list[WorkerResult] = []
 
     def set_plan(self, plan: CreatePlanResult):
         self.plan = plan
@@ -79,12 +72,12 @@ class TaskRecorder:
         self.trajectories.append(result.trajectory)
 
     def get_plan_str(self) -> str:
-        return "\n".join([
-            f"{i}. {t.task}" for i, t in enumerate(self.plan.todo, 1)
-        ])
+        return "\n".join([f"{i}. {t.task}" for i, t in enumerate(self.plan.todo, 1)])
 
     def get_trajectory_str(self) -> str:
-        return "\n".join([
-            f"<subtask>{t.task}</subtask>\n<output>{r.output}</output>" 
-            for i, (r, t) in enumerate(zip(self.task_records, self.plan.todo), 1)
-        ])
+        return "\n".join(
+            [
+                f"<subtask>{t.task}</subtask>\n<output>{r.output}</output>"
+                for i, (r, t) in enumerate(zip(self.task_records, self.plan.todo, strict=False), 1)
+            ]
+        )

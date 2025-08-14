@@ -1,11 +1,10 @@
 import json
 import logging
 
-from agents import Tool, FunctionTool, TContext, RunContextWrapper
+from agents import FunctionTool, RunContextWrapper, TContext, Tool
 
 from .base_env import BaseEnv
-from .utils.docker_manager import DockerManager
-from .utils.mcp_client import MCPClient
+from .utils import DockerManager, MCPClient
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +27,17 @@ class BrowserEnv(BaseEnv):
 
     async def get_tools(self) -> list[Tool]:
         activated_tools = (
-            "search_google", "go_to_url", "go_back",
+            "search_google",
+            "go_to_url",
+            "go_back",
             # "wait",
-            "click_element", "input_text", 
-            "switch_tab", "open_tab",
-            "scroll_down", "scroll_up",
-            "download_file"
+            "click_element",
+            "input_text",
+            "switch_tab",
+            "open_tab",
+            "scroll_down",
+            "scroll_up",
+            "download_file",
             # "search_google_api"
         )
         tools: list[Tool] = []
@@ -47,9 +51,10 @@ class BrowserEnv(BaseEnv):
                             return f"Error: {res.content[0].text}"
                         self.browser_state = res.content[1].text  # DISCUSS: record the web actions?
                         return res.content[0].text
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     logger.error(f"except: {e}", exc_info=True)
                     return f"Error: {e}"
+
             return on_invoke_tool
 
         async with MCPClient.get_mcp_client(self.mcp_url) as client:
@@ -59,10 +64,12 @@ class BrowserEnv(BaseEnv):
             for tool in res.tools:
                 if tool.name not in activated_tools:
                     continue
-                tools.append(FunctionTool(
-                    name=tool.name,
-                    description=tool.description,
-                    params_json_schema=tool.inputSchema,
-                    on_invoke_tool=create_on_invoke_tool(tool.name),
-                ))
+                tools.append(
+                    FunctionTool(
+                        name=tool.name,
+                        description=tool.description,
+                        params_json_schema=tool.inputSchema,
+                        on_invoke_tool=create_on_invoke_tool(tool.name),
+                    )
+                )
             return tools

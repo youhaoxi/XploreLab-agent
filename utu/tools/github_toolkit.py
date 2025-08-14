@@ -1,10 +1,11 @@
-""" 
+"""
 https://docs.github.com/en/rest?apiVersion=2022-11-28
 """
 
-from typing import Callable
-import requests
+from collections.abc import Callable
 from urllib.parse import urlparse
+
+import requests
 
 from .base import AsyncBaseToolkit
 
@@ -12,20 +13,20 @@ from .base import AsyncBaseToolkit
 class GitHubToolkit(AsyncBaseToolkit):
     async def get_repo_info(self, github_url) -> dict:
         """Get the info of the specified github repo
-        
+
         Args:
             github_url (str): The url to get content from.
-        
+
         Returns:
             dict: The info of the specified github repo"""
         parsed_url = urlparse(github_url)
-        path_parts = parsed_url.path.strip('/').split('/')
+        path_parts = parsed_url.path.strip("/").split("/")
         if len(path_parts) < 2:
             return {"error": "Invalid GitHub repository URL"}
         api_url = f"https://api.github.com/repos/{path_parts[0]}/{path_parts[1]}"
         headers = {
             "Authorization": f"Bearer {self.config.config.get('github_token')}",
-            "X-GitHub-Api-Version": "2022-11-28"
+            "X-GitHub-Api-Version": "2022-11-28",
         }
         try:
             response = requests.get(api_url, headers=headers)
@@ -46,7 +47,7 @@ class GitHubToolkit(AsyncBaseToolkit):
                 "updated_at": repo_data["updated_at"],
                 "description": repo_data.get("description", "No description"),
                 "open_issues_count": repo_data["open_issues_count"],
-                "html_url": repo_data["html_url"]
+                "html_url": repo_data["html_url"],
             }
             return info
         except requests.exceptions.RequestException as e:

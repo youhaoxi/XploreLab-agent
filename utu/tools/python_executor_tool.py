@@ -1,23 +1,21 @@
-import os
-import html
-import io
-import contextlib
-import base64
-import glob
-import re
-import sys
 import asyncio
-from IPython.core.interactiveshell import InteractiveShell
+import base64
+import contextlib
+import glob
+import io
+import os
+import re
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
-
+from .base import AsyncBaseToolkit
 
 # Used to clean ANSI escape sequences
-ANSI_ESCAPE = re.compile(r'\x1b\[[0-9;]*[a-zA-Z]')
+ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]")
 
 
 def _execute_python_code_sync(code: str, workdir: str):
@@ -29,8 +27,8 @@ def _execute_python_code_sync(code: str, workdir: str):
     try:
         # Clean up code format
         code_clean = code.strip()
-        if code_clean.startswith('```python'):
-            code_clean = code_clean.split('```python')[1].split('```')[0].strip()
+        if code_clean.startswith("```python"):
+            code_clean = code_clean.split("```python")[1].split("```")[0].strip()
 
         # Create and change to working directory
         os.makedirs(workdir, exist_ok=True)
@@ -42,16 +40,16 @@ def _execute_python_code_sync(code: str, workdir: str):
         # Create a new IPython shell instance
         from IPython.core.interactiveshell import InteractiveShell
         from traitlets.config.loader import Config
-        
+
         InteractiveShell.clear_instance()
-        
+
         config = Config()
         config.HistoryManager.enabled = False
-        config.HistoryManager.hist_file = ':memory:'
-        
+        config.HistoryManager.hist_file = ":memory:"
+
         shell = InteractiveShell.instance(config=config)
-        
-        if hasattr(shell, 'history_manager'):
+
+        if hasattr(shell, "history_manager"):
             shell.history_manager.enabled = False
 
         output = io.StringIO()
@@ -62,8 +60,8 @@ def _execute_python_code_sync(code: str, workdir: str):
 
             if plt.get_fignums():
                 img_buffer = io.BytesIO()
-                plt.savefig(img_buffer, format='png')
-                img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+                plt.savefig(img_buffer, format="png")
+                img_base64 = base64.b64encode(img_buffer.getvalue()).decode("utf-8")
                 plt.close()
 
                 image_name = "output_image.png"
@@ -82,9 +80,9 @@ def _execute_python_code_sync(code: str, workdir: str):
         if stderr_result:
             combined_result += "\n" + stderr_result
 
-        result = ANSI_ESCAPE.sub('', combined_result)
-        stdout_result = ANSI_ESCAPE.sub('', stdout_result)
-        stderr_result = ANSI_ESCAPE.sub('', stderr_result)
+        result = ANSI_ESCAPE.sub("", combined_result)
+        stdout_result = ANSI_ESCAPE.sub("", stdout_result)
+        stderr_result = ANSI_ESCAPE.sub("", stderr_result)
 
         files_after = set(glob.glob("*"))
         new_files = list(files_after - files_before)
@@ -92,24 +90,28 @@ def _execute_python_code_sync(code: str, workdir: str):
 
         try:
             shell.atexit_operations = lambda: None
-            if hasattr(shell, 'history_manager') and shell.history_manager:
+            if hasattr(shell, "history_manager") and shell.history_manager:
                 shell.history_manager.enabled = False
                 shell.history_manager.end_session = lambda: None
             InteractiveShell.clear_instance()
-        except:
+        except Exception:  # pylint: disable=broad-except
             pass
 
         return {
-            "success": False if "Error" in stderr_result or ("Error" in stdout_result and "Traceback" in stdout_result) else True,
-            "message": f"Code execution completed\nOutput:\n{stdout_result.strip()}" if stdout_result.strip() else "Code execution completed, no output",
+            "success": False
+            if "Error" in stderr_result or ("Error" in stdout_result and "Traceback" in stdout_result)
+            else True,
+            "message": f"Code execution completed\nOutput:\n{stdout_result.strip()}"
+            if stdout_result.strip()
+            else "Code execution completed, no output",
             "stdout": stdout_result,
             "stderr": stderr_result,
             "status": True,
             "output": result.strip(),
             "files": new_files,
-            "error": stderr_result.strip() if stderr_result.strip() else ""
+            "error": stderr_result.strip() if stderr_result.strip() else "",
         }
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         return {
             "success": False,
             "message": f"Code execution failed, error message:\n{str(e)}",
@@ -118,7 +120,7 @@ def _execute_python_code_sync(code: str, workdir: str):
             "status": False,
             "output": "",
             "files": [],
-            "error": str(e)
+            "error": str(e),
         }
     finally:
         os.chdir(original_dir)
@@ -128,6 +130,7 @@ class PythonExecutorTool(AsyncBaseToolkit):
     """
     A tool for executing Python code in a sandboxed environment.
     """
+
     def __init__(self, config: ToolkitConfig | dict | None = None):
         super().__init__(config)
 
@@ -139,12 +142,12 @@ class PythonExecutorTool(AsyncBaseToolkit):
     async def execute_python_code(self, code: str, workdir: str = "./run_workdir", timeout: int = 30) -> dict:
         """
         Executes Python code and returns the output.
-        
+
         Args:
             code (str): The Python code to execute.
             workdir (str): The working directory for the execution. Defaults to "./run_workdir".
             timeout (int): The execution timeout in seconds. Defaults to 30.
-            
+
         Returns:
             dict: A dictionary containing the execution results.
         """
@@ -155,11 +158,11 @@ class PythonExecutorTool(AsyncBaseToolkit):
                     None,  # Use the default thread pool executor
                     _execute_python_code_sync,
                     code,
-                    workdir
+                    workdir,
                 ),
-                timeout=timeout
+                timeout=timeout,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return {
                 "success": False,
                 "message": f"Code execution timed out ({timeout} seconds)",
@@ -168,5 +171,5 @@ class PythonExecutorTool(AsyncBaseToolkit):
                 "status": False,
                 "output": "",
                 "files": [],
-                "error": f"Code execution timed out ({timeout} seconds)"
+                "error": f"Code execution timed out ({timeout} seconds)",
             }

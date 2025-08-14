@@ -9,7 +9,7 @@ class UTUBaseModel(BaseModel):
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
-    
+
     def get(self, key, default=None):
         """
         Get the value of the specified key, or return default if not found.
@@ -26,4 +26,3 @@ class UTUBaseModel(BaseModel):
     def as_dict(self) -> dict:
         # only contain fields that are not None
         return {k: v for k, v in self.model_dump().items() if v is not None}
-

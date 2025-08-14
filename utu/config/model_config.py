@@ -1,15 +1,16 @@
 import os
-from typing_extensions import Literal
+from typing import Literal
 
-from pydantic import Field, ConfigDict
 # from openai import NOT_GIVEN
 from agents import ModelSettings
+from pydantic import ConfigDict, Field
 
 from .base_config import ConfigBaseModel
 
 
 class ModelProviderConfig(ConfigBaseModel):
     """config for model provider"""
+
     type: Literal["chat.completions", "responses"] = os.getenv("UTU_LLM_TYPE")
     model: str = os.getenv("UTU_LLM_MODEL")
     base_url: str | None = os.getenv("UTU_LLM_BASE_URL")
@@ -18,12 +19,13 @@ class ModelProviderConfig(ConfigBaseModel):
 
 class ModelSettingsConfig(ConfigBaseModel, ModelSettings):
     """ModelSettings in openai-agents"""
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True
-    )
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
 
 class ModelParamsConfig(ConfigBaseModel):
     """Basic params shared in chat.completions and responses"""
+
     temperature: float | None = None
     top_p: float | None = None
     parallel_tool_calls: bool = False

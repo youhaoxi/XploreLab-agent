@@ -4,7 +4,7 @@ import datetime
 from agents import Tool
 
 
-class Env(abc.ABC):
+class Env:
     @abc.abstractmethod
     def get_state(self) -> str:
         raise NotImplementedError

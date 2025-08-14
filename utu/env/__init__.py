@@ -1,8 +1,8 @@
 from ..config import AgentConfig
-from .shell_local_env import ShellLocalEnv
+from ..utils import DIR_ROOT
 from .base_env import BaseEnv, Env
 from .browser_env import BrowserEnv
-from ..utils import DIR_ROOT
+from .shell_local_env import ShellLocalEnv
 
 
 async def get_env(config: AgentConfig, trace_id: str) -> Env:

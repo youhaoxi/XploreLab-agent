@@ -1,13 +1,13 @@
 # import logging
-from typing import Any, Collection, cast
-
-from opentelemetry import trace as trace_api
-from opentelemetry.instrumentation.instrumentor import BaseInstrumentor  # type: ignore
-from opentelemetry.trace import Tracer
+from collections.abc import Collection
+from typing import Any, cast
 
 from openinference.instrumentation import OITracer, TraceConfig
 from openinference.instrumentation.openai_agents.package import _instruments
 from openinference.instrumentation.openai_agents.version import __version__
+from opentelemetry import trace as trace_api
+from opentelemetry.instrumentation.instrumentor import BaseInstrumentor  # type: ignore
+from opentelemetry.trace import Tracer
 
 from ..utils import get_logger
 

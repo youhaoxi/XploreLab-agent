@@ -1,18 +1,18 @@
-from typing import Optional, Any
+from typing import Any
 
 from sqlalchemy import JSON
-from sqlmodel import SQLModel, Field, Column, String, Float
+from sqlmodel import Column, Field, Float, SQLModel, String
 
 
 class ToolCacheModel(SQLModel, table=True):
     __tablename__ = "cache_tool"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
 
     function: str = Field(sa_column=Column(String))
-    args: Optional[str] = Field(default=None, sa_column=Column(String))
-    kwargs: Optional[str] = Field(default=None, sa_column=Column(String))
-    result: Optional[Any] = Field(default=None, sa_column=Column(JSON))
+    args: str | None = Field(default=None, sa_column=Column(String))
+    kwargs: str | None = Field(default=None, sa_column=Column(String))
+    result: Any | None = Field(default=None, sa_column=Column(JSON))
 
     cache_key: str = Field(sa_column=Column(String))
     timestamp: int = Field(sa_column=Column(Float))

@@ -1,19 +1,21 @@
 import logging
-from typing import AsyncIterator, Any
+from collections.abc import AsyncIterator
+from typing import Any
 
-from pydantic import BaseModel
 from openai.types.chat import (
-    ChatCompletion, ChatCompletionChunk, 
-    ChatCompletionMessageToolCall, ChatCompletionMessage, 
-    ChatCompletionToolParam
+    ChatCompletionChunk,
+    ChatCompletionMessage,
+    ChatCompletionMessageToolCall,
+    ChatCompletionToolParam,
 )
 from openai.types.responses import (
-    Response, ResponseStreamEvent,
-    ResponseInputParam, ResponseTextConfigParam, ToolParam,
-    FunctionToolParam
+    FunctionToolParam,
+    Response,
 )
+from pydantic import BaseModel
 
 from ..print_utils import PrintUtils
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,7 +46,9 @@ class OpenAIUtils:
                     index = tool_call.index
                     if index not in final_tool_calls:
                         final_tool_calls[index] = tool_call
-                        PrintUtils.print_info(f"<{tool_call.function.name}>{tool_call.function.arguments}", end="", color="blue")
+                        PrintUtils.print_info(
+                            f"<{tool_call.function.name}>{tool_call.function.arguments}", end="", color="blue"
+                        )
                     else:
                         if final_tool_calls[index].function.arguments:
                             final_tool_calls[index].function.arguments += tool_call.function.arguments
@@ -52,16 +56,15 @@ class OpenAIUtils:
                             final_tool_calls[index].function.arguments = tool_call.function.arguments
                         PrintUtils.print_info(f"{tool_call.function.arguments}", end="", color="blue")
         PrintUtils.print_info("")  # print a newline
-        tool_calls = [ChatCompletionMessageToolCall(
-            id=tool_call.id,
-            function=tool_call.function.model_dump(),
-            type=tool_call.type # type is always "function"
-        ) for tool_call in final_tool_calls.values()]
-        message = ChatCompletionMessage(
-            role="assistant",
-            content=content,
-            tool_calls=tool_calls
-        )
+        tool_calls = [
+            ChatCompletionMessageToolCall(
+                id=tool_call.id,
+                function=tool_call.function.model_dump(),
+                type=tool_call.type,  # type is always "function"
+            )
+            for tool_call in final_tool_calls.values()
+        ]
+        message = ChatCompletionMessage(role="assistant", content=content, tool_calls=tool_calls)
         OpenAIUtils.print_message(message)
         return message
 
@@ -85,15 +88,19 @@ class OpenAIUtils:
                 case "image_generation_call":
                     PrintUtils.print_info(f"<{item.type}> -> {item.result[:4]}")
                 case "code_interpreter_call":
-                    PrintUtils.print_info(f"<{item.type}>(container_id={item.container_id}, code={item.code}) -> {item.outputs}")
+                    PrintUtils.print_info(
+                        f"<{item.type}>(container_id={item.container_id}, code={item.code}) -> {item.outputs}"
+                    )
                 case "local_shell_call":
                     PrintUtils.print_info(f"<{item.type}>(action={item.action})")
                 case "mcp_list_tools":
-                    PrintUtils.print_info(f"<{item.type}>(server_label={item.server_label}) -> {item.tools}")
+                    PrintUtils.print_info(f"<{item.type}>(server={item.server_label}) -> {item.tools}")
                 case "mcp_call":
-                    PrintUtils.print_info(f"<{item.type}>(server_label={item.server_label}) {item.name}({item.arguments}) -> {item.output}")
+                    PrintUtils.print_info(
+                        f"<{item.type}>(server={item.server_label}) {item.name}({item.arguments}) -> {item.output}"
+                    )
                 case "mcp_approval_request":
-                    PrintUtils.print_info(f"<{item.type}>(server_label={item.server_label}) {item.name}({item.arguments})")
+                    PrintUtils.print_info(f"<{item.type}>(server={item.server_label}) {item.name}({item.arguments})")
                 case _:
                     PrintUtils.print_error(f"Unknown item type: {item.type}\n{item}")
 

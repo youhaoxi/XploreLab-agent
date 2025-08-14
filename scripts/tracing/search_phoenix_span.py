@@ -1,16 +1,17 @@
-""" 
+"""
 Get phoenix span url by trace_id
 """
+
 import argparse
 
 import tqdm
 
-from utu.tracing import PhoenixUtils
-from utu.eval import DBDataManager
 from utu.config import ConfigLoader
+from utu.eval import DBDataManager
+from utu.tracing import PhoenixUtils
 
-project_name="uTu-WebWalker"
-phoenix_utils = PhoenixUtils(project_name=project_name)
+PROJECT_NAME = "uTu-WebWalker"
+phoenix_utils = PhoenixUtils(project_name=PROJECT_NAME)
 
 
 def main():
@@ -41,6 +42,7 @@ def main():
             num_updated += 1
     print(f"Updated {num_updated} samples.")
     print(f"Trace IDs not found: {trace_ids_not_found}")
+
 
 if __name__ == "__main__":
     main()
