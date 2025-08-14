@@ -4,8 +4,7 @@ import logging
 from agents import FunctionTool, RunContextWrapper, TContext, Tool
 
 from .base_env import BaseEnv
-from .utils.docker_manager import DockerManager
-from .utils.mcp_client import MCPClient
+from .utils import DockerManager, MCPClient
 
 logger = logging.getLogger(__name__)
 

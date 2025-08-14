@@ -20,7 +20,7 @@ def verify(file_path: str) -> int:
 
     try:
         doc = Document(file_path)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         logger.error(f"Error: {e}")
         return 0
 

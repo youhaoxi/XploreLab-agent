@@ -30,17 +30,17 @@ async def test_search_google_api(search_toolkit: SearchToolkit):
     print(result)
 
 
-test_url = "https://docs.crawl4ai.com/core/simple-crawling/"
+TEST_URL = "https://docs.crawl4ai.com/core/simple-crawling/"
 
 
 async def test_get_content(search_toolkit: SearchToolkit):
-    result = await search_toolkit.get_content(test_url)
+    result = await search_toolkit.get_content(TEST_URL)
     print(result)
 
 
 async def test_cache(search_toolkit: SearchToolkit):
     for _ in range(2):
-        res = await search_toolkit.get_content(test_url)
+        res = await search_toolkit.get_content(TEST_URL)
         hash = hashlib.md5(res.encode()).hexdigest()
         print(hash)
 

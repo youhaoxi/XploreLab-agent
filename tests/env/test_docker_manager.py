@@ -1,44 +1,34 @@
 import asyncio
-import logging
 
-from utu.env import DockerManager, MCPClient
+from utu.env.utils import DockerManager, MCPClient
 
 docker_manager = DockerManager()
 
 
 async def test_mcp():
-    try:
-        id = "test"
-        res = await docker_manager.find_all(stop=True)
+    id = "test"
+    res = await docker_manager.find_all(stop=True)
+    print(res)
+    container_info = await docker_manager.start_container(id)
+    print(f"container_info: {container_info}")
+    async with MCPClient.get_mcp_client(container_info["mcp_url"]) as client:
+        res = await client.list_tools()
         print(res)
-        container_info = await docker_manager.start_container(id)
-        print(f"container_info: {container_info}")
-        async with MCPClient.get_mcp_client(container_info["mcp_url"]) as client:
-            res = await client.list_tools()
-            print(res)
-            res = await client.call_tool(
-                "go_to_url", {"url": "https://github.com/modelcontextprotocol/python-sdk/issues/79"}
-            )
-            print(res)
-    except Exception as e:
-        logging.error(f"except: {e}", exc_info=True)
-    finally:
-        await docker_manager.stop_container(id)
+        res = await client.call_tool(
+            "go_to_url", {"url": "https://github.com/modelcontextprotocol/python-sdk/issues/79"}
+        )
+        print(res)
+    await docker_manager.stop_container(id)
 
 
 async def test_concurrency():
-    try:
-        n = 20
-        tasks = [docker_manager.start_container(f"test_{i}") for i in range(n)]
-        res = await asyncio.gather(*tasks)
-        print(res)
-
-        stat = docker_manager.get_all_status()
-        print(stat)
-    except Exception as e:
-        print(e)
-    finally:
-        docker_manager.cleanup()
+    n = 20
+    tasks = [docker_manager.start_container(f"test_{i}") for i in range(n)]
+    res = await asyncio.gather(*tasks)
+    print(res)
+    stat = docker_manager.get_all_status()
+    print(stat)
+    docker_manager.cleanup()
 
 
 async def test_find():

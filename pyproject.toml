@@ -107,5 +107,5 @@ disallow_incomplete_defs = false
 disallow_untyped_defs = false
 disallow_untyped_calls = false
 
-[tool.pylint.messages_control]
-disable = ["broad-except", "bare-except", "invalid-name"]
+# [tool.pylint.messages_control]
+# disable = ["broad-except", "bare-except", "invalid-name"]

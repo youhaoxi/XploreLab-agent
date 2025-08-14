@@ -41,7 +41,7 @@ def upload_dataset(file_path: str, dataset_name: str):
                 except json.JSONDecodeError:
                     print(f"Warning: Skipping invalid JSON on line {i + 1}", file=sys.stderr)
                     continue
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     print(f"Error processing line {i + 1}: {e}", file=sys.stderr)
                     session.rollback()
                     sys.exit(1)

@@ -5,6 +5,7 @@ https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking
 
 from .base import AsyncBaseToolkit
 
+
 class ThinkingToolkit(AsyncBaseToolkit):
     async def think(self, thought: str) -> str:
         """Use the tool to think about something.

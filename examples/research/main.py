@@ -54,10 +54,10 @@ class ResearchManager:
         )
         self.printer.update_item(
             "planning",
-            f"Will perform {len(result.final_output.searches)} searches",
+            f"Will perform {len(result.get_run_result().final_output.searches)} searches",
             is_done=True,
         )
-        return result.final_output_as(WebSearchPlan)
+        return result.get_run_result().final_output_as(WebSearchPlan)
 
     async def _perform_searches(self, search_plan: WebSearchPlan) -> list[str]:
         with custom_span("Search the web"):
@@ -82,7 +82,7 @@ class ResearchManager:
                 input,
             )
             return str(result.final_output)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             return None
 
     async def _write_report(self, query: str, search_results: list[str]) -> ReportData:
@@ -92,7 +92,7 @@ class ResearchManager:
             input,
         )
         self.printer.mark_item_done("writing")
-        return result.final_output_as(ReportData)
+        return result.get_run_result().final_output_as(ReportData)
 
 
 async def main() -> None:
