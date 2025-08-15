@@ -67,16 +67,26 @@ nav:
   - Intro: index.md
   - Quickstart: quickstart.md
   - Examples: examples.md
+  - Documentation:
+    - Config: config.md
+    - Agent Environments: env.md
+    - Tools: tools.md
   - API Reference:
     - Agents:
       - ref/agents/simple_agent.md
       - ref/agents/orchestra_agent.md
     - Tools:
       - ref/tool/base_toolkit.md
+      - ref/tool/search_toolkit.md
       - ref/tool/document_toolkit.md
       - ref/tool/image_toolkit.md
-      - ref/tool/search_toolkit.md
       - ref/tool/video_toolkit.md
+      - ref/tool/codesnip_toolkit.md
+      - ref/tool/bash_toolkit.md
+      - ref/tool/python_executor_toolkit.md
+    - Environments:
+      - ref/env/base_env.md
+      - ref/env/browser_env.md
     - Utils:
       - ref/utils/openai_utils.md
       - ref/utils/agents_utils.md

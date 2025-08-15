@@ -2,13 +2,13 @@ from .arxiv_toolkit import ArxivToolkit
 from .audio_toolkit import AudioToolkit
 from .base import AsyncBaseToolkit as AsyncBaseToolkit
 from .bash_remote_tool import BashRemoteToolkit
-from .bash_tool import BashTool
+from .bash_toolkit import BashToolkit
 from .codesnip_toolkit import CodesnipToolkit
 from .document_toolkit import DocumentToolkit
 from .file_edit_toolkit import FileEditToolkit
 from .github_toolkit import GitHubToolkit
 from .image_toolkit import ImageToolkit
-from .python_executor_tool import PythonExecutorTool
+from .python_executor_toolkit import PythonExecutorToolkit
 from .search_toolkit import SearchToolkit
 from .serper_toolkit import SerperToolkit
 from .video_toolkit import VideoToolkit
@@ -23,9 +23,9 @@ TOOLKIT_MAP = {
     "arxiv": ArxivToolkit,
     "wikipedia": WikipediaSearchTool,
     "codesnip": CodesnipToolkit,
-    "bash": BashTool,
+    "bash": BashToolkit,
     "bash_remote": BashRemoteToolkit,
-    "python_executor": PythonExecutorTool,
+    "python_executor": PythonExecutorToolkit,
     "video": VideoToolkit,
     "audio": AudioToolkit,
     "serper": SerperToolkit,

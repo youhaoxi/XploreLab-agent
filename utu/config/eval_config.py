@@ -8,25 +8,40 @@ from .base_config import ConfigBaseModel
 
 
 class DataConfig(ConfigBaseModel):
-    dataset: str  # built-in dataset name or custom dataset path
-    type: Literal["single", "mixed"]  # 数据集里只包含单独的benchmark数据，还是包含多个benchmarks
+    """Data config"""
+
+    dataset: str
+    """Built-in dataset name or custom dataset path"""
+    type: Literal["single", "mixed"]
+    """Whether the dataset contains only single benchmark data or multiple benchmarks"""
     question_field: str
+    """Question field name in the dataset"""
     gt_field: str
+    """Ground truth field name in the dataset"""
 
 
 class EvalConfig(ConfigBaseModel):
-    # TODO: seperate config into subconfigs: data/output/rollout/judge/agent
+    """Evaluation config"""
+
     exp_id: str = "default"
+    """Experiment ID"""
 
     # data
     db_url: str = os.getenv("DB_URL", "sqlite:///evaluation_samples.db")
+    """Database URL"""
     data: DataConfig = None
+    """Data config"""
 
     # rollout
     agent: AgentConfig | None = None
-    concurrency: int  # rollout parallelism
+    """Agent config for rollout"""
+    concurrency: int
+    """Rollout parallelism"""
 
     # judgement
     judge_model: ModelConfigs = Field(default_factory=ModelConfigs)
-    judge_concurrency: int  # judgement parallelism
-    eval_method: str = None  # 使用什么benchmark的评估方法（"GAIA", "BrowseCamp", ...)
+    """Judge model config"""
+    judge_concurrency: int
+    """Judgement parallelism"""
+    eval_method: str = None
+    """Evaluation method"""

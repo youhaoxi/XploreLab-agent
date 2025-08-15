@@ -1,7 +1,7 @@
 from utu.config import ConfigLoader
-from utu.tools import PythonExecutorTool
+from utu.tools import PythonExecutorToolkit
 
-toolkit = PythonExecutorTool(ConfigLoader.load_toolkit_config("python_executor"))
+toolkit = PythonExecutorToolkit(ConfigLoader.load_toolkit_config("python_executor"))
 
 
 async def test_python_executor_toolkit():
