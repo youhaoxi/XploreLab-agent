@@ -46,8 +46,10 @@ class SimpleAgent(BaseAgent):
         output_type: type[Any] | AgentOutputSchemaBase | None = None,
     ):
         self.config = self._get_config(config)
-        self.name = name or self.config.agent.name
-        self.instructions = instructions or self.config.agent.instructions
+        if name:
+            self.config.agent.name = name
+        if instructions:
+            self.config.agent.instructions = instructions
         self.model = self._get_model(self.config, model)
         self.model_settings = self._get_model_settings(self.config, model_settings)
         self.tools: list[Tool] = tools or []
