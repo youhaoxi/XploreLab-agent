@@ -33,6 +33,9 @@ class OrchestraAgent(BaseAgent):
         self.worker_agents = self._setup_workers()
         self.reporter_agent = ReporterAgent(config)
 
+    def set_planner(self, planner: PlannerAgent):
+        self.planner_agent = planner
+
     def _setup_workers(self) -> dict[str, BaseWorkerAgent]:
         workers = {}
         for name, config in self.config.workers.items():
