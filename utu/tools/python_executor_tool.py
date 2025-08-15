@@ -76,11 +76,6 @@ def _execute_python_code_sync(code: str, workdir: str):
         stdout_result = output.getvalue()
         stderr_result = error_output.getvalue()
 
-        combined_result = stdout_result
-        if stderr_result:
-            combined_result += "\n" + stderr_result
-
-        result = ANSI_ESCAPE.sub("", combined_result)
         stdout_result = ANSI_ESCAPE.sub("", stdout_result)
         stderr_result = ANSI_ESCAPE.sub("", stderr_result)
 
@@ -104,10 +99,7 @@ def _execute_python_code_sync(code: str, workdir: str):
             "message": f"Code execution completed\nOutput:\n{stdout_result.strip()}"
             if stdout_result.strip()
             else "Code execution completed, no output",
-            "stdout": stdout_result,
-            "stderr": stderr_result,
             "status": True,
-            "output": result.strip(),
             "files": new_files,
             "error": stderr_result.strip() if stderr_result.strip() else "",
         }
@@ -115,10 +107,7 @@ def _execute_python_code_sync(code: str, workdir: str):
         return {
             "success": False,
             "message": f"Code execution failed, error message:\n{str(e)}",
-            "stdout": "",
-            "stderr": str(e),
             "status": False,
-            "output": "",
             "files": [],
             "error": str(e),
         }
