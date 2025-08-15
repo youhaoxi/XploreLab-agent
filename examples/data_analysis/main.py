@@ -2,7 +2,7 @@ import asyncio
 import pathlib
 import re
 
-from examples.data_analysis.planner import PlannerAgent
+from examples.data_analysis.planner import DAPlannerAgent
 from utu.agents import OrchestraAgent
 from utu.config import ConfigLoader
 
@@ -13,7 +13,7 @@ async def main():
     config.planner_config["examples_path"] = pathlib.Path(__file__).parent / "planner_examples_data.json"
     config.reporter_config["template_path"] = pathlib.Path(__file__).parent / "web_reporter_sp.j2"
     runner = OrchestraAgent(config)
-    planner = PlannerAgent(config)
+    planner = DAPlannerAgent(config)
     await runner.build()
     runner.set_planner(planner)
 
