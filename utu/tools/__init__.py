@@ -11,6 +11,7 @@ from .image_toolkit import ImageToolkit
 from .python_executor_toolkit import PythonExecutorToolkit
 from .search_toolkit import SearchToolkit
 from .serper_toolkit import SerperToolkit
+from .tabular_data_toolkit import TabularDataToolkit
 from .video_toolkit import VideoToolkit
 from .wikipedia_toolkit import WikipediaSearchTool
 
@@ -29,4 +30,5 @@ TOOLKIT_MAP = {
     "video": VideoToolkit,
     "audio": AudioToolkit,
     "serper": SerperToolkit,
+    "tabular": TabularDataToolkit,
 }
