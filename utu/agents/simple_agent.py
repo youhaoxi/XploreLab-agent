@@ -94,7 +94,8 @@ class SimpleAgent(BaseAgent):
         await self.env.build()
         self.current_agent = Agent(
             name=self.config.agent.name,
-            instructions=self.config.agent.instructions,
+            # instructions=self.config.agent.instructions,
+            instructions=self.instructions,
             model=self.model,
             model_settings=self.model_settings,
             tools=await self.get_tools(),
