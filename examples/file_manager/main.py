@@ -1,5 +1,3 @@
-import asyncio
-
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
 from utu.ui.gradio_chatbot import GradioChatbot
@@ -14,12 +12,10 @@ config = ConfigLoader.load_agent_config("examples/file_manager")
 worker_agent = SimpleAgent(config=config)
 
 
-async def main_gradio():
-    await worker_agent.build()
-
+def main_gradio():
     chatbot = GradioChatbot(worker_agent, example_query=EXAMPLE_QUERY)
     chatbot.launch()
 
 
 if __name__ == "__main__":
-    asyncio.run(main_gradio())
+    main_gradio()

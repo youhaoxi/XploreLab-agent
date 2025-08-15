@@ -223,4 +223,5 @@ class GradioChatbot:
         self.ui = demo
 
     def launch(self):
+        asyncio.run(self.simple_agent.build())
         self.ui.launch(share=False)

@@ -1,5 +1,3 @@
-import asyncio
-
 import agents as ag
 
 from utu.agents import SimpleAgent
@@ -25,9 +23,8 @@ config = ConfigLoader.load_agent_config("examples/base")
 config.max_turns = 100
 
 
-async def main():
+def main():
     simple_agent = SimpleAgent(config=config, name="gradio-demo", tools=[fibonacci])
-    await simple_agent.build()
 
     chatbot = GradioChatbot(
         simple_agent,
@@ -37,4 +34,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
