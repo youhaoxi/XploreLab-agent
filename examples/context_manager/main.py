@@ -1,11 +1,13 @@
 import asyncio
+
 from agents import function_tool
 
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
 
-
 COUNT = 0
+
+
 @function_tool
 def count() -> int:
     global COUNT
@@ -14,8 +16,9 @@ def count() -> int:
 
 
 queries = [
-    "Use the count tool for 20 times, and give me the sum of the results. Note that you can only use one tool per turn.",
+    "Use the count tool for 20 times, and give me the sum of the results. You can only use one tool per turn.",
 ]
+
 
 async def main():
     config = ConfigLoader.load_agent_config("examples/base")

@@ -1,4 +1,5 @@
 import os
+
 import pandas as pd
 from phoenix.client import Client
 from phoenix.client.types.spans import SpanQuery
@@ -14,7 +15,9 @@ class PhoenixUtils:
         self.project_info = self.get_project()
         print(f"Project info: {self.project_info}")
 
-    def get_spans(self, condition: str, select: list[str]=None, limit: int=10, root_spans_only: bool=True) -> pd.DataFrame:
+    def get_spans(
+        self, condition: str, select: list[str] = None, limit: int = 10, root_spans_only: bool = True
+    ) -> pd.DataFrame:
         if not select:
             query = SpanQuery().where(condition)
         else:
@@ -30,9 +33,11 @@ class PhoenixUtils:
     def get_project(self) -> dict:
         return self.client.projects.get(project_name=self.project_name)
 
-    def get_trace_url_by_id(self, trace_id: str) -> str|None:
+    def get_trace_url_by_id(self, trace_id: str) -> str | None:
         # get trace by trace_id in @openai-agents, see the trick in OpenInferenceTracingProcessor
-        spans_df = self.get_spans(condition=f"metadata['trace_id'] == '{trace_id}'", select=["context.trace_id"], limit=1)
+        spans_df = self.get_spans(
+            condition=f"metadata['trace_id'] == '{trace_id}'", select=["context.trace_id"], limit=1
+        )
         if spans_df.empty:
             return None
         trace_id = spans_df.iloc[0]["context.trace_id"]

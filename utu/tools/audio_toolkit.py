@@ -1,11 +1,10 @@
-
-from typing import Callable
+from collections.abc import Callable
 
 from openai.types.audio import TranscriptionVerbose
 
-from ..utils import SimplifiedAsyncOpenAI, async_file_cache, FileUtils, DIR_ROOT, get_logger
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from ..utils import DIR_ROOT, FileUtils, SimplifiedAsyncOpenAI, async_file_cache, get_logger
+from .base import AsyncBaseToolkit
 
 logger = get_logger(__name__)
 
@@ -19,10 +18,11 @@ duration: {duration}
 transcription: {transcription}
 """
 
+
 class AudioToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        self.client = SimplifiedAsyncOpenAI(**config.config['audio_model'])
+        self.client = SimplifiedAsyncOpenAI(**config.config["audio_model"])
         self.llm = SimplifiedAsyncOpenAI(**config.config_llm.model_provider.model_dump())
         self.md5_to_path = {}
 
@@ -31,10 +31,10 @@ class AudioToolkit(AsyncBaseToolkit):
         # model: gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1
         fn = self.md5_to_path[md5]
         transcript: TranscriptionVerbose = await self.client.audio.transcriptions.create(
-            model=self.config.config['audio_model']['model'],
+            model=self.config.config["audio_model"]["model"],
             file=open(fn, "rb"),
             response_format="verbose_json",
-            timestamp_granularities=["segment"]
+            timestamp_granularities=["segment"],
         )
         return transcript.model_dump()
 
@@ -51,7 +51,6 @@ class AudioToolkit(AsyncBaseToolkit):
         self.md5_to_path[md5] = path  # record md5 to map
         return md5
 
-
     async def audio_qa(self, audio_path: str, question: str) -> str:
         """Asks a question about the audio and gets an answer.
 
@@ -65,12 +64,12 @@ class AudioToolkit(AsyncBaseToolkit):
 
         messages = [
             {"role": "system", "content": "You are a helpful assistant specializing in audio analysis."},
-            {"role": "user", "content": INSTRUCTION_QA.format(
-                question=question,
-                file=audio_path,
-                duration=res["duration"],
-                transcription=res["text"]
-            )},
+            {
+                "role": "user",
+                "content": INSTRUCTION_QA.format(
+                    question=question, file=audio_path, duration=res["duration"], transcription=res["text"]
+                ),
+            },
         ]
         output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         return output

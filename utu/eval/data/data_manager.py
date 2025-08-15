@@ -3,12 +3,12 @@ import json
 import pathlib
 from typing import Literal
 
-from sqlmodel import SQLModel, create_engine, Session, select
+from sqlmodel import Session, SQLModel, create_engine, select
 
 from ...config import EvalConfig
-from ...db import EvaluationSample, DatasetSample
-from ..processer import BUILTIN_BENCHMARKS
+from ...db import DatasetSample, EvaluationSample
 from ...utils import get_logger
+from ..processer import BUILTIN_BENCHMARKS
 
 logger = get_logger(__name__)
 
@@ -37,10 +37,10 @@ class BaseDataManager(abc.ABC):
 
 class DataManager(BaseDataManager):
     def load(self) -> list[EvaluationSample]:
-        """ Load raw data from the specified dataset. """
+        """Load raw data from the specified dataset."""
         data_path = self._get_data_path()
         samples = []
-        with open(data_path, 'r', encoding='utf-8') as f:
+        with open(data_path, encoding="utf-8") as f:
             for line in f:
                 data = json.loads(line.strip())
                 # assert "source" in data, f"Missing source in data: {data}"
@@ -70,9 +70,9 @@ class DataManager(BaseDataManager):
         return [d for d in self.data if d.stage == stage]
 
     def save(self, ofn: str) -> None:
-        with open(ofn, 'w', encoding='utf-8') as f:
+        with open(ofn, "w", encoding="utf-8") as f:
             for sample in self.data:
-                f.write(json.dumps(sample.as_dict()) + '\n')
+                f.write(json.dumps(sample.as_dict()) + "\n")
 
 
 class DBDataManager(DataManager):
@@ -88,11 +88,9 @@ class DBDataManager(DataManager):
 
         with Session(self.engine) as session:
             datapoints = session.exec(
-                select(DatasetSample).where(
-                    DatasetSample.dataset == self.config.data.dataset
-                )
+                select(DatasetSample).where(DatasetSample.dataset == self.config.data.dataset)
             ).all()
-
+            logger.info(f"Loaded {len(datapoints)} samples from {self.config.data.dataset}.")
             samples = []
             for dp in datapoints:
                 sample = EvaluationSample(
@@ -107,23 +105,28 @@ class DBDataManager(DataManager):
                     exp_id=self.config.exp_id,  # add exp_id
                 )
                 samples.append(sample)
-            
+
             self.data = samples
             self.save(self.data)  # save to db
             return self.data
 
-    def get_samples(self, stage: Literal["init", "rollout", "judged"] = None, limit: int = None) -> list[EvaluationSample]:
+    def get_samples(
+        self, stage: Literal["init", "rollout", "judged"] = None, limit: int = None
+    ) -> list[EvaluationSample]:
         """Get samples from exp_id with specified stage."""
         with Session(self.engine) as session:
             samples = session.exec(
-                select(EvaluationSample).where(
+                select(EvaluationSample)
+                .where(
                     EvaluationSample.exp_id == self.config.exp_id,
                     EvaluationSample.stage == stage if stage else True,
-                ).order_by(EvaluationSample.dataset_index).limit(limit)
+                )
+                .order_by(EvaluationSample.dataset_index)
+                .limit(limit)
             ).all()
             return samples
 
-    def save(self, samples: list[EvaluationSample]|EvaluationSample) -> None:
+    def save(self, samples: list[EvaluationSample] | EvaluationSample) -> None:
         """Update or add sample(s) to db."""
         if isinstance(samples, list):
             with Session(self.engine) as session:
@@ -134,7 +137,7 @@ class DBDataManager(DataManager):
                 session.add(samples)
                 session.commit()
 
-    def delete_samples(self, samples: list[EvaluationSample]|EvaluationSample) -> None:
+    def delete_samples(self, samples: list[EvaluationSample] | EvaluationSample) -> None:
         """Delete sample(s) from db."""
         if isinstance(samples, list):
             with Session(self.engine) as session:
@@ -150,8 +153,6 @@ class DBDataManager(DataManager):
         # check if any record has the same exp_id
         with Session(self.engine) as session:
             has_exp_id = session.exec(
-                select(EvaluationSample).where(
-                    EvaluationSample.exp_id == self.config.exp_id
-                )
+                select(EvaluationSample).where(EvaluationSample.exp_id == self.config.exp_id)
             ).first()
         return has_exp_id is not None

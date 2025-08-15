@@ -1,10 +1,5 @@
 import asyncio
 import threading
-from dataclasses import dataclass, asdict
-
-from agents import RunResult
-
-from ..utils import ChatCompletionConverter
 
 
 # 限制并发数量的装饰器
@@ -15,8 +10,11 @@ def limit_concurrency(max_concurrent: int):
         async def wrapper(*args, **kwargs):
             async with semaphore:
                 return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator
+
 
 # 限制线程级并发数量的装饰器
 def limit_concurrency_thread(max_concurrent: int):
@@ -26,7 +24,9 @@ def limit_concurrency_thread(max_concurrent: int):
         def wrapper(*args, **kwargs):
             with semaphore:
                 return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
@@ -35,6 +35,7 @@ def async_to_sync(func):
     def wrapper(index, *args, **kwargs):
         result = asyncio.run(func(*args, **kwargs))
         return index, result
+
     return wrapper
 
 

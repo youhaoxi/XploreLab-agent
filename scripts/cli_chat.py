@@ -1,8 +1,9 @@
 import argparse
 import asyncio
 
-from utu.config import ConfigLoader, AgentConfig
 from utu.agents import SimpleAgent
+from utu.config import AgentConfig, ConfigLoader
+
 
 async def main():
     parser = argparse.ArgumentParser()
@@ -25,6 +26,7 @@ async def main():
             if user_input.lower() in ["exit", "quit", "q"]:
                 break
             await agent.chat(user_input)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

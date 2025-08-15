@@ -1,4 +1,4 @@
-""" 
+"""
 https://github.com/pexpect/pexpect
 @ii-agent/src/ii_agent/tools/bash_tool.py
 
@@ -15,13 +15,13 @@ Run commands in a bash shell\n
 """
 
 import re
-from typing import Callable
+from collections.abc import Callable
 
 import pexpect
 
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
 from ..utils import get_logger
+from .base import AsyncBaseToolkit
 
 logger = get_logger(__name__)
 
@@ -39,6 +39,7 @@ def start_persistent_shell(timeout: int) -> tuple[pexpect.spawn, str]:
     # Force an initial read until the newly set prompt shows up
     child.expect(custom_prompt)
     return child, custom_prompt
+
 
 def run_command(child: pexpect.spawn, custom_prompt: str, cmd: str) -> str:
     # Send the command
@@ -94,7 +95,7 @@ class BashTool(AsyncBaseToolkit):
         for banned_str in self.banned_command_strs:
             if banned_str in command:
                 return f"Command not executed due to banned string in command: {banned_str} found in {command}."
-        
+
         # if self.require_confirmation:
         #     ...
 
@@ -102,21 +103,24 @@ class BashTool(AsyncBaseToolkit):
         try:
             echo_result = run_command(self.child, self.custom_prompt, "echo hello")
             assert echo_result.strip() == "hello"
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self.child, self.custom_prompt = start_persistent_shell(self.timeout)
 
         # 3) Execute the command and capture output
         try:
             result = run_command(self.child, self.custom_prompt, command)
-            return str({
-                "command output": result,
-            })
-        except Exception as e:
-            return str({
-                "error": str(e),
-            })
+            return str(
+                {
+                    "command output": result,
+                }
+            )
+        except Exception as e:  # pylint: disable=broad-except
+            return str(
+                {
+                    "error": str(e),
+                }
+            )
         # TODO: add workspace tree in output
-
 
     async def get_tools_map(self) -> dict[str, Callable]:
         return {

@@ -2,14 +2,13 @@ import asyncio
 import json
 import time
 
-from tqdm import tqdm
 from agents.tracing import gen_trace_id
+from tqdm import tqdm
 
-from ...utils import get_logger, setup_logging, AgentsUtils
-
-from ...config import EvalConfig, ConfigLoader
-from ...agents import SimpleAgent
-from ..data import DBDataManager, EvaluationSample, EvaluationResult
+from ...agents import BaseAgent, get_agent
+from ...config import ConfigLoader, EvalConfig
+from ...utils import get_logger, setup_logging
+from ..data import DBDataManager, EvaluationSample
 from ..processer import PROCESSER_FACTORY, BaseProcesser
 
 setup_logging()
@@ -19,30 +18,30 @@ logger = get_logger(__name__)
 class BaseBenchmark:
     dataset: DBDataManager
     _source_to_processer: dict[str, BaseProcesser] = {}
-    _source_to_agent: dict[str, SimpleAgent] = {}
+    _source_to_agent: dict[str, BaseAgent] = {}
 
-    def __init__(self, config: EvalConfig|str) -> None:
+    def __init__(self, config: EvalConfig | str) -> None:
         # config
-        if isinstance(config, str): config = ConfigLoader.load_eval_config(name=config)
+        if isinstance(config, str):
+            config = ConfigLoader.load_eval_config(name=config)
         self.config = config
-        
+
         # dataset
         self.dataset = DBDataManager(config)
         self.dataset.load()
-
 
     async def main(self):
         logger.info(f"> Running with config: \n{json.dumps(self.config.model_dump(), indent=2, ensure_ascii=False)}")
         self.preprocess()
         await self.rollout()
         await self.judge()
-        logger.info(f"> Running stat...")
+        logger.info("> Running stat...")
         await self.stat()
-        logger.info(f"> Cleaning up...")
+        logger.info("> Cleaning up...")
         await self.cleanup()
 
     def preprocess(self) -> None:
-        """ Preprocess the dataset before rollout. """
+        """Preprocess the dataset before rollout."""
         samples = self.dataset.get_samples(stage="init")
         logger.info(f"Preprocessing {len(samples)} samples...")
         results = []
@@ -52,7 +51,7 @@ class BaseBenchmark:
                 results.append(processed_sample)
         logger.info(f"Successfully preprocessed {len(results)} samples. Updated to db.")
         return results
-    
+
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
         processer = self._get_processer(sample.source)
         processed_sample = processer.preprocess_one(sample)
@@ -66,12 +65,17 @@ class BaseBenchmark:
         logger.info(f"Rollout {len(samples)} samples...")
 
         semaphore = asyncio.Semaphore(self.config.concurrency)
+
         async def rollout_with_semaphore(item: EvaluationSample):
             async with semaphore:
                 try:
                     return await self.rollout_one(item)
-                except Exception as e:
-                    logger.error(f">>>>>>>>>>>>>\nError running rollout on sample '{item.raw_question}': {e}\n<<<<<<<<<<<<<", exc_info=True)
+                except Exception as e:  # pylint: disable=broad-except
+                    logger.error(
+                        f">>>>>>>>>>>>>\nError running rollout on sample '{item.raw_question}': {e}\n<<<<<<<<<<<<<",
+                        exc_info=True,
+                    )
+
         tasks = [rollout_with_semaphore(item) for item in samples]
         results = []
         for task in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Rolling out"):
@@ -82,36 +86,27 @@ class BaseBenchmark:
         return results
 
     async def rollout_one(self, sample: EvaluationSample) -> EvaluationSample:
-        agent = await self._get_agent(sample.source)
+        agent = get_agent(self.config.agent)
+        await agent.build()
         trace_id = gen_trace_id()
         start_time = time.time()
         result = await agent.run(sample.augmented_question, trace_id=trace_id)
         end_time = time.time()
 
         # Update the sample with the predicted answer and trajectory
-        trajectory = [AgentsUtils.get_trajectory_from_agent_result(result)]
         sample.update(
             trace_id=trace_id,
             response=result.final_output,
             time_cost=end_time - start_time,
-            trajectories=json.dumps(trajectory, ensure_ascii=False),
-            stage="rollout"  # update stage to rollout!
+            trajectories=json.dumps(result.trajectories, ensure_ascii=False),
+            stage="rollout",  # update stage to rollout!
         )
         self.dataset.save(sample)
         return sample
 
-    async def _get_agent(self, source) -> SimpleAgent:
-        if source not in self._source_to_agent:
-            instructions = self._get_processer(source).get_instructions()
-            # SP: configed instructions + processer instructions
-            agent = SimpleAgent(config=self.config.agent, name=f"{source}-agent", instructions=f"{self.config.agent.agent.instructions}\n\n{instructions}")
-            await agent.build()
-            self._source_to_agent[source] = agent
-        return self._source_to_agent[source]
-
-    async def judge(self, stage: str|None = "rollout") -> list[EvaluationSample]:
+    async def judge(self, stage: str | None = "rollout") -> list[EvaluationSample]:
         """Judge samples.
-        
+
         Args:
             stage (str|None, optional): The stage of samples to judge. If set to None, you can rejudge all samples.
         """
@@ -119,13 +114,15 @@ class BaseBenchmark:
         logger.info(f"Judging {len(samples)} samples...")
 
         semaphore = asyncio.Semaphore(self.config.judge_concurrency)
+
         async def judge_with_semaphore(item: EvaluationSample):
             async with semaphore:
                 try:
                     return await self.judge_one(item)
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     logger.error(f">>>>>>>>>>>>>\nError judging sample '{item}': {e}\n<<<<<<<<<<<<<", exc_info=True)
                     return None
+
         tasks = [judge_with_semaphore(item) for item in samples]
         results = []
         for task in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Judging"):
@@ -149,15 +146,14 @@ class BaseBenchmark:
         logger.info(f"Stat from {len(judged_samples)} samples:")
 
         data_by_benchmark = self._group_data_by_benchmark(judged_samples)
-        overall_results: list[EvaluationResult] = []
+        overall_results: list[dict] = []
         for benchmark, data in data_by_benchmark.items():
             evaluator = self._get_processer(benchmark)
             result = await evaluator.stat(data)
-            result.update(benchmark=benchmark)
             overall_results.append(result)
 
-        logger.info(json.dumps([r.as_dict() for r in overall_results], indent=4, ensure_ascii=False))
-    
+        logger.info(json.dumps(overall_results, indent=4, ensure_ascii=False))
+
     def _get_processer(self, source: str) -> BaseProcesser:
         if source not in self._source_to_processer:
             processer = PROCESSER_FACTORY.get(source, self.config)

@@ -1,18 +1,24 @@
 import asyncio
 import logging
-import json
 
-from agents.run import AgentRunner, AgentToolUseTracker, SingleStepResult
 from agents import (
-    TContext, TResponseInputItem, 
-    Agent, Tool, ModelResponse, RunHooks, RunItem, RunContextWrapper, 
-    AgentOutputSchemaBase, RunConfig, Handoff, ItemHelpers
+    Agent,
+    ItemHelpers,
+    RunConfig,
+    RunContextWrapper,
+    RunHooks,
+    RunItem,
+    TContext,
+    Tool,
+    TResponseInputItem,
 )
+from agents.run import AgentRunner, AgentToolUseTracker, SingleStepResult
 from agents.util import _coro
 
 from ..context import BaseContextManager
 
 logger = logging.getLogger(__name__)
+
 
 class UTUAgentRunner(AgentRunner):
     # TODO: also add context_manager to _run_single_turn_streamed for .run_streamed
@@ -35,11 +41,7 @@ class UTUAgentRunner(AgentRunner):
         if should_run_agent_start_hooks:
             await asyncio.gather(
                 hooks.on_agent_start(context_wrapper, agent),
-                (
-                    agent.hooks.on_start(context_wrapper, agent)
-                    if agent.hooks
-                    else _coro.noop_coroutine()
-                ),
+                (agent.hooks.on_start(context_wrapper, agent) if agent.hooks else _coro.noop_coroutine()),
             )
 
         system_prompt, prompt_config = await asyncio.gather(
@@ -54,7 +56,7 @@ class UTUAgentRunner(AgentRunner):
 
         # FIXME: set context manage as a hook?
         # ADD: context manager
-        context_manager: BaseContextManager|None = context_wrapper.context.get("context_manager", None)
+        context_manager: BaseContextManager | None = context_wrapper.context.get("context_manager", None)
         if context_manager:
             input = context_manager.preprocess(input, context_wrapper)
         new_response = await cls._get_new_response(

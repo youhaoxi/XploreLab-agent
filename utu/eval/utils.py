@@ -13,7 +13,7 @@ def parse_eval_config() -> EvalConfig:
     parser.add_argument("--concurrency", type=int, default=None, help="Test concurrency.")
     parser.add_argument("--judge_concurrency", type=int, default=None, help="Judge concurrency.")
     args = parser.parse_args()
-    
+
     config = ConfigLoader.load_eval_config(args.config_name)
     if args.exp_id:
         config.exp_id = args.exp_id

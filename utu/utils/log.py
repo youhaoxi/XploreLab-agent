@@ -1,10 +1,9 @@
 import json
-import pathlib
 import logging
+import pathlib
 from logging.handlers import TimedRotatingFileHandler
 
 from colorlog import ColoredFormatter
-
 
 DIR_LOGS = pathlib.Path(__file__).parent.parent.parent / "logs"
 DIR_LOGS.mkdir(exist_ok=True)
@@ -18,7 +17,7 @@ def setup_logging() -> None:
     global _LOGGING_INITIALIZED
     if _LOGGING_INITIALIZED:
         return
-    
+
     # set httpx logging level to WARNING
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
@@ -44,23 +43,29 @@ def setup_logging() -> None:
     )
     console_handler.setFormatter(color_formatter)
 
-    file_handler = TimedRotatingFileHandler(DIR_LOGS / "utu.log", when="midnight", interval=1, backupCount=30, encoding="utf-8")
+    file_handler = TimedRotatingFileHandler(
+        DIR_LOGS / "utu.log", when="midnight", interval=1, backupCount=30, encoding="utf-8"
+    )
     file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s[%(name)s] - %(levelname)s - %(filename)s:%(lineno)d - %(message)s - %(threadName)s")
+    formatter = logging.Formatter(
+        "%(asctime)s[%(name)s] - %(levelname)s - %(filename)s:%(lineno)d - %(message)s - %(threadName)s"
+    )
     file_handler.setFormatter(formatter)
 
     root_logger.addHandler(console_handler)
     root_logger.addHandler(file_handler)
-    
+
     # Mark logging as initialized
     _LOGGING_INITIALIZED = True
 
 
 def get_logger(name: str) -> logging.Logger:
     logger = logging.getLogger(name)
+
     def log_error_with_exc(msg, *args, **kwargs):
         kwargs["exc_info"] = True
         logger.error(msg, *args, **kwargs)
+
     logger.error_exc = log_error_with_exc
     return logger
 
@@ -68,7 +73,6 @@ def get_logger(name: str) -> logging.Logger:
 def oneline_object(obj: object, limit: int = 100) -> str:
     try:
         s = json.dumps(obj, ensure_ascii=False)
-    except:
+    except TypeError:
         s = json.dumps(str(obj), ensure_ascii=False)
     return f"{s[:limit]}..." if len(s) > limit else s
-

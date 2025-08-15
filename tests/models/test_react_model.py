@@ -1,9 +1,9 @@
 from agents import Agent, Runner
 
 from utu.config import ConfigLoader
-from utu.utils import AgentsUtils
-from utu.tools import SearchToolkit
 from utu.models.react import ReactModel, get_react_model
+from utu.tools import SearchToolkit
+from utu.utils import AgentsUtils
 
 
 async def test_react_model():

@@ -1,14 +1,15 @@
-from typing import TypeVar, Type
+from typing import TypeVar
 
-from pydantic import BaseModel
-from omegaconf import OmegaConf, DictConfig
 from hydra import compose, initialize
+from omegaconf import DictConfig, OmegaConf
+from pydantic import BaseModel
 
-from .model_config import ModelConfigs
 from .agent_config import AgentConfig, ToolkitConfig
 from .eval_config import EvalConfig
+from .model_config import ModelConfigs
 
 TConfig = TypeVar("TConfig", bound=BaseModel)
+
 
 class ConfigLoader:
     config_path = "../../configs"

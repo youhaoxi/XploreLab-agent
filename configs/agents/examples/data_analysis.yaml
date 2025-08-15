@@ -1,0 +1,23 @@
+# @package _global_
+defaults:
+  - /model/base@planner_model
+  - /model/base@reporter_model
+  - /simple_agents/search_agent@workers.SearchAgent
+  - /simple_agents/data_analysis_agent@workers.DataAnalysisAgent
+  - _self_
+
+
+type: orchestra
+
+planner_config:
+  examples_path: planner_examples_data.json
+
+workers_info:
+  - name: SearchAgent
+    desc: information retrieval and data collection.
+    strengths: Web search, information retrieval, research material collection, API data fetching
+    weaknesses: No access to private databases, retrieval only (no content creation/modification)
+  - name: DataAnalysisAgent
+    desc: explore and analyze data, return the analysis
+    strengths: Exploring and analyzing tabular data files (CSV, Excel, etc.), performing automated field extraction, statistical analysis, pattern discovery, and generating data insights
+    weaknesses: Only works with structured tabular data with clear file paths. Cannot perform complex machine learning modeling

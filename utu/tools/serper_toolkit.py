@@ -1,10 +1,11 @@
 import os
-from typing import Dict, Any, Optional, List, Callable
+from collections.abc import Callable
+from typing import Any
 
 import httpx
 
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from .base import AsyncBaseToolkit
 
 
 class SerperToolkit(AsyncBaseToolkit):
@@ -12,22 +13,19 @@ class SerperToolkit(AsyncBaseToolkit):
     A toolkit for interacting with the Serper API (google.serper.dev).
     """
 
-    def __init__(self, config: Optional[ToolkitConfig] = None) -> None:
+    def __init__(self, config: ToolkitConfig | None = None) -> None:
         super().__init__(config)
         self.api_key = os.getenv("SERPER_API_KEY")
         if not self.api_key:
             raise ValueError("SERPER_API_KEY environment variable is required")
         self.async_client = httpx.AsyncClient()
 
-    async def _search(self, endpoint: str, payload: dict) -> Dict[str, Any]:
+    async def _search(self, endpoint: str, payload: dict) -> dict[str, Any]:
         """
         Helper function to make requests to the Serper API.
         """
         url = f"https://google.serper.dev/{endpoint}"
-        headers = {
-            'X-API-KEY': self.api_key,
-            'Content-Type': 'application/json'
-        }
+        headers = {"X-API-KEY": self.api_key, "Content-Type": "application/json"}
         try:
             response = await self.async_client.post(url, headers=headers, json=payload)
             response.raise_for_status()
@@ -44,8 +42,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search the web using Google Search.
 
@@ -62,24 +60,14 @@ class SerperToolkit(AsyncBaseToolkit):
         Returns:
             Dict[str, Any]: A dictionary containing the search results.
         """
-        payload = {
-            "q": query,
-            "location": location,
-            "gl": gl,
-            "hl": hl,
-            "num": num
-        }
+        payload = {"q": query, "location": location, "gl": gl, "hl": hl, "num": num}
         if date_range:
             payload["tbs"] = f"qdr:{date_range}"
 
         result = await self._search("search", payload)
         if "error" in result:
-             return {
-                "query": query,
-                "error": result["error"],
-                "status": "error"
-            }
-        
+            return {"query": query, "error": result["error"], "status": "error"}
+
         return {
             "query": query,
             "location": location,
@@ -89,16 +77,12 @@ class SerperToolkit(AsyncBaseToolkit):
             "results": result.get("organic", []),
             "searchParameters": result.get("searchParameters", {}),
             "total_results": len(result.get("organic", [])),
-            "status": "success"
+            "status": "success",
         }
 
     async def autocomplete(
-        self,
-        query: str,
-        location: str = "China",
-        gl: str = "cn",
-        hl: str = "zh-cn"
-    ) -> Dict[str, Any]:
+        self, query: str, location: str = "China", gl: str = "cn", hl: str = "zh-cn"
+    ) -> dict[str, Any]:
         """
         Get autocomplete suggestions for a given query.
 
@@ -111,20 +95,11 @@ class SerperToolkit(AsyncBaseToolkit):
         Returns:
             Dict[str, Any]: A dictionary containing autocomplete suggestions.
         """
-        payload = {
-            "q": query,
-            "location": location,
-            "gl": gl,
-            "hl": hl
-        }
+        payload = {"q": query, "location": location, "gl": gl, "hl": hl}
         result = await self._search("autocomplete", payload)
         if "error" in result:
-            return {
-                "query": query,
-                "error": result["error"],
-                "status": "error"
-            }
-        
+            return {"query": query, "error": result["error"], "status": "error"}
+
         return {
             "query": query,
             "location": location,
@@ -133,16 +108,10 @@ class SerperToolkit(AsyncBaseToolkit):
             "suggestions": result.get("suggestions", []),
             "searchParameters": result.get("searchParameters", {}),
             "total_suggestions": len(result.get("suggestions", [])),
-            "status": "success"
+            "status": "success",
         }
 
-    async def google_lens(
-        self,
-        url: str,
-        gl: str = "cn",
-        hl: str = "zh-cn",
-        num: int = 10
-    ) -> Dict[str, Any]:
+    async def google_lens(self, url: str, gl: str = "cn", hl: str = "zh-cn", num: int = 10) -> dict[str, Any]:
         """
         Analyze an image using Google Lens.
 
@@ -155,18 +124,10 @@ class SerperToolkit(AsyncBaseToolkit):
         Returns:
             Dict[str, Any]: A dictionary containing the visual search results.
         """
-        payload = {
-            "url": url,
-            "gl": gl,
-            "hl": hl
-        }
+        payload = {"url": url, "gl": gl, "hl": hl}
         result = await self._search("lens", payload)
         if "error" in result:
-            return {
-                "url": url,
-                "error": result["error"],
-                "status": "error"
-            }
+            return {"url": url, "error": result["error"], "status": "error"}
 
         return {
             "url": url,
@@ -175,7 +136,7 @@ class SerperToolkit(AsyncBaseToolkit):
             "results": result.get("organic", [])[:num],
             "searchParameters": result.get("searchParameters", {}),
             "total_results": min(len(result.get("organic", [])), num),
-            "status": "success"
+            "status": "success",
         }
 
     async def image_search(
@@ -185,8 +146,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search for images using Google Images.
 
@@ -201,23 +162,13 @@ class SerperToolkit(AsyncBaseToolkit):
         Returns:
             Dict[str, Any]: Dictionary with image search results.
         """
-        payload = {
-            "q": query,
-            "location": location,
-            "gl": gl,
-            "hl": hl,
-            "num": num
-        }
+        payload = {"q": query, "location": location, "gl": gl, "hl": hl, "num": num}
         if date_range:
             payload["tbs"] = f"qdr:{date_range}"
-        
+
         result = await self._search("images", payload)
         if "error" in result:
-            return {
-                "query": query,
-                "error": result["error"],
-                "status": "error"
-            }
+            return {"query": query, "error": result["error"], "status": "error"}
 
         return {
             "query": query,
@@ -225,20 +176,20 @@ class SerperToolkit(AsyncBaseToolkit):
             "results": result.get("images", []),
             "searchParameters": result.get("searchParameters", {}),
             "total_results": len(result.get("images", [])),
-            "status": "success"
+            "status": "success",
         }
 
     async def map_search(
         self,
         query: str,
         hl: str = "zh-cn",
-        latitude: Optional[float] = None,
-        longitude: Optional[float] = None,
-        zoom: Optional[int] = 18,
-        place_id: Optional[str] = None,
-        cid: Optional[str] = None,
-        num: int = 10
-    ) -> Dict[str, Any]:
+        latitude: float | None = None,
+        longitude: float | None = None,
+        zoom: int | None = 18,
+        place_id: str | None = None,
+        cid: str | None = None,
+        num: int = 10,
+    ) -> dict[str, Any]:
         """
         Search for locations using Google Maps.
 
@@ -255,11 +206,7 @@ class SerperToolkit(AsyncBaseToolkit):
         Returns:
             Dict[str, Any]: Dictionary with map search results.
         """
-        payload = {
-            "q": query,
-            "hl": hl,
-            "num": num
-        }
+        payload = {"q": query, "hl": hl, "num": num}
         if latitude is not None and longitude is not None:
             if zoom is not None:
                 payload["ll"] = f"@{latitude},{longitude},{zoom}z"
@@ -269,15 +216,11 @@ class SerperToolkit(AsyncBaseToolkit):
             payload["placeId"] = place_id
         if cid:
             payload["cid"] = cid
-        
+
         result = await self._search("maps", payload)
 
         if "error" in result:
-            return {
-                "query": query,
-                "error": result["error"],
-                "status": "error"
-            }
+            return {"query": query, "error": result["error"], "status": "error"}
 
         return {
             "query": query,
@@ -290,7 +233,7 @@ class SerperToolkit(AsyncBaseToolkit):
             "results": result.get("places", []),
             "searchParameters": result.get("searchParameters", {}),
             "total_results": len(result.get("places", [])),
-            "status": "success"
+            "status": "success",
         }
 
     async def news_search(
@@ -300,8 +243,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search for news articles using Google News.
 
@@ -316,23 +259,13 @@ class SerperToolkit(AsyncBaseToolkit):
         Returns:
             Dict[str, Any]: Dictionary with news search results.
         """
-        payload = {
-            "q": query,
-            "location": location,
-            "gl": gl,
-            "hl": hl,
-            "num": num
-        }
+        payload = {"q": query, "location": location, "gl": gl, "hl": hl, "num": num}
         if date_range:
             payload["tbs"] = f"qdr:{date_range}"
-        
+
         result = await self._search("news", payload)
         if "error" in result:
-            return {
-                "query": query,
-                "error": result["error"],
-                "status": "error"
-            }
+            return {"query": query, "error": result["error"], "status": "error"}
 
         return {
             "query": query,
@@ -343,7 +276,7 @@ class SerperToolkit(AsyncBaseToolkit):
             "results": result.get("news", []),
             "searchParameters": result.get("searchParameters", {}),
             "total_results": len(result.get("news", [])),
-            "status": "success"
+            "status": "success",
         }
 
     async def place_search(
@@ -353,8 +286,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search for places using Google Places.
 
@@ -369,24 +302,14 @@ class SerperToolkit(AsyncBaseToolkit):
         Returns:
             Dict[str, Any]: Dictionary with place search results.
         """
-        payload = {
-            "q": query,
-            "location": location,
-            "gl": gl,
-            "hl": hl,
-            "num": num
-        }
+        payload = {"q": query, "location": location, "gl": gl, "hl": hl, "num": num}
         if date_range:
             payload["tbs"] = f"qdr:{date_range}"
-        
+
         result = await self._search("places", payload)
 
         if "error" in result:
-            return {
-                "query": query,
-                "error": result["error"],
-                "status": "error"
-            }
+            return {"query": query, "error": result["error"], "status": "error"}
 
         return {
             "query": query,
@@ -394,17 +317,12 @@ class SerperToolkit(AsyncBaseToolkit):
             "results": result.get("places", []),
             "searchParameters": result.get("searchParameters", {}),
             "total_results": len(result.get("places", [])),
-            "status": "success"
+            "status": "success",
         }
 
     async def scholar_search(
-        self,
-        query: str,
-        location: str = "China",
-        gl: str = "cn",
-        hl: str = "zh-cn",
-        num: int = 10
-    ) -> Dict[str, Any]:
+        self, query: str, location: str = "China", gl: str = "cn", hl: str = "zh-cn", num: int = 10
+    ) -> dict[str, Any]:
         """
         Search for academic papers using Google Scholar.
 
@@ -425,14 +343,10 @@ class SerperToolkit(AsyncBaseToolkit):
             "hl": hl,
             "num": num,
         }
-        
+
         result = await self._search("scholar", payload)
         if "error" in result:
-            return {
-                "query": query,
-                "error": result["error"],
-                "status": "error"
-            }
+            return {"query": query, "error": result["error"], "status": "error"}
 
         return {
             "query": query,
@@ -442,7 +356,7 @@ class SerperToolkit(AsyncBaseToolkit):
             "results": result.get("organic", []),
             "searchParameters": result.get("searchParameters", {}),
             "total_results": len(result.get("organic", [])),
-            "status": "success"
+            "status": "success",
         }
 
     async def video_search(
@@ -452,8 +366,8 @@ class SerperToolkit(AsyncBaseToolkit):
         gl: str = "cn",
         hl: str = "zh-cn",
         num: int = 10,
-        date_range: Optional[str] = None
-    ) -> Dict[str, Any]:
+        date_range: str | None = None,
+    ) -> dict[str, Any]:
         """
         Search for videos using Google Videos.
 
@@ -468,24 +382,14 @@ class SerperToolkit(AsyncBaseToolkit):
         Returns:
             Dict[str, Any]: Dictionary with video search results.
         """
-        payload = {
-            "q": query,
-            "location": location,
-            "gl": gl,
-            "hl": hl,
-            "num": num
-        }
+        payload = {"q": query, "location": location, "gl": gl, "hl": hl, "num": num}
         if date_range:
             payload["tbs"] = f"qdr:{date_range}"
-        
+
         result = await self._search("videos", payload)
 
         if "error" in result:
-            return {
-                "query": query,
-                "error": result["error"],
-                "status": "error"
-            }
+            return {"query": query, "error": result["error"], "status": "error"}
 
         return {
             "query": query,
@@ -493,7 +397,7 @@ class SerperToolkit(AsyncBaseToolkit):
             "results": result.get("videos", []),
             "searchParameters": result.get("searchParameters", {}),
             "total_results": len(result.get("videos", [])),
-            "status": "success"
+            "status": "success",
         }
 
     async def get_tools_map(self) -> dict[str, Callable]:

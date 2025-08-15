@@ -38,6 +38,7 @@ ___*
 _SESSION_DATA
 .cache/
 /data/
+/examples/data_analysis/data
 output/
 workspace/
 
@@ -46,6 +47,7 @@ mytools/
 logs/
 
 .pytest_cache/
+.mypy_cache/
 uv.lock
 .env
 test.yaml

@@ -1,9 +1,8 @@
 import abc
-import asyncio
-from typing import Callable
+from collections.abc import Callable
 
-from agents import FunctionTool, function_tool
 import mcp.types as types
+from agents import FunctionTool, function_tool
 
 from ..config import ToolkitConfig
 from ..utils import ChatCompletionConverter, get_event_loop
@@ -22,8 +21,8 @@ class MCPConverter:
 class AsyncBaseToolkit(abc.ABC):
     config: ToolkitConfig
     tools_map: dict[str, Callable] = None
-    
-    def __init__(self, config: ToolkitConfig|dict|None = None):
+
+    def __init__(self, config: ToolkitConfig | dict | None = None):
         if not isinstance(config, ToolkitConfig):
             config = config or {}
             config = ToolkitConfig(config=config, name=self.__class__.__name__)
@@ -45,7 +44,6 @@ class AsyncBaseToolkit(abc.ABC):
     async def cleanup(self):
         self._built = False
 
-
     @abc.abstractmethod
     async def get_tools_map(self) -> dict[str, Callable]:
         pass
@@ -54,27 +52,31 @@ class AsyncBaseToolkit(abc.ABC):
         if self.tools_map is None:
             self.tools_map = await self.get_tools_map()
         if self.config.activated_tools:
-            assert all(tool_name in self.tools_map for tool_name in self.config.activated_tools), f"Error config activated tools: {self.config.activated_tools}"
+            assert all(tool_name in self.tools_map for tool_name in self.config.activated_tools), (
+                f"Error config activated tools: {self.config.activated_tools}"
+            )
             tools_map = {tool_name: self.tools_map[tool_name] for tool_name in self.config.activated_tools}
         else:
             tools_map = self.tools_map
         return tools_map
 
     async def get_tools_in_agents(self) -> list[FunctionTool]:
-        """ Convert tools to @agents format. """
+        """Convert tools to @agents format."""
         tools_map = await self.get_tools_map_func()
         tools = []
-        for tool_name, tool in tools_map.items():
-            tools.append(function_tool(
-                tool, 
-                strict_mode=False  # turn off strict mode
-            ))
+        for _, tool in tools_map.items():
+            tools.append(
+                function_tool(
+                    tool,
+                    strict_mode=False,  # turn off strict mode
+                )
+            )
         return tools
 
     async def get_tools_in_openai(self) -> list[dict]:
         tools = await self.get_tools_in_agents()
         return [ChatCompletionConverter.tool_to_openai(tool) for tool in tools]
-    
+
     async def get_tools_in_mcp(self) -> list[types.Tool]:
         tools = await self.get_tools_in_agents()
         return [MCPConverter.function_tool_to_mcp(tool) for tool in tools]
@@ -86,7 +88,6 @@ class AsyncBaseToolkit(abc.ABC):
         tool = tools_map[name]
         return await tool(**arguments)
 
-
     # -------------------------------------------------------------------------------------------------------------
     def get_tools_map_sync(self) -> dict[str, Callable]:
         if self.tools_map is None:
@@ -95,13 +96,15 @@ class AsyncBaseToolkit(abc.ABC):
                 loop.run_until_complete(self.build())
             self.tools_map = loop.run_until_complete(self.get_tools_map_func())
         return self.tools_map
-    
+
     def get_tools_in_agents_sync(self) -> list[FunctionTool]:
         tools_map = self.get_tools_map_sync()
         tools = []
-        for tool_name, tool in tools_map.items():
-            tools.append(function_tool(
-                tool, 
-                strict_mode=False  # turn off strict mode
-            ))
+        for _, tool in tools_map.items():
+            tools.append(
+                function_tool(
+                    tool,
+                    strict_mode=False,  # turn off strict mode
+                )
+            )
         return tools

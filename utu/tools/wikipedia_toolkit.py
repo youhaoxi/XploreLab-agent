@@ -1,31 +1,35 @@
-""" 
+"""
 @smolagents/src/smolagents/default_tools.py
 https://github.com/martin-majlis/Wikipedia-API
 https://www.mediawiki.org/wiki/API:Main_page
 """
+
 import calendar
 import datetime
-from typing import Callable
+from collections.abc import Callable
 
 import requests
 
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
+from .base import AsyncBaseToolkit
 
 
 class WikipediaSearchTool(AsyncBaseToolkit):
     """
-    WikipediaSearchTool searches Wikipedia and returns a summary or full text of the given topic, along with the page URL.
+    WikipediaSearchTool searches Wikipedia and returns a summary or full text of the given topic.
 
     Attributes:
-        user_agent (str): A custom user-agent string to identify the project. This is required as per Wikipedia API policies, read more here: http://github.com/martin-majlis/Wikipedia-API/blob/master/README.rst
+        user_agent (str): A custom user-agent string to identify the project.
+            This is required as per Wikipedia API policies, read more here:
+            http://github.com/martin-majlis/Wikipedia-API/blob/master/README.rst
         language (str): The language in which to retrieve Wikipedia articles.
-                http://meta.wikimedia.org/wiki/List_of_Wikipedias
-        content_type (str): Defines the content to fetch. Can be "summary" for a short summary or "text" for the full article.
+            http://meta.wikimedia.org/wiki/List_of_Wikipedias
+        content_type (str): Defines the content to fetch.
+            Can be "summary" for a short summary or "text" for the full article.
         extract_format (str): Defines the output format. Can be `"WIKI"` or `"HTML"`.
     """
 
-    def __init__(self, config: ToolkitConfig|dict = None) -> None:
+    def __init__(self, config: ToolkitConfig | dict = None) -> None:
         super().__init__(config)
         try:
             import wikipediaapi
@@ -53,7 +57,7 @@ class WikipediaSearchTool(AsyncBaseToolkit):
 
     async def wikipedia_search(self, query: str) -> str:
         """Searches Wikipedia and returns a summary or full text of the given topic, along with the page URL.
-        
+
         Args:
             query (str): The topic to search on Wikipedia.
         """
@@ -75,9 +79,8 @@ class WikipediaSearchTool(AsyncBaseToolkit):
 
             return f"✅ **Wikipedia Page:** {title}\n\n**Content:** {text}\n\n🔗 **Read more:** {url}"
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             return f"Error fetching Wikipedia summary: {str(e)}"
-
 
     async def search_wikipedia_revisions(self, entity: str, year: int, month: int) -> str:
         """Get the revisions of a Wikipedia entity in a given month, return the revision url.
@@ -122,9 +125,7 @@ class WikipediaSearchTool(AsyncBaseToolkit):
                     timestamp = rev["timestamp"]
                     # Construct the revision url
                     rev_url = f"https://en.wikipedia.org/w/index.php?title={entity}&oldid={oldid}"
-                    revisions_list.append(
-                        {"timestamp": timestamp, "oldid": oldid, "url": rev_url}
-                    )
+                    revisions_list.append({"timestamp": timestamp, "oldid": oldid, "url": rev_url})
         return str(revisions_list)
 
     async def get_tools_map(self) -> dict[str, Callable]:

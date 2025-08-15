@@ -2,21 +2,49 @@
 https://github.com/bytedance/SandboxFusion
 https://bytedance.github.io/SandboxFusion/docs/docs/get-started
 """
-from typing import Callable, Optional
+
+from collections.abc import Callable
 
 import requests
 
-from .base import AsyncBaseToolkit
 from ..config import ToolkitConfig
-from ..utils import oneline_object, get_logger
+from ..utils import get_logger, oneline_object
+from .base import AsyncBaseToolkit
 
 logger = get_logger(__name__)
 
 SUPPORTED_LANGUAGES = [
-    "python", "cpp", "nodejs", "go", "go_test", "java", "php", "csharp", "bash",
-    "typescript", "sql", "rust", "cuda", "lua", "R", "perl", "D_ut", "ruby", "scala", "julia",
-    "pttest", "junit", "kotlin_script", "jest", "verilog", "python_gpu", "lean", "swift", "racket"
+    "python",
+    "cpp",
+    "nodejs",
+    "go",
+    "go_test",
+    "java",
+    "php",
+    "csharp",
+    "bash",
+    "typescript",
+    "sql",
+    "rust",
+    "cuda",
+    "lua",
+    "R",
+    "perl",
+    "D_ut",
+    "ruby",
+    "scala",
+    "julia",
+    "pttest",
+    "junit",
+    "kotlin_script",
+    "jest",
+    "verilog",
+    "python_gpu",
+    "lean",
+    "swift",
+    "racket",
 ]
+
 
 class CodesnipToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
@@ -25,8 +53,10 @@ class CodesnipToolkit(AsyncBaseToolkit):
 
     async def run_code(self, code: str, language: str = "python") -> str:
         """Run code in sandbox and return the result.
-        Supported languages: python, cpp, nodejs, go, go_test, java, php, csharp, bash, typescript, sql, rust, cuda, lua, R, perl, D_ut, ruby, scala, julia, pttest, junit, kotlin_script, jest, verilog, python_gpu, lean, swift, racket
-        
+        Supported languages: python, cpp, nodejs, go, go_test, java, php, csharp, bash, typescript, sql, rust, cuda,
+         lua, R, perl, D_ut, ruby, scala, julia, pttest, junit, kotlin_script, jest, verilog, python_gpu, lean, swift,
+         racket
+
         Args:
             code (str): The code to run.
             language (str, optional): The language of the code. Defaults to "python".

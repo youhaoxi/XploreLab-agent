@@ -1,23 +1,13 @@
-from importlib import import_module
+import pathlib
 
-def get_benchmark_templates(benchmark_name: str) -> dict:
-    """Get the benchmark templates for a given benchmark name."""
-    try:
-        module = import_module(f"utu.eval.processer.prompts.{benchmark_name}")
-        return {
-            "system": getattr(module, "SYSTEM_PROMPT", ""),
-            "augmented": getattr(module, "AUGMENTED_TEMPLATE", ""),
-            "judge": getattr(module, "JUDGE_TEMPLATE", ""),
-        }
-    except ImportError:
-        print(f"Benchmark '{benchmark_name}' not found. Using default templates.")
-        module = import_module("utu.eval.processer.prompts.default")
-        return {
-            "system": getattr(module, "SYSTEM_PROMPT", ""),
-            "augmented": getattr(module, "AUGMENTED_TEMPLATE", ""),
-            "judge": getattr(module, "JUDGE_TEMPLATE", ""),
-        }
+import yaml
 
-__all__ = [
-    "get_benchmark_templates",
-]
+
+def load_yaml(file_path: pathlib.Path) -> dict[str, str]:
+    with file_path.open() as f:
+        return yaml.safe_load(f)
+
+
+_prompt_path = pathlib.Path(__file__).parent
+AUGMENTATION_PROMPTS = load_yaml(_prompt_path / "augmentation_templates.yaml")
+JUDGE_PROMPTS = load_yaml(_prompt_path / "judge_templates.yaml")

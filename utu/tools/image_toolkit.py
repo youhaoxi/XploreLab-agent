@@ -1,19 +1,20 @@
-""" 
+"""
 @smolagents/examples/open_deep_research/scripts/visual_qa.py
 @camel/camel/toolkits/image_analysis_toolkit.py
 https://platform.openai.com/docs/guides/images-vision?api-mode=chat
 """
-from typing import Optional, Callable
-from io import BytesIO
-import requests
-import base64
 
+import base64
+from collections.abc import Callable
+from io import BytesIO
 from urllib.parse import urlparse
+
+import requests
 from PIL import Image
 
-from .base import AsyncBaseToolkit
-from ..utils import SimplifiedAsyncOpenAI, get_logger
 from ..config import ToolkitConfig
+from ..utils import SimplifiedAsyncOpenAI, get_logger
+from .base import AsyncBaseToolkit
 
 logger = get_logger(__name__)
 
@@ -49,9 +50,9 @@ class ImageToolkit(AsyncBaseToolkit):
             logger.debug(f"Loading local image: {image_path}")
             try:
                 image = Image.open(image_path).convert("RGB")
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logger.error(f"Image loading failed: {e}")
-                raise ValueError(f"Invalid image file: {e}")
+                raise ValueError(f"Invalid image file: {image_path}") from e
         # Convert the image to a base64 string
         buffer = BytesIO()
         image.save(buffer, format="JPEG")  # Use the appropriate format (e.g., JPEG, PNG)
@@ -61,25 +62,31 @@ class ImageToolkit(AsyncBaseToolkit):
         image_string = f"data:image/jpeg;base64,{base64_image}"
         return image_string
 
-    async def image_qa(self, image_path: str, question: Optional[str] = None) -> str:
+    async def image_qa(self, image_path: str, question: str | None = None) -> str:
         """Generate textual description or answer questions about attached image.
-        
+
         Args:
             image_path (str): Local path or URL to an image.
-            question (str, optional): The question to answer. If not provided, a description of the image will be generated.
+            question (str, optional): The question to answer. If not provided, return a description of the image.
         """
         image_str = self._load_image(image_path)
         if not question:
             messages = [
                 {"role": "system", "content": SP_DESCRIPTION},
-                {"role": "user", "content": [{"type": "image_url", "image_url": {"url": image_str}}]}
+                {"role": "user", "content": [{"type": "image_url", "image_url": {"url": image_str}}]},
             ]
             output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
             output = f"You did not provide a particular question, so here is a detailed caption for the image: {output}"
         else:
             messages = [
                 {"role": "system", "content": SP_DESCRIPTION},
-                {"role": "user", "content": [{"type": "text", "text": question}, {"type": "image_url", "image_url": {"url": image_str}}]}
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": question},
+                        {"type": "image_url", "image_url": {"url": image_str}},
+                    ],
+                },
             ]
             output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         return output
