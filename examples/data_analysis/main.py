@@ -19,7 +19,7 @@ async def main():
 
     print(f"Run completed with result: {result}")
     with open(fn.parent / "result.json", "w", encoding="utf-8") as f:
-        json.dump(result.model_dump(), f, ensure_ascii=False, indent=4)
+        json.dump(result.to_dict(), f, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
