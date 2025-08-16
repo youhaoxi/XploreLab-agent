@@ -59,7 +59,7 @@ def run_command(child: pexpect.spawn, custom_prompt: str, cmd: str) -> str:
     return clean_output
 
 
-class BashTool(AsyncBaseToolkit):
+class BashToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
         self.workspace_root = self.config.config.get("workspace_root", "/tmp/")

@@ -30,6 +30,9 @@ INSTRUCTION_SUMMARY = (
 
 class DocumentToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
+        """Initialize the DocumentToolkit.
+
+        - Required env variables: `CHUNKR_API_KEY`"""
         super().__init__(config)
         self.chunkr = Chunkr(api_key=self.config.config.get("CHUNKR_API_KEY"))
         self.chunkr.config = Configuration(

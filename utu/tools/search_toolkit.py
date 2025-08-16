@@ -45,6 +45,9 @@ RE_MATCHED_SITES = re.compile(r"^(" + "|".join(banned_sites) + r")")
 
 class SearchToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None):
+        """Initialize the SearchToolkit.
+
+        - Required env variables: `JINA_API_KEY`, `SERPER_API_KEY`"""
         super().__init__(config)
         self.jina_url_template = r"https://r.jina.ai/{url}"
         self.jina_header = {"Authorization": f"Bearer {self.config.config.get('JINA_API_KEY')}"}

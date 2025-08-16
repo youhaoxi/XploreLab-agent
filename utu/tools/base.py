@@ -19,6 +19,8 @@ class MCPConverter:
 
 
 class AsyncBaseToolkit(abc.ABC):
+    """Base class for toolkits."""
+
     config: ToolkitConfig
     tools_map: dict[str, Callable] = None
 
@@ -46,9 +48,15 @@ class AsyncBaseToolkit(abc.ABC):
 
     @abc.abstractmethod
     async def get_tools_map(self) -> dict[str, Callable]:
+        """Abstract method to get tools map.
+
+        Returns:
+            dict[str, Callable]: A dictionary of tool names to their corresponding functions.
+        """
         pass
 
     async def get_tools_map_func(self) -> dict[str, Callable]:
+        """Get tools map. It will filter tools by config.activated_tools if it is not None."""
         if self.tools_map is None:
             self.tools_map = await self.get_tools_map()
         if self.config.activated_tools:
@@ -61,7 +69,7 @@ class AsyncBaseToolkit(abc.ABC):
         return tools_map
 
     async def get_tools_in_agents(self) -> list[FunctionTool]:
-        """Convert tools to @agents format."""
+        """Get tools in openai-agents format."""
         tools_map = await self.get_tools_map_func()
         tools = []
         for _, tool in tools_map.items():
@@ -74,14 +82,17 @@ class AsyncBaseToolkit(abc.ABC):
         return tools
 
     async def get_tools_in_openai(self) -> list[dict]:
+        """Get tools in OpenAI format."""
         tools = await self.get_tools_in_agents()
         return [ChatCompletionConverter.tool_to_openai(tool) for tool in tools]
 
     async def get_tools_in_mcp(self) -> list[types.Tool]:
+        """Get tools in MCP format."""
         tools = await self.get_tools_in_agents()
         return [MCPConverter.function_tool_to_mcp(tool) for tool in tools]
 
     async def call_tool(self, name: str, arguments: dict) -> str:
+        """Call a tool by its name."""
         tools_map = await self.get_tools_map_func()
         if name not in tools_map:
             raise ValueError(f"Tool {name} not found")

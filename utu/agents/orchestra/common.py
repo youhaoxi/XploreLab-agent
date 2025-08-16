@@ -1,10 +1,13 @@
+from dataclasses import dataclass, field
+from typing import Literal
 
-from pydantic import BaseModel, Field
+from agents import RunResultStreaming
 
-from ..common import TaskRecorder
+from ..common import DataClassWithStreamEvents, TaskRecorder
 
 
-class AgentInfo(BaseModel):
+@dataclass
+class AgentInfo:
     """Subagent information (for planner)"""
 
     name: str
@@ -13,15 +16,17 @@ class AgentInfo(BaseModel):
     weaknesses: str
 
 
-class Subtask(BaseModel):
+@dataclass
+class Subtask:
     agent_name: str
     task: str
     completed: bool | None = None
 
 
-class CreatePlanResult(BaseModel):
+@dataclass
+class CreatePlanResult(DataClassWithStreamEvents):
     analysis: str = ""
-    todo: list[Subtask] = Field(default_factory=list)
+    todo: list[Subtask] = field(default_factory=list)
 
     @property
     def trajectory(self):
@@ -38,27 +43,28 @@ class CreatePlanResult(BaseModel):
         }
 
 
-class WorkerResult(BaseModel):
-    task: str
-    output: str
-    trajectory: dict
-    search_results: list[dict] = Field(default_factory=list)
+@dataclass
+class WorkerResult(DataClassWithStreamEvents):
+    task: str = ""
+    output: str = ""
+    trajectory: dict = field(default_factory=dict)
+
+    stream: RunResultStreaming | None = None
 
 
-class AnalysisResult(BaseModel):
-    output: str
+@dataclass
+class AnalysisResult(DataClassWithStreamEvents):
+    output: str = ""
 
     @property
     def trajectory(self):
         return {"agent": "analysis", "trajectory": [{"role": "assistant", "content": self.output}]}
 
 
+@dataclass
 class OrchestraTaskRecorder(TaskRecorder):
-    def __init__(self, task: str, trace_id: str):
-        super().__init__(task, trace_id)
-
-        self.plan: CreatePlanResult = None
-        self.task_records: list[WorkerResult] = []
+    plan: CreatePlanResult = field(default=None)
+    task_records: list[WorkerResult] = field(default_factory=list)
 
     def set_plan(self, plan: CreatePlanResult):
         self.plan = plan
@@ -81,3 +87,10 @@ class OrchestraTaskRecorder(TaskRecorder):
                 for i, (r, t) in enumerate(zip(self.task_records, self.plan.todo, strict=False), 1)
             ]
         )
+
+
+@dataclass
+class OrchestraStreamEvent:
+    name: Literal["plan", "worker", "report"]
+    item: CreatePlanResult | WorkerResult | AnalysisResult
+    type: Literal["orchestra_stream_event"] = "orchestra_stream_event"

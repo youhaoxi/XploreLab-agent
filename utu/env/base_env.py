@@ -5,18 +5,24 @@ from agents import Tool
 
 
 class Env:
+    """Environment interface for agents."""
+
     @abc.abstractmethod
     def get_state(self) -> str:
+        """Get the current state of the environment."""
         raise NotImplementedError
 
     @abc.abstractmethod
     async def get_tools(self) -> list[Tool]:
+        """Get the tools available in the environment."""
         raise NotImplementedError
 
     async def build(self):
+        """Build the environment."""
         pass
 
     async def cleanup(self):
+        """Cleanup the environment."""
         pass
 
     async def __aenter__(self):

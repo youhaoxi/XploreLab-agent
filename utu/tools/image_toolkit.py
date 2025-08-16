@@ -93,5 +93,5 @@ class ImageToolkit(AsyncBaseToolkit):
 
     async def get_tools_map(self) -> dict[str, Callable]:
         return {
-            "visualizer": self.image_qa,
+            "image_qa": self.image_qa,
         }

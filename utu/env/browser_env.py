@@ -10,12 +10,15 @@ logger = logging.getLogger(__name__)
 
 
 class BrowserEnv(BaseEnv):
+    """Browser environment for agents."""
+
     def __init__(self, trace_id: str):
         self.trace_id = trace_id
         self.docker_manager = DockerManager()
         self.browser_state: str = None
 
     async def build(self):
+        """Build the environment. We use docker to run a browser container."""
         self.container_info = await self.docker_manager.start_container(self.trace_id)
         self.mcp_url = self.container_info["mcp_url"]
 
@@ -23,9 +26,11 @@ class BrowserEnv(BaseEnv):
         await self.docker_manager.stop_container(self.trace_id)
 
     def get_state(self) -> str:
+        """Get the current state of the environment."""
         return self.browser_state
 
     async def get_tools(self) -> list[Tool]:
+        """Get the tools available in the environment."""
         activated_tools = (
             "search_google",
             "go_to_url",

@@ -3,7 +3,7 @@ import pytest
 from utu.config import ConfigLoader
 from utu.tools import (
     BashRemoteToolkit,
-    BashTool,
+    BashToolkit,
     CodesnipToolkit,
     FileEditToolkit,
     GitHubToolkit,
@@ -79,12 +79,12 @@ async def test_run_code(codesnip_toolkit: CodesnipToolkit):
 
 
 @pytest.fixture
-def bash_toolkit() -> BashTool:
+def bash_toolkit() -> BashToolkit:
     config = ConfigLoader.load_toolkit_config("bash")
-    return BashTool(config=config)
+    return BashToolkit(config=config)
 
 
-async def test_run_bash(bash_toolkit: BashTool):
+async def test_run_bash(bash_toolkit: BashToolkit):
     result = await bash_toolkit.run_bash("curl https://httpbin.org/get")
     print(result)
     result = await bash_toolkit.run_bash("wget https://www.gnu.org/software/wget/manual/wget.html -O wget.html")

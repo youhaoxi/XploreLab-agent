@@ -1,4 +1,4 @@
-from .common import AnalysisResult, CreatePlanResult, OrchestraTaskRecorder, Subtask, WorkerResult
+from .common import AnalysisResult, CreatePlanResult, OrchestraStreamEvent, OrchestraTaskRecorder, Subtask, WorkerResult
 from .planner import PlannerAgent
 from .reporter import ReporterAgent
 from .worker import BaseWorkerAgent, SimpleWorkerAgent
@@ -12,5 +12,6 @@ __all__ = [
     "BaseWorkerAgent",
     "SimpleWorkerAgent",
     "OrchestraTaskRecorder",
+    "OrchestraStreamEvent",
     "Subtask",
 ]

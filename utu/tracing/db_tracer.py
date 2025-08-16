@@ -1,9 +1,3 @@
-"""
-useful:
-    get_current_span, get_current_trace
-    add_trace_processor
-"""
-
 import os
 from typing import Any
 
@@ -20,6 +14,11 @@ from ..utils import OpenAIUtils
 
 
 class DBTracingProcessor(TracingProcessor):
+    """Basic tracing processor that stores events into database.
+
+    Required environment variables: `DB_URL`
+    """
+
     def __init__(self) -> None:
         self.engine = create_engine(os.getenv("DB_URL"), pool_size=300, max_overflow=500, pool_timeout=30)
         SQLModel.metadata.create_all(self.engine)

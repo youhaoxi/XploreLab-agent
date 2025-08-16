@@ -1,7 +1,7 @@
 [project]
 name = "utu-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "a simple yet powerful agents framework"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

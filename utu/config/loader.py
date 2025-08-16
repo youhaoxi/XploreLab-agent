@@ -12,6 +12,8 @@ TConfig = TypeVar("TConfig", bound=BaseModel)
 
 
 class ConfigLoader:
+    """Config loader"""
+
     config_path = "../../configs"
     version_base = "1.3"
 
@@ -31,21 +33,25 @@ class ConfigLoader:
 
     @classmethod
     def load_agent_config(cls, name: str = "default") -> AgentConfig:
+        """Load agent config from /configs/agents"""
         cfg = cls._load_config_to_dict(name, config_path="../../configs/agents")
         return AgentConfig(**cfg)
 
     @classmethod
     def load_toolkit_config(cls, name: str = "search") -> ToolkitConfig:
+        """Load toolkit config from /configs/agents/tools"""
         cfg = cls._load_config_to_dict(name, config_path="../../configs/agents/tools")
         return ToolkitConfig(**cfg)
 
     @classmethod
     def load_model_config(cls, name: str = "base") -> ModelConfigs:
+        """Load model config from /configs/agents/model"""
         cfg = cls._load_config_to_dict(name, config_path="../../configs/agents/model")
         return ModelConfigs(**cfg)
 
     @classmethod
     def load_eval_config(cls, name: str = "default") -> EvalConfig:
+        """Load eval config from /configs"""
         if not name.startswith("eval/"):
             name = "eval/" + name
         cfg = cls._load_config_to_dict(name, config_path="../../configs")

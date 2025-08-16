@@ -15,11 +15,16 @@ class ProfileConfig(ConfigBaseModel):
 
 
 class ToolkitConfig(ConfigBaseModel):
+    """Toolkit config."""
+
     mode: Literal["builtin", "mcp"] = "builtin"
     name: str | None = None
     activated_tools: list[str] | None = None
+    """Activated tools, if None, all tools will be activated."""
     config: dict | None = Field(default_factory=dict)
+    """Toolkit config."""
     config_llm: ModelConfigs | None = None
+    """LLM config if used in toolkit."""
 
 
 class ContextManagerConfig(ConfigBaseModel):
@@ -36,7 +41,7 @@ class AgentConfig(ConfigBaseModel):
     """Overall agent config"""
 
     type: Literal["simple", "orchestra"] = "simple"
-    """Agent type, "simple" or "orchestra"""
+    """Agent type, "simple" or "orchestra". """
 
     model: ModelConfigs = Field(default_factory=ModelConfigs)
     """Model config, with model_provider, model_settings, model_params"""
