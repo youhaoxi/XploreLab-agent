@@ -2,7 +2,7 @@ import agents as ag
 
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
-from utu.ui.gradio_chatbot import GradioChatbot
+from utu.ui.webui_chatbot import WebUIChatbot
 
 
 @ag.function_tool
@@ -24,13 +24,13 @@ config.max_turns = 100
 
 
 def main():
-    simple_agent = SimpleAgent(config=config, name="gradio-demo", tools=[fibonacci])
+    simple_agent = SimpleAgent(config=config, name="demo", tools=[fibonacci])
 
-    chatbot = GradioChatbot(
+    chatbot = WebUIChatbot(
         simple_agent,
         example_query="斐波那契数列的第10个数是多少？记这个数为x，数列的第x个数是多少？",
     )
-    chatbot.launch(port=8848)
+    chatbot.launch()
 
 
 if __name__ == "__main__":
