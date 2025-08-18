@@ -123,12 +123,12 @@ class SearchToolkit(AsyncBaseToolkit):
                 return text
 
     # @async_file_cache(expire_time=None)
-    async def web_qa(self, url: str, query: str = None) -> str:
+    async def web_qa(self, url: str, query: str) -> str:
         """Ask question to a webpage, you will get the answer and related links from the specified url.
 
         Args:
             url (str): The url to ask question to.
-            query (str, optional): The question to ask. If not given, return the summary of the webpage.
+            query (str): The question to ask. Should be clear, concise, and specific.
         """
         logger.info(f"[tool] web_qa: {oneline_object({url, query})}")
         content = await self.get_content(url)
