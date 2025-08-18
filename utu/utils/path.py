@@ -1,9 +1,11 @@
 import hashlib
 import pathlib
 import tempfile
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
+import yaml
 
 
 def get_package_path() -> pathlib.Path:
@@ -54,3 +56,12 @@ class FileUtils:
                 for chunk in iter(lambda: f.read(4096), b""):
                     hash_md5.update(chunk)
         return hash_md5.hexdigest()
+
+    @staticmethod
+    def load_yaml(file_path: pathlib.Path | str) -> dict[str, Any]:
+        if isinstance(file_path, str):
+            file_path = pathlib.Path(file_path)
+        if not file_path.exists():
+            raise FileNotFoundError(f"File {file_path} does not exist")
+        with file_path.open() as f:
+            return yaml.safe_load(f)
