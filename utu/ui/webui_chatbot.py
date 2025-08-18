@@ -1,9 +1,9 @@
 import asyncio
-from importlib.resources import files
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
+from importlib.resources import files
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 import agents as ag
 import tornado.web
@@ -55,7 +55,7 @@ class ExampleContent:
 @dataclass
 class Event:
     type: Literal["raw", "orchestra", "finish", "example"]
-    data: Optional[TextDeltaContent | OrchestraContent | ExampleContent] = None
+    data: TextDeltaContent | OrchestraContent | ExampleContent | None = None
 
 
 @dataclass
@@ -77,7 +77,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # print("WebSocket opened")
         # send example query
         self.write_message(asdict(Event("example", ExampleContent(type="example", query=self.example_query))))
-            
+
 
     async def on_message(self, message: str):
         try:
@@ -220,7 +220,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                             item = event.item
                             if event.name == "plan":
                                 todo_str = []
-                                for i, subtask in enumerate(item.todo, 1):
+                                for subtask in item.todo:
                                     task_info = (
                                         f"{subtask.task} "
                                         f"({subtask.agent_name})"
@@ -257,7 +257,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                         if isinstance(self.agent, SimpleAgent):
                             self.agent.input_items = stream.to_input_list()
                             self.agent.current_agent = stream.last_agent
-                except TypeError as e:
+                except TypeError:
                     # print(f"Invalid query format: {e}")
                     self.close(1002, "Invalid query format")
             else:
@@ -266,7 +266,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         except json.JSONDecodeError:
             # print(f"Invalid JSON received: {message}")
             self.close(1002, "Invalid JSON received")
-        except Exception as e:
+        except Exception:
             # print(f"Error processing message: {str(e)}")
             # stack trace
             # import traceback
