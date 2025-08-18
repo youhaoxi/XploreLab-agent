@@ -80,6 +80,9 @@ nav:
     - Agent Environments: env.md
     - Tools: tools.md
     - Evaluation: eval.md
+  - Examples Output:
+    - Deep Research: examples_output/deep_research.md
+    - Wide Research: examples_output/wide_research.md
   - API Reference:
     - Agents:
       - ref/agents/simple_agent.md
