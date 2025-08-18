@@ -4,11 +4,14 @@ import logging
 import agents as ag
 import gradio as gr
 
+from utu.agents import OrchestraAgent, SimpleAgent
+from utu.agents.orchestra import OrchestraStreamEvent
+
 
 class GradioChatbot:
 
-    def __init__(self, simple_agent, example_query=""):
-        self.simple_agent = simple_agent
+    def __init__(self, agent: SimpleAgent | OrchestraAgent, example_query=""):
+        self.agent = agent
         self.user_interrupted = False
         self.user_interrupted_lock = asyncio.Lock()
         self.example_query = example_query
@@ -50,11 +53,15 @@ class GradioChatbot:
                 await set_user_interrupt(False)
 
                 chat_message = {"role": "user", "content": message}
-                self.simple_agent.input_items.append(chat_message)
                 history.append(chat_message)
                 yield history
 
-                stream = self.simple_agent.run_streamed(self.simple_agent.input_items)
+                if isinstance(self.agent, OrchestraAgent):
+                    stream = self.agent.run_streamed(message)
+                elif isinstance(self.agent, SimpleAgent):
+                    self.agent.input_items.append(chat_message)
+                    stream = self.agent.run_streamed(self.agent.input_items)
+
                 async for event in stream.stream_events():
                     logging.info(f"Event: {event}")
                     if await check_and_reset_user_interrupt():
@@ -196,20 +203,71 @@ class GradioChatbot:
                         else:
                             pass
                     elif isinstance(event, ag.AgentUpdatedStreamEvent):
-                        new_agent = event.new_agent.name
-                        history.append(
-                            {
-                                "role": "assistant",
-                                "content": f"new agent: {new_agent}",
-                                "metadata": {"title": "new agent"},
-                            }
-                        )
+                        # new_agent = event.new_agent.name
+                        # history.append(
+                        #     {
+                        #         "role": "assistant",
+                        #         "content": f"new agent: {new_agent}",
+                        #         "metadata": {"title": "new agent"},
+                        #     }
+                        # )
+                        pass
+                    elif isinstance(event, OrchestraStreamEvent):
+                        item = event.item
+                        if event.name == "plan":
+                            analysis = item.analysis
+                            todo_str = []
+                            for i, subtask in enumerate(item.todo, 1):
+                                todo_str.append(f"{i}. {subtask.task} ({subtask.agent_name})")
+                            todo_str = "\n".join(todo_str)
+                            history.append(
+                                {
+                                    "role": "assistant",
+                                    "content": f"{analysis}",
+                                    "metadata": {"title": "💭 Plan Analysis"},
+                                },
+                            )
+                            history.append(
+                                {
+                                    "role": "assistant",
+                                    "content": f"{todo_str}",
+                                    "metadata": {"title": "📋 Todo"},
+                                }
+                            )
+                        elif event.name == "worker":
+                            task = item.task
+                            output = item.output
+                            history.append(
+                                {
+                                    "role": "assistant",
+                                    "content": f"{task}",
+                                    "metadata": {"title": "Worker Task"}
+                                }
+                            )
+                            history.append(
+                                {
+                                    "role": "assistant",
+                                    "content": f"{output}",
+                                    "metadata": {"title": "Worker Output"}
+                                }
+                            )
+                        elif event.name == "report":
+                            output = item.output
+                            history.append(
+                                {
+                                    "role": "assistant",
+                                    "content": f"{output}",
+                                    "metadata": {"title": "Report Output"}
+                                }
+                            )
+                        else:
+                            pass
                     else:
                         pass
                     yield history
 
-                self.simple_agent.input_items = stream.to_input_list()
-                self.simple_agent.current_agent = stream.last_agent
+                self.agent.input_items = stream.to_input_list()
+                self.agent.current_agent = stream.last_agent
 
             async def cancel_response():
                 await set_user_interrupt(True)
@@ -222,6 +280,6 @@ class GradioChatbot:
 
         self.ui = demo
 
-    def launch(self):
-        asyncio.run(self.simple_agent.build())
-        self.ui.launch(share=False)
+    def launch(self, port=8848):
+        asyncio.run(self.agent.build())
+        self.ui.launch(share=False, server_port=port)
