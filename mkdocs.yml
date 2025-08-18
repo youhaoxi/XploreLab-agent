@@ -60,6 +60,13 @@ plugins:
             # show_root_heading: true
             show_source: true
 
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
 watch:
   - utu
 
@@ -69,8 +76,10 @@ nav:
   - Examples: examples.md
   - Documentation:
     - Config: config.md
+    - Agents: agents.md
     - Agent Environments: env.md
     - Tools: tools.md
+    - Evaluation: eval.md
   - API Reference:
     - Agents:
       - ref/agents/simple_agent.md
@@ -87,6 +96,10 @@ nav:
     - Environments:
       - ref/env/base_env.md
       - ref/env/browser_env.md
+    - Evaluation:
+      - ref/eval/data.md
+      - ref/eval/processor.md
+      - ref/eval/benchmarks.md
     - Utils:
       - ref/utils/openai_utils.md
       - ref/utils/agents_utils.md

@@ -213,9 +213,9 @@ class SimpleAgent(BaseAgent):
 
     # util apis
     async def chat(self, input: str) -> RunResult:
-        # TODO: support multi-modal input -- `def add_input(...)`
         # TODO: set "session-level" tracing for multi-turn chat
         self.input_items.append({"content": input, "role": "user"})
+        # print(f"< {self.input_items}")
         recorder = await self.run(self.input_items)
         run_result = recorder.get_run_result()
         AgentsUtils.print_new_items(run_result.new_items)

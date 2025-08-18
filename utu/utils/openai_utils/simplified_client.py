@@ -29,7 +29,7 @@ class SimplifiedAsyncOpenAI(AsyncOpenAI):
         # default configs
         **kwargs: dict,
     ) -> None:
-        print(f"> type: {type}, base_url: {base_url}, kwargs: {kwargs}")
+        logger.info(f"> type: {type}, base_url: {base_url}, kwargs: {kwargs}")
         super().__init__(
             api_key=api_key or os.getenv("UTU_LLM_API_KEY") or "xxx", base_url=base_url or os.getenv("UTU_LLM_BASE_URL")
         )

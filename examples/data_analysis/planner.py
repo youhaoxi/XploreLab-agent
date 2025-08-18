@@ -37,9 +37,11 @@ class DAPlannerAgent(PlannerAgent):
             return ""
         columns_info = await data_analysis_tool.get_column_info(file_path)
         info_str = f"Data columns of `{file_path}`:\n{columns_info}" if columns_info else ""
-        info_str += ("\n**Note**: These background information is invisible to other agents, "
-                     "but can help you to make better plan. So your plan should be based on the assumption "
-                      "that the agents is initially unaware of this information.")
+        info_str += (
+            "\n**Note**: These background information is invisible to other agents, "
+            "but can help you to make better plan. So your plan should be based on the assumption "
+            "that the agents is initially unaware of this information."
+        )
         return info_str
 
     def _extract_file_path(self, task: str) -> str:
