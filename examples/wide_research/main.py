@@ -4,8 +4,8 @@
 https://manus.im/blog/introducing-wide-research
 """
 
-import json
 import asyncio
+import json
 import pathlib
 import traceback
 
@@ -65,7 +65,7 @@ async def wide_research(task: str, subtasks: list[str], output_schema: dict, out
         with open(output_fn, "w") as f:
             for result in results:
                 f.write(json.dumps(result, ensure_ascii=False) + "\n")
-        with open(output_fn, "r") as f:
+        with open(output_fn) as f:
             return f"Results saved to {output_fn}:\n" + f.read()
     except Exception as e:
         print(f"Error: {e}")

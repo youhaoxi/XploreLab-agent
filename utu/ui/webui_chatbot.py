@@ -78,7 +78,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # send example query
         self.write_message(asdict(Event("example", ExampleContent(type="example", query=self.example_query))))
 
-
     async def on_message(self, message: str):
         try:
             data = json.loads(message)
@@ -94,54 +93,53 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                     if isinstance(self.agent, OrchestraAgent):
                         stream = self.agent.run_streamed(query.query)
                     elif isinstance(self.agent, SimpleAgent):
-                        self.agent.input_items.append(
-                            {"role": "user", "content": query.query}
-                        )
+                        self.agent.input_items.append({"role": "user", "content": query.query})
                         stream = self.agent.run_streamed(self.agent.input_items)
                     else:
-                        raise ValueError(
-                            f"Unsupported agent type: {type(self.agent).__name__}"
-                        )
+                        raise ValueError(f"Unsupported agent type: {type(self.agent).__name__}")
 
                     async for event in stream.stream_events():
                         event_to_send = None
                         if isinstance(event, ag.RawResponsesStreamEvent):
                             if event.data.type == "response.output_text.delta":
-                                if event.data.delta != '':
-                                    event_to_send = Event(type="raw", data=TextDeltaContent(
+                                if event.data.delta != "":
+                                    event_to_send = Event(
+                                        type="raw",
+                                        data=TextDeltaContent(
+                                            type="text",
+                                            delta=event.data.delta,
+                                            inprogress=True,
+                                        ),
+                                    )
+                            elif event.data.type == "response.output_text.done":
+                                event_to_send = Event(
+                                    type="raw",
+                                    data=TextDeltaContent(
                                         type="text",
                                         delta=event.data.delta,
-                                        inprogress=True,
-                                    ))
-                            elif event.data.type == "response.output_text.done":
-                                event_to_send = Event(type="raw", data=TextDeltaContent(
-                                    type="text",
-                                    delta=event.data.delta,
-                                    inprogress=False,
-                                ))
-                            elif (
-                                event.data.type
-                                == "response.reasoning_summary_text.delta"
-                            ):
-                                if event.data.delta != '':
-                                    event_to_send = Event(type="raw", data=TextDeltaContent(
+                                        inprogress=False,
+                                    ),
+                                )
+                            elif event.data.type == "response.reasoning_summary_text.delta":
+                                if event.data.delta != "":
+                                    event_to_send = Event(
+                                        type="raw",
+                                        data=TextDeltaContent(
+                                            type="reason",
+                                            delta=event.data.delta,
+                                            inprogress=True,
+                                        ),
+                                    )
+                            elif event.data.type == "response.reasoning_summary_text.done":
+                                event_to_send = Event(
+                                    type="raw",
+                                    data=TextDeltaContent(
                                         type="reason",
                                         delta=event.data.delta,
-                                        inprogress=True,
-                                    ))
-                            elif (
-                                event.data.type
-                                == "response.reasoning_summary_text.done"
-                            ):
-                                event_to_send = Event(type="raw", data=TextDeltaContent(
-                                    type="reason",
-                                    delta=event.data.delta,
-                                    inprogress=False,
-                                ))
-                            elif (
-                                event.data.type
-                                == "response.function_call_arguments.delta"
-                            ):
+                                        inprogress=False,
+                                    ),
+                                )
+                            elif event.data.type == "response.function_call_arguments.delta":
                                 # if event.data.delta != '':
                                 #     event_to_send = Event(type="raw", data=TextDeltaContent(
                                 #         type="tool_call_argument",
@@ -149,30 +147,31 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                 #         inprogress=True,
                                 #     ))
                                 pass
-                            elif (
-                                event.data.type == "response.output_item.done"
-                            ):
+                            elif event.data.type == "response.output_item.done":
                                 item = event.data.item
                                 if item.type == "function_call":
-                                    event_to_send = Event(type="raw", data=TextDeltaContent(
-                                        type="tool_call",
-                                        delta=item.name,
-                                        argument=item.arguments,
-                                        callid = item.call_id,
-                                        inprogress=True,
-                                    ))
+                                    event_to_send = Event(
+                                        type="raw",
+                                        data=TextDeltaContent(
+                                            type="tool_call",
+                                            delta=item.name,
+                                            argument=item.arguments,
+                                            callid=item.call_id,
+                                            inprogress=True,
+                                        ),
+                                    )
                                 elif item.type == "reasoning":
-                                    event_to_send = Event(type="raw", data=TextDeltaContent(
-                                        type="reason",
-                                        delta=item.summary,
-                                        inprogress=False,
-                                    ))
+                                    event_to_send = Event(
+                                        type="raw",
+                                        data=TextDeltaContent(
+                                            type="reason",
+                                            delta=item.summary,
+                                            inprogress=False,
+                                        ),
+                                    )
                                 elif item.type == "message":
                                     pass
-                            elif (
-                                event.data.type
-                                == "response.function_call_arguments.done"
-                            ):
+                            elif event.data.type == "response.function_call_arguments.done":
                                 # event_to_send = Event(type="raw", data=TextDeltaContent(
                                 #     type="tool_call_argument",
                                 #     delta=event.data.delta,
@@ -190,28 +189,37 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                     # ))
                                     pass
                                 elif item.type == "reasoning":
-                                    event_to_send = Event(type="raw", data=TextDeltaContent(
-                                        type="reason",
-                                        delta="",
-                                        inprogress=True,
-                                    ))
+                                    event_to_send = Event(
+                                        type="raw",
+                                        data=TextDeltaContent(
+                                            type="reason",
+                                            delta="",
+                                            inprogress=True,
+                                        ),
+                                    )
                                 elif item.type == "message":
-                                    event_to_send = Event(type="raw", data=TextDeltaContent(
-                                        type="text",
-                                        delta="",
-                                        inprogress=True,
-                                    ))
+                                    event_to_send = Event(
+                                        type="raw",
+                                        data=TextDeltaContent(
+                                            type="text",
+                                            delta="",
+                                            inprogress=True,
+                                        ),
+                                    )
                             else:
                                 event_to_send = None
                         elif isinstance(event, ag.RunItemStreamEvent):
                             item = event.item
                             if item.type == "tool_call_output_item":
-                                event_to_send = Event(type="raw", data=TextDeltaContent(
-                                    type="tool_call_output",
-                                    delta=item.output,
-                                    callid=item.raw_item['call_id'],
-                                    inprogress=False,
-                                ))
+                                event_to_send = Event(
+                                    type="raw",
+                                    data=TextDeltaContent(
+                                        type="tool_call_output",
+                                        delta=item.output,
+                                        callid=item.raw_item["call_id"],
+                                        inprogress=False,
+                                    ),
+                                )
                             else:
                                 pass
                         elif isinstance(event, ag.AgentUpdatedStreamEvent):
@@ -221,29 +229,22 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                             if event.name == "plan":
                                 todo_str = []
                                 for subtask in item.todo:
-                                    task_info = (
-                                        f"{subtask.task} "
-                                        f"({subtask.agent_name})"
-                                    )
+                                    task_info = f"{subtask.task} ({subtask.agent_name})"
                                     todo_str.append(task_info)
-                                plan_item = PlanItem(
-                                    analysis=item.analysis, todo=todo_str
+                                plan_item = PlanItem(analysis=item.analysis, todo=todo_str)
+                                event_to_send = Event(
+                                    type="orchestra", data=OrchestraContent(type="plan", item=plan_item)
                                 )
-                                event_to_send = Event(type="orchestra", data=OrchestraContent(
-                                    type="plan", item=plan_item
-                                ))
                             elif event.name == "worker":
-                                worker_item = WorkerItem(
-                                    task=item.task, output=item.output
+                                worker_item = WorkerItem(task=item.task, output=item.output)
+                                event_to_send = Event(
+                                    type="orchestra", data=OrchestraContent(type="worker", item=worker_item)
                                 )
-                                event_to_send = Event(type="orchestra", data=OrchestraContent(
-                                    type="worker", item=worker_item
-                                ))
                             elif event.name == "report":
                                 report_item = ReportItem(output=item.output)
-                                event_to_send = Event(type="orchestra", data=OrchestraContent(
-                                    type="report", item=report_item
-                                ))
+                                event_to_send = Event(
+                                    type="orchestra", data=OrchestraContent(type="report", item=report_item)
+                                )
                             else:
                                 pass
                         else:
@@ -279,7 +280,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
 
 class WebUIChatbot:
-
     def __init__(self, agent: SimpleAgent | OrchestraAgent, example_query: str = ""):
         self.agent = agent
         self.example_query = example_query

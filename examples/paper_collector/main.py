@@ -24,5 +24,6 @@ async def main():
     with open(data_dir / "final_output.txt", "w", encoding="utf-8") as f:
         f.write(result.final_output)
 
+
 if __name__ == "__main__":
     asyncio.run(main())
