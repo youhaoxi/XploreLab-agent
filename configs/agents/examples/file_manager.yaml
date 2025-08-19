@@ -4,7 +4,7 @@ defaults:
   - _self_
 
 agent:
-  name: FileManagerAgent    
+  name: FileManagerAgent
   instructions: |-
     You are a helpful assistant.
     You are required to use `run_bash` tool to execute bash commands, help the user move, organize, and batch-rename files.

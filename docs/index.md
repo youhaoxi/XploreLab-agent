@@ -1,6 +1,8 @@
-# uTu-agent
+# Youtu-agent
 
-uTu-agent is a powerful and modular framework for building, running, and evaluating autonomous agents. It is designed with flexibility and extensibility in mind, allowing developers to easily create custom agents, tools, and environments.
+![youtu lab](assets/youtu_lab.png)
+
+Youtu-agent is a powerful and modular framework for building, running, and evaluating autonomous agents. It is designed with flexibility and extensibility in mind, allowing developers to easily create custom agents, tools, and environments.
 
 The framework's design is centered on a clear separation of concerns, enabling robust and scalable agent development.
 

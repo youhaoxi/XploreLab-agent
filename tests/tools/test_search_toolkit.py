@@ -46,7 +46,7 @@ async def test_cache(search_toolkit: SearchToolkit):
 
 
 queries = (
-    ("https://docs.crawl4ai.com/core/simple-crawling/",),
+    ("https://docs.crawl4ai.com/core/simple-crawling/", ""),
     ("https://docs.crawl4ai.com/core/simple-crawling/", "How to log?"),
     ("https://github.com/theskumar/python-dotenv", "Summary this page"),
 )

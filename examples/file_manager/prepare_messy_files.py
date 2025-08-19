@@ -90,6 +90,7 @@ def prepare_messy_files(work_dir="/tmp/file_manager_test"):
                 f.write(f"这是{student_name}的{file_name}。\n")
     print(f"Simulated messy files in {work_dir}")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare messy files for testing")
     parser.add_argument("--work_dir", default="/tmp/file_manager_test", help="Work directory")

@@ -1,10 +1,11 @@
 from .agents_utils import AgentsUtils, ChatCompletionConverter
 from .common import get_event_loop, get_jinja_env, get_jinja_template, schema_to_basemodel
-from .env import assert_env, get_env
+from .env import EnvUtils
 from .log import get_logger, oneline_object, setup_logging
 from .openai_utils import OpenAIUtils, SimplifiedAsyncOpenAI
 from .path import DIR_ROOT, FileUtils
 from .print_utils import PrintUtils
+from .sqlmodel_utils import SQLModelUtils
 from .token import TokenUtils
 from .tool_cache import async_file_cache
 
@@ -18,6 +19,7 @@ __all__ = [
     "setup_logging",
     "schema_to_basemodel",
     "get_logger",
+    "SQLModelUtils",
     "async_file_cache",
     "DIR_ROOT",
     "FileUtils",
@@ -25,6 +27,5 @@ __all__ = [
     "get_event_loop",
     "get_jinja_env",
     "get_jinja_template",
-    "get_env",
-    "assert_env",
+    "EnvUtils",
 ]

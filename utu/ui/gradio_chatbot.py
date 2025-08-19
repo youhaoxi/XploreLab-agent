@@ -9,7 +9,6 @@ from utu.agents.orchestra import OrchestraStreamEvent
 
 
 class GradioChatbot:
-
     def __init__(self, agent: SimpleAgent | OrchestraAgent, example_query=""):
         self.agent = agent
         self.user_interrupted = False
@@ -77,16 +76,10 @@ class GradioChatbot:
                         break
                     if isinstance(event, ag.RawResponsesStreamEvent):
                         if event.data.type == "response.output_text.delta":
-                            if (
-                                history
-                                and history[-1]["role"] == "assistant"
-                                and "metadata" not in history[-1]
-                            ):
+                            if history and history[-1]["role"] == "assistant" and "metadata" not in history[-1]:
                                 history[-1]["content"] += event.data.delta
                             else:
-                                history.append(
-                                    {"role": "assistant", "content": event.data.delta}
-                                )
+                                history.append({"role": "assistant", "content": event.data.delta})
                         elif event.data.type == "response.reasoning_summary_text.delta":
                             if (
                                 history
@@ -113,9 +106,7 @@ class GradioChatbot:
                                 and ("metadata" in history[-1])
                                 and history[-1]["metadata"]["type"] == "reasoning"
                             ):
-                                history[-1][
-                                    "content"
-                                ] += "... [Reasoning Completed] ..."
+                                history[-1]["content"] += "... [Reasoning Completed] ..."
                         elif event.data.type == "response.output_item.added":
                             item = event.data.item
                             if item.type == "function_call":
@@ -140,9 +131,7 @@ class GradioChatbot:
                                         },
                                     }
                                 )
-                        elif (
-                            event.data.type == "response.function_call_arguments.delta"
-                        ):
+                        elif event.data.type == "response.function_call_arguments.delta":
                             if (
                                 history
                                 and history[-1]["role"] == "assistant"
@@ -168,9 +157,7 @@ class GradioChatbot:
                                 and ("metadata" in history[-1])
                                 and history[-1]["metadata"]["type"] == "tool_call"
                             ):
-                                history[-1][
-                                    "content"
-                                ] += "... [Tool Call Arguments Completed] ..."
+                                history[-1]["content"] += "... [Tool Call Arguments Completed] ..."
                         elif event.data.type in ("response.output_text.done",):
                             pass
                         elif event.data.type in (
@@ -238,27 +225,15 @@ class GradioChatbot:
                             task = item.task
                             output = item.output
                             history.append(
-                                {
-                                    "role": "assistant",
-                                    "content": f"{task}",
-                                    "metadata": {"title": "Worker Task"}
-                                }
+                                {"role": "assistant", "content": f"{task}", "metadata": {"title": "Worker Task"}}
                             )
                             history.append(
-                                {
-                                    "role": "assistant",
-                                    "content": f"{output}",
-                                    "metadata": {"title": "Worker Output"}
-                                }
+                                {"role": "assistant", "content": f"{output}", "metadata": {"title": "Worker Output"}}
                             )
                         elif event.name == "report":
                             output = item.output
                             history.append(
-                                {
-                                    "role": "assistant",
-                                    "content": f"{output}",
-                                    "metadata": {"title": "Report Output"}
-                                }
+                                {"role": "assistant", "content": f"{output}", "metadata": {"title": "Report Output"}}
                             )
                         else:
                             pass
@@ -272,9 +247,7 @@ class GradioChatbot:
             async def cancel_response():
                 await set_user_interrupt(True)
 
-            submit_button.click(
-                respond, inputs=[user_input, chatbot], outputs=[chatbot]
-            )
+            submit_button.click(respond, inputs=[user_input, chatbot], outputs=[chatbot])
             cancel_button.click(cancel_response, inputs=[], outputs=[])
             user_input.submit(respond, inputs=[user_input, chatbot], outputs=[chatbot])
 

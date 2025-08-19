@@ -18,8 +18,9 @@ Your core task is to generate a report based on `user_query` and `trajectory`. P
 - If additional elements (such as images, forms, or interactivity) are required, ensure proper tags and attributes are used.
 - The HTML should be compatible with major browsers and pass validation checks for common accessibility and SEO standards.
 - **Chart Handling Strategy**:
+  - If raw data exists, generate beautiful HTML/CSS/JS charts, e.g. using Chart.js and canvas elements.
   - You can use the charts provided in the `trajectory` variable to generate the report.
-  - If raw data exists, generate beautiful HTML/CSS/JS charts.
+  - If mermaid charts exist, you can directly embed them using the Mermaid.js library or convert them into beautiful HTML/CSS/JS charts.
   - Create custom SVG visualizations for key metrics or data points.
   - **Always ensure visual consistency with the overall design theme**
 - **Directly output the HTML code without any additional explanations or comments.**

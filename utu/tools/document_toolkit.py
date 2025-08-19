@@ -1,5 +1,8 @@
-"""
-https://github.com/lumina-ai-inc/chunkr
+"""Document toolkit for parsing documents and support Q&A.
+
+Support backends:
+
+- Chunkr: <https://github.com/lumina-ai-inc/chunkr>
 """
 
 from collections.abc import Callable
@@ -9,23 +12,9 @@ from chunkr_ai.models import Configuration
 
 from ..config import ToolkitConfig
 from ..utils import DIR_ROOT, FileUtils, SimplifiedAsyncOpenAI, async_file_cache, get_logger
-from .base import AsyncBaseToolkit
+from .base import TOOL_PROMPTS, AsyncBaseToolkit
 
 logger = get_logger(__name__)
-
-
-# ref @smolagents
-SP = """You will have to write a short caption for this file, then answer question based on the file content."""
-
-INSTRUCTION_QA = (
-    "Now answer the question below. Use these three headings: "
-    "'1. Short answer', '2. Extremely detailed answer', '3. Additional Context on the document and question asked'.\n"
-    "Question: {question}"
-)
-INSTRUCTION_SUMMARY = (
-    "Please provide a structured description of the document, including important informations, "
-    "e.g. author, date, title, keywords, summary, key points, etc."
-)
 
 
 class DocumentToolkit(AsyncBaseToolkit):
@@ -44,17 +33,18 @@ class DocumentToolkit(AsyncBaseToolkit):
 
     @async_file_cache(expire_time=None)
     async def parse_document(self, md5: str) -> str:
-        # https://docs.chunkr.ai/sdk/data-operations/create#supported-file-types
+        """Parse document to markdown with Chunkr.
+
+        - ref: <https://docs.chunkr.ai/sdk/data-operations/create#supported-file-types>
+
+        Args:
+            md5 (str): md5 of the document.
+        """
         logger.info(f"[tool] parse_document: {self.md5_to_path[md5]}")
         task = await self.chunkr.upload(self.md5_to_path[md5])
 
         logger.info("  getting results...")
         markdown = task.markdown()
-        # html = task.html()
-        # content = task.content()
-        # json = task.json()
-
-        # self.chunkr.close()
         return markdown
 
     def handle_path(self, path: str) -> str:
@@ -72,6 +62,7 @@ class DocumentToolkit(AsyncBaseToolkit):
 
     async def document_qa(self, document_path: str, question: str | None = None) -> str:
         """Get file content summary or answer questions about attached document.
+
         Supported file types: pdf, docx, pptx, xlsx, xls, ppt, doc
 
         Args:
@@ -83,13 +74,13 @@ class DocumentToolkit(AsyncBaseToolkit):
         if len(document_markdown) > self.text_limit:
             document_markdown = document_markdown[: self.text_limit] + "\n..."
         messages = [
-            {"role": "system", "content": SP},
+            {"role": "system", "content": TOOL_PROMPTS["document_sp"]},
             {"role": "user", "content": document_markdown},
         ]
         if question:
-            messages.append({"role": "user", "content": INSTRUCTION_QA.format(question=question)})
+            messages.append({"role": "user", "content": TOOL_PROMPTS["document_qa"].format(question=question)})
         else:
-            messages.append({"role": "user", "content": INSTRUCTION_SUMMARY})
+            messages.append({"role": "user", "content": TOOL_PROMPTS["document_summary"]})
         output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         if not question:
             output = (
