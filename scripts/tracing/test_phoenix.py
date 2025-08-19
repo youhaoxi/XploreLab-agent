@@ -10,9 +10,9 @@ import tqdm
 from agents._run_impl import TraceCtxManager
 from agents.tracing import agent_span, function_span, generation_span
 
-from utu.tracing import setup_phoenix_tracing
+from utu.tracing import setup_otel_tracing
 
-setup_phoenix_tracing(project_name="test_phoenix")
+setup_otel_tracing(project_name="test_phoenix")
 
 TEST_LEN = 100_000
 
