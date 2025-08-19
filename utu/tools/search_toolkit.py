@@ -6,38 +6,10 @@ import aiohttp
 
 from ..config import ToolkitConfig
 from ..utils import SimplifiedAsyncOpenAI, async_file_cache, get_logger, oneline_object
-from .base import AsyncBaseToolkit
+from .base import TOOL_PROMPTS, AsyncBaseToolkit
 
 logger = get_logger(__name__)
 
-
-# TODO: ref @smolagents -- to keep rich context info
-TEMPLATE_QA = r"""
-You are a webpage analysis agent that extract relevant information from the given webpage content to answer the query.
-NOTE:
-1. Be concise, do not extract too long or irrelevant information.
-2. Before give your conclusion, you can summarize user's query if necessary.
-3. Use language same as query.
-
-<query>
-{query}
-</query>
-<content>
-{content}
-</content>
-""".strip()
-TEMPLATE_LINKS = r"""You are a webpage analysis agent that extract relevant links to the given query. NOTE:
-1. You should extract the most relevant links to the query. Do not include the url of given webpage.
-2. You can only output urls that exist in following webpage.
-3. Output format: id. title(url)
-
-<query>
-{query}
-</query>
-<content>
-{content}
-</content>
-"""
 
 banned_sites = ("https://huggingface.co/datasets/", "https://grok.com/share/", "https://modelscope.cn/datasets/")
 RE_MATCHED_SITES = re.compile(r"^(" + "|".join(banned_sites) + r")")
@@ -122,7 +94,6 @@ class SearchToolkit(AsyncBaseToolkit):
                 logger.info(f"[tool] get_content: {oneline_object(text)}...")
                 return text
 
-    # @async_file_cache(expire_time=None)
     async def web_qa(self, url: str, query: str) -> str:
         """Ask question to a webpage, you will get the answer and related links from the specified url.
 
@@ -140,13 +111,13 @@ class SearchToolkit(AsyncBaseToolkit):
         return result
 
     async def _qa(self, content: str, query: str) -> str:
-        template = TEMPLATE_QA.format(content=content, query=query)
+        template = TOOL_PROMPTS["search_qa"].format(content=content, query=query)
         return await self.llm.query_one(
             messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump()
         )
 
     async def _extract_links(self, content: str, query: str) -> str:
-        template = TEMPLATE_LINKS.format(content=content, query=query)
+        template = TOOL_PROMPTS["search_related"].format(content=content, query=query)
         return await self.llm.query_one(
             messages=[{"role": "user", "content": template}], **self.config.config_llm.model_params.model_dump()
         )

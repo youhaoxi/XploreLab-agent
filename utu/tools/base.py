@@ -5,7 +5,7 @@ import mcp.types as types
 from agents import FunctionTool, function_tool
 
 from ..config import ToolkitConfig
-from ..utils import ChatCompletionConverter, get_event_loop
+from ..utils import DIR_ROOT, ChatCompletionConverter, FileUtils, get_event_loop
 
 
 class MCPConverter:
@@ -119,3 +119,6 @@ class AsyncBaseToolkit(abc.ABC):
                 )
             )
         return tools
+
+
+TOOL_PROMPTS: dict[str, str] = FileUtils.load_yaml(DIR_ROOT / "utu" / "prompts" / "tools" / "tools_prompts.yaml")

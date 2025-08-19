@@ -14,18 +14,9 @@ from PIL import Image
 
 from ..config import ToolkitConfig
 from ..utils import SimplifiedAsyncOpenAI, get_logger
-from .base import AsyncBaseToolkit
+from .base import TOOL_PROMPTS, AsyncBaseToolkit
 
 logger = get_logger(__name__)
-
-# ref @camel
-SP_DESCRIPTION = """You are an image analysis expert. Provide a detailed description including text if present."""
-
-SP_INSTRUCTION = """Answer questions about images by:
-1. Careful visual inspection
-2. Contextual reasoning
-3. Text transcription where relevant
-4. Logical deduction from visual evidence"""
 
 
 class ImageToolkit(AsyncBaseToolkit):
@@ -72,14 +63,14 @@ class ImageToolkit(AsyncBaseToolkit):
         image_str = self._load_image(image_path)
         if not question:
             messages = [
-                {"role": "system", "content": SP_DESCRIPTION},
+                {"role": "system", "content": TOOL_PROMPTS["image_summary"]},
                 {"role": "user", "content": [{"type": "image_url", "image_url": {"url": image_str}}]},
             ]
             output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
             output = f"You did not provide a particular question, so here is a detailed caption for the image: {output}"
         else:
             messages = [
-                {"role": "system", "content": SP_DESCRIPTION},
+                {"role": "system", "content": TOOL_PROMPTS["image_qa"]},
                 {
                     "role": "user",
                     "content": [
