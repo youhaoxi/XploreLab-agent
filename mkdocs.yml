@@ -1,4 +1,4 @@
-site_name: uTu-agent
+site_name: Youtu-agent
 theme:
   name: material
   palette:
@@ -25,8 +25,8 @@ theme:
     - navigation.expand
     # Enables annotations in code blocks
     - content.code.annotate
-  # logo: assets/logo.svg
-  # favicon: images/favicon-platform.svg
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
 
 repo_name: uTu-agent
 repo_url: https://github.com/utu-agent/utu-agent

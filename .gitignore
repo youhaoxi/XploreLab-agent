@@ -25,7 +25,7 @@ uv.lock
 *.wav
 *.MOV
 *.xml
-*.png
+# *.png
 *.jpg
 *.zip
 *.docx
@@ -39,6 +39,7 @@ _SESSION_DATA
 .cache/
 /data/
 /examples/data_analysis/data
+/examples/data_analysis/output
 /examples/gui_agent_datamaker/data
 !/examples/gui_agent_datamaker/data/Dublin_Zoo_Intro.docx
 /docs/examples_output
