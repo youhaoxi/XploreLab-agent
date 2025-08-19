@@ -34,10 +34,12 @@ uv.lock
 *.pdb
 *.bak
 *.publish
+*.html
 ___*
 _SESSION_DATA
 .cache/
 /data/
+/examples/paper_collector/data
 /examples/data_analysis/data
 /examples/data_analysis/output
 /examples/gui_agent_datamaker/data
@@ -56,3 +58,4 @@ uv.lock
 .env
 test.yaml
 requirements.txt
+GEMINI.md

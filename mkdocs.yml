@@ -67,6 +67,9 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
 
+extra_css:
+  - stylesheets/extra.css
+
 watch:
   - utu
 
@@ -83,6 +86,7 @@ nav:
   - Examples Output:
     - Deep Research: examples_output/deep_research.md
     - Wide Research: examples_output/wide_research.md
+    - Data Analysis: examples_output/data_analysis.md
   - API Reference:
     - Agents:
       - ref/agents/simple_agent.md
