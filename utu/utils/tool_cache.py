@@ -1,16 +1,15 @@
 import functools
 import hashlib
 import json
-import os
 import pathlib
 import time
 from datetime import datetime
 from typing import Literal
 
-from sqlmodel import Session, create_engine, select
+from sqlmodel import select
 
 from ..db import ToolCacheModel
-from ..utils import get_logger
+from ..utils import SQLModelUtils, get_logger
 from .path import DIR_ROOT
 
 logger = get_logger(__name__)
@@ -18,23 +17,8 @@ logger = get_logger(__name__)
 DIR_CACHE = DIR_ROOT / ".cache"
 DIR_CACHE.mkdir(exist_ok=True)
 
-engine = create_engine(
-    os.getenv("DB_URL"), pool_size=300, max_overflow=500, pool_timeout=30
-)  # set a larger pool size to avoid connection pool overflow
 
-
-def async_file_cache(
-    cache_dir: str | pathlib.Path = DIR_CACHE, expire_time: int | None = None, mode: Literal["db", "file"] = "db"
-):
-    """Decorator to cache async function results to local files.
-    Args:
-        cache_dir (str|pathlib.Path): Directory to store cache files
-        expire_time (Optional[int]): Cache expiration time in seconds, None means no expiration
-    """
-    # TODO: only cache successful results!
-    cache_path = pathlib.Path(cache_dir)
-    cache_path.mkdir(exist_ok=True, parents=True)
-
+def create_cached_file(cache_path: pathlib.Path, expire_time: int | None = None):
     def decorator_file(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
@@ -56,7 +40,6 @@ def async_file_cache(
             start_time = time.time()
             result = await func(*args, **kwargs)
             execution_time = time.time() - start_time
-
             metadata = {
                 "function": func_name,
                 "timestamp": time.time(),
@@ -65,17 +48,19 @@ def async_file_cache(
                 "kwargs": str(kwargs),
                 "execution_time": execution_time,
             }
-
             cache_data = {"result": result, "metadata": metadata}
 
             with open(cache_file, "w") as f:
                 json.dump(cache_data, f, ensure_ascii=False, indent=2)
-
             logger.debug(f"💾 Cached result for {func_name} to {cache_file}")
             return result
 
         return wrapper
 
+    return decorator_file
+
+
+def create_cached_db(expire_time: int | None = None):
     def decorator_db(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
@@ -84,7 +69,7 @@ def async_file_cache(
             args_str = str(cache_args) + str(sorted(kwargs.items()))
             cache_key = hashlib.md5(args_str.encode()).hexdigest()
 
-            with Session(engine) as session:
+            with SQLModelUtils.create_session() as session:
                 stmt = select(ToolCacheModel).where(
                     ToolCacheModel.function == func_name, ToolCacheModel.cache_key == cache_key
                 )
@@ -113,9 +98,21 @@ def async_file_cache(
 
         return wrapper
 
-    if mode == "db":
-        return decorator_db
-    elif mode == "file":
-        return decorator_file
+    return decorator_db
+
+
+def async_file_cache(
+    cache_dir: str | pathlib.Path = DIR_CACHE, expire_time: int | None = None, mode: Literal["db", "file"] = "db"
+):
+    """Decorator to cache async function results to local files.
+
+    Args:
+        cache_dir (str|pathlib.Path): Directory to store cache files
+        expire_time (Optional[int]): Cache expiration time in seconds, None means no expiration
+    """
+    cache_path = pathlib.Path(cache_dir)
+    cache_path.mkdir(exist_ok=True, parents=True)
+    if mode == "db" and SQLModelUtils.check_db_available():
+        return create_cached_db(expire_time)
     else:
-        raise ValueError(f"Invalid mode: {mode}")
+        return create_cached_file(cache_path, expire_time)
