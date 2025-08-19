@@ -1,4 +1,3 @@
-import os
 from typing import Any
 
 from agents.tracing import Span, Trace, TracingProcessor, get_current_trace
@@ -7,10 +6,11 @@ from agents.tracing.span_data import (
     GenerationSpanData,
     ResponseSpanData,
 )
-from sqlmodel import Session, SQLModel, create_engine
 
 from ..db import GenerationTracingModel, ToolTracingModel
-from ..utils import OpenAIUtils
+from ..utils import OpenAIUtils, SQLModelUtils, get_logger
+
+logger = get_logger(__name__)
 
 
 class DBTracingProcessor(TracingProcessor):
@@ -20,8 +20,11 @@ class DBTracingProcessor(TracingProcessor):
     """
 
     def __init__(self) -> None:
-        self.engine = create_engine(os.getenv("DB_URL"), pool_size=300, max_overflow=500, pool_timeout=30)
-        SQLModel.metadata.create_all(self.engine)
+        if not SQLModelUtils.check_db_available():
+            logger.warning("DB_URL not set or database connection failed! Tracing will not be stored into database!")
+            self.enabled = False
+        else:
+            self.enabled = True
 
     def on_trace_start(self, trace: Trace) -> None:
         pass
@@ -33,9 +36,12 @@ class DBTracingProcessor(TracingProcessor):
         pass
 
     def on_span_end(self, span: Span[Any]) -> None:
+        if not self.enabled:
+            return
+
         data = span.span_data
         if isinstance(data, GenerationSpanData):
-            with Session(self.engine) as session:
+            with SQLModelUtils.create_session() as session:
                 session.add(
                     GenerationTracingModel(
                         trace_id=get_current_trace().trace_id,
@@ -50,7 +56,7 @@ class DBTracingProcessor(TracingProcessor):
                 session.commit()
         elif isinstance(data, ResponseSpanData):
             # print(f"> response_id={data.response.id}: {data.response.model_dump()}")
-            with Session(self.engine) as session:
+            with SQLModelUtils.create_session() as session:
                 session.add(
                     GenerationTracingModel(
                         trace_id=get_current_trace().trace_id,
@@ -66,7 +72,7 @@ class DBTracingProcessor(TracingProcessor):
                 )
                 session.commit()
         elif isinstance(data, FunctionSpanData):
-            with Session(self.engine) as session:
+            with SQLModelUtils.create_session() as session:
                 session.add(
                     ToolTracingModel(
                         name=data.name,

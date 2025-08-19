@@ -3,11 +3,11 @@ import json
 import pathlib
 from typing import Literal
 
-from sqlmodel import Session, SQLModel, create_engine, select
+from sqlmodel import select
 
 from ...config import EvalConfig
 from ...db import DatasetSample, EvaluationSample
-from ...utils import get_logger
+from ...utils import get_logger, SQLModelUtils
 from ..processer import BUILTIN_BENCHMARKS
 
 logger = get_logger(__name__)
@@ -84,15 +84,13 @@ class DBDataManager(FileDataManager):
 
     def __init__(self, config: EvalConfig) -> None:
         self.config = config
-        self.engine = create_engine(self.config.db_url, pool_size=300, max_overflow=500, pool_timeout=30)
-        SQLModel.metadata.create_all(self.engine)
 
     def load(self) -> list[EvaluationSample]:
         if self._check_exp_id():
             logger.warning(f"exp_id {self.config.exp_id} already exists in db")
             return self.get_samples()
 
-        with Session(self.engine) as session:
+        with SQLModelUtils.create_session() as session:
             datapoints = session.exec(
                 select(DatasetSample).where(DatasetSample.dataset == self.config.data.dataset)
             ).all()
@@ -120,7 +118,7 @@ class DBDataManager(FileDataManager):
         self, stage: Literal["init", "rollout", "judged"] = None, limit: int = None
     ) -> list[EvaluationSample]:
         """Get samples from exp_id with specified stage."""
-        with Session(self.engine) as session:
+        with SQLModelUtils.create_session() as session:
             samples = session.exec(
                 select(EvaluationSample)
                 .where(
@@ -135,29 +133,29 @@ class DBDataManager(FileDataManager):
     def save(self, samples: list[EvaluationSample] | EvaluationSample) -> None:
         """Update or add sample(s) to db."""
         if isinstance(samples, list):
-            with Session(self.engine) as session:
+            with SQLModelUtils.create_session() as session:
                 session.add_all(samples)
                 session.commit()
         else:
-            with Session(self.engine) as session:
+            with SQLModelUtils.create_session() as session:
                 session.add(samples)
                 session.commit()
 
     def delete_samples(self, samples: list[EvaluationSample] | EvaluationSample) -> None:
         """Delete sample(s) from db."""
         if isinstance(samples, list):
-            with Session(self.engine) as session:
+            with SQLModelUtils.create_session() as session:
                 for sample in samples:
                     session.delete(sample)
                 session.commit()
         else:
-            with Session(self.engine) as session:
+            with SQLModelUtils.create_session() as session:
                 session.delete(samples)
                 session.commit()
 
     def _check_exp_id(self) -> bool:
         # check if any record has the same exp_id
-        with Session(self.engine) as session:
+        with SQLModelUtils.create_session() as session:
             has_exp_id = session.exec(
                 select(EvaluationSample).where(EvaluationSample.exp_id == self.config.exp_id)
             ).first()

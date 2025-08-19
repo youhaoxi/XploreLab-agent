@@ -2,6 +2,7 @@ import json
 import logging
 import pathlib
 from logging.handlers import TimedRotatingFileHandler
+from typing import Literal
 
 from colorlog import ColoredFormatter
 
@@ -12,22 +13,23 @@ DIR_LOGS.mkdir(exist_ok=True)
 _LOGGING_INITIALIZED = False
 
 
-def setup_logging() -> None:
+def setup_logging(level: Literal["WARNING", "INFO", "DEBUG"] = "WARNING") -> None:
     # Check if logging has already been initialized
     global _LOGGING_INITIALIZED
     if _LOGGING_INITIALIZED:
+        logging.getLogger().warning("Logging has already been initialized! Skipping...")
         return
 
     # set httpx logging level to WARNING
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
+    root_logger.setLevel(level)
     if root_logger.handlers:
         root_logger.handlers.clear()
 
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
+    console_handler.setLevel(level)
     color_formatter = ColoredFormatter(
         "%(green)s%(asctime)s%(reset)s[%(blue)s%(name)s%(reset)s] - "
         "%(log_color)s%(levelname)s%(reset)s - %(filename)s:%(lineno)d - %(green)s%(message)s%(reset)s",
@@ -54,6 +56,7 @@ def setup_logging() -> None:
 
     root_logger.addHandler(console_handler)
     root_logger.addHandler(file_handler)
+    root_logger.info(f"Logging initialized with level {level}.")
 
     # Mark logging as initialized
     _LOGGING_INITIALIZED = True
