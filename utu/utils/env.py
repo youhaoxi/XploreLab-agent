@@ -15,5 +15,6 @@ class EnvUtils:
         if isinstance(key, list):
             for k in key:
                 EnvUtils.assert_env(k)
-        if not os.getenv(key):
-            raise ValueError(f"Environment variable {key} is not set")
+        else:
+            if not os.getenv(key):
+                raise ValueError(f"Environment variable {key} is not set")
