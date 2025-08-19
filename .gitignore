@@ -25,7 +25,7 @@ uv.lock
 *.wav
 *.MOV
 *.xml
-*.png
+# *.png
 *.jpg
 *.zip
 *.docx
@@ -34,13 +34,19 @@ uv.lock
 *.pdb
 *.bak
 *.publish
+*.html
 ___*
 _SESSION_DATA
 .cache/
 /data/
+/examples/paper_collector/data
 /examples/data_analysis/data
-output/
-workspace/
+/examples/data_analysis/output
+/examples/gui_agent_datamaker/data
+!/examples/gui_agent_datamaker/data/Dublin_Zoo_Intro.docx
+/docs/examples_output
+/output/
+/workspace/
 
 mytools/
 
@@ -52,3 +58,4 @@ uv.lock
 .env
 test.yaml
 requirements.txt
+GEMINI.md

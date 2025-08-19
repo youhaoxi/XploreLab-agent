@@ -4,19 +4,9 @@ from openai.types.audio import TranscriptionVerbose
 
 from ..config import ToolkitConfig
 from ..utils import DIR_ROOT, FileUtils, SimplifiedAsyncOpenAI, async_file_cache, get_logger
-from .base import AsyncBaseToolkit
+from .base import TOOL_PROMPTS, AsyncBaseToolkit
 
 logger = get_logger(__name__)
-
-
-INSTRUCTION_QA = """Answer the following question based on the given audio information:
-question: {question}
-
-# Audio information
-file: {file}
-duration: {duration}
-transcription: {transcription}
-"""
 
 
 class AudioToolkit(AsyncBaseToolkit):
@@ -66,7 +56,7 @@ class AudioToolkit(AsyncBaseToolkit):
             {"role": "system", "content": "You are a helpful assistant specializing in audio analysis."},
             {
                 "role": "user",
-                "content": INSTRUCTION_QA.format(
+                "content": TOOL_PROMPTS["audio_qa"].format(
                     question=question, file=audio_path, duration=res["duration"], transcription=res["text"]
                 ),
             },

@@ -20,6 +20,7 @@ async def main():
     # Run the agent with a sample question
     # data from https://www.kaggle.com/datasets/joannanplkrk/its-raining-cats
     fn = pathlib.Path(__file__).parent / "data" / "cat_breeds_clean.csv"
+    assert fn.exists(), f"File {fn} does not exist."
     question = f"请分析位于`{fn}`的猫品种数据，提取有价值的信息。"
     result = await runner.run(question)
 

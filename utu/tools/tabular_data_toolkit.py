@@ -15,17 +15,14 @@ logger = get_logger(__name__)
 TEMPLATE_COLUMN_QA = (
     "You are a data analysis agent that extracts and summarizes data structure information "
     "from tabular data files (CSV, Excel, etc.).\n\n"
-
     "<column_info>\n"
     "{column_info}\n"
     "</column_info>\n\n"
-
     "You should extract the file structure(e.g. the delimiter), and provide detail column information "
     "(e.g. column_name, type, column explanation and sample values) for each column.\n"
     "<output_format>\n"
     "### File Structure\n"
     "- Delimiter: <the delimiter used in the file, e.g. ',', '\\\\t', ' '>\n\n"
-
     "### Columns\n"
     "| Column Name | Type | Explanation | Sample Value |\n"
     "|-------------|------|-------------|--------------|\n"

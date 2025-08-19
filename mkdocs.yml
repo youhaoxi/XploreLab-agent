@@ -1,4 +1,4 @@
-site_name: uTu-agent
+site_name: Youtu-agent
 theme:
   name: material
   palette:
@@ -25,8 +25,8 @@ theme:
     - navigation.expand
     # Enables annotations in code blocks
     - content.code.annotate
-  # logo: assets/logo.svg
-  # favicon: images/favicon-platform.svg
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
 
 repo_name: uTu-agent
 repo_url: https://github.com/utu-agent/utu-agent
@@ -60,6 +60,16 @@ plugins:
             # show_root_heading: true
             show_source: true
 
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_css:
+  - stylesheets/extra.css
+
 watch:
   - utu
 
@@ -69,8 +79,14 @@ nav:
   - Examples: examples.md
   - Documentation:
     - Config: config.md
+    - Agents: agents.md
     - Agent Environments: env.md
     - Tools: tools.md
+    - Evaluation: eval.md
+  - Examples Output:
+    - Deep Research: examples_output/deep_research.md
+    - Wide Research: examples_output/wide_research.md
+    - Data Analysis: examples_output/data_analysis.md
   - API Reference:
     - Agents:
       - ref/agents/simple_agent.md
@@ -87,6 +103,10 @@ nav:
     - Environments:
       - ref/env/base_env.md
       - ref/env/browser_env.md
+    - Evaluation:
+      - ref/eval/data.md
+      - ref/eval/processor.md
+      - ref/eval/benchmarks.md
     - Utils:
       - ref/utils/openai_utils.md
       - ref/utils/agents_utils.md

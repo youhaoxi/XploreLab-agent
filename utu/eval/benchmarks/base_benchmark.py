@@ -2,12 +2,11 @@ import asyncio
 import json
 import time
 
-from agents.tracing import gen_trace_id
 from tqdm import tqdm
 
 from ...agents import BaseAgent, get_agent
 from ...config import ConfigLoader, EvalConfig
-from ...utils import get_logger, setup_logging
+from ...utils import AgentsUtils, get_logger, setup_logging
 from ..data import DBDataManager, EvaluationSample
 from ..processer import PROCESSER_FACTORY, BaseProcesser
 
@@ -16,6 +15,15 @@ logger = get_logger(__name__)
 
 
 class BaseBenchmark:
+    """Base class for benchmarks.
+
+    Evaluation phases:
+      - preprocess: load and preprocess the data
+      - rollout: rollout the predictions
+      - judge: judge the correctness of a batch of predictions
+      - stat: get metrics.
+    """
+
     dataset: DBDataManager
     _source_to_processer: dict[str, BaseProcesser] = {}
     _source_to_agent: dict[str, BaseAgent] = {}
@@ -61,6 +69,7 @@ class BaseBenchmark:
         return sample
 
     async def rollout(self) -> None:
+        """Rollout the datapoints."""
         samples = self.dataset.get_samples(stage="init")
         logger.info(f"Rollout {len(samples)} samples...")
 
@@ -88,7 +97,7 @@ class BaseBenchmark:
     async def rollout_one(self, sample: EvaluationSample) -> EvaluationSample:
         agent = get_agent(self.config.agent)
         await agent.build()
-        trace_id = gen_trace_id()
+        trace_id = AgentsUtils.gen_trace_id()
         start_time = time.time()
         result = await agent.run(sample.augmented_question, trace_id=trace_id)
         end_time = time.time()

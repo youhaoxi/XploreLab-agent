@@ -14,6 +14,8 @@ logger = get_logger(__name__)
 
 
 class BaseDataManager(abc.ABC):
+    """Base data manager for loading and saving data."""
+
     data: list[EvaluationSample]
 
     def __init__(self, config: EvalConfig) -> None:
@@ -35,7 +37,9 @@ class BaseDataManager(abc.ABC):
         raise NotImplementedError
 
 
-class DataManager(BaseDataManager):
+class FileDataManager(BaseDataManager):
+    """File data manager for loading and saving data."""
+
     def load(self) -> list[EvaluationSample]:
         """Load raw data from the specified dataset."""
         data_path = self._get_data_path()
@@ -75,7 +79,9 @@ class DataManager(BaseDataManager):
                 f.write(json.dumps(sample.as_dict()) + "\n")
 
 
-class DBDataManager(DataManager):
+class DBDataManager(FileDataManager):
+    """Database data manager for loading and saving data."""
+
     def __init__(self, config: EvalConfig) -> None:
         self.config = config
         self.engine = create_engine(self.config.db_url, pool_size=300, max_overflow=500, pool_timeout=30)
