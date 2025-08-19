@@ -1,8 +1,7 @@
 import asyncio
 import json
 from dataclasses import asdict, dataclass
-from importlib.resources import files
-from pathlib import Path
+from importlib import resources
 from typing import Literal
 
 import agents as ag
@@ -283,7 +282,9 @@ class WebUIChatbot:
     def __init__(self, agent: SimpleAgent | OrchestraAgent, example_query: str = ""):
         self.agent = agent
         self.example_query = example_query
-        self.static_path = Path(files("utu")) / "ui" / "static" / "dist"
+        # hack
+        with resources.as_file(resources.files("utu_agent_ui.static").joinpath("index.html")) as static_dir:
+            self.static_path = str(static_dir).replace("index.html", "")
 
     def make_app(self) -> tornado.web.Application:
         return tornado.web.Application(
@@ -297,9 +298,10 @@ class WebUIChatbot:
                 (
                     r"/(.*)",
                     tornado.web.StaticFileHandler,
-                    {"path": str(self.static_path), "default_filename": "index.html"},
+                    {"path": self.static_path, "default_filename": "index.html"},
                 ),
-            ]
+            ],
+            debug=True,
         )
 
     async def __launch(self, port: int = 8848):
