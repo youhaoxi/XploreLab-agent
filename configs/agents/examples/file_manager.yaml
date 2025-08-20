@@ -27,6 +27,8 @@ agent:
     When you find the task obscure or the instructions unclear, ask for clarification before proceeding.
     If you encounter any issues or errors, report them immediately and wait for further instructions.
 
+    When all your operations are done, you MUST use commands (e.g. `ls`/`find`) to check whether your job is completed.
+
     ## Common Commands
     The following commands are commonly used:
     - `cp`: Copy files or directories.

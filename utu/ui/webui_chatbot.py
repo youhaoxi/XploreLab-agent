@@ -3,8 +3,10 @@ import json
 from dataclasses import asdict, dataclass
 from importlib import resources
 from typing import Literal
+import traceback
 
 import agents as ag
+from openai.types.responses import ResponseTextDoneEvent
 import tornado.web
 import tornado.websocket
 
@@ -81,6 +83,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # print("WebSocket opened")
         # send example query
         self.write_message(asdict(Event("example", ExampleContent(type="example", query=self.example_query))))
+        
+    async def send_event(self, event: Event):
+        # print in green color
+        print(f"\033[92mSending event: {asdict(event)}\033[0m")
+        self.write_message(asdict(event))
 
     async def on_message(self, message: str):
         try:
@@ -98,12 +105,15 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                         stream = self.agent.run_streamed(query.query)
                     elif isinstance(self.agent, SimpleAgent):
                         self.agent.input_items.append({"role": "user", "content": query.query})
+                        # print in red color
+                        print(f"\033[91mInput items: {self.agent.input_items}\033[0m")
                         stream = self.agent.run_streamed(self.agent.input_items)
                     else:
                         raise ValueError(f"Unsupported agent type: {type(self.agent).__name__}")
 
                     async for event in stream.stream_events():
                         event_to_send = None
+                        print(f"--------------------\n{event}")
                         if isinstance(event, ag.RawResponsesStreamEvent):
                             if event.data.type == "response.output_text.delta":
                                 if event.data.delta != "":
@@ -120,11 +130,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                     type="raw",
                                     data=TextDeltaContent(
                                         type="text",
-                                        delta=event.data.delta,
+                                        delta="",
                                         inprogress=False,
                                     ),
                                 )
-                            elif event.data.type == "response.reasoning_summary_text.delta":
+                            elif event.data.type == "response.reasoning_summary_text.delta" or event.data.type == "response.reasoning_text.delta":
                                 if event.data.delta != "":
                                     event_to_send = Event(
                                         type="raw",
@@ -134,13 +144,13 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                             inprogress=True,
                                         ),
                                     )
-                            elif event.data.type == "response.reasoning_summary_text.done":
+                            elif event.data.type == "response.reasoning_summary_text.done" or event.data.type == "response.reasoning_text.done":
                                 event_to_send = Event(
                                     type="raw",
                                     data=TextDeltaContent(
                                         type="reason",
-                                        delta=event.data.delta,
-                                        inprogress=False,
+                                        delta="",
+                                        inprogress=True,
                                     ),
                                 )
                             elif event.data.type == "response.function_call_arguments.delta":
@@ -169,7 +179,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                         type="raw",
                                         data=TextDeltaContent(
                                             type="reason",
-                                            delta=item.summary,
+                                            delta="",
                                             inprogress=False,
                                         ),
                                     )
@@ -197,7 +207,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                         type="raw",
                                         data=TextDeltaContent(
                                             type="reason",
-                                            delta="",
+                                            delta=item.summary,
                                             inprogress=True,
                                         ),
                                     )
@@ -264,14 +274,20 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                             pass
                         if event_to_send:
                             # print(f"Sending event: {asdict(event_to_send)}")
-                            self.write_message(asdict(event_to_send))
+                            await self.send_event(event_to_send)
                     event_to_send = Event(type="finish")
-                    self.write_message(asdict(event_to_send))
+                    # self.write_message(asdict(event_to_send))
+                    await self.send_event(event_to_send)
                     if isinstance(self.agent, SimpleAgent):
-                        self.agent.input_items = stream.to_input_list()
+                        input_list = stream.to_input_list()
+                        self.agent.input_items = input_list
+                        # print in red
+                        print(f"\033[91mInput list: {input_list}\033[0m")
                         self.agent.current_agent = stream.last_agent
                 except TypeError:
-                    # print(f"Invalid query format: {e}")
+                    print(f"Invalid query format: {e}")
+                    # stack trace
+                    print(traceback.format_exc())
                     self.close(1002, "Invalid query format")
             else:
                 # print(f"Unhandled message type: {data.get('type')}")
@@ -282,7 +298,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         except Exception as e:
             print(f"Error processing message: {str(e)}")
             # stack trace
-            import traceback
             print(traceback.format_exc())
             self.close(1002, "Error processing message")
 
