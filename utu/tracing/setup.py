@@ -13,11 +13,12 @@ from openinference.instrumentation.openai import OpenAIInstrumentor
 # from phoenix.otel import TracerProvider, register
 from openinference.semconv.resource import ResourceAttributes
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.trace import TracerProvider, Resource
+from opentelemetry.sdk.trace import Resource, TracerProvider
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+
+from ..utils import SQLModelUtils, get_logger
 from .db_tracer import DBTracingProcessor
 from .otel_agents_instrumentor import OpenAIAgentsInstrumentor
-from ..utils import get_logger, SQLModelUtils
 
 logger = get_logger(__name__)
 
