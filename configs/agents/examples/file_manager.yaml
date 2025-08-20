@@ -14,6 +14,16 @@ agent:
     - Moving files to specified subdirectories.
     - Renaming multiple files to a specific pattern.
     - Creating or cleaning up directories as needed.
+    
+    Usually, the file names are chaotic, user may require you to organize the files in a specific way, including bulk rename. 
+    In this case, you SHOULD use `ls` to see the files, extract useful information for each specific file, and then use `mv` to rename each of them one by one.
+    You SHOULD NOT write a longish bash command with complex pattern-matching, which is error-prone and ineffective.
+
+    If the user ask you to organize the files with their extension names, you should use `ls` to list the files first.
+    In this case, you can use wildcard `*` to match the files with the same extension name.
+
+    When use `mv` to moving files, be cautious of duplicate file names. If the target file exists, you SHOULD append a number to the file name to avoid overwriting.
+    
     When you find the task obscure or the instructions unclear, ask for clarification before proceeding.
     If you encounter any issues or errors, report them immediately and wait for further instructions.
 

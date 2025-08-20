@@ -52,9 +52,14 @@ class ExampleContent:
 
 
 @dataclass
+class NewAgentContent:
+    type: Literal["new"]
+    name: str
+
+@dataclass
 class Event:
-    type: Literal["raw", "orchestra", "finish", "example"]
-    data: TextDeltaContent | OrchestraContent | ExampleContent | None = None
+    type: Literal["raw", "orchestra", "finish", "example", "new"]
+    data: TextDeltaContent | OrchestraContent | ExampleContent | NewAgentContent | None = None
 
 
 @dataclass
@@ -222,7 +227,16 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                             else:
                                 pass
                         elif isinstance(event, ag.AgentUpdatedStreamEvent):
-                            pass
+                            if event.new_agent:
+                                if hasattr(event.new_agent, "name"):
+                                    new_agent_name = f"{event.new_agent.name} ({event.new_agent.__class__.__name__})"
+                                else:
+                                    new_agent_name = event.new_agent.__class__.__name__
+
+                                event_to_send = Event(
+                                    type="new",
+                                    data=NewAgentContent(type="new", name=new_agent_name),
+                                )
                         elif isinstance(event, OrchestraStreamEvent):
                             item = event.item
                             if event.name == "plan":
@@ -251,12 +265,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                         if event_to_send:
                             # print(f"Sending event: {asdict(event_to_send)}")
                             self.write_message(asdict(event_to_send))
-                    else:
-                        event_to_send = Event(type="finish")
-                        self.write_message(asdict(event_to_send))
-                        if isinstance(self.agent, SimpleAgent):
-                            self.agent.input_items = stream.to_input_list()
-                            self.agent.current_agent = stream.last_agent
+                    event_to_send = Event(type="finish")
+                    self.write_message(asdict(event_to_send))
+                    if isinstance(self.agent, SimpleAgent):
+                        self.agent.input_items = stream.to_input_list()
+                        self.agent.current_agent = stream.last_agent
                 except TypeError:
                     # print(f"Invalid query format: {e}")
                     self.close(1002, "Invalid query format")
@@ -266,11 +279,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         except json.JSONDecodeError:
             # print(f"Invalid JSON received: {message}")
             self.close(1002, "Invalid JSON received")
-        except Exception:
-            # print(f"Error processing message: {str(e)}")
+        except Exception as e:
+            print(f"Error processing message: {str(e)}")
             # stack trace
-            # import traceback
-            # print(traceback.format_exc())
+            import traceback
+            print(traceback.format_exc())
             self.close(1002, "Error processing message")
 
     def on_close(self):
