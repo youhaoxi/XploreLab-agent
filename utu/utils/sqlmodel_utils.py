@@ -23,7 +23,7 @@ class SQLModelUtils:
 
     @staticmethod
     def check_db_available():
-        if EnvUtils.get_env("DB_URL") is None:
+        if not EnvUtils.get_env("DB_URL"):
             # logger.error("DB_URL is not set")
             return False
         try:

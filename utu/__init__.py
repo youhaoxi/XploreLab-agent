@@ -1,9 +1,10 @@
 # ruff: noqa
 from agents.run import set_default_agent_runner
 
-from .utils import EnvUtils
+from .utils import EnvUtils, setup_logging
 from .patch.runner import UTUAgentRunner
 
-EnvUtils.assert_env("UTU_LLM_TYPE")
+EnvUtils.assert_env(["UTU_LLM_TYPE", "UTU_LLM_MODEL", "UTU_LLM_BASE_URL", "UTU_LLM_API_KEY"])
+setup_logging(EnvUtils.get_env("UTU_LOG_LEVEL", "WARNING"))
 # print("patched runner!")
 set_default_agent_runner(UTUAgentRunner())

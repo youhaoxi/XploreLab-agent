@@ -6,11 +6,10 @@ from tqdm import tqdm
 
 from ...agents import BaseAgent, get_agent
 from ...config import ConfigLoader, EvalConfig
-from ...utils import AgentsUtils, get_logger, setup_logging
+from ...utils import AgentsUtils, get_logger
 from ..data import DBDataManager, EvaluationSample
 from ..processer import PROCESSER_FACTORY, BaseProcesser
 
-setup_logging()
 logger = get_logger(__name__)
 
 
