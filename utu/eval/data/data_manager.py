@@ -7,7 +7,7 @@ from sqlmodel import select
 
 from ...config import EvalConfig
 from ...db import DatasetSample, EvaluationSample
-from ...utils import get_logger, SQLModelUtils
+from ...utils import SQLModelUtils, get_logger
 from ..processer import BUILTIN_BENCHMARKS
 
 logger = get_logger(__name__)

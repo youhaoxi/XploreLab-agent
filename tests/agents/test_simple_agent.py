@@ -15,7 +15,8 @@ async def agent():
 
 
 async def test_chat_streamed(agent: SimpleAgent):
-    await agent.chat_streamed("That's the weather in Beijing today?")
+    run_result_streaming = await agent.chat_streamed("That's the weather in Beijing today?")
+    print(run_result_streaming)
 
 
 async def test_chat(agent: SimpleAgent):
