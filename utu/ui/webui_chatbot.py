@@ -220,6 +220,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                             inprogress=True,
                                         ),
                                     )
+                                else:
+                                    event_to_send = None
                             else:
                                 event_to_send = None
                         elif isinstance(event, ag.RunItemStreamEvent):
