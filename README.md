@@ -1,9 +1,9 @@
 # Youtu-agent: A simple yet powerful agents framework from Tencent Youtu Lab.
 
 <div align="center">
-<a href="./docs/index.md"><img src=https://img.shields.io/badge/📖-Documentation-blue.svg></a>
+<a href="https://tencent.github.io/Youtu-agent/"><img src=https://img.shields.io/badge/📖-Documentation-blue.svg></a>
 <a href=https://arxiv.org/abs/2502.14345><img src=https://img.shields.io/badge/arXiv-2502.14345-b31b1b.svg></a>
-<a href=https://github.com/Tencent/uTu-agent><img src=https://img.shields.io/badge/GitHub-Tencent-blue.svg></a>
+<a href=https://github.com/Tencent/Youtu-agent><img src=https://img.shields.io/badge/GitHub-Tencent-blue.svg></a>
 </div>
 
 `Youtu-agent` is a flexible, high-performance framework for building, running, and evaluating autonomous agents. Designed with modularity and extensibility in mind, it provides a strong baseline for researchers and a reliable scaffolding for developers, achieving state-of-the-art results on complex reasoning and interaction benchmarks.

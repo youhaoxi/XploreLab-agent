@@ -3,7 +3,7 @@ from .common import get_event_loop, get_jinja_env, get_jinja_template, schema_to
 from .env import EnvUtils
 from .log import get_logger, oneline_object, setup_logging
 from .openai_utils import OpenAIUtils, SimplifiedAsyncOpenAI
-from .path import DIR_ROOT, FileUtils
+from .path import CACHE_DIR, DIR_ROOT, FileUtils
 from .print_utils import PrintUtils
 from .sqlmodel_utils import SQLModelUtils
 from .token import TokenUtils
@@ -23,6 +23,7 @@ __all__ = [
     "async_file_cache",
     "DIR_ROOT",
     "FileUtils",
+    "CACHE_DIR",
     "TokenUtils",
     "get_event_loop",
     "get_jinja_env",

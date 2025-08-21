@@ -6,7 +6,6 @@ from agents._run_impl import QueueCompleteSentinel
 from agents.tracing import function_span
 
 from ..config import AgentConfig, ConfigLoader
-from ..tracing import setup_tracing
 from ..utils import AgentsUtils, get_logger
 from .base_agent import BaseAgent
 from .orchestra import (
@@ -60,7 +59,6 @@ class OrchestraAgent(BaseAgent):
         3. report
         """
         # setup
-        setup_tracing()
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
@@ -75,7 +73,6 @@ class OrchestraAgent(BaseAgent):
         return task_recorder
 
     def run_streamed(self, input: str, trace_id: str = None) -> OrchestraTaskRecorder:
-        setup_tracing()
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 

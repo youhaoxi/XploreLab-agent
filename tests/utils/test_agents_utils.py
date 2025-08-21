@@ -33,11 +33,12 @@ agent = Agent(
 
 
 async def test_print_stream_events():
-    stream = Runner.run_streamed(agent, "tell me a joke. And what is the weather like in Shanghai?")
-    await AgentsUtils.print_stream_events(stream.stream_events())
+    with trace(workflow_name="test_print_stream_events"):
+        stream = Runner.run_streamed(agent, "tell me a joke. And what is the weather like in Shanghai?")
+        await AgentsUtils.print_stream_events(stream.stream_events())
 
 
-async def test_print_events():
+async def test_print_items():
     result = await Runner.run(agent, "tell me a joke. And what is the weather like in Shanghai?")
     AgentsUtils.print_new_items(result.new_items)
 
