@@ -5,6 +5,7 @@ from typing import Any
 from openai.types.chat import (
     ChatCompletionChunk,
     ChatCompletionMessage,
+    ChatCompletionMessageFunctionToolCall,
     ChatCompletionMessageToolCall,
     ChatCompletionToolParam,
 )
@@ -57,7 +58,7 @@ class OpenAIUtils:
                         PrintUtils.print_info(f"{tool_call.function.arguments}", end="", color="blue")
         PrintUtils.print_info("")  # print a newline
         tool_calls = [
-            ChatCompletionMessageToolCall(
+            ChatCompletionMessageFunctionToolCall(
                 id=tool_call.id,
                 function=tool_call.function.model_dump(),
                 type=tool_call.type,  # type is always "function"
@@ -71,10 +72,11 @@ class OpenAIUtils:
     @staticmethod
     def print_response(response: Response) -> None:
         for item in response.output:
+            # print(f"> responses item: {item}")
             match item.type:
                 case "reasoning":
                     content = getattr(item, "content", item.summary)
-                    PrintUtils.print_bot(f"{content}", add_prefix=True, color="gray")
+                    PrintUtils.print_bot(f"<reasoning>{content}</reasoning>", add_prefix=True, color="gray")
                 case "message":
                     PrintUtils.print_bot(f"{item.content}", add_prefix=True)
                 case "function_call":
