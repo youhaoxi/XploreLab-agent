@@ -50,6 +50,7 @@ dev = [
     "pytest-asyncio>=1.0.0",
     "ruff>=0.12.8",
     "tencentcloud-sdk-python>=3.0.1425",
+    "tornado>=6.5.2",
 ]
 documents = [
     "pymupdf>=1.26.3",

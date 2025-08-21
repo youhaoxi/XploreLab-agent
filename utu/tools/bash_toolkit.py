@@ -124,5 +124,5 @@ class BashToolkit(AsyncBaseToolkit):
 
     async def get_tools_map(self) -> dict[str, Callable]:
         return {
-            "bash": self.run_bash,
+            "run_bash": self.run_bash,
         }

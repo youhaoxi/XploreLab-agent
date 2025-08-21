@@ -47,9 +47,9 @@ _SESSION_DATA
 /docs/examples_output
 /output/
 /workspace/
+/configs/agents/generated
 
 mytools/
-
 logs/
 
 .pytest_cache/
