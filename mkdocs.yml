@@ -10,26 +10,28 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Toggle to light mode
-      primary: deep purple
-      accent: purple
+      # primary: deep purple
+      # accent: purple
   features:
     # Allows copying code blocks
     - content.code.copy
     # Allows selecting code blocks
     - content.code.select
     # Shows the current path in the sidebar
-    - navigation.path
+    # - navigation.path
     # Shows sections in the sidebar
     - navigation.sections
+    # Shows tabs on top
+    - navigation.tabs
     # Shows sections expanded by default
-    - navigation.expand
+    # - navigation.expand
     # Enables annotations in code blocks
     - content.code.annotate
   logo: assets/logo.svg
   favicon: assets/logo.svg
 
-repo_name: uTu-agent
-repo_url: https://github.com/utu-agent/utu-agent
+repo_name: Youtu-agent
+repo_url: https://github.com/Tencent/Youtu-agent
 
 extra:
   # Remove material generation message in footer
