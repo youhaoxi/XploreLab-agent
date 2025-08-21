@@ -3,15 +3,13 @@
 Support backends:
 
 - Chunkr: <https://github.com/lumina-ai-inc/chunkr>
+- pymupdf: <https://github.com/pymupdf/PyMuPDF>
 """
 
 from collections.abc import Callable
 
-from chunkr_ai import Chunkr
-from chunkr_ai.models import Configuration
-
 from ..config import ToolkitConfig
-from ..utils import DIR_ROOT, FileUtils, SimplifiedAsyncOpenAI, async_file_cache, get_logger
+from ..utils import CACHE_DIR, FileUtils, SimplifiedAsyncOpenAI, get_logger
 from .base import TOOL_PROMPTS, AsyncBaseToolkit
 
 logger = get_logger(__name__)
@@ -19,39 +17,31 @@ logger = get_logger(__name__)
 
 class DocumentToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
-        """Initialize the DocumentToolkit.
-
-        - Required env variables: `CHUNKR_API_KEY`"""
+        """Initialize the DocumentToolkit, with configed parser and llm."""
         super().__init__(config)
-        self.chunkr = Chunkr(api_key=self.config.config.get("CHUNKR_API_KEY"))
-        self.chunkr.config = Configuration(
-            high_resolution=self.config.config.get("high_resolution", True),
-        )
+        if self.config.config.get("parser") == "chunkr":
+            from .documents.chunkr_parser import ChunkrParser
+
+            self.parser = ChunkrParser(self.config.config)
+        elif self.config.config.get("parser") == "pymupdf":
+            from .documents.pdf_parser import PDFParser
+
+            self.parser = PDFParser(self.config.config)
+        else:
+            raise ValueError(f"Unsupported parser: {self.config.config.get('parser')}")
         self.text_limit = self.config.config.get("text_limit", 100_000)
         self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_provider.model_dump())
         self.md5_to_path = {}
 
-    @async_file_cache(expire_time=None)
     async def parse_document(self, md5: str) -> str:
-        """Parse document to markdown with Chunkr.
-
-        - ref: <https://docs.chunkr.ai/sdk/data-operations/create#supported-file-types>
-
-        Args:
-            md5 (str): md5 of the document.
-        """
         logger.info(f"[tool] parse_document: {self.md5_to_path[md5]}")
-        task = await self.chunkr.upload(self.md5_to_path[md5])
-
-        logger.info("  getting results...")
-        markdown = task.markdown()
-        return markdown
+        return await self.parser.parse(self.md5_to_path[md5])
 
     def handle_path(self, path: str) -> str:
         md5 = FileUtils.get_file_md5(path)
         if FileUtils.is_web_url(path):
             # download document to data/_document, with md5
-            fn = DIR_ROOT / "data" / "_document" / f"{md5}{FileUtils.get_file_ext(path)}"
+            fn = CACHE_DIR / "documents" / f"{md5}{FileUtils.get_file_ext(path)}"
             fn.parent.mkdir(parents=True, exist_ok=True)
             if not fn.exists():
                 path = FileUtils.download_file(path, fn)

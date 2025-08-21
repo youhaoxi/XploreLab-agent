@@ -10,21 +10,10 @@ def document_toolkit() -> DocumentToolkit:
     return DocumentToolkit(config=config)
 
 
-DOCUMENT_URL = "https://arxiv.org/pdf/2107.14339.pdf"
-DOCUMENT_PATH = "/Users/frankshi/LProjects/Agents/uTu-agent/data/gaia/files/3cc53dbf-1ab9-4d21-a56a-fc0151c10f89.xlsx"
-tasks = (
-    (
-        DOCUMENT_URL,
-        "There is a diagram of an X-ray time profile in this document. How long is the time profile (in seconds)?",
-    ),
-    (DOCUMENT_URL,),
-    (DOCUMENT_PATH,),
-)
-
-
 async def test_document_toolkit(document_toolkit: DocumentToolkit):
-    # res = await document_toolkit.parse_document(document_url1)
-    # print(res)
-    for task in tasks:
-        result = await document_toolkit.document_qa(*task)
-        print(f"{task}: {result}")
+    q = "There is a diagram of an X-ray time profile in this document. How long is the time profile (in seconds)?"
+    result = await document_toolkit.document_qa(
+        document_path="https://arxiv.org/pdf/2107.14339.pdf",
+        question=q,
+    )
+    print(result)

@@ -51,6 +51,9 @@ dev = [
     "ruff>=0.12.8",
     "tencentcloud-sdk-python>=3.0.1425",
 ]
+documents = [
+    "pymupdf>=1.26.3",
+]
 
 
 [build-system]
