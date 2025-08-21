@@ -13,6 +13,7 @@ def get_package_path() -> pathlib.Path:
 
 
 DIR_ROOT = get_package_path()
+CACHE_DIR = DIR_ROOT / ".cache"
 
 
 class FileUtils:
