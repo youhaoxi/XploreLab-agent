@@ -1,12 +1,12 @@
 import asyncio
 import json
+import traceback
+import re
 from dataclasses import asdict, dataclass
 from importlib import resources
 from typing import Literal
-import traceback
 
 import agents as ag
-from openai.types.responses import ResponseTextDoneEvent
 import tornado.web
 import tornado.websocket
 
@@ -83,7 +83,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # print("WebSocket opened")
         # send example query
         self.write_message(asdict(Event("example", ExampleContent(type="example", query=self.example_query))))
-        
+
     async def send_event(self, event: Event):
         # print in green color
         print(f"\033[92mSending event: {asdict(event)}\033[0m")
@@ -134,7 +134,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                         inprogress=False,
                                     ),
                                 )
-                            elif event.data.type == "response.reasoning_summary_text.delta" or event.data.type == "response.reasoning_text.delta":
+                            elif event.data.type == "response.reasoning_summary_text.delta" \
+                                or event.data.type == "response.reasoning_text.delta":
                                 if event.data.delta != "":
                                     event_to_send = Event(
                                         type="raw",
@@ -144,7 +145,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                                             inprogress=True,
                                         ),
                                     )
-                            elif event.data.type == "response.reasoning_summary_text.done" or event.data.type == "response.reasoning_text.done":
+                            elif event.data.type == "response.reasoning_summary_text.done" \
+                                or event.data.type == "response.reasoning_text.done":
                                 event_to_send = Event(
                                     type="raw",
                                     data=TextDeltaContent(
@@ -277,6 +279,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                         if event_to_send:
                             # print(f"Sending event: {asdict(event_to_send)}")
                             await self.send_event(event_to_send)
+                    else:
+                        pass
                     event_to_send = Event(type="finish")
                     # self.write_message(asdict(event_to_send))
                     await self.send_event(event_to_send)
@@ -286,14 +290,15 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                         # print in red
                         print(f"\033[91mInput list: {input_list}\033[0m")
                         self.agent.current_agent = stream.last_agent
-                except TypeError:
+                except TypeError as e:
                     print(f"Invalid query format: {e}")
                     # stack trace
                     print(traceback.format_exc())
                     self.close(1002, "Invalid query format")
             else:
                 # print(f"Unhandled message type: {data.get('type')}")
-                self.close(1002, "Unhandled message type")
+                # self.close(1002, "Unhandled message type")
+                pass
         except json.JSONDecodeError:
             # print(f"Invalid JSON received: {message}")
             self.close(1002, "Invalid JSON received")
@@ -340,6 +345,9 @@ class WebUIChatbot:
         app.listen(port)
         print(f"Server started at http://localhost:{port}/")
         await asyncio.Event().wait()
+
+    async def launch_async(self, port: int = 8848):
+        await self.__launch(port=port)
 
     def launch(self, port: int = 8848):
         asyncio.run(self.__launch(port=port))
