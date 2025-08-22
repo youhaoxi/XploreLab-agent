@@ -1,4 +1,4 @@
-# <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-agent: A simple yet powerful agents framework with open-source models.
+# <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-agent: A simple yet powerful agents framework that delivers with open-source models
 
 <div align="center">
 <a href="https://tencent.github.io/Youtu-agent/"><img src=https://img.shields.io/badge/📖-Documentation-blue.svg></a>
@@ -14,9 +14,10 @@
 | 
 </p>
 
-<img src="docs/assets/mascot.png" alt="MiroFlow Logo" width="200" align="right">
 
 `Youtu-agent` is a flexible, high-performance framework for building, running, and evaluating autonomous agents. Beyond topping the benchmarks, this framework delivers powerful agent capabilities, e.g. data analysis, file processing, and deep research.
+
+<img src="docs/assets/mascot.png" alt="MiroFlow Logo" width="200" align="left" style="margin-right:20px;">
 
 Key highlights:
 - **Verified performance**: Achieved 60.71% on WebWalkerQA and 72.8% on GAIA (text-only subset), using purely `DeepSeek-V3-0324` (without Claude or GPT).
@@ -38,24 +39,34 @@ Key highlights:
 
 ## 💡 Examples
 
+Click on the images to view detailed videos.
+
 <table border="1" style="border-collapse: collapse;">
   <tr>
     <td style="border: 1px solid black; padding: 10px;">
-      <iframe width="420" height="236" src="https://www.youtube.com/embed/SCR4Ru8_h5Q?si=Xb-bdPjw70alR8Nl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <a href="https://www.youtube.com/watch?v=SCR4Ru8_h5Q">
+        <img src="https://img.youtube.com/vi/SCR4Ru8_h5Q/0.jpg" alt="Data Analysis" width="420" height="236">
+      </a>
       <br><strong>Data Analysis</strong><br>Analyzes a CSV file and generates an HTML report.
     </td>
     <td style="border: 1px solid black; padding: 10px;">
-      <iframe width="420" height="236" src="https://www.youtube.com/embed/GdA4AapE2L4?si=f9ObucqZ1qzm4cYd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <a href="https://www.youtube.com/watch?v=GdA4AapE2L4">
+        <img src="https://img.youtube.com/vi/GdA4AapE2L4/0.jpg" alt="File Management" width="420" height="236">
+      </a>
       <br><strong>File Management</strong><br>Renames and categorizes local files for the user.
     </td>
   </tr>
   <tr>
     <td style="border: 1px solid black; padding: 10px;">
-      <iframe width="420" height="236" src="https://www.youtube.com/embed/vBddCjjRk00?si=4khHv2sJ79Qe7m0Y" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <a href="https://www.youtube.com/watch?v=vBddCjjRk00">
+        <img src="https://img.youtube.com/vi/vBddCjjRk00/0.jpg" alt="Wide Research" width="420" height="236">
+      </a>
       <br><strong>Wide Research</strong><br>Gathers extensive information to generate a comprehensive report, replicating the functionality of Manus.
     </td>
     <td style="border: 1px solid black; padding: 10px;">
-      <iframe width="420" height="236" src="https://www.youtube.com/embed/v3QQg0WAnPs?si=rxpfzn2IL1XOvja9" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <a href="https://www.youtube.com/watch?v=v3QQg0WAnPs">
+        <img src="https://img.youtube.com/vi/v3QQg0WAnPs/0.jpg" alt="Paper Analysis" width="420" height="236">
+      </a>
       <br><strong>Paper Analysis</strong><br>Parses a given paper, performs analysis, and compiles related literature to produce a final result.
     </td>
   </tr>
