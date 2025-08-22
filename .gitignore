@@ -46,7 +46,7 @@ _SESSION_DATA
 /examples/data_analysis/output
 /examples/gui_agent_datamaker/data
 !/examples/gui_agent_datamaker/data/Dublin_Zoo_Intro.docx
-/docs/examples_output
+# /docs/examples_output
 /output/
 /workspace/
 /configs/agents/generated
