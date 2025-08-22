@@ -12,9 +12,13 @@ class ModelProviderConfig(ConfigBaseModel):
     """config for model provider"""
 
     type: Literal["chat.completions", "responses"] = os.getenv("UTU_LLM_TYPE")
+    """model type, supported types: chat.completions, responses"""
     model: str = os.getenv("UTU_LLM_MODEL")
+    """model name"""
     base_url: str | None = os.getenv("UTU_LLM_BASE_URL")
+    """model provider base url"""
     api_key: str | None = os.getenv("UTU_LLM_API_KEY")
+    """model provider api key"""
 
 
 class ModelSettingsConfig(ConfigBaseModel, ModelSettings):

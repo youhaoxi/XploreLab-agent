@@ -35,7 +35,9 @@ uv.lock
 *.bak
 *.publish
 *.html
-___*
+*.pkl
+_*
+!__init__.py
 _SESSION_DATA
 .cache/
 /data/
