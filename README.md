@@ -33,9 +33,7 @@ Key highlights:
 - **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**: Achieved 60.71% accuracy with `DeepSeek-V3-0324`, setting a new SOTA performance.
 - **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**: Achieved 72.8% accuracy on the text-only validation subset using `DeepSeek-V3-0324` (including models used within tools). We are actively extending evaluation to the full GAIA benchmark with multimodal tools, and conducting cross-framework experiments to ensure fair comparison.
 
-<div align="center">
-<img src="docs/assets/images/benchmark_webwalkerqa.png" alt="WebWalkerQA" style="width:80%;">
-</div>
+![WebWalkerQA](docs/assets/images/benchmark_webwalkerqa.png)
 
 ## 💡 Examples
 
@@ -78,9 +76,7 @@ For more detailed examples and advanced use-cases, please refer to the [`example
 
 ## ✨ Features
 
-<div align="center">
-<img src="docs/assets/images/header.png" alt="features" style="width:80%;">
-</div>
+![features](docs/assets/images/header.png)
 
 ### Design Philosophy
 - **Minimal design**: We try to keep the framework simple and easy to use, avoiding unnecessary overhead.
