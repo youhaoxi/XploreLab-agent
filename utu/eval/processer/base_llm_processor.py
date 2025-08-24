@@ -74,7 +74,7 @@ class BaseLLMJudgeProcesser(BaseProcesser):
         }
 
     def _get_judge_messages(self, question: str, response: str, correct_answer: str) -> list:
-        if self.name in JUDGE_PROMPT_MAP:
+        if self.name not in JUDGE_PROMPT_MAP:
             logger.warning(f"Judge prompt for {self.name} is not implemented! Using default judge prompt.")
         template = JUDGE_PROMPT_MAP.get(self.name, JUDGE_PROMPT_MAP["default"])
         input = template.format(question=question, response=response, correct_answer=correct_answer)
