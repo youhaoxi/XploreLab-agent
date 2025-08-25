@@ -85,11 +85,12 @@ python scripts/cli_chat.py --stream --config generated/xxx
 
 <table border="1" style="border-collapse: collapse;">
   <tr>
-    <td style="border: 1px solid black; width:420px; max-width:420px; word-break:break-word; overflow-wrap:anywhere; padding:10px; vertical-align:top;">
+    <td style="border: 1px solid black; width:420px; padding:10px; vertical-align:top;">
       <a href="https://www.youtube.com/watch?v=JVpHDJtKBo8">
         <img src="https://img.youtube.com/vi/JVpHDJtKBo8/0.jpg" alt="Automatic Agent Generation" width="420" height="236">
       </a>
-      <br><strong>Automatic Agent Generation</strong><br>Interactively clarify your requirements, automatically generate the agent configuration, and run it right away.
+      <br><strong>Automatic Agent Generation</strong><br>Interactively clarify your requirements, automatically generate <br>
+the agent configuration, and run it right away.
     </td>
   </tr>
 </table>
