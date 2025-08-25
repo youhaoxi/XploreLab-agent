@@ -11,8 +11,6 @@ wheels/
 
 # Misc
 .DS_Store
-uv.lock
-.env
 .vscode
 *.log
 *.db
@@ -56,7 +54,7 @@ logs/
 
 .pytest_cache/
 .mypy_cache/
-uv.lock
+# uv.lock
 .env
 test.yaml
 requirements.txt
