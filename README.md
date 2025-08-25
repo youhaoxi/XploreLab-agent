@@ -7,7 +7,7 @@
 </div>
 
 <p align="center">
-| <a href="README_ZH.md"><b>🇨🇳 中文版</b></a>
+| <a href="README_ZH.md"><b>中文版</b></a>
 | <a href="#-benchmark-performance"><b>🌟 Performance</b></a> 
 | <a href="#-examples"><b>💡 Examples</b> </a> 
 | <a href="#-features"><b>✨ Features</b> </a> 
@@ -82,10 +82,16 @@ python scripts/gen_simple_agent.py
 # Run the generated config
 python scripts/cli_chat.py --stream --config generated/xxx
 ```
-
-<a href="https://www.youtube.com/watch?v=JVpHDJtKBo8">
-  <img src="https://github.com/user-attachments/assets/2a185840-732c-48df-a72f-837c836318d1" width="420" height="236">
-</a>
+<table border="1" style="border-collapse: collapse;">
+  <tr>
+    <td style="border: 1px solid black; padding: 10px; width: 420px; vertical-align: top;">
+      <a href="https://www.youtube.com/watch?v=JVpHDJtKBo8">
+        <img src="https://img.youtube.com/vi/JVpHDJtKBo8/0.jpg" alt="Automatic Agent Generation" width="420" height="236">
+      </a>
+      <br><strong>Automatic Agent Generation</strong><br>Interactively clarify your requirements, automatically generate the agent configuration, and run it right away.
+    </td>
+  </tr>
+</table>
 
 
 For more detailed examples and advanced use-cases, please refer to the [`examples`](./examples) directory and our comprehensive documentation at [`docs/examples.md`](./docs/examples.md).

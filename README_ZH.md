@@ -7,7 +7,7 @@
 </div>
 
 <p align="center">
-| <a href="README.md"><b>🇺🇸 English</b></a>
+| <a href="README.md"><b>English</b></a>
 | <a href="#-基准性能"><b>🌟 性能</b></a> 
 | <a href="#-示例"><b>💡 示例</b> </a> 
 | <a href="#-特性"><b>✨ 特性</b> </a> 
@@ -81,9 +81,17 @@ python scripts/gen_simple_agent.py
 python scripts/cli_chat.py --stream --config generated/xxx
 ```
 
-<a href="https://www.youtube.com/watch?v=JVpHDJtKBo8">
-  <img src="https://github.com/user-attachments/assets/2a185840-732c-48df-a72f-837c836318d1" width="420" height="236">
-</a>
+<table border="1" style="border-collapse: collapse;">
+  <tr>
+    <td style="border: 1px solid black; padding: 10px; width: 420px; vertical-align: top;">
+      <a href="https://www.youtube.com/watch?v=JVpHDJtKBo8">
+        <img src="https://img.youtube.com/vi/JVpHDJtKBo8/0.jpg" alt="Automatic Agent Generation" width="420" height="236">
+      </a>
+      <br><strong>自动智能体生成</strong><br>交互式对话的方式捕获需求，自动生成agent配置，并立即运行。
+    </td>
+  </tr>
+</table>
+
 
 更详细的示例和高级用例，请参阅 [`examples`](./examples) 目录和我们的文档 [`docs/examples.md`](./docs/examples.md)。
 
