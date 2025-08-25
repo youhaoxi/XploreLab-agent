@@ -17,7 +17,7 @@
 
 `Youtu-agent` 是一个灵活、高性能的框架，用于构建、运行和评估自主智能体。除了在基准测试中名列前茅，该框架还提供了强大的智能体能力，例如数据分析、文件处理和深度研究。
 
-<img src="docs/assets/mascot.png" alt="MiroFlow Logo" width="200" align="left" style="margin-right:20px;">
+<img src="docs/assets/mascot.png" alt="Youtu-agent Logo" width="200" align="left" style="margin-right:20px;">
 
 主要亮点：
 - **验证性能**：在 WebWalkerQA 上达到 71.47% 的准确率，在 GAIA（纯文本子集）上达到 72.8% 的准确率，纯粹使用 `DeepSeek-V3` 系列模型（不使用 Claude 或 GPT）。
