@@ -18,6 +18,9 @@ format-check:
 lint: 
 	uv run ruff check
 
+.PHONY: build-docs
+build-docs:
+	uv run mkdocs build
 
 .PHONY: serve-docs
 serve-docs:
