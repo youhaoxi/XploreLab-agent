@@ -82,6 +82,7 @@ python scripts/gen_simple_agent.py
 # Run the generated config
 python scripts/cli_chat.py --stream --config generated/xxx
 ```
+
 <table border="1" style="border-collapse: collapse;">
   <tr>
     <td style="border: 1px solid black; padding: 10px; width: 420px; vertical-align: top;">
