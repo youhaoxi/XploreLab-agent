@@ -9,12 +9,12 @@ import json
 import pathlib
 import traceback
 
-from agents import AgentOutputSchema, function_tool
+from agents import function_tool
 
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
 from utu.tools import SearchToolkit
-from utu.utils import FileUtils, schema_to_basemodel, AgentsUtils
+from utu.utils import AgentsUtils, FileUtils, schema_to_basemodel
 
 PROMPTS = FileUtils.load_yaml(pathlib.Path(__file__).parent / "prompts.yaml")
 SEARCH_TOOLKIT = SearchToolkit(ConfigLoader.load_toolkit_config("search"))
@@ -23,7 +23,7 @@ CONCURRENCY = 20
 
 @function_tool(strict_mode=False)
 async def search_wide(task: str, subtasks: list[str], output_schema: dict, output_fn: str) -> str:
-    """Perform structured wide research. Given task with several search subtasks, this tool will perform research simultaneously. 
+    """Perform structured wide research. Given task with several search subtasks, this tool will perform research simultaneously.
     It is helpful when you need to collect several homogeneous information of the same topic.
 
     NOTEs:
@@ -37,7 +37,7 @@ async def search_wide(task: str, subtasks: list[str], output_schema: dict, outpu
           {"properties": {"provider": {"description": "The model provider", "title": "Provider", "type": "string"}, "model_name": {"description": "The model name", "title": "Model Name", "type": "string"}, "context_window": {"description": "The context window", "type": "integer"}, "required": ["provider", "model_name", "context_window"], "title": "LLM", "type": "object"}
         output_fn (str): The file name to save the output, in JSONL format. e.g. `output.jsonl`
     """
-    output_type = schema_to_basemodel(output_schema)
+    output_type = schema_to_basemodel(output_schema)  # noqa: F841
     print(f"Processing {len(subtasks)} subtasks for task: {task}\nOutput schema: {output_schema}")
     try:
         searcher = SimpleAgent(
@@ -86,6 +86,7 @@ class WideResearch:
             result = await planner.run(task)
             output = result.get_run_result().final_output
             return output
+
     async def run_streamed(self, task: str):
         async with self.planner_agent as planner:
             result = planner.run_streamed(task)

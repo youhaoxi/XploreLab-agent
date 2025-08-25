@@ -48,7 +48,7 @@ _SESSION_DATA
 /output/
 /workspace/
 /configs/agents/generated
-
+site/
 mytools/
 logs/
 

@@ -1,8 +1,8 @@
 from collections.abc import Callable
 from typing import Any
 
-from ..utils import PrintUtils
 from ..config import ToolkitConfig
+from ..utils import PrintUtils
 from .base import AsyncBaseToolkit
 
 

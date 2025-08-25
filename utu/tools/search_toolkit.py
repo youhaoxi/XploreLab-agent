@@ -109,7 +109,9 @@ class SearchToolkit(AsyncBaseToolkit):
         query = (
             query or "Summarize the content of this webpage, in the same language as the webpage."
         )  # use the same language
-        res_summary, res_links = await asyncio.gather(self._qa(content, query), self._extract_links(url, content, query))
+        res_summary, res_links = await asyncio.gather(
+            self._qa(content, query), self._extract_links(url, content, query)
+        )
         result = f"Summary: {res_summary}\n\nRelated Links: {res_links}"
         return result
 
