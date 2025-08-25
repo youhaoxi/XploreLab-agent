@@ -17,7 +17,7 @@
 
 `Youtu-agent` is a flexible, high-performance framework for building, running, and evaluating autonomous agents. Beyond topping the benchmarks, this framework delivers powerful agent capabilities, e.g. data analysis, file processing, and deep research, all with open-source models.
 
-<img src="docs/assets/mascot.png" alt="MiroFlow Logo" width="200" align="left" style="margin-right:20px;">
+<img src="docs/assets/mascot.png" alt="Youtu-agent Logo" width="200" align="left" style="margin-right:20px;">
 
 Key highlights:
 - **Verified performance**: Achieved 71.47% on WebWalkerQA and 72.8% on GAIA (text-only subset), using purely `DeepSeek-V3` series models (without Claude or GPT).
