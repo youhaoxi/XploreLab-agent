@@ -20,7 +20,7 @@
 <img src="docs/assets/mascot.png" alt="MiroFlow Logo" width="200" align="left" style="margin-right:20px;">
 
 主要亮点：
-- **验证性能**：在 WebWalkerQA 上达到 60.71% 的准确率，在 GAIA（纯文本子集）上达到 72.8% 的准确率，纯粹使用 `DeepSeek-V3-0324`（不使用 Claude 或 GPT）。
+- **验证性能**：在 WebWalkerQA 上达到 71.47% 的准确率，在 GAIA（纯文本子集）上达到 72.8% 的准确率，纯粹使用 `DeepSeek-V3` 系列模型（不使用 Claude 或 GPT）。
 - **开源友好且成本敏感**：针对可访问、低成本部署进行了优化，不依赖封闭模型。
 - **实际用例**：开箱即用地支持 CSV 分析、文献综述、个人文件整理以及播客和视频生成等任务。
 - **灵活的架构**：基于 [openai-agents](https://github.com/openai/openai-agents-python) 构建，兼容 `responses` 和 `chat.completions` API，支持 `DeepSeek` 和 `gpt-oss` 模型。
@@ -30,12 +30,12 @@
 
 `Youtu-agent` 基于开源模型和轻量级工具构建，在具有挑战性的深度搜索和工具使用基准测试中表现出色。
 
-- **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**：使用 `DeepSeek-V3-0324` 实现了 60.71% 的准确率，创造了新的 SOTA 性能。
-- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**：使用 `DeepSeek-V3-0324`（包括工具中使用的模型）在纯文本验证子集上实现了 72.8% 的准确率。我们正在积极扩展对带有多模态工具的完整 GAIA 基准的评估，并进行跨框架实验以确保公平比较。
+- **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**：使用 `DeepSeek-V3-0324` 实现了 60.71% 的准确率，使用新发布的 `DeepSeek-V3.1` 可进一步提升至 71.47%，创造了新的 SOTA 性能。
+- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**：使用 `DeepSeek-V3-0324`（包括工具中使用的模型）在纯文本验证子集上实现了 72.8% 的准确率。我们正在积极扩展对带有多模态工具的完整 GAIA 基准的评估，并进行跨框架实验以确保公平比较，将在近期放出相关代码和数据。
 
 ![WebWalkerQA](docs/assets/images/benchmark_webwalkerqa.png)
 
-## 💡 示例
+## 💡 使用示例
 
 <table border="1" style="border-collapse: collapse;">
   <tr>
@@ -68,7 +68,7 @@
   </tr>
 </table>
 
-有关更详细的示例和高级用例，请参阅 [`examples`](./examples) 目录和我们的文档 [`docs/examples.md`](./docs/examples.md)。
+更详细的示例和高级用例，请参阅 [`examples`](./examples) 目录和我们的文档 [`docs/examples.md`](./docs/examples.md)。
 
 ## ✨ 特性
 
@@ -96,7 +96,7 @@
 
 ## 🤔 为何选择 Youtu-agent？
 
-`Youtu-agent` 旨在为不同的用户群体提供显著价值：
+`Youtu-agent` 旨在为不同的用户群体提供价值：
 
 ### 对于智能体研究人员和大型语言模型训练师
 - 一个**简单而强大的基线**，比基本的 ReAct 更强大，可作为模型训练和消融研究的绝佳起点。
@@ -113,7 +113,7 @@
 
 ## 🧩 核心概念
 
-- **智能体（Agent）**：一个配置了特定提示、工具和环境的大型语言模型。
+- **智能体（Agent）**：一个配置了提示词、工具和环境的大语言模型。
 - **工具包（Toolkit）**：智能体可以使用的封装工具集。
 - **环境（Environment）**：智能体操作的世界（例如，浏览器、shell）。
 - **上下文管理器（ContextManager）**：一个可配置模块，用于管理智能体的上下文窗口。
@@ -181,7 +181,7 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
 
 ## 引用
 
-如果您觉得这项工作有帮助，请考虑引用我们的论文：
+如果您觉得这项工作有帮助，请考虑引用：
 
 ```bibtex
 @misc{youtu-agent-2025,

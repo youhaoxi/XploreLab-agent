@@ -1,4 +1,4 @@
-# <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-agent: A simple yet powerful agents framework that delivers with open-source models
+# <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-agent: A simple yet powerful agent framework that delivers with open-source models
 
 <div align="center">
 <a href="https://tencent.github.io/Youtu-agent/"><img src=https://img.shields.io/badge/📖-Documentation-blue.svg></a>
@@ -15,12 +15,12 @@
 </p>
 
 
-`Youtu-agent` is a flexible, high-performance framework for building, running, and evaluating autonomous agents. Beyond topping the benchmarks, this framework delivers powerful agent capabilities, e.g. data analysis, file processing, and deep research.
+`Youtu-agent` is a flexible, high-performance framework for building, running, and evaluating autonomous agents. Beyond topping the benchmarks, this framework delivers powerful agent capabilities, e.g. data analysis, file processing, and deep research, all with open-source models.
 
 <img src="docs/assets/mascot.png" alt="MiroFlow Logo" width="200" align="left" style="margin-right:20px;">
 
 Key highlights:
-- **Verified performance**: Achieved 60.71% on WebWalkerQA and 72.8% on GAIA (text-only subset), using purely `DeepSeek-V3-0324` (without Claude or GPT).
+- **Verified performance**: Achieved 71.47% on WebWalkerQA and 72.8% on GAIA (text-only subset), using purely `DeepSeek-V3` series models (without Claude or GPT).
 - **Open-source friendly & cost-aware**: Optimized for accessible, low-cost deployment without reliance on closed models.
 - **Practical use cases**: Out-of-the-box support for tasks like CSV analysis, literature review, personal file organization, and podcast and video generation.
 - **Flexible architecture**: Built on [openai-agents](https://github.com/openai/openai-agents-python), compatible with both `responses` and `chat.completions` APIs, supporting `DeepSeek` and `gpt-oss` models.
@@ -30,8 +30,8 @@ Key highlights:
 
 `Youtu-agent` is built on open-source models and lightweight tools, demonstrating strong results on challenging deep search and tool use benchmarks.
 
-- **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**: Achieved 60.71% accuracy with `DeepSeek-V3-0324`, setting a new SOTA performance.
-- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**: Achieved 72.8% accuracy on the text-only validation subset using `DeepSeek-V3-0324` (including models used within tools). We are actively extending evaluation to the full GAIA benchmark with multimodal tools, and conducting cross-framework experiments to ensure fair comparison.
+- **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**: Achieved 60.71% accuracy with `DeepSeek-V3-0324`， using new released `DeepSeek-V3.1` can further improve to 71.47%, setting a new SOTA performance.
+- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**: Achieved 72.8% accuracy on the text-only validation subset using `DeepSeek-V3-0324` (including models used within tools). We are actively extending evaluation to the full GAIA benchmark with multimodal tools, and conducting cross-framework experiments to ensure fair comparison, and will release the related code and data in the near future.
 
 ![WebWalkerQA](docs/assets/images/benchmark_webwalkerqa.png)
 
@@ -189,7 +189,7 @@ This project builds upon the excellent work of several open-source projects:
 
 ## Citation
 
-If you find this work useful, please consider citing our paper:
+If you find this work useful, please consider citing:
 
 ```bibtex
 @misc{youtu-agent-2025,
