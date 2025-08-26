@@ -29,7 +29,7 @@ class DataClassWithStreamEvents:
                 self._is_complete = True
                 break
 
-            if self._is_complete and self._event_queue.empty():  # self.is_complete and
+            if self._is_complete and self._event_queue.empty():
                 break
             try:
                 item = await self._event_queue.get()

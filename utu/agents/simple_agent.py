@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from contextlib import AsyncExitStack
-from typing import Any
+from typing import Any, Literal
 
 from agents import (
     Agent,
@@ -12,6 +12,7 @@ from agents import (
     Runner,
     RunResult,
     RunResultStreaming,
+    StopAtTools,
     TContext,
     Tool,
     TResponseInputItem,
@@ -23,7 +24,6 @@ from ..config import AgentConfig, ConfigLoader, ToolkitConfig
 from ..context import BaseContextManager, build_context_manager
 from ..env import BaseEnv, get_env
 from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
-from ..tracing import setup_tracing
 from ..utils import AgentsUtils, get_logger
 from .base_agent import BaseAgent
 from .common import TaskRecorder
@@ -44,6 +44,7 @@ class SimpleAgent(BaseAgent):
         model_settings: ModelSettings | None = None,
         tools: list[Tool] = None,
         output_type: type[Any] | AgentOutputSchemaBase | None = None,
+        tool_use_behavior: Literal["run_llm_again", "stop_on_first_tool"] | StopAtTools = "run_llm_again",
     ):
         self.config = self._get_config(config)
         if name:
@@ -54,6 +55,7 @@ class SimpleAgent(BaseAgent):
         self.model_settings = self._get_model_settings(self.config, model_settings)
         self.tools: list[Tool] = tools or []
         self.output_type: type[Any] | AgentOutputSchemaBase | None = output_type
+        self.tool_use_behavior: Literal["run_llm_again", "stop_on_first_tool"] | StopAtTools = tool_use_behavior
         self.context_manager: BaseContextManager = None
         self.env: BaseEnv = None
         self.current_agent: Agent[TContext] = None  # move to task recorder?
@@ -101,6 +103,7 @@ class SimpleAgent(BaseAgent):
             model_settings=self.model_settings,
             tools=await self.get_tools(),
             output_type=self.output_type,
+            tool_use_behavior=self.tool_use_behavior,
             mcp_servers=self._mcp_servers,
         )
         self.context_manager = build_context_manager(self.config)
@@ -170,7 +173,6 @@ class SimpleAgent(BaseAgent):
 
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> TaskRecorder:
-        setup_tracing()
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
@@ -193,7 +195,6 @@ class SimpleAgent(BaseAgent):
         return task_recorder
 
     def run_streamed(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResultStreaming:
-        setup_tracing()
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
@@ -223,12 +224,13 @@ class SimpleAgent(BaseAgent):
         self.current_agent = run_result.last_agent
         return run_result
 
-    async def chat_streamed(self, input: str):
+    async def chat_streamed(self, input: str) -> RunResultStreaming:
         self.input_items.append({"content": input, "role": "user"})
         run_result_streaming = self.run_streamed(self.input_items)
         await AgentsUtils.print_stream_events(run_result_streaming.stream_events())
         self.input_items = run_result_streaming.to_input_list()
         self.current_agent = run_result_streaming.last_agent
+        return run_result_streaming
 
     def set_run_hooks(self, run_hooks: RunHooks):
         # WIP

@@ -59,6 +59,7 @@ class UTUAgentRunner(AgentRunner):
         context_manager: BaseContextManager | None = context_wrapper.context.get("context_manager", None)
         if context_manager:
             input = context_manager.preprocess(input, context_wrapper)
+        # print(f"< [DEBUG] input: {input}")
         new_response = await cls._get_new_response(
             agent,
             system_prompt,

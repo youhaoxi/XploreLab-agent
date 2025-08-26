@@ -1,3 +1,4 @@
+import importlib.metadata
 import os
 
 from dotenv import find_dotenv, load_dotenv
@@ -18,3 +19,10 @@ class EnvUtils:
         else:
             if not os.getenv(key):
                 raise ValueError(f"Environment variable {key} is not set")
+
+    @staticmethod
+    def ensure_package(package_name: str) -> None:
+        try:
+            importlib.metadata.version(package_name)
+        except importlib.metadata.PackageNotFoundError:
+            raise ValueError(f"Package {package_name} is required but not installed!") from None

@@ -1,16 +1,18 @@
 import logging
-from collections.abc import AsyncIterator
 from typing import Any
 
+from openai._streaming import AsyncStream
 from openai.types.chat import (
     ChatCompletionChunk,
     ChatCompletionMessage,
+    ChatCompletionMessageFunctionToolCall,
     ChatCompletionMessageToolCall,
     ChatCompletionToolParam,
 )
 from openai.types.responses import (
     FunctionToolParam,
     Response,
+    ResponseStreamEvent,
 )
 from pydantic import BaseModel
 
@@ -20,6 +22,9 @@ logger = logging.getLogger(__name__)
 
 
 class OpenAIUtils:
+    # --------------------------------------------------------
+    # chat completions
+    # --------------------------------------------------------
     @staticmethod
     def print_message(message: ChatCompletionMessage) -> None:
         if hasattr(message, "reasoning_content") and message.reasoning_content:
@@ -31,7 +36,7 @@ class OpenAIUtils:
                 PrintUtils.print_bot(f"<{tool_call.function.name}>{tool_call.function.arguments}", add_prefix=True)
 
     @staticmethod
-    async def print_stream(stream: AsyncIterator[ChatCompletionChunk]) -> ChatCompletionMessage:
+    async def print_stream(stream: AsyncStream[ChatCompletionChunk]) -> ChatCompletionMessage:
         final_tool_calls: dict[int, ChatCompletionMessageToolCall] = {}
         content = ""
         async for chunk in stream:
@@ -57,7 +62,7 @@ class OpenAIUtils:
                         PrintUtils.print_info(f"{tool_call.function.arguments}", end="", color="blue")
         PrintUtils.print_info("")  # print a newline
         tool_calls = [
-            ChatCompletionMessageToolCall(
+            ChatCompletionMessageFunctionToolCall(
                 id=tool_call.id,
                 function=tool_call.function.model_dump(),
                 type=tool_call.type,  # type is always "function"
@@ -68,13 +73,17 @@ class OpenAIUtils:
         OpenAIUtils.print_message(message)
         return message
 
+    # --------------------------------------------------------
+    # responses
+    # --------------------------------------------------------
     @staticmethod
     def print_response(response: Response) -> None:
         for item in response.output:
+            # print(f"> responses item: {item}")
             match item.type:
                 case "reasoning":
                     content = getattr(item, "content", item.summary)
-                    PrintUtils.print_bot(f"{content}", add_prefix=True, color="gray")
+                    PrintUtils.print_bot(f"<reasoning>{content}</reasoning>", add_prefix=True, color="gray")
                 case "message":
                     PrintUtils.print_bot(f"{item.content}", add_prefix=True)
                 case "function_call":
@@ -103,6 +112,10 @@ class OpenAIUtils:
                     PrintUtils.print_info(f"<{item.type}>(server={item.server_label}) {item.name}({item.arguments})")
                 case _:
                     PrintUtils.print_error(f"Unknown item type: {item.type}\n{item}")
+
+    @staticmethod
+    def print_response_stream(stream: AsyncStream[ResponseStreamEvent]) -> Response:
+        raise NotImplementedError
 
     @staticmethod
     def get_response_configs(response: Response, include_output: bool = False) -> dict:

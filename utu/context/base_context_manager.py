@@ -22,5 +22,6 @@ class DummyContextManager(BaseContextManager):
     def preprocess(
         self, input: str | list[TResponseInputItem], run_context: RunContextWrapper[TContext] = None
     ) -> str | list[TResponseInputItem]:
+        # NOTE: filter type="reasoning" items for vllm cannot process it for now!
         # return ChatCompletionConverter.filter_items(input)
         return input

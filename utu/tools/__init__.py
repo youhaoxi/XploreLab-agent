@@ -1,3 +1,4 @@
+from ..config import ConfigLoader
 from .arxiv_toolkit import ArxivToolkit
 from .audio_toolkit import AudioToolkit
 from .base import AsyncBaseToolkit as AsyncBaseToolkit
@@ -12,6 +13,7 @@ from .python_executor_toolkit import PythonExecutorToolkit
 from .search_toolkit import SearchToolkit
 from .serper_toolkit import SerperToolkit
 from .tabular_data_toolkit import TabularDataToolkit
+from .user_interaction_toolkit import UserInteractionToolkit as UserInteractionToolkit
 from .video_toolkit import VideoToolkit
 from .wikipedia_toolkit import WikipediaSearchTool
 
@@ -32,3 +34,15 @@ TOOLKIT_MAP = {
     "serper": SerperToolkit,
     "tabular": TabularDataToolkit,
 }
+
+
+def get_toolkits_map(names: list[str] = None) -> dict[str, AsyncBaseToolkit]:
+    toolkits = {}
+    if names is None:
+        names = list(TOOLKIT_MAP.keys())
+    else:
+        assert all(name in TOOLKIT_MAP for name in names), f"Error config tools: {names}"
+    for name in names:
+        config = ConfigLoader.load_toolkit_config(name)
+        toolkits[name] = TOOLKIT_MAP[name](config=config)
+    return toolkits

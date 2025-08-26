@@ -1,3 +1,4 @@
+from agents import trace
 from pydantic import BaseModel
 
 from utu.config import ConfigLoader
@@ -27,15 +28,22 @@ tools = [
 tools_response = [OpenAIUtils.tool_chatcompletion_to_responses(t) for t in tools]
 
 
+# test chat completions -----------------------------------------------------------------------
+# for model test, use the .chat.completions.create API
 async def test_model():
-    res = await openai_client.chat_completions_create(messages=messages, tools=tools, stream=False)
+    res = await openai_client.chat.completions.create(
+        messages=messages, model=config.model_provider.model, tools=tools, stream=False
+    )
     print(res.choices[0].message)
 
 
 async def test_model_stream():
-    stream = await openai_client.chat_completions_create(messages=messages, tools=tools, stream=True)
+    stream = await openai_client.chat.completions.create(
+        messages=messages, model=config.model_provider.model, tools=tools, stream=True
+    )
     async for chunk in stream:
-        print(chunk.choices[0].delta)
+        print(f"chat completion chunk: {chunk}")
+        # print(chunk.choices[0].delta)
 
 
 async def test_query_one():
@@ -58,16 +66,35 @@ async def test_print_stream():
 
 # test responses -----------------------------------------------------------------------
 async def test_responses():
-    res = await openai_client.responses_create(input=messages, tools=tools_response)
-    print(res)
+    res = await openai_client.responses.create(input=messages, tools=tools_response, model=config.model_provider.model)
     for item in res.output:
-        print(item)
+        print(f"> responses item: {item}")
+
+
+async def test_responses_stream():
+    stream = await openai_client.responses.create(
+        input=messages, tools=tools_response, stream=True, model=config.model_provider.model
+    )
+    async for event in stream:
+        print(f"> responses stream event: {event}")
 
 
 async def test_print_response():
-    res = await openai_client.responses_create(input=messages, tools=tools_response)
-    OpenAIUtils.print_response(res)
-    print(OpenAIUtils.get_response_configs(res))
+    with trace(workflow_name="test_print_response"):
+        res = await openai_client.responses_create(input=messages, tools=tools_response)
+        OpenAIUtils.print_response(res)
+        print(OpenAIUtils.get_response_configs(res))
+
+
+async def test_print_response_stream():
+    print("test_print_response_stream")
+    with trace(workflow_name="test_print_response_stream"):
+        stream = await openai_client.responses.create(
+            input=messages, tools=tools_response, stream=True, tool_choice="auto"
+        )
+        print(f"input: {messages}\ntools: {tools_response}")
+        async for event in stream:
+            print(f"> responses event: {event}")
 
 
 async def test_output_schema():

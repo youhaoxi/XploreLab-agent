@@ -21,13 +21,18 @@ search_qa: |
   </content>
 search_related: |
   You are a webpage analysis agent that extract relevant links to the given query. NOTE:
-  1. You should extract the most relevant links to the query. Do not include the url of given webpage.
-  2. You can only output urls that exist in following webpage.
+  1. You should extract the most relevant links to the query. Do not include given url.
+  2. You can only output valid urls that exist in following webpage.
   3. Output format: id. title(url)
 
   <query>
   {query}
   </query>
+
+  Below is the content of the given url.
+  <url>
+  {url}
+  </url>
   <content>
   {content}
   </content>

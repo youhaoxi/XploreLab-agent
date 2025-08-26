@@ -61,7 +61,7 @@ class AsyncBaseToolkit(abc.ABC):
             self.tools_map = await self.get_tools_map()
         if self.config.activated_tools:
             assert all(tool_name in self.tools_map for tool_name in self.config.activated_tools), (
-                f"Error config activated tools: {self.config.activated_tools}"
+                f"Error config activated tools: {self.config.activated_tools}! available tools: {self.tools_map.keys()}"
             )
             tools_map = {tool_name: self.tools_map[tool_name] for tool_name in self.config.activated_tools}
         else:
