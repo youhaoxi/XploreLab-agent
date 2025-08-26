@@ -11,8 +11,6 @@ wheels/
 
 # Misc
 .DS_Store
-uv.lock
-.env
 .vscode
 *.log
 *.db
@@ -35,7 +33,9 @@ uv.lock
 *.bak
 *.publish
 *.html
-___*
+*.pkl
+_*
+!__init__.py
 _SESSION_DATA
 .cache/
 /data/
@@ -44,17 +44,17 @@ _SESSION_DATA
 /examples/data_analysis/output
 /examples/gui_agent_datamaker/data
 !/examples/gui_agent_datamaker/data/Dublin_Zoo_Intro.docx
-/docs/examples_output
+# /docs/examples_output
 /output/
 /workspace/
-
+/configs/agents/generated
+site/
 mytools/
-
 logs/
 
 .pytest_cache/
 .mypy_cache/
-uv.lock
+# uv.lock
 .env
 test.yaml
 requirements.txt
