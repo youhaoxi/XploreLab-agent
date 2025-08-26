@@ -1,11 +1,10 @@
+import argparse
 import asyncio
 import json
-import traceback
-import argparse
-from dataclasses import asdict, dataclass
-from importlib import resources
-from typing import Literal
 import pickle
+import traceback
+from dataclasses import asdict
+from importlib import resources
 
 import tornado.web
 import tornado.websocket
@@ -16,8 +15,10 @@ REPLAY_INTERVAL = 0.5
 
 
 class ReplayWebSocketHandler(tornado.websocket.WebSocketHandler):
-    def initialize(self, example_query: str = "", events: list[Event] = []):
+    def initialize(self, example_query: str = "", events: list[Event] | None = None):
         self.example_query = example_query
+        if events is None:
+            events = []
         self.events = events
 
     def check_origin(self, origin):
@@ -50,7 +51,7 @@ class ReplayWebSocketHandler(tornado.websocket.WebSocketHandler):
                         await asyncio.sleep(REPLAY_INTERVAL)
                         await self.send_event(real_event)
                         # last_time = timestamp
-                    
+
                 except TypeError as e:
                     print(f"Invalid query format: {e}")
                     # stack trace

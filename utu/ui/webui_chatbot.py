@@ -11,8 +11,16 @@ import tornado.websocket
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.agents.orchestra_agent import OrchestraAgent
 from utu.agents.simple_agent import SimpleAgent
-from .common import Event, ExampleContent, UserQuery
-from .common import handle_new_agent, handle_orchestra_events, handle_raw_stream_events, handle_tool_call_output
+
+from .common import (
+    Event,
+    ExampleContent,
+    UserQuery,
+    handle_new_agent,
+    handle_orchestra_events,
+    handle_raw_stream_events,
+    handle_tool_call_output,
+)
 
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):

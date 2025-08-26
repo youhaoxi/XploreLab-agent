@@ -1,6 +1,8 @@
 import argparse
 import pickle
+
 from utu.ui.common import Event
+
 
 def _yield_current_event(current_event):
     """Helper function to yield current event and return None."""
@@ -10,14 +12,14 @@ def _yield_current_event(current_event):
 
 def merged_event_stream(events: list[Event]):
     current_event = None
-    
+
     for event in events:
         real_event = event["event"]
-        
+
         # Handle raw events
         if real_event.type == "raw":
             data = real_event.data
-            
+
             # Handle text and reason events (mergeable types)
             if data.type in ("text", "reason"):
                 if current_event is None:
@@ -30,23 +32,23 @@ def merged_event_stream(events: list[Event]):
                 else:
                     current_event["event"].data.delta += data.delta
                 continue
-                
+
             # Handle tool call events
             if data.type in ("tool_call", "tool_call_output"):
                 yield from _yield_current_event(current_event)
                 current_event = None
                 yield event
                 continue
-                
+
             raise ValueError(f"Unsupported raw event data type: {data.type}")
-            
+
         # Handle other event types that just need to flush current event
         if real_event.type in ("orchestra", "finish", "example"):
             yield from _yield_current_event(current_event)
             current_event = None
             yield event
             continue
-            
+
         # Handle new event type with special processing
         if real_event.type == "new":
             yield from _yield_current_event(current_event)
@@ -55,9 +57,9 @@ def merged_event_stream(events: list[Event]):
                 real_event.data.name = real_event.data.name[:-len(" (Agent)")]
             yield event
             continue
-            
+
         raise ValueError(f"Unsupported event type: {real_event.type}")
-    
+
     # Yield any remaining event
     if current_event is not None:
         yield current_event
