@@ -4,7 +4,7 @@ import traceback
 import re
 from dataclasses import asdict, dataclass
 from importlib import resources
-from typing import Literal
+from typing import Literal, Optional
 
 import agents as ag
 import tornado.web
@@ -88,6 +88,123 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # print in green color
         print(f"\033[92mSending event: {asdict(event)}\033[0m")
         self.write_message(asdict(event))
+        
+    async def _handle_raw_stream_events(self, event: ag.RawResponsesStreamEvent) -> Optional[Event]:
+        def _send_delta(delta: str, type: Literal["text", "reason", "tool_call_argument", "tool_call_output"], inprogress: bool = True, allow_empty=True):
+            if delta != "" or allow_empty:
+                event_to_send = Event(
+                    type="raw",
+                    data=TextDeltaContent(
+                        type=type,
+                        delta=delta,
+                        inprogress=inprogress,
+                    ),
+                )
+                return event_to_send
+            return None
+        
+        event_to_send = None
+        if event.data.type == "response.output_text.delta":
+            if event.data.delta != "":
+                event_to_send = _send_delta(event.data.delta, "text")
+        elif event.data.type == "response.output_text.done":
+            event_to_send = _send_delta("", "text", inprogress=False)
+        elif event.data.type == "response.reasoning_summary_text.delta" \
+            or event.data.type == "response.reasoning_text.delta":
+            if event.data.delta != "":
+                event_to_send = _send_delta(event.data.delta, "reason")
+        elif event.data.type == "response.reasoning_summary_text.done" \
+            or event.data.type == "response.reasoning_text.done":
+            event_to_send = _send_delta("", "reason", inprogress=False)
+        elif event.data.type == "response.function_call_arguments.delta":
+            pass
+        elif event.data.type == "response.output_item.done":
+            item = event.data.item
+            if item.type == "function_call":
+                event_to_send = Event(
+                    type="raw",
+                    data=TextDeltaContent(
+                        type="tool_call",
+                        delta=item.name,
+                        argument=item.arguments,
+                        callid=item.call_id,
+                        inprogress=True,
+                    ),
+                )
+            elif item.type == "reasoning":
+                event_to_send = _send_delta("", "reason", inprogress=False)
+            elif item.type == "message":
+                pass
+        elif event.data.type == "response.function_call_arguments.done":
+            pass
+        elif event.data.type == "response.output_item.added":
+            item = event.data.item
+            if item.type == "function_call":
+                pass
+            elif item.type == "reasoning":
+                event_to_send = _send_delta("", "reason", inprogress=True)
+            elif item.type == "message":
+                event_to_send = _send_delta("", "text", inprogress=True)
+            else:
+                event_to_send = None
+        else:
+            event_to_send = None
+        return event_to_send
+
+    async def _handle_orchestra_events(self, event: OrchestraStreamEvent) -> Optional[Event]:
+        item = event.item
+        if event.name == "plan":
+            todo_str = []
+            for subtask in item.todo:
+                task_info = f"{subtask.task} ({subtask.agent_name})"
+                todo_str.append(task_info)
+            plan_item = PlanItem(analysis=item.analysis, todo=todo_str)
+            event_to_send = Event(
+                type="orchestra", data=OrchestraContent(type="plan", item=plan_item)
+            )
+        elif event.name == "worker":
+            worker_item = WorkerItem(task=item.task, output=item.output)
+            event_to_send = Event(
+                type="orchestra", data=OrchestraContent(type="worker", item=worker_item)
+            )
+        elif event.name == "report":
+            report_item = ReportItem(output=item.output)
+            event_to_send = Event(
+                type="orchestra", data=OrchestraContent(type="report", item=report_item)
+            )
+        else:
+            pass
+        return event_to_send
+
+    async def _handle_tool_call_output(self, event: ag.RunItemStreamEvent) -> Optional[Event]:
+        item = event.item
+        if item.type == "tool_call_output_item":
+            event_to_send = Event(
+                type="raw",
+                data=TextDeltaContent(
+                    type="tool_call_output",
+                    delta=item.output,
+                    callid=item.raw_item["call_id"],
+                    inprogress=False,
+                ),
+            )
+            return event_to_send
+        return None
+
+    async def _handle_new_agent(self, event: ag.AgentUpdatedStreamEvent) -> Optional[Event]:
+        if event.new_agent:
+            if hasattr(event.new_agent, "name"):
+                new_agent_name = f"{event.new_agent.name} ({event.new_agent.__class__.__name__})"
+            else:
+                new_agent_name = event.new_agent.__class__.__name__
+
+            event_to_send = Event(
+                type="new",
+                data=NewAgentContent(type="new", name=new_agent_name),
+            )
+        else:
+            pass
+        return event_to_send
 
     async def on_message(self, message: str):
         try:
@@ -115,165 +232,13 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                         event_to_send = None
                         print(f"--------------------\n{event}")
                         if isinstance(event, ag.RawResponsesStreamEvent):
-                            if event.data.type == "response.output_text.delta":
-                                if event.data.delta != "":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="text",
-                                            delta=event.data.delta,
-                                            inprogress=True,
-                                        ),
-                                    )
-                            elif event.data.type == "response.output_text.done":
-                                event_to_send = Event(
-                                    type="raw",
-                                    data=TextDeltaContent(
-                                        type="text",
-                                        delta="",
-                                        inprogress=False,
-                                    ),
-                                )
-                            elif event.data.type == "response.reasoning_summary_text.delta" \
-                                or event.data.type == "response.reasoning_text.delta":
-                                if event.data.delta != "":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="reason",
-                                            delta=event.data.delta,
-                                            inprogress=True,
-                                        ),
-                                    )
-                            elif event.data.type == "response.reasoning_summary_text.done" \
-                                or event.data.type == "response.reasoning_text.done":
-                                event_to_send = Event(
-                                    type="raw",
-                                    data=TextDeltaContent(
-                                        type="reason",
-                                        delta="",
-                                        inprogress=True,
-                                    ),
-                                )
-                            elif event.data.type == "response.function_call_arguments.delta":
-                                # if event.data.delta != '':
-                                #     event_to_send = Event(type="raw", data=TextDeltaContent(
-                                #         type="tool_call_argument",
-                                #         delta=event.data.delta,
-                                #         inprogress=True,
-                                #     ))
-                                pass
-                            elif event.data.type == "response.output_item.done":
-                                item = event.data.item
-                                if item.type == "function_call":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="tool_call",
-                                            delta=item.name,
-                                            argument=item.arguments,
-                                            callid=item.call_id,
-                                            inprogress=True,
-                                        ),
-                                    )
-                                elif item.type == "reasoning":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="reason",
-                                            delta="",
-                                            inprogress=False,
-                                        ),
-                                    )
-                                elif item.type == "message":
-                                    pass
-                            elif event.data.type == "response.function_call_arguments.done":
-                                # event_to_send = Event(type="raw", data=TextDeltaContent(
-                                #     type="tool_call_argument",
-                                #     delta=event.data.delta,
-                                #     inprogress=False,
-                                # ))
-                                pass
-                            elif event.data.type == "response.output_item.added":
-                                item = event.data.item
-                                if item.type == "function_call":
-                                    # event_to_send = Event(type="raw", data=TextDeltaContent(
-                                    #     type="tool_call",
-                                    #     delta=item.name,
-                                    #     inprogress=True,
-                                    #     tool_name=item.name,
-                                    # ))
-                                    pass
-                                elif item.type == "reasoning":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="reason",
-                                            delta=item.summary,
-                                            inprogress=True,
-                                        ),
-                                    )
-                                elif item.type == "message":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="text",
-                                            delta="",
-                                            inprogress=True,
-                                        ),
-                                    )
-                                else:
-                                    event_to_send = None
-                            else:
-                                event_to_send = None
+                            event_to_send = await self._handle_raw_stream_events(event)
                         elif isinstance(event, ag.RunItemStreamEvent):
-                            item = event.item
-                            if item.type == "tool_call_output_item":
-                                event_to_send = Event(
-                                    type="raw",
-                                    data=TextDeltaContent(
-                                        type="tool_call_output",
-                                        delta=item.output,
-                                        callid=item.raw_item["call_id"],
-                                        inprogress=False,
-                                    ),
-                                )
-                            else:
-                                pass
+                            event_to_send = await self._handle_tool_call_output(event)
                         elif isinstance(event, ag.AgentUpdatedStreamEvent):
-                            if event.new_agent:
-                                if hasattr(event.new_agent, "name"):
-                                    new_agent_name = f"{event.new_agent.name} ({event.new_agent.__class__.__name__})"
-                                else:
-                                    new_agent_name = event.new_agent.__class__.__name__
-
-                                event_to_send = Event(
-                                    type="new",
-                                    data=NewAgentContent(type="new", name=new_agent_name),
-                                )
+                            event_to_send = await self._handle_new_agent(event)
                         elif isinstance(event, OrchestraStreamEvent):
-                            item = event.item
-                            if event.name == "plan":
-                                todo_str = []
-                                for subtask in item.todo:
-                                    task_info = f"{subtask.task} ({subtask.agent_name})"
-                                    todo_str.append(task_info)
-                                plan_item = PlanItem(analysis=item.analysis, todo=todo_str)
-                                event_to_send = Event(
-                                    type="orchestra", data=OrchestraContent(type="plan", item=plan_item)
-                                )
-                            elif event.name == "worker":
-                                worker_item = WorkerItem(task=item.task, output=item.output)
-                                event_to_send = Event(
-                                    type="orchestra", data=OrchestraContent(type="worker", item=worker_item)
-                                )
-                            elif event.name == "report":
-                                report_item = ReportItem(output=item.output)
-                                event_to_send = Event(
-                                    type="orchestra", data=OrchestraContent(type="report", item=report_item)
-                                )
-                            else:
-                                pass
+                            event_to_send = await self._handle_orchestra_events(event)
                         else:
                             pass
                         if event_to_send:
