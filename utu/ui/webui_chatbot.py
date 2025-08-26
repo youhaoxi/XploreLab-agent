@@ -1,8 +1,8 @@
 import asyncio
 import json
-from dataclasses import asdict, dataclass
+import traceback
+from dataclasses import asdict
 from importlib import resources
-from typing import Literal
 
 import agents as ag
 import tornado.web
@@ -12,55 +12,15 @@ from utu.agents.orchestra import OrchestraStreamEvent
 from utu.agents.orchestra_agent import OrchestraAgent
 from utu.agents.simple_agent import SimpleAgent
 
-
-@dataclass
-class TextDeltaContent:
-    type: Literal["reason", "tool_call_argument", "tool_call_output", "text"]
-    delta: str
-    inprogress: bool = False
-    callid: str | None = None
-    argument: str | None = None
-
-
-@dataclass
-class PlanItem:
-    analysis: str
-    todo: list[str]
-
-
-@dataclass
-class WorkerItem:
-    task: str
-    output: str
-
-
-@dataclass
-class ReportItem:
-    output: str
-
-
-@dataclass
-class OrchestraContent:
-    type: Literal["plan", "worker", "report"]
-    item: PlanItem | WorkerItem | ReportItem
-
-
-@dataclass
-class ExampleContent:
-    type: Literal["example"]
-    query: str
-
-
-@dataclass
-class Event:
-    type: Literal["raw", "orchestra", "finish", "example"]
-    data: TextDeltaContent | OrchestraContent | ExampleContent | None = None
-
-
-@dataclass
-class UserQuery:
-    type: Literal["query"]
-    query: str
+from .common import (
+    Event,
+    ExampleContent,
+    UserQuery,
+    handle_new_agent,
+    handle_orchestra_events,
+    handle_raw_stream_events,
+    handle_tool_call_output,
+)
 
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
@@ -76,6 +36,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # print("WebSocket opened")
         # send example query
         self.write_message(asdict(Event("example", ExampleContent(type="example", query=self.example_query))))
+
+    async def send_event(self, event: Event):
+        # print in green color
+        print(f"\033[92mSending event: {asdict(event)}\033[0m")
+        self.write_message(asdict(event))
 
     async def on_message(self, message: str):
         try:
@@ -93,184 +58,55 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                         stream = self.agent.run_streamed(query.query)
                     elif isinstance(self.agent, SimpleAgent):
                         self.agent.input_items.append({"role": "user", "content": query.query})
+                        # print in red color
+                        print(f"\033[91mInput items: {self.agent.input_items}\033[0m")
                         stream = self.agent.run_streamed(self.agent.input_items)
                     else:
                         raise ValueError(f"Unsupported agent type: {type(self.agent).__name__}")
 
                     async for event in stream.stream_events():
                         event_to_send = None
+                        print(f"--------------------\n{event}")
                         if isinstance(event, ag.RawResponsesStreamEvent):
-                            if event.data.type == "response.output_text.delta":
-                                if event.data.delta != "":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="text",
-                                            delta=event.data.delta,
-                                            inprogress=True,
-                                        ),
-                                    )
-                            elif event.data.type == "response.output_text.done":
-                                event_to_send = Event(
-                                    type="raw",
-                                    data=TextDeltaContent(
-                                        type="text",
-                                        delta=event.data.delta,
-                                        inprogress=False,
-                                    ),
-                                )
-                            elif event.data.type == "response.reasoning_summary_text.delta":
-                                if event.data.delta != "":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="reason",
-                                            delta=event.data.delta,
-                                            inprogress=True,
-                                        ),
-                                    )
-                            elif event.data.type == "response.reasoning_summary_text.done":
-                                event_to_send = Event(
-                                    type="raw",
-                                    data=TextDeltaContent(
-                                        type="reason",
-                                        delta=event.data.delta,
-                                        inprogress=False,
-                                    ),
-                                )
-                            elif event.data.type == "response.function_call_arguments.delta":
-                                # if event.data.delta != '':
-                                #     event_to_send = Event(type="raw", data=TextDeltaContent(
-                                #         type="tool_call_argument",
-                                #         delta=event.data.delta,
-                                #         inprogress=True,
-                                #     ))
-                                pass
-                            elif event.data.type == "response.output_item.done":
-                                item = event.data.item
-                                if item.type == "function_call":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="tool_call",
-                                            delta=item.name,
-                                            argument=item.arguments,
-                                            callid=item.call_id,
-                                            inprogress=True,
-                                        ),
-                                    )
-                                elif item.type == "reasoning":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="reason",
-                                            delta=item.summary,
-                                            inprogress=False,
-                                        ),
-                                    )
-                                elif item.type == "message":
-                                    pass
-                            elif event.data.type == "response.function_call_arguments.done":
-                                # event_to_send = Event(type="raw", data=TextDeltaContent(
-                                #     type="tool_call_argument",
-                                #     delta=event.data.delta,
-                                #     inprogress=False,
-                                # ))
-                                pass
-                            elif event.data.type == "response.output_item.added":
-                                item = event.data.item
-                                if item.type == "function_call":
-                                    # event_to_send = Event(type="raw", data=TextDeltaContent(
-                                    #     type="tool_call",
-                                    #     delta=item.name,
-                                    #     inprogress=True,
-                                    #     tool_name=item.name,
-                                    # ))
-                                    pass
-                                elif item.type == "reasoning":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="reason",
-                                            delta="",
-                                            inprogress=True,
-                                        ),
-                                    )
-                                elif item.type == "message":
-                                    event_to_send = Event(
-                                        type="raw",
-                                        data=TextDeltaContent(
-                                            type="text",
-                                            delta="",
-                                            inprogress=True,
-                                        ),
-                                    )
-                            else:
-                                event_to_send = None
+                            event_to_send = await handle_raw_stream_events(event)
                         elif isinstance(event, ag.RunItemStreamEvent):
-                            item = event.item
-                            if item.type == "tool_call_output_item":
-                                event_to_send = Event(
-                                    type="raw",
-                                    data=TextDeltaContent(
-                                        type="tool_call_output",
-                                        delta=item.output,
-                                        callid=item.raw_item["call_id"],
-                                        inprogress=False,
-                                    ),
-                                )
-                            else:
-                                pass
+                            event_to_send = await handle_tool_call_output(event)
                         elif isinstance(event, ag.AgentUpdatedStreamEvent):
-                            pass
+                            event_to_send = await handle_new_agent(event)
                         elif isinstance(event, OrchestraStreamEvent):
-                            item = event.item
-                            if event.name == "plan":
-                                todo_str = []
-                                for subtask in item.todo:
-                                    task_info = f"{subtask.task} ({subtask.agent_name})"
-                                    todo_str.append(task_info)
-                                plan_item = PlanItem(analysis=item.analysis, todo=todo_str)
-                                event_to_send = Event(
-                                    type="orchestra", data=OrchestraContent(type="plan", item=plan_item)
-                                )
-                            elif event.name == "worker":
-                                worker_item = WorkerItem(task=item.task, output=item.output)
-                                event_to_send = Event(
-                                    type="orchestra", data=OrchestraContent(type="worker", item=worker_item)
-                                )
-                            elif event.name == "report":
-                                report_item = ReportItem(output=item.output)
-                                event_to_send = Event(
-                                    type="orchestra", data=OrchestraContent(type="report", item=report_item)
-                                )
-                            else:
-                                pass
+                            event_to_send = await handle_orchestra_events(event)
                         else:
                             pass
                         if event_to_send:
                             # print(f"Sending event: {asdict(event_to_send)}")
-                            self.write_message(asdict(event_to_send))
+                            await self.send_event(event_to_send)
                     else:
-                        event_to_send = Event(type="finish")
-                        self.write_message(asdict(event_to_send))
-                        if isinstance(self.agent, SimpleAgent):
-                            self.agent.input_items = stream.to_input_list()
-                            self.agent.current_agent = stream.last_agent
-                except TypeError:
-                    # print(f"Invalid query format: {e}")
+                        pass
+                    event_to_send = Event(type="finish")
+                    # self.write_message(asdict(event_to_send))
+                    await self.send_event(event_to_send)
+                    if isinstance(self.agent, SimpleAgent):
+                        input_list = stream.to_input_list()
+                        self.agent.input_items = input_list
+                        # print in red
+                        print(f"\033[91mInput list: {input_list}\033[0m")
+                        self.agent.current_agent = stream.last_agent
+                except TypeError as e:
+                    print(f"Invalid query format: {e}")
+                    # stack trace
+                    print(traceback.format_exc())
                     self.close(1002, "Invalid query format")
             else:
                 # print(f"Unhandled message type: {data.get('type')}")
-                self.close(1002, "Unhandled message type")
+                # self.close(1002, "Unhandled message type")
+                pass
         except json.JSONDecodeError:
             # print(f"Invalid JSON received: {message}")
             self.close(1002, "Invalid JSON received")
-        except Exception:
-            # print(f"Error processing message: {str(e)}")
+        except Exception as e:
+            print(f"Error processing message: {str(e)}")
             # stack trace
-            # import traceback
-            # print(traceback.format_exc())
+            print(traceback.format_exc())
             self.close(1002, "Error processing message")
 
     def on_close(self):
@@ -310,6 +146,9 @@ class WebUIChatbot:
         app.listen(port)
         print(f"Server started at http://localhost:{port}/")
         await asyncio.Event().wait()
+
+    async def launch_async(self, port: int = 8848):
+        await self.__launch(port=port)
 
     def launch(self, port: int = 8848):
         asyncio.run(self.__launch(port=port))
