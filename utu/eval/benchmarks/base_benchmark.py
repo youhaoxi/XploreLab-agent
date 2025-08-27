@@ -35,7 +35,9 @@ class BaseBenchmark:
 
         # dataset
         self.dataset = DBDataManager(config)
-        self.dataset.load()
+        _samples = self.dataset.load()
+        if len(_samples) == 0:
+            raise ValueError(f"No samples found for data config '{self.config.data}'! Please check the data config.")
 
     async def main(self):
         logger.info(f"> Running with config: \n{json.dumps(self.config.model_dump(), indent=2, ensure_ascii=False)}")

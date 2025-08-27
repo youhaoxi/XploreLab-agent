@@ -1,23 +1,18 @@
 import argparse
 import json
-import os
 import sys
 
-from sqlmodel import Session, create_engine
+from sqlmodel import Session
 
 from utu.db.eval_datapoint import DatasetSample
+from utu.utils.sqlmodel_utils import SQLModelUtils
 
 
 def upload_dataset(file_path: str, dataset_name: str):
     """
     Connects to the database and uploads datapoints from a local JSONL file.
     """
-    db_url = os.environ.get("DB_URL")
-    if not db_url:
-        print("Error: DB_URL environment variable not set.", file=sys.stderr)
-        sys.exit(1)
-
-    engine = create_engine(db_url)
+    engine = SQLModelUtils.get_engine()
 
     print("Connecting to the database...")
     with Session(engine) as session:
