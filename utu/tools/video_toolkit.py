@@ -27,7 +27,7 @@ class VideoToolkit(AsyncBaseToolkit):
         r"""Asks a question about the video.
 
         Args:
-            video_path (str): The path or URL to the video file.
+            video_url (str): The path or URL to the video file.
             question (str): The question to ask about the video.
         """
         if not video_url.startswith("http"):
