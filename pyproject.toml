@@ -1,5 +1,5 @@
 [project]
-name = "utu-agent"
+name = "Youtu-agent"
 version = "0.1.0"
 description = "a simple yet powerful agents framework"
 readme = "README.md"
