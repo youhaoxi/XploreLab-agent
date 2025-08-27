@@ -24,4 +24,9 @@ class DummyContextManager(BaseContextManager):
     ) -> str | list[TResponseInputItem]:
         # NOTE: filter type="reasoning" items for vllm cannot process it for now!
         # return ChatCompletionConverter.filter_items(input)
+
+        # TODO: add action limit
+        # if run_context is None or run_context.context.get("env", None) is None:
+        #     logger.warning(f"run_context {run_context} or env is None")
+        #     return input
         return input

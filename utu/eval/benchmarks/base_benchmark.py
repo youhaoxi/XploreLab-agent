@@ -10,7 +10,7 @@ from ...utils import AgentsUtils, get_logger
 from ..data import DBDataManager, EvaluationSample
 from ..processer import PROCESSER_FACTORY, BaseProcesser
 
-logger = get_logger(__name__)
+logger = get_logger(__name__, "INFO")
 
 
 class BaseBenchmark:
@@ -147,7 +147,7 @@ class BaseBenchmark:
         self.dataset.save(result)
         return result
 
-    async def stat(self):
+    async def stat(self) -> list[dict]:
         # TODO: wrap the data like @verl / @torch
         # TODO: log to wandb
         judged_samples = self.dataset.get_samples(stage="judged")
@@ -161,6 +161,7 @@ class BaseBenchmark:
             overall_results.append(result)
 
         logger.info(json.dumps(overall_results, indent=4, ensure_ascii=False))
+        return overall_results
 
     def _get_processer(self, source: str) -> BaseProcesser:
         if source not in self._source_to_processer:
