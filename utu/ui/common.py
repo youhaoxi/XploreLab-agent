@@ -49,6 +49,7 @@ class NewAgentContent:
     type: Literal["new"]
     name: str
 
+
 @dataclass
 class Event:
     type: Literal["raw", "orchestra", "finish", "example", "new"]
@@ -85,11 +86,11 @@ async def handle_raw_stream_events(event: ag.RawResponsesStreamEvent) -> Event |
         event_to_send = _send_delta(event.data.delta, "text", allow_empty=False)
     elif event.data.type == "response.output_text.done":
         event_to_send = _send_delta("", "text", inprogress=False)
-    elif event.data.type == "response.reasoning_summary_text.delta" \
-        or event.data.type == "response.reasoning_text.delta":
+    elif (
+        event.data.type == "response.reasoning_summary_text.delta" or event.data.type == "response.reasoning_text.delta"
+    ):
         event_to_send = _send_delta(event.data.delta, "reason", allow_empty=False)
-    elif event.data.type == "response.reasoning_summary_text.done" \
-        or event.data.type == "response.reasoning_text.done":
+    elif event.data.type == "response.reasoning_summary_text.done" or event.data.type == "response.reasoning_text.done":
         event_to_send = _send_delta("", "reason", inprogress=False)
     elif event.data.type == "response.function_call_arguments.delta":
         pass
@@ -126,6 +127,7 @@ async def handle_raw_stream_events(event: ag.RawResponsesStreamEvent) -> Event |
         event_to_send = None
     return event_to_send
 
+
 async def handle_orchestra_events(event: OrchestraStreamEvent) -> Event | None:
     item = event.item
     if event.name == "plan":
@@ -134,22 +136,17 @@ async def handle_orchestra_events(event: OrchestraStreamEvent) -> Event | None:
             task_info = f"{subtask.task} ({subtask.agent_name})"
             todo_str.append(task_info)
         plan_item = PlanItem(analysis=item.analysis, todo=todo_str)
-        event_to_send = Event(
-            type="orchestra", data=OrchestraContent(type="plan", item=plan_item)
-        )
+        event_to_send = Event(type="orchestra", data=OrchestraContent(type="plan", item=plan_item))
     elif event.name == "worker":
         worker_item = WorkerItem(task=item.task, output=item.output)
-        event_to_send = Event(
-            type="orchestra", data=OrchestraContent(type="worker", item=worker_item)
-        )
+        event_to_send = Event(type="orchestra", data=OrchestraContent(type="worker", item=worker_item))
     elif event.name == "report":
         report_item = ReportItem(output=item.output)
-        event_to_send = Event(
-            type="orchestra", data=OrchestraContent(type="report", item=report_item)
-        )
+        event_to_send = Event(type="orchestra", data=OrchestraContent(type="report", item=report_item))
     else:
         pass
     return event_to_send
+
 
 async def handle_tool_call_output(event: ag.RunItemStreamEvent) -> Event | None:
     item = event.item
@@ -165,6 +162,7 @@ async def handle_tool_call_output(event: ag.RunItemStreamEvent) -> Event | None:
         )
         return event_to_send
     return None
+
 
 async def handle_new_agent(event: ag.AgentUpdatedStreamEvent) -> Event | None:
     if event.new_agent:

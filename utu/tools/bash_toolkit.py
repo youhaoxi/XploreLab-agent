@@ -47,6 +47,7 @@ class BashToolkit(AsyncBaseToolkit):
     @staticmethod
     def start_persistent_shell(timeout: int):
         import pexpect
+        # https://github.com/pexpect/pexpect/issues/321
 
         # Start a new Bash shell
         child = pexpect.spawn("/bin/bash", encoding="utf-8", echo=False, timeout=timeout)

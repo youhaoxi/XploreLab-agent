@@ -10,6 +10,7 @@ def _yield_current_event(current_event):
         yield current_event
     return None
 
+
 def merged_event_stream(events: list[Event]):
     current_event = None
 
@@ -54,7 +55,7 @@ def merged_event_stream(events: list[Event]):
             yield from _yield_current_event(current_event)
             current_event = None
             if real_event.data.name.endswith(" (Agent)"):
-                real_event.data.name = real_event.data.name[:-len(" (Agent)")]
+                real_event.data.name = real_event.data.name[: -len(" (Agent)")]
             yield event
             continue
 
@@ -64,12 +65,15 @@ def merged_event_stream(events: list[Event]):
     if current_event is not None:
         yield current_event
 
+
 def process_events(events: list[Event]):
     return list(merged_event_stream(events))
+
 
 def save_events(events: list[Event], output: str):
     with open(output, "wb") as f:
         pickle.dump(events, f)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

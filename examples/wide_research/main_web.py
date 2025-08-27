@@ -73,8 +73,8 @@ async def wide_research(task: str, subtasks: list[str], output_schema: dict, out
         return f"Error: {e}"
 
 
-
 TASK = "Find the outstanding papers of ACL 2025, extract their title, author list, keywords, abstract, url in one sentence."
+
 
 class WideResearch:
     async def build(self):

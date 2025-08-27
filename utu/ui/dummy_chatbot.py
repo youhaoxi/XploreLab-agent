@@ -21,15 +21,15 @@ from .common import (
 event_list = []
 start_time = time.time()
 
+
 async def send_event(event: Event):
-    event_list.append({
-        "timestamp": time.time() - start_time,
-        "event": event
-    })
+    event_list.append({"timestamp": time.time() - start_time, "event": event})
+
 
 def save_event_list():
     with open(f"event_list_{time.time()}.pkl", "wb") as f:
         pickle.dump(event_list, f)
+
 
 async def run(agent: SimpleAgent | OrchestraAgent, query: str):
     if isinstance(agent, OrchestraAgent):
@@ -65,8 +65,10 @@ async def run(agent: SimpleAgent | OrchestraAgent, query: str):
                         inprogress=False,
                     ),
                 )
-            elif event.data.type == "response.reasoning_summary_text.delta" \
-                or event.data.type == "response.reasoning_text.delta":
+            elif (
+                event.data.type == "response.reasoning_summary_text.delta"
+                or event.data.type == "response.reasoning_text.delta"
+            ):
                 if event.data.delta != "":
                     event_to_send = Event(
                         type="raw",
@@ -76,8 +78,10 @@ async def run(agent: SimpleAgent | OrchestraAgent, query: str):
                             inprogress=True,
                         ),
                     )
-            elif event.data.type == "response.reasoning_summary_text.done" \
-                or event.data.type == "response.reasoning_text.done":
+            elif (
+                event.data.type == "response.reasoning_summary_text.done"
+                or event.data.type == "response.reasoning_text.done"
+            ):
                 event_to_send = Event(
                     type="raw",
                     data=TextDeltaContent(
@@ -190,19 +194,13 @@ async def run(agent: SimpleAgent | OrchestraAgent, query: str):
                     task_info = f"{subtask.task} ({subtask.agent_name})"
                     todo_str.append(task_info)
                 plan_item = PlanItem(analysis=item.analysis, todo=todo_str)
-                event_to_send = Event(
-                    type="orchestra", data=OrchestraContent(type="plan", item=plan_item)
-                )
+                event_to_send = Event(type="orchestra", data=OrchestraContent(type="plan", item=plan_item))
             elif event.name == "worker":
                 worker_item = WorkerItem(task=item.task, output=item.output)
-                event_to_send = Event(
-                    type="orchestra", data=OrchestraContent(type="worker", item=worker_item)
-                )
+                event_to_send = Event(type="orchestra", data=OrchestraContent(type="worker", item=worker_item))
             elif event.name == "report":
                 report_item = ReportItem(output=item.output)
-                event_to_send = Event(
-                    type="orchestra", data=OrchestraContent(type="report", item=report_item)
-                )
+                event_to_send = Event(type="orchestra", data=OrchestraContent(type="report", item=report_item))
             else:
                 pass
         else:
