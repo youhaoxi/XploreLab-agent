@@ -155,52 +155,64 @@ For more design and implementation details, please refer to our [technical docum
 
 ## 🚀 Getting Started
 
-First, ensure you have completed the initial setup (clone repo, install dependencies).
+Youtu-agent provides complete code and examples to help you get started quickly. Follow the steps below to run your first agent:
+
+### Setup
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/Tencent/Youtu-agent.git
+cd Youtu-agent
+uv sync
+```
+
+> [!NOTE]
+> The project requires Python 3.12+. We recommend using [uv](https://github.com/astral-sh/uv) for dependency management.
+
 
 ### Quickstart
 
-This example runs a simple agent equipped with a web search tool.
+Youtu-agent ships with built-in configurations. For example, the default config (`configs/agents/default.yaml`) defines a simple agent equipped with a search tool:
 
-**1. Create a config file:**
 ```yaml
-# configs/agents/sample_tool.yaml
 defaults:
   - /model/base
-  - /tools/search@toolkits.search # Loads the 'search' toolkit
+  - /tools/search@toolkits.search
   - _self_
 
 agent:
-    name: simple-tool-agent
-    instructions: "You are a helpful assistant that can search the web."
+  name: simple-tool-agent
+  instructions: "You are a helpful assistant that can search the web."
 ```
 
-**2. Write and run the Python script:**
-```python
-import asyncio
-from utu.agents import SimpleAgent
+You can launch an interactive CLI chatbot with this agent by running:
 
-async def main():
-    async with SimpleAgent(config="sample_tool.yaml") as agent:
-        await agent.chat("What's the weather in Beijing today?")
-
-asyncio.run(main())
-```
-
-See [quickstart](./docs/quickstart.md) for more details.
-
-
-### Using Examples
-
-You can try running the examples, such as a deep research agent.
 ```bash
-python -m examples.research.main
+python scripts/cli_chat.py --stream --config default
 ```
 
-See [examples](./docs/examples.md) for more examples.
+📖 More details: [Quickstart Documentation](https://tencent.github.io/Youtu-agent/quickstart)
 
-### Evaluation
+### Explore examples
+The repository provides multiple ready-to-use examples. For instance, you can generate an SVG infographic based on a research topic:
 
-Run the full evaluation pipeline on a benchmark like WebWalkerQA.
+```bash
+python examples/svg_generator/main_web.py
+```
+
+Given a research topic, the agent will automatically search the web, collect relevant information, and output an SVG visualization.
+
+![svg_generator_ui](https://github.com/user-attachments/assets/337d327f-91ee-434e-bbcf-297dd4b26c28)
+
+![svg_generator_result](https://github.com/user-attachments/assets/41aa7348-5f02-4daa-b5b2-225e35d21067)
+
+📖 Learn more: [Examples Documentation](https://tencent.github.io/Youtu-agent/examples)
+
+### Run evaluations
+
+Youtu-agent also supports benchmarking on standard datasets. For example, to evaluate on `WebWalkerQA`:
+
 ```bash
 # prepare dataset
 python scripts/data/process_web_walker_qa.py
@@ -208,8 +220,13 @@ python scripts/data/process_web_walker_qa.py
 python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA --concurrency 5
 ```
 
-See [evaluation](./docs/evaluation.md) for more details.
+Results are stored and can be further analyzed in the evaluation platform.
 
+![eval_analysis_overview](https://github.com/user-attachments/assets/4a285b9e-d096-437e-9b8e-e5bf6b1924b6)
+
+![eval_analysis_detail](https://github.com/user-attachments/assets/4ede525a-5e16-4d88-9ebb-01a7dca3aaec)
+
+📖 Learn more: [Evaluation Documentation](https://tencent.github.io/Youtu-agent/eval)
 
 ## Acknowledgements
 

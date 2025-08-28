@@ -81,12 +81,16 @@ plugins:
             # show_root_heading: true
             show_source: true
 
+# https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions
 markdown_extensions:
+  # https://squidfunk.github.io/mkdocs-material/reference/diagrams
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
 
 extra_css:
   - stylesheets/extra.css

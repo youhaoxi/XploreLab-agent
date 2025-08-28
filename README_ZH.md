@@ -146,58 +146,81 @@ python scripts/cli_chat.py --stream --config generated/xxx
 
 更多的设计与实现细节，请参阅我们的[在线文档](https://tencent.github.io/Youtu-agent/)。
 
-## 🚀 快速开始
+## 🚀 快速上手
 
-首先，请确保您已完成初始设置（克隆仓库，安装依赖）。
+Youtu-agent 提供了完整的代码与示例，帮助你快速开始使用。按照以下步骤即可运行你的第一个智能体：
 
-### 快速入门
+### 环境准备
 
-此示例运行一个配备了网页搜索工具的简单智能体。
+克隆仓库并安装依赖：
 
-**1. 创建配置文件：**
+```bash
+git clone https://github.com/Tencent/Youtu-agent.git
+cd Youtu-agent
+uv sync
+```
+
+> [!NOTE]
+> 本项目使用 **Python 3.12+**。推荐使用 [uv](https://github.com/astral-sh/uv) 进行依赖管理。
+
+### 快速开始
+
+Youtu-agent 内置了配置文件。例如，默认配置文件 (`configs/agents/default.yaml`) 定义了一个带有搜索工具的简单 Agent：
+
 ```yaml
-# configs/agents/sample_tool.yaml
 defaults:
   - /model/base
-  - /tools/search@toolkits.search # 加载 'search' 工具包
+  - /tools/search@toolkits.search
   - _self_
 
 agent:
-    name: simple-tool-agent
-    instructions: "你是一个可以搜索网络的有用助手。"
+  name: simple-tool-agent
+  instructions: "You are a helpful assistant that can search the web."
 ```
 
-**2. 编写并运行 Python 脚本：**
-```python
-import asyncio
-from utu.agents import SimpleAgent
+你可以通过以下命令启动交互式 CLI 聊天机器人：
 
-async def main():
-    async with SimpleAgent(config="sample_tool.yaml") as agent:
-        await agent.chat("今天北京的天气怎么样？")
-
-asyncio.run(main())
-```
-
-更多详情请参阅 [快速入门](./docs/quickstart.md)。
-
-### 使用示例
-
-您可以尝试运行示例，例如深度研究智能体。
 ```bash
-python -m examples.research.main
+python scripts/cli_chat.py --stream --config default
 ```
 
-更多示例请参阅 [示例](./docs/examples.md)。
+📖 更多内容请参考：[快速开始文档](https://tencent.github.io/Youtu-agent/quickstart)
 
-### 评估
+### 示例探索
 
-在 WebWalkerQA 等基准上运行完整的评估流程。
+本仓库提供了多个可直接运行的示例。例如，你可以基于某个研究主题自动生成一张 **SVG 信息图**：
+
 ```bash
+python examples/svg_generator/main_web.py
+```
+
+给定一个研究主题后，Agent 会自动执行网络搜索，收集相关信息，并输出一张 SVG 可视化图。
+
+![svg_generator_ui](https://github.com/user-attachments/assets/337d327f-91ee-434e-bbcf-297dd4b26c28)
+
+![svg_generator_result](https://github.com/user-attachments/assets/41aa7348-5f02-4daa-b5b2-225e35d21067)
+
+📖 更多示例请参考：[示例文档](https://tencent.github.io/Youtu-agent/examples)
+
+### 运行评测
+
+Youtu-agent 还支持在标准数据集上进行基准测试。例如，在 **WebWalkerQA** 上运行评测：
+
+```bash
+# 数据集预处理
+python scripts/data/process_web_walker_qa.py
+
+# 使用配置 ww.yaml 运行评测
 python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA --concurrency 5
 ```
 
-更多详情请参阅 [评估](./docs/evaluation.md)。
+结果会保存到本地，并可在分析平台中进一步查看。
+
+![eval_analysis_overview](https://github.com/user-attachments/assets/4a285b9e-d096-437e-9b8e-e5bf6b1924b6)
+
+![eval_analysis_detail](https://github.com/user-attachments/assets/4ede525a-5e16-4d88-9ebb-01a7dca3aaec)
+
+📖 更多内容请参考：[评测文档](https://tencent.github.io/Youtu-agent/eval)
 
 ## 致谢
 

@@ -2,14 +2,14 @@
 
 This guide will walk you through setting up the project, running your first agent, and executing evaluations.
 
-## 1. Installation & Setup
+## Installation & Setup
 
 First, clone the repository and set up the Python environment.
 
 ```sh
 # Clone the project repository
-git clone https://github.com/Tencent/uTu-agent.git
-cd uTu-agent
+git clone https://github.com/Tencent/Youtu-agent.git
+cd Youtu-agent
 
 # We use `uv` to manage the virtual environment and dependencies
 # Create the virtual environment
@@ -25,11 +25,11 @@ uv sync --group dev
 cp .env.example .env
 ```
 
-After creating the `.env` file, you **must** edit it to add your necessary API keys (e.g., `OPENAI_API_KEY`, `SERPER_API_KEY`, etc.).
+After creating the `.env` file, you **must** edit it to add your necessary API keys (e.g., `UTU_LLM_API_KEY`, `SERPER_API_KEY`, etc.).
 
 ---
 
-## 2. Running an Agent
+## Running an Agent
 
 You can interact with agents directly from the command line using the `cli_chat.py` script.
 
@@ -47,12 +47,20 @@ python scripts/cli_chat.py --config_name simple_agents/search_agent.yaml --strea
 Run a multi-agent (Plan-and-Execute) orchestra agent by specifying its configuration file:
 
 ```sh
-# TODO: add a web UI for orchestra agent
+python examples/svg_generator/main.py
 ```
+
+You can also run a web UI for the agent:
+
+```sh
+python examples/svg_generator/main_web.py
+```
+
+See more in [frontend](./frontend.md).
 
 ---
 
-## 3. Running Evaluations
+## Running Evaluations
 
 The framework includes a powerful evaluation harness to benchmark agent performance.
 
@@ -82,14 +90,14 @@ python scripts/db/dump_db.py --exp_id "<your_exp_id>"
 
 ---
 
-## 4. Advanced Setup
+## Advanced Setup
 
 ### Database Configuration
 
 The evaluation framework uses a SQL database (defaulting to SQLite) to store datasets and experiment results. To use a different database (e.g., PostgreSQL), set the `DB_URL` environment variable:
 
 ```sh
-export DB_URL="postgresql://user:password@host:port/database"
+DB_URL="postgresql://user:password@host:port/database"
 ```
 
 ### Tracing
@@ -103,7 +111,36 @@ The framework also supports any tracing service compatible with the `openai-agen
 
 ---
 
-## 5. Next Steps
+
+## Customizing the Agent
+
+### Create a config file
+```yaml
+# configs/agents/sample_tool.yaml
+defaults:
+  - /model/base
+  - /tools/search@toolkits.search # Loads the 'search' toolkit
+  - _self_
+
+agent:
+    name: simple-tool-agent
+    instructions: "You are a helpful assistant that can search the web."
+```
+
+### Write and run the Python script
+
+```python
+import asyncio
+from utu.agents import SimpleAgent
+
+async def main():
+    async with SimpleAgent(config="sample_tool.yaml") as agent:
+        await agent.chat("What's the weather in Beijing today?")
+
+asyncio.run(main())
+```
+
+## Next Steps
 
 - **Explore Examples**: Check the `/examples` directory for more detailed use cases and advanced scripts.
 - **Dive into Evaluations**: Learn more about how the evaluation framework works by reading the [Evaluation Framework documentation](./eval.md).
