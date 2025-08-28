@@ -86,11 +86,11 @@ async def handle_raw_stream_events(event: ag.RawResponsesStreamEvent) -> Event |
         event_to_send = _send_delta(event.data.delta, "text", allow_empty=False)
     elif event.data.type == "response.output_text.done":
         event_to_send = _send_delta("", "text", inprogress=False)
-    elif (
-        event.data.type == "response.reasoning_summary_text.delta" or event.data.type == "response.reasoning_text.delta"
-    ):
+    elif event.data.type == "response.reasoning_text.delta":
+        if isinstance(event.data.delta, list):
+            event.data.delta = "".join([d["text"] for d in event.data.delta])
         event_to_send = _send_delta(event.data.delta, "reason", allow_empty=False)
-    elif event.data.type == "response.reasoning_summary_text.done" or event.data.type == "response.reasoning_text.done":
+    elif event.data.type == "response.reasoning_summary_text.done":
         event_to_send = _send_delta("", "reason", inprogress=False)
     elif event.data.type == "response.function_call_arguments.delta":
         pass
