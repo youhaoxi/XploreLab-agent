@@ -103,6 +103,7 @@ nav:
     - Agent Environments: env.md
     - Tools: tools.md
     - Evaluation: eval.md
+    - WebUI: frontend.md
   - Examples: 
     - Examples: examples.md
     - Examples Output:
