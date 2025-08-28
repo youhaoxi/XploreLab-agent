@@ -100,5 +100,6 @@ if __name__ == "__main__":
     if os.path.exists(args.work_dir) and os.listdir(args.work_dir):
         print(f"Warning: {args.work_dir} is not empty. Files may be overwritten.")
         input("Press Enter to continue or Ctrl+C to abort.")
+        os.system(f"rm -rf {args.work_dir}")
 
     prepare_messy_files(args.work_dir)
