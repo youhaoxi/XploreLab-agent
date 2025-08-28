@@ -23,6 +23,8 @@ def merged_event_stream(events: list[Event]):
 
             # Handle text and reason events (mergeable types)
             if data.type in ("text", "reason"):
+                if isinstance(data.delta, list):
+                    data.delta = "".join([item.text for item in data.delta])
                 if current_event is None:
                     current_event = event
                 elif current_event["event"].data.type == data.type:
