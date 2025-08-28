@@ -1,8 +1,6 @@
 import { useCallback } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 
-const WS_URL = 'ws://localhost:8848/ws'; // Update this to your WebSocket server URL
-
 export const useChatWebSocket = (ws_url: string) => {
   const { sendMessage, lastMessage, readyState, getWebSocket } = useWebSocket(ws_url, {
     onError: (event) => {
