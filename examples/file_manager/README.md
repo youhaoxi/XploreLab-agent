@@ -17,7 +17,7 @@ python -m examples.file_manager.prepare_messy_files
 
 Next, start the Gradio web interface:
 ```bash
-python -m examples.file_manager.main
+python -m examples.file_manager.main_web
 ```
 
 Then, open the web UI and give the agent a task.
