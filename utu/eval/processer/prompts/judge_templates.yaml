@@ -39,6 +39,8 @@ BrowseComp_ZH: |
 
   confidence: 从[response]中提取的置信度分数，介于0% 到100% 之间。如果没有可用的置信度分数，则填写100%。
 
+# https://github.com/Alibaba-NLP/WebAgent/blob/main/WebWalker/src/evaluate.py
+# https://github.com/langchain-ai/langchain/blob/master/libs/langchain/langchain/evaluation/qa/eval_prompt.py#L59
 WebWalker: |
   You are a teacher grading a quiz.
   You are given a question, the context the question is about, and the student's answer. You are asked to score the student's answer as either CORRECT or INCORRECT, based on the context.
