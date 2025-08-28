@@ -1,4 +1,4 @@
-# <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-agent: A simple yet powerful agents framework that delivers with open-source models
+# <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-agent: A simple yet powerful agent framework that delivers with open-source models
 
 <div align="center">
 <a href="https://tencent.github.io/Youtu-agent/"><img src=https://img.shields.io/badge/📖-Documentation-blue.svg></a>
@@ -7,6 +7,7 @@
 </div>
 
 <p align="center">
+| <a href="README_ZH.md"><b>中文版</b></a>
 | <a href="#-benchmark-performance"><b>🌟 Performance</b></a> 
 | <a href="#-examples"><b>💡 Examples</b> </a> 
 | <a href="#-features"><b>✨ Features</b> </a> 
@@ -15,27 +16,25 @@
 </p>
 
 
-`Youtu-agent` is a flexible, high-performance framework for building, running, and evaluating autonomous agents. Beyond topping the benchmarks, this framework delivers powerful agent capabilities, e.g. data analysis, file processing, and deep research.
+`Youtu-agent` is a flexible, high-performance framework for building, running, and evaluating autonomous agents. Beyond topping the benchmarks, this framework delivers powerful agent capabilities, e.g. data analysis, file processing, and deep research, all with open-source models.
 
-<img src="docs/assets/mascot.png" alt="MiroFlow Logo" width="200" align="left" style="margin-right:20px;">
+<img src="docs/assets/mascot.png" alt="Youtu-agent Logo" width="200" align="left" style="margin-right:20px;">
 
 Key highlights:
-- **Verified performance**: Achieved 60.71% on WebWalkerQA and 72.8% on GAIA (text-only subset), using purely `DeepSeek-V3-0324` (without Claude or GPT).
+- **Verified performance**: Achieved 71.47% on WebWalkerQA and 72.8% on GAIA (text-only subset), using purely `DeepSeek-V3` series models (without Claude or GPT), establishing a strong open-source starting point.
 - **Open-source friendly & cost-aware**: Optimized for accessible, low-cost deployment without reliance on closed models.
-- **Practical use cases**: Out-of-the-box support for tasks like CSV analysis, literature review, personal file organization, and podcast and video generation.
-- **Flexible architecture**: Built on [openai-agents](https://github.com/openai/openai-agents-python), compatible with both `responses` and `chat.completions` APIs, supporting `DeepSeek` and `gpt-oss` models.
+- **Practical use cases**: Out-of-the-box support for tasks like CSV analysis, literature review, personal file organization, and podcast and video generation (coming soon).
+- **Flexible architecture**: Built on [openai-agents](https://github.com/openai/openai-agents-python), with extensible support for diverse model APIs (form `DeepSeek` to `gpt-oss`), tool integrations, and framework implementations.
 - **Automation & simplicity**: YAML-based configs, auto agent generation, and streamlined setup reduce manual overhead.
 
 ## 🌟 Benchmark Performance
 
 `Youtu-agent` is built on open-source models and lightweight tools, demonstrating strong results on challenging deep search and tool use benchmarks.
 
-- **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**: Achieved 60.71% accuracy with `DeepSeek-V3-0324`, setting a new SOTA performance.
-- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**: Achieved 72.8% accuracy on the text-only validation subset using `DeepSeek-V3-0324` (including models used within tools). We are actively extending evaluation to the full GAIA benchmark with multimodal tools, and conducting cross-framework experiments to ensure fair comparison.
+- **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**: Achieved 60.71% accuracy with `DeepSeek-V3-0324`， using new released `DeepSeek-V3.1` can further improve to 71.47%, setting a new SOTA performance.
+- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**: Achieved 72.8% accuracy on the [text-only validation subset](https://github.com/sunnynexus/WebThinker/blob/main/data/GAIA/dev.json) using `DeepSeek-V3-0324` (including models used within tools). We are actively extending evaluation to the full GAIA benchmark with multimodal tools, and will release the trajectories in the near future. Stay tuned! ✨
 
-<div align="center">
-<img src="docs/assets/images/benchmark_webwalkerqa.png" alt="WebWalkerQA" style="width:80%;">
-</div>
+![WebWalkerQA](docs/assets/images/benchmark_webwalkerqa.png)
 
 ## 💡 Examples
 
@@ -72,15 +71,38 @@ Click on the images to view detailed videos.
   </tr>
 </table>
 
+### 🤖 Automatic Agent Generation
+
+A standout feature of `Youtu-agent` is its ability to **automatically generate agent configurations**. In other frameworks, defining a task-specific agent often requires writing code or carefully crafting prompts. In contrast, `Youtu-agent` uses simple YAML-based configs, which enables streamlined automation: a built-in "meta-agent" chats with you to capture requirements, then generates and saves the config automatically.
+
+```bash
+# Interactively clarify your requirements and auto-generate a config
+python scripts/gen_simple_agent.py
+
+# Run the generated config
+python scripts/cli_chat.py --stream --config generated/xxx
+```
+
+<table border="1" style="border-collapse: collapse;">
+  <tr>
+    <td style="border: 1px solid black; width:420px; padding:10px; vertical-align:top;">
+      <a href="https://www.youtube.com/watch?v=JVpHDJtKBo8">
+        <img src="https://img.youtube.com/vi/JVpHDJtKBo8/0.jpg" alt="Automatic Agent Generation" width="420" height="236">
+      </a>
+      <br><strong>Automatic Agent Generation</strong><br>Interactively clarify your requirements, automatically generate <br>
+the agent configuration, and run it right away.
+    </td>
+  </tr>
+</table>
+
+
 For more detailed examples and advanced use-cases, please refer to the [`examples`](./examples) directory and our comprehensive documentation at [`docs/examples.md`](./docs/examples.md).
 
 
 
 ## ✨ Features
 
-<div align="center">
-<img src="docs/assets/images/header.png" alt="features" style="width:80%;">
-</div>
+![features](docs/assets/images/header.png)
 
 ### Design Philosophy
 - **Minimal design**: We try to keep the framework simple and easy to use, avoiding unnecessary overhead.
@@ -90,7 +112,7 @@ For more detailed examples and advanced use-cases, please refer to the [`example
 ### Core Features
 - **Built on openai-agents**: Leveraging the foundation of [openai-agents](https://github.com/openai/openai-agents-python) SDK, our framework inherits streaming, tracing, and agent-loop capabilities, ensuring compatibility with both `responses` and `chat.completions` APIs for seamless adaptation to diverse models like [gpt-oss](https://github.com/openai/gpt-oss).
 - **Fully asynchronous**: Enables high-performance and efficient execution, especially beneficial for evaluating benchmarks.
-- **Tracing & analysis system**: Beyond OTEL, our `DBTracingProcessor` system provides in-depth analysis of tool calls and agent trajectories.
+- **Tracing & analysis system**: Beyond OTEL, our `DBTracingProcessor` system provides in-depth analysis of tool calls and agent trajectories. (will be released soon)
 
 ### Automation
 - **YAML based configuration**: Structured and easily manageable agent configurations.
@@ -109,7 +131,7 @@ For more detailed examples and advanced use-cases, please refer to the [`example
 
 ### For Agents Researchers & LLM Trainers
 - A **simple yet powerful baseline** that is stronger than basic ReAct, serving as an excellent starting point for model training and ablation studies.
-- **Built-in support for common benchmarks** and one-click evaluation scripts to streamline the experimental process.
+- **One-click evaluation scripts** to streamline the experimental process and ensure consistent benchmarking.
 
 ### For Agent Application Developers
 - A **proven and portable scaffolding** for building real-world agent applications.
@@ -128,6 +150,8 @@ For more detailed examples and advanced use-cases, please refer to the [`example
 - **Environment**: The world in which the agent operates (e.g., a browser, a shell).
 - **ContextManager**: A configurable module for managing the agent's context window.
 - **Benchmark**: An encapsulated workflow for a specific dataset, including preprocessing, rollout, and judging logic.
+
+For more design and implementation details, please refer to our [technical documentation](https://tencent.github.io/Youtu-agent/).
 
 ## 🚀 Getting Started
 
@@ -178,6 +202,9 @@ See [examples](./docs/examples.md) for more examples.
 
 Run the full evaluation pipeline on a benchmark like WebWalkerQA.
 ```bash
+# prepare dataset
+python scripts/data/process_web_walker_qa.py
+# run evaluation with config ww.yaml with your custom exp_id
 python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA --concurrency 5
 ```
 
@@ -193,7 +220,7 @@ This project builds upon the excellent work of several open-source projects:
 
 ## Citation
 
-If you find this work useful, please consider citing our paper:
+If you find this work useful, please consider citing:
 
 ```bibtex
 @misc{youtu-agent-2025,

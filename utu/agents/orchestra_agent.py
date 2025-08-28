@@ -88,9 +88,10 @@ class OrchestraAgent(BaseAgent):
         task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan", item=plan))
         for task in task_recorder.plan.todo:
             # print(f"> processing {task}")
-            task_recorder._event_queue.put_nowait(
-                AgentUpdatedStreamEvent(new_agent=self.worker_agents[task.agent_name])
-            )
+            # DONOT send this event because Runner will send it
+            # task_recorder._event_queue.put_nowait(
+            #     AgentUpdatedStreamEvent(new_agent=self.worker_agents[task.agent_name])
+            # )
             worker_agent = self.worker_agents[task.agent_name]
             result_streaming = worker_agent.work_streamed(task_recorder, task)
             async for event in result_streaming.stream.stream_events():
@@ -127,7 +128,7 @@ class OrchestraAgent(BaseAgent):
 
     async def report(self, task_recorder: OrchestraTaskRecorder) -> AnalysisResult:
         """Step3: Report"""
-        with function_span("report") as span_fn:
+        with function_span("reporter") as span_fn:
             analysis_result = await self.reporter_agent.report(task_recorder)
             task_recorder.add_reporter_result(analysis_result)
             span_fn.span_data.input = json.dumps(

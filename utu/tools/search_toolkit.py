@@ -10,8 +10,9 @@ from .base import TOOL_PROMPTS, AsyncBaseToolkit
 
 logger = get_logger(__name__)
 
-
-banned_sites = ("https://huggingface.co/datasets/", "https://grok.com/share/", "https://modelscope.cn/datasets/")
+# https://huggingface.co/datasets/callanwu/WebWalkerQA
+# https://huggingface.co/spaces/dobval/WebThinker
+banned_sites = ("https://huggingface.co/", "https://grok.com/share/", "https://modelscope.cn/datasets/")
 RE_MATCHED_SITES = re.compile(r"^(" + "|".join(banned_sites) + r")")
 
 
@@ -109,7 +110,9 @@ class SearchToolkit(AsyncBaseToolkit):
         query = (
             query or "Summarize the content of this webpage, in the same language as the webpage."
         )  # use the same language
-        res_summary, res_links = await asyncio.gather(self._qa(content, query), self._extract_links(url, content, query))
+        res_summary, res_links = await asyncio.gather(
+            self._qa(content, query), self._extract_links(url, content, query)
+        )
         result = f"Summary: {res_summary}\n\nRelated Links: {res_links}"
         return result
 

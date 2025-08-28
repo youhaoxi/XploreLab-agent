@@ -3,7 +3,7 @@
 exp_id: "test"
 
 data:
-  dataset: "data/web_walker/test_sampled_150.jsonl"
+  dataset: "WebWalkerQA"
   type: "single"
   question_field: "question"
   gt_field: "answer"
@@ -75,7 +75,7 @@ agent:
               model: ${oc.env:UTU_LLM_MODEL}
               base_url: ${oc.env:UTU_LLM_BASE_URL}
               api_key: ${oc.env:UTU_LLM_API_KEY}
-      max_turns: 20
+      max_turns: 50
   workers_info:
     - name: SearchAgent
       desc: information retrieval and data collection.

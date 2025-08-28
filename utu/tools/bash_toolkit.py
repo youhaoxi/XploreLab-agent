@@ -17,46 +17,11 @@ Run commands in a bash shell\n
 import re
 from collections.abc import Callable
 
-import pexpect
-
 from ..config import ToolkitConfig
 from ..utils import get_logger
 from .base import AsyncBaseToolkit
 
 logger = get_logger(__name__)
-
-
-def start_persistent_shell(timeout: int) -> tuple[pexpect.spawn, str]:
-    # Start a new Bash shell
-    child = pexpect.spawn("/bin/bash", encoding="utf-8", echo=False, timeout=timeout)
-    # Set a known, unique prompt
-    # We use a random string that is unlikely to appear otherwise
-    # so we can detect the prompt reliably.
-    custom_prompt = "PEXPECT_PROMPT>> "
-    child.sendline("stty -onlcr")
-    child.sendline("unset PROMPT_COMMAND")
-    child.sendline(f"PS1='{custom_prompt}'")
-    # Force an initial read until the newly set prompt shows up
-    child.expect(custom_prompt)
-    return child, custom_prompt
-
-
-def run_command(child: pexpect.spawn, custom_prompt: str, cmd: str) -> str:
-    # Send the command
-    child.sendline(cmd)
-    # Wait until we see the prompt again
-    child.expect(custom_prompt)
-    # Output is everything printed before the prompt minus the command itself
-    # pexpect puts the matched prompt in child.after and everything before it in child.before.
-
-    raw_output = child.before.strip()
-    ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
-    clean_output = ansi_escape.sub("", raw_output)
-
-    if clean_output.startswith("\r"):
-        clean_output = clean_output[1:]
-
-    return clean_output
 
 
 class BashToolkit(AsyncBaseToolkit):
@@ -72,12 +37,48 @@ class BashToolkit(AsyncBaseToolkit):
             "git add",
         ]
 
-        self.child, self.custom_prompt = start_persistent_shell(timeout=self.timeout)
+        self.child, self.custom_prompt = self.start_persistent_shell(timeout=self.timeout)
         if self.workspace_root:
             self.setup_workspace(self.workspace_root)
 
     def setup_workspace(self, workspace_root: str):
-        run_command(self.child, self.custom_prompt, f"cd {workspace_root}")
+        self.run_command(self.child, self.custom_prompt, f"cd {workspace_root}")
+
+    @staticmethod
+    def start_persistent_shell(timeout: int):
+        import pexpect
+        # https://github.com/pexpect/pexpect/issues/321
+
+        # Start a new Bash shell
+        child = pexpect.spawn("/bin/bash", encoding="utf-8", echo=False, timeout=timeout)
+        # Set a known, unique prompt
+        # We use a random string that is unlikely to appear otherwise
+        # so we can detect the prompt reliably.
+        custom_prompt = "PEXPECT_PROMPT>> "
+        child.sendline("stty -onlcr")
+        child.sendline("unset PROMPT_COMMAND")
+        child.sendline(f"PS1='{custom_prompt}'")
+        # Force an initial read until the newly set prompt shows up
+        child.expect(custom_prompt)
+        return child, custom_prompt
+
+    @staticmethod
+    def run_command(child, custom_prompt: str, cmd: str) -> str:
+        # Send the command
+        child.sendline(cmd)
+        # Wait until we see the prompt again
+        child.expect(custom_prompt)
+        # Output is everything printed before the prompt minus the command itself
+        # pexpect puts the matched prompt in child.after and everything before it in child.before.
+
+        raw_output = child.before.strip()
+        ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
+        clean_output = ansi_escape.sub("", raw_output)
+
+        if clean_output.startswith("\r"):
+            clean_output = clean_output[1:]
+
+        return clean_output
 
     async def run_bash(self, command: str) -> str:
         """Execute a bash command in your workspace and return its output.
@@ -101,14 +102,14 @@ class BashToolkit(AsyncBaseToolkit):
 
         # confirm no bad stuff happened
         try:
-            echo_result = run_command(self.child, self.custom_prompt, "echo hello")
+            echo_result = self.run_command(self.child, self.custom_prompt, "echo hello")
             assert echo_result.strip() == "hello"
         except Exception:  # pylint: disable=broad-except
-            self.child, self.custom_prompt = start_persistent_shell(self.timeout)
+            self.child, self.custom_prompt = self.start_persistent_shell(self.timeout)
 
         # 3) Execute the command and capture output
         try:
-            result = run_command(self.child, self.custom_prompt, command)
+            result = self.run_command(self.child, self.custom_prompt, command)
             return str(
                 {
                     "command output": result,

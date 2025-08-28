@@ -11,8 +11,6 @@ wheels/
 
 # Misc
 .DS_Store
-uv.lock
-.env
 .vscode
 *.log
 *.db
@@ -50,13 +48,13 @@ _SESSION_DATA
 /output/
 /workspace/
 /configs/agents/generated
-
+site/
 mytools/
 logs/
 
 .pytest_cache/
 .mypy_cache/
-uv.lock
+# uv.lock
 .env
 test.yaml
 requirements.txt

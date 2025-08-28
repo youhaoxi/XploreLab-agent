@@ -11,14 +11,17 @@ DIR_LOGS.mkdir(exist_ok=True)
 
 # Flag to track if logging has been set up
 _LOGGING_INITIALIZED = False
+_ROOT_LEVEL = "WARNING"
 
 
 def setup_logging(level: Literal["WARNING", "INFO", "DEBUG"] = "WARNING") -> None:
     # Check if logging has already been initialized
-    global _LOGGING_INITIALIZED
+    global _LOGGING_INITIALIZED, _ROOT_LEVEL
     if _LOGGING_INITIALIZED:
         logging.getLogger().warning("Logging has already been initialized! Skipping...")
         return
+
+    _ROOT_LEVEL = level
 
     # set httpx logging level to WARNING
     logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -29,7 +32,7 @@ def setup_logging(level: Literal["WARNING", "INFO", "DEBUG"] = "WARNING") -> Non
         root_logger.handlers.clear()
 
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(level)
+    console_handler.setLevel(logging.DEBUG)
     color_formatter = ColoredFormatter(
         "%(green)s%(asctime)s%(reset)s[%(blue)s%(name)s%(reset)s] - "
         "%(log_color)s%(levelname)s%(reset)s - %(filename)s:%(lineno)d - %(green)s%(message)s%(reset)s",
@@ -48,7 +51,7 @@ def setup_logging(level: Literal["WARNING", "INFO", "DEBUG"] = "WARNING") -> Non
     file_handler = TimedRotatingFileHandler(
         DIR_LOGS / "utu.log", when="midnight", interval=1, backupCount=30, encoding="utf-8"
     )
-    file_handler.setLevel(logging.INFO)
+    file_handler.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
         "%(asctime)s[%(name)s] - %(levelname)s - %(filename)s:%(lineno)d - %(message)s - %(threadName)s"
     )
@@ -62,8 +65,9 @@ def setup_logging(level: Literal["WARNING", "INFO", "DEBUG"] = "WARNING") -> Non
     _LOGGING_INITIALIZED = True
 
 
-def get_logger(name: str) -> logging.Logger:
+def get_logger(name: str, level: int | Literal["INFO", "WARNING", "ERROR", "CRITICAL"] = _ROOT_LEVEL) -> logging.Logger:
     logger = logging.getLogger(name)
+    logger.setLevel(level)
 
     def log_error_with_exc(msg, *args, **kwargs):
         kwargs["exc_info"] = True

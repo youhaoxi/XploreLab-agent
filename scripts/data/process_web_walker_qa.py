@@ -1,13 +1,13 @@
 import json
-import os
 
 import pandas as pd
 from datasets import load_dataset
-from sqlmodel import Session, create_engine, select
+from sqlmodel import Session, select
 
 from utu.db.eval_datapoint import DatasetSample
+from utu.utils.sqlmodel_utils import SQLModelUtils
 
-engine = create_engine(os.environ.get("DB_URL"))
+engine = SQLModelUtils.get_engine()
 
 
 def build_dataset():
@@ -70,4 +70,4 @@ def sampling(dataset_name: str = "WebWalkerQA", n: int = 150):
 
 if __name__ == "__main__":
     build_dataset()
-    sampling(n=150)
+    # sampling(n=150)
