@@ -21,7 +21,7 @@
 <img src="docs/assets/mascot.png" alt="Youtu-agent Logo" width="200" align="left" style="margin-right:20px;">
 
 主要亮点：
-- **验证性能**：在 WebWalkerQA 上达到 71.47% 的准确率，在 GAIA（纯文本子集）上达到 72.8% 的准确率，纯粹使用 `DeepSeek-V3` 系列模型（不使用 Claude 或 GPT），建立了强大的开源起点。
+- **验证性能**：在 WebWalkerQA 上达到 71.47% 的 pass@1，在 GAIA（纯文本子集）上达到 72.8% 的 pass@1，纯粹使用 `DeepSeek-V3` 系列模型（不使用 Claude 或 GPT），建立了强大的开源起点。
 - **开源友好且成本敏感**：针对可访问、低成本部署进行了优化，不依赖封闭模型。
 - **实际用例**：开箱即用地支持 CSV 分析、文献综述、个人文件整理以及播客和视频生成等任务。（即将推出）
 - **灵活的架构**：基于 [openai-agents](https://github.com/openai/openai-agents-python) 构建，可兼容各种模型 API（从 `DeepSeek` 到 `gpt-oss`）、工具集成和框架实现。
@@ -32,7 +32,7 @@
 `Youtu-agent` 基于开源模型和轻量级工具构建，在具有挑战性的深度搜索和工具使用基准测试中表现出色。
 
 - **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**：使用 `DeepSeek-V3-0324` 实现了 60.71% 的准确率，使用新发布的 `DeepSeek-V3.1` 可进一步提升至 71.47%，创造了新的 SOTA 性能。
-- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**：使用 `DeepSeek-V3-0324`（包括工具中使用的模型）在[纯文本验证子集](https://github.com/sunnynexus/WebThinker?tab=readme-ov-file#benchmarks)上实现了 72.8% 的准确率。我们正在积极扩展对带有多模态工具的完整 GAIA 基准的评估，将在近期放出完整轨迹，敬请关注！✨
+- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**：使用 `DeepSeek-V3-0324`（包括工具中使用的模型）在[纯文本验证子集](https://github.com/sunnynexus/WebThinker?tab=readme-ov-file#benchmarks)上实现了 72.8% 的 pass@1。我们正在积极扩展对带有多模态工具的完整 GAIA 基准的评估，将在近期放出完整轨迹，敬请关注！✨
 
 ![WebWalkerQA](docs/assets/images/benchmark_webwalkerqa.png)
 

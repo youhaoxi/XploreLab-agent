@@ -21,7 +21,7 @@
 <img src="docs/assets/mascot.png" alt="Youtu-agent Logo" width="200" align="left" style="margin-right:20px;">
 
 Key highlights:
-- **Verified performance**: Achieved 71.47% on WebWalkerQA and 72.8% on GAIA (text-only subset), using purely `DeepSeek-V3` series models (without Claude or GPT), establishing a strong open-source starting point.
+- **Verified performance**: Achieved 71.47% on WebWalkerQA (pass@1) and 72.8% on GAIA (text-only subset, pass@1), using purely `DeepSeek-V3` series models (without Claude or GPT), establishing a strong open-source starting point.
 - **Open-source friendly & cost-aware**: Optimized for accessible, low-cost deployment without reliance on closed models.
 - **Practical use cases**: Out-of-the-box support for tasks like CSV analysis, literature review, personal file organization, and podcast and video generation (coming soon).
 - **Flexible architecture**: Built on [openai-agents](https://github.com/openai/openai-agents-python), with extensible support for diverse model APIs (form `DeepSeek` to `gpt-oss`), tool integrations, and framework implementations.
@@ -32,7 +32,7 @@ Key highlights:
 `Youtu-agent` is built on open-source models and lightweight tools, demonstrating strong results on challenging deep search and tool use benchmarks.
 
 - **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**: Achieved 60.71% accuracy with `DeepSeek-V3-0324`， using new released `DeepSeek-V3.1` can further improve to 71.47%, setting a new SOTA performance.
-- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**: Achieved 72.8% accuracy on the [text-only validation subset](https://github.com/sunnynexus/WebThinker/blob/main/data/GAIA/dev.json) using `DeepSeek-V3-0324` (including models used within tools). We are actively extending evaluation to the full GAIA benchmark with multimodal tools, and will release the trajectories in the near future. Stay tuned! ✨
+- **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**: Achieved 72.8% pass@1 on the [text-only validation subset](https://github.com/sunnynexus/WebThinker/blob/main/data/GAIA/dev.json) using `DeepSeek-V3-0324` (including models used within tools). We are actively extending evaluation to the full GAIA benchmark with multimodal tools, and will release the trajectories in the near future. Stay tuned! ✨
 
 ![WebWalkerQA](docs/assets/images/benchmark_webwalkerqa.png)
 
@@ -164,7 +164,8 @@ Clone the repository and install dependencies:
 ```bash
 git clone https://github.com/Tencent/Youtu-agent.git
 cd Youtu-agent
-uv sync
+uv sync  # or, `make sync`
+source ./.venv/bin/activate
 ```
 
 > [!NOTE]
