@@ -48,6 +48,10 @@ class PlannerAgent:
         self.planner_examples = self._load_planner_examples()
         self.available_agents = self._load_available_agents()
 
+    @property
+    def name(self) -> str:
+        return self.config.planner_config.get("name", "planner")
+
     def _load_planner_examples(self) -> list[dict]:
         examples_path = self.config.planner_config.get("examples_path", "")
         if examples_path and pathlib.Path(examples_path).exists():

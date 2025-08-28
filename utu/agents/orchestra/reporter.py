@@ -11,6 +11,10 @@ class ReporterAgent:
         self.llm = SimplifiedAsyncOpenAI(**self.config.reporter_model.model_params.model_dump())
         self.template = self._get_template()
 
+    @property
+    def name(self) -> str:
+        return self.config.reporter_config.get("name", "reporter")
+
     def _get_template(self):
         template_path = self.config.reporter_config.get("template_path", None)
         if template_path and pathlib.Path(template_path).exists():

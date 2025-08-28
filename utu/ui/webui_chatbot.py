@@ -140,17 +140,17 @@ class WebUIChatbot:
             debug=True,
         )
 
-    async def __launch(self, port: int = 8848, ip: str = '127.0.0.1'):
+    async def __launch(self, port: int = 8848, ip: str = "127.0.0.1"):
         await self.agent.build()
         app = self.make_app()
         app.listen(port, address=ip)
         print(f"Server started at http://{ip}:{port}/")
         await asyncio.Event().wait()
 
-    async def launch_async(self, port: int = 8848, ip: str = '127.0.0.1'):
+    async def launch_async(self, port: int = 8848, ip: str = "127.0.0.1"):
         await self.__launch(port=port, ip=ip)
 
-    def launch(self, port: int = 8848, ip: str = '127.0.0.1'):
+    def launch(self, port: int = 8848, ip: str = "127.0.0.1"):
         asyncio.run(self.__launch(port=port, ip=ip))
 
 
