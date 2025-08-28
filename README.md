@@ -40,33 +40,53 @@ Key highlights:
 
 Click on the images to view detailed videos.
 
-<table border="1" style="border-collapse: collapse;">
+<table>
   <tr>
-    <td style="border: 1px solid black; padding: 10px;">
-      <a href="https://www.youtube.com/watch?v=SCR4Ru8_h5Q">
-        <img src="https://img.youtube.com/vi/SCR4Ru8_h5Q/0.jpg" alt="Data Analysis" width="420" height="236">
-      </a>
-      <br><strong>Data Analysis</strong><br>Analyzes a CSV file and generates an HTML report.
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <strong>Data Analysis</strong><br>Analyzes a CSV file and generates an HTML report.
     </td>
-    <td style="border: 1px solid black; padding: 10px;">
-      <a href="https://www.youtube.com/watch?v=GdA4AapE2L4">
-        <img src="https://img.youtube.com/vi/GdA4AapE2L4/0.jpg" alt="File Management" width="420" height="236">
-      </a>
-      <br><strong>File Management</strong><br>Renames and categorizes local files for the user.
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <strong>File Management</strong><br>Renames and categorizes local files for the user.
     </td>
   </tr>
   <tr>
-    <td style="border: 1px solid black; padding: 10px;">
-      <a href="https://www.youtube.com/watch?v=vBddCjjRk00">
-        <img src="https://img.youtube.com/vi/vBddCjjRk00/0.jpg" alt="Wide Research" width="420" height="236">
-      </a>
-      <br><strong>Wide Research</strong><br>Gathers extensive information to generate a comprehensive report, replicating the functionality of Manus.
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <video src="https://github.com/user-attachments/assets/b6aba820-368e-427f-ba71-85543a751775" 
+             poster="https://img.youtube.com/vi/SCR4Ru8_h5Q/sddefault.jpg" 
+             controls muted preload="metadata" 
+             width="100%" height="300"
+             style="object-fit: cover; border-radius: 8px;"></video>
     </td>
-    <td style="border: 1px solid black; padding: 10px;">
-      <a href="https://www.youtube.com/watch?v=v3QQg0WAnPs">
-        <img src="https://img.youtube.com/vi/v3QQg0WAnPs/0.jpg" alt="Paper Analysis" width="420" height="236">
-      </a>
-      <br><strong>Paper Analysis</strong><br>Parses a given paper, performs analysis, and compiles related literature to produce a final result.
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <video src="https://github.com/user-attachments/assets/dbb9cfc6-3963-4264-ba93-9ba21c5a579e" 
+             poster="https://img.youtube.com/vi/GdA4AapE2L4/sddefault.jpg" 
+             controls muted preload="metadata" 
+             width="100%" height="300"
+             style="object-fit: cover; border-radius: 8px;"></video>
+    </td>
+  </tr>
+  <tr >
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <strong>Wide Research</strong><br>Gathers extensive information to generate a comprehensive report, replicating the functionality of Manus.
+    </td>
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <strong>Paper Analysis</strong><br>Parses a given paper, performs analysis, and compiles related literature to produce a final result.
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <video src="https://github.com/user-attachments/assets/6fc75814-e565-4f94-9ab5-33e3e7788e92" 
+             poster="https://img.youtube.com/vi/v3QQg0WAnPs/sddefault.jpg" 
+             controls muted preload="metadata" 
+             width="100%" height=300"
+             style="object-fit: cover; border-radius: 8px;"></video>
+    </td>
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <video src="https://github.com/user-attachments/assets/09b24f94-30f0-4e88-9aaf-9f3bbf82e99d" 
+             poster="https://img.youtube.com/vi/vBddCjjRk00/sddefault.jpg" 
+             controls muted preload="metadata" 
+             width="100%" height="300"
+             style="object-fit: cover; border-radius: 8px;"></video>
     </td>
   </tr>
 </table>
@@ -83,14 +103,19 @@ python scripts/gen_simple_agent.py
 python scripts/cli_chat.py --stream --config generated/xxx
 ```
 
-<table border="1" style="border-collapse: collapse;">
+<table>
   <tr>
-    <td style="border: 1px solid black; width:420px; padding:10px; vertical-align:top;">
-      <a href="https://www.youtube.com/watch?v=JVpHDJtKBo8">
-        <img src="https://img.youtube.com/vi/JVpHDJtKBo8/0.jpg" alt="Automatic Agent Generation" width="420" height="236">
-      </a>
-      <br><strong>Automatic Agent Generation</strong><br>Interactively clarify your requirements, automatically generate <br>
-the agent configuration, and run it right away.
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <strong>Automatic Agent Generation</strong><br>Interactively clarify your requirements, automatically generate the agent configuration, and run it right away.
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid black; padding:10px; vertical-align:top; width: 400px;">
+      <video src="https://github.com/user-attachments/assets/0c2ee833-507e-4141-8de4-148ff3d9f9ef" 
+             poster="https://img.youtube.com/vi/JVpHDJtKBo8/maxresdefault.jpg" 
+             controls muted preload="metadata" 
+             width="100%" height="auto" 
+             style="object-fit: cover; border-radius: 8px;"></video>
     </td>
   </tr>
 </table>
