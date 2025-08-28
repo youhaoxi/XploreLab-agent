@@ -33,7 +33,9 @@ const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [exampleQuery, setExampleQuery] = useState<string[]>([]);
   const [hideExampleQuery, setHideExampleQuery] = useState(false);
-  const { sendQuery, lastMessage, readyState } = useChatWebSocket();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [wsUrl, setWsUrl] = useState(localStorage.getItem('wsUrl') || 'ws://localhost:8848/ws');
+  const { sendQuery, lastMessage, readyState } = useChatWebSocket(wsUrl);
   const [inputValue, setInputValue] = useState('');
   const [isModelResponding, setIsModelResponding] = useState(false);
   // const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -342,95 +344,139 @@ const App: React.FC = () => {
     }
   }, []);
 
+  const handleOpenSettings = () => setSettingsOpen(true);
+  const handleCloseSettings = () => setSettingsOpen(false);
+  
+  const handleSaveSettings = () => {
+    localStorage.setItem('wsUrl', wsUrl);
+    handleCloseSettings();
+    // Reload the page to reconnect with the new WebSocket URL
+    window.location.reload();
+  };
+
   return (
-    <div className="chat-container" ref={mainContainerRef}>
-      <div className="header-container">
-        <h1 className="chat-title"><img className="title-logo" src={logoSquareUrl} alt="logo" />Youtu Agent</h1>
-        
-      </div>
-
-      <div className="chat-messages">
-        {messages.map((message, index) => {
-          // Check if previous message is from the same sender
-          const showSender = index === 0 ||
-            messages[index - 1].sender !== message.sender ||
-            message.sender === 'user';
-
-          return (
-            <div key={message.id} id={`message-${message.id}`}>
-              <MessageComponent
-                message={message}
-                showSender={showSender}
-                onDownloadReport={message.type === 'report' ? (content) => {
-                  downloadReport(content);
-                } : undefined}
+    <div className="app">
+      <button 
+        className="settings-button"
+        onClick={handleOpenSettings}
+        title="Settings"
+      >
+        <i className="fas fa-cog"></i>
+      </button>
+      
+      {settingsOpen && (
+        <div className="modal-overlay" onClick={handleCloseSettings}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h3>Settings</h3>
+            <div className="form-group">
+              <label htmlFor="wsUrl">WebSocket URL</label>
+              <input
+                id="wsUrl"
+                type="text"
+                value={wsUrl}
+                onChange={(e) => setWsUrl(e.target.value)}
+                placeholder="ws://localhost:8848/ws"
               />
             </div>
-          );
-        })}
-        
-        {isModelResponding && (
-          <div className="respond-placeholder">
-            <i className="breathing-circle fa fa-circle"></i>
+            <div className="modal-actions">
+              <button onClick={handleCloseSettings}>Cancel</button>
+              <button onClick={handleSaveSettings} className="primary">Save</button>
+            </div>
           </div>
-        )}
-        
-        {!hideExampleQuery && exampleQuery.length > 0 && (
-          <div className="example-queries">
-            <div className="example-queries-title">Try asking:</div>
-            {exampleQuery.map((query, idx) => (
-              <div key={idx} className="example-query" onClick={() => {
-                setInputValue(query);
-                setHideExampleQuery(true);
-              }}>
-                {query}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      )}
       
-      {/* Agent TOC */}
-      <AgentTOC 
-        messages={messages} 
-        onNavigate={scrollToMessage} 
-      />
-
-      <div className="chat-input-container">
-        <div className="chat-input-wrapper">
-          <div className="input-group">
-            <input
-              ref={inputRef}
-              type="text"
-              className="chat-input"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={isModelResponding ? 'AI is thinking...' : 'Type a message...'}
-              disabled={isModelResponding}
-            />
-            <button
-              className="send-button"
-              onClick={handleSendMessage}
-              disabled={isModelResponding}
-              title={isModelResponding ? 'AI is thinking...' : 'Send message'}
-            >
-              {isModelResponding ? (
-                <i className="breathing-circle fa fa-circle"></i>
-              ) : (
-                <i className="fas fa-paper-plane"></i>
-              )}
-            </button>
+      <div className="main-content">
+        <div className="chat-container" ref={mainContainerRef}>
+          <div className="header-container">
+            <h1 className="chat-title"><img className="title-logo" src={logoSquareUrl} alt="logo" />Youtu Agent</h1>
+            
           </div>
+
+          <div className="chat-messages">
+            {messages.map((message, index) => {
+              // Check if previous message is from the same sender
+              const showSender = index === 0 ||
+                messages[index - 1].sender !== message.sender ||
+                message.sender === 'user';
+
+              return (
+                <div key={message.id} id={`message-${message.id}`}>
+                  <MessageComponent
+                    message={message}
+                    showSender={showSender}
+                    onDownloadReport={message.type === 'report' ? (content) => {
+                      downloadReport(content);
+                    } : undefined}
+                  />
+                </div>
+              );
+            })}
+            
+            {isModelResponding && (
+              <div className="respond-placeholder">
+                <i className="breathing-circle fa fa-circle"></i>
+              </div>
+            )}
+            
+            {!hideExampleQuery && exampleQuery.length > 0 && (
+              <div className="example-queries">
+                <div className="example-queries-title">Try asking:</div>
+                {exampleQuery.map((query, idx) => (
+                  <div key={idx} className="example-query" onClick={() => {
+                    setInputValue(query);
+                    setHideExampleQuery(true);
+                  }}>
+                    {query}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* Agent TOC */}
+          <AgentTOC 
+            messages={messages} 
+            onNavigate={scrollToMessage} 
+          />
+
+          <div className="chat-input-container">
+            <div className="chat-input-wrapper">
+              <div className="input-group">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className="chat-input"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={isModelResponding ? 'AI is thinking...' : 'Type a message...'}
+                  disabled={isModelResponding}
+                />
+                <button
+                  className="send-button"
+                  onClick={handleSendMessage}
+                  disabled={isModelResponding}
+                  title={isModelResponding ? 'AI is thinking...' : 'Send message'}
+                >
+                  {isModelResponding ? (
+                    <i className="breathing-circle fa fa-circle"></i>
+                  ) : (
+                    <i className="fas fa-paper-plane"></i>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer with pic.png */}
+          <footer className="app-footer">
+            <div className="p-4">
+              <img src={logoUrl} alt="Footer Logo" className="footer-logo" />
+            </div>
+          </footer>
         </div>
       </div>
-
-      {/* Footer with pic.png */}
-      <footer className="app-footer">
-        <div className="p-4">
-          <img src={logoUrl} alt="Footer Logo" className="footer-logo" />
-        </div>
-      </footer>
     </div>
   );
 };
