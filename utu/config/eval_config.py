@@ -27,7 +27,7 @@ class EvalConfig(ConfigBaseModel):
     """Experiment ID"""
 
     # data
-    db_url: str = os.getenv("DB_URL", "sqlite:///evaluation_samples.db")
+    db_url: str = os.getenv("DB_URL", "sqlite:///tesxt.db")
     """Database URL"""
     data: DataConfig = None
     """Data config"""

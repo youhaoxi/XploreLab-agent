@@ -202,6 +202,9 @@ See [examples](./docs/examples.md) for more examples.
 
 Run the full evaluation pipeline on a benchmark like WebWalkerQA.
 ```bash
+# prepare dataset
+python scripts/data/process_web_walker_qa.py
+# run evaluation with config ww.yaml with your custom exp_id
 python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA --concurrency 5
 ```
 

@@ -8,6 +8,7 @@ import websockets
 URL = "ws://localhost:8848/ws"
 OUTPUT_FILE = "output.pkl"
 
+
 async def websocket_client():
     uri = URL
     output_list = []
@@ -19,10 +20,14 @@ async def websocket_client():
         init_response = json.loads(init_response)
 
         # 发送初始化响应
-        await websocket.send(json.dumps({
-            "type": "query",
-            "query": init_response["data"]["query"],
-        }))
+        await websocket.send(
+            json.dumps(
+                {
+                    "type": "query",
+                    "query": init_response["data"]["query"],
+                }
+            )
+        )
 
         while True:
             response = await websocket.recv()
@@ -39,5 +44,6 @@ async def websocket_client():
 
     with open(OUTPUT_FILE, "wb") as f:
         pickle.dump(output_list, f)
+
 
 asyncio.run(websocket_client())

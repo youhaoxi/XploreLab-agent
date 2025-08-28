@@ -3,7 +3,7 @@
 exp_id: "test"
 
 data:
-  dataset: "data/web_walker/test_sampled_150.jsonl"
+  dataset: "WebWalkerQA"
   type: "single"
   question_field: "question"
   gt_field: "answer"

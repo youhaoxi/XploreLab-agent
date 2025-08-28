@@ -75,7 +75,7 @@ def prepare_messy_files(work_dir="/tmp/file_manager_test"):
 
     for ind, student_name in enumerate(student_names):
         # create a report file for each student
-        num_repeats = random.choices([1, 2, 3], weights=[0.5, 0.4, 0.1])[0]
+        num_repeats = random.choices([1, 2], weights=[0.7, 0.3])[0]
         for _ in range(num_repeats):
             file_name_format = random.choice(formats)
             file_name = file_name_format.format(
@@ -100,5 +100,6 @@ if __name__ == "__main__":
     if os.path.exists(args.work_dir) and os.listdir(args.work_dir):
         print(f"Warning: {args.work_dir} is not empty. Files may be overwritten.")
         input("Press Enter to continue or Ctrl+C to abort.")
+        os.system(f"rm -rf {args.work_dir}")
 
     prepare_messy_files(args.work_dir)

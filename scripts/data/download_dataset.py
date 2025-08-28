@@ -1,11 +1,10 @@
 import argparse
 import json
-import os
-import sys
 
-from sqlmodel import Session, create_engine, select
+from sqlmodel import Session, select
 
 from utu.db.eval_datapoint import DatasetSample
+from utu.utils.sqlmodel_utils import SQLModelUtils
 
 
 def download_dataset(dataset_name: str, output_path: str):
@@ -13,12 +12,7 @@ def download_dataset(dataset_name: str, output_path: str):
     Connects to the database, fetches all datapoints for a specific dataset,
     and saves them to a local JSONL file.
     """
-    db_url = os.environ.get("DB_URL")
-    if not db_url:
-        print("Error: DB_URL environment variable not set.", file=sys.stderr)
-        sys.exit(1)
-
-    engine = create_engine(db_url)
+    engine = SQLModelUtils.get_engine()
 
     print("Connecting to the database...")
     with Session(engine) as session:

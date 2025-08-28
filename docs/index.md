@@ -1,6 +1,50 @@
-# Youtu-agent
 
-![youtu lab](assets/youtu_lab.png)
+<style>
+.banner {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+}
+.banner-left img {
+    max-height: 250px;
+}
+.banner-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* margin-left: 20px; */
+}
+.banner-title {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: "Arial", sans-serif;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.banner-logo {
+    align-self: center;
+}
+.banner-logo img {
+    max-height: 40px;
+}
+</style>
+
+<div class="banner">
+<div class="banner-left">
+    <img src="assets/images/mascot_docs.png" alt="Mascot">
+</div>
+<div class="banner-right">
+    <div class="banner-title">
+    Youtu-agent: A simple yet powerful agent framework that delivers with open-source models
+    </div>
+    <div class="banner-logo">
+    <img src="assets/youtu_lab.png" alt="Youtu Lab Logo">
+    </div>
+</div>
+</div>
+
+# Introduction
 
 Youtu-agent is a powerful and modular framework for building, running, and evaluating autonomous agents. It is designed with flexibility and extensibility in mind, allowing developers to easily create custom agents, tools, and environments.
 
