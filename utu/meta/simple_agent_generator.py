@@ -88,8 +88,8 @@ class SimpleAgentGenerator:
             toolkits_includes=add_indented_lines(toolkits_includes, 2),
             toolkits_configs=add_indented_lines(toolkits_configs, 2),
         )
-        print(config)
         (self.output_dir / f"{name}.yaml").write_text(config)
+        print(f"Generated agent config saved to {self.output_dir / f'{name}.yaml'}!")
 
     async def step1(self, user_input: str) -> str:
         async with self.agent_1 as agent:
