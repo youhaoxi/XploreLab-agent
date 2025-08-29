@@ -28,6 +28,10 @@
 - **灵活的架构**：基于 [openai-agents](https://github.com/openai/openai-agents-python) 构建，可兼容各种模型 API（从 `DeepSeek` 到 `gpt-oss`）、工具集成和框架实现。
 - **自动化与简洁性**：基于 YAML 的配置、自动智能体生成和简化的设置减少了手动开销。
 
+## 🗞️ 新闻
+
+- [2025-08-28] 我们发布了 DeepSeek-V3.1 的更新，并介绍了如何在 `Youtu-agent` 框架中应用它。[这里](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF) 是文档。
+
 ## 🌟 基准性能
 
 `Youtu-agent` 基于开源模型和轻量级工具构建，在具有挑战性的深度搜索和工具使用基准测试中表现出色。

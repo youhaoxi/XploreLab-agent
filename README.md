@@ -28,6 +28,10 @@ Key highlights:
 - **Flexible architecture**: Built on [openai-agents](https://github.com/openai/openai-agents-python), with extensible support for diverse model APIs (form `DeepSeek` to `gpt-oss`), tool integrations, and framework implementations.
 - **Automation & simplicity**: YAML-based configs, auto agent generation, and streamlined setup reduce manual overhead.
 
+## 🗞️ News
+
+- [2025-08-28] We made a live sharing updates about DeepSeek-V3.1 and how to apply it in the `Youtu-agent` framework. [Here](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF) is the documentation.
+
 ## 🌟 Benchmark Performance
 
 `Youtu-agent` is built on open-source models and lightweight tools, demonstrating strong results on challenging deep search and tool use benchmarks.
