@@ -1,4 +1,3 @@
-import os
 from typing import Literal
 
 # from openai import NOT_GIVEN
@@ -6,18 +5,19 @@ from agents import ModelSettings
 from pydantic import ConfigDict, Field
 
 from .base_config import ConfigBaseModel
+from ..utils import EnvUtils
 
 
 class ModelProviderConfig(ConfigBaseModel):
     """config for model provider"""
 
-    type: Literal["chat.completions", "responses"] = os.getenv("UTU_LLM_TYPE")
+    type: Literal["chat.completions", "responses"] = "chat.completions"
     """model type, supported types: chat.completions, responses"""
-    model: str = os.getenv("UTU_LLM_MODEL")
+    model: str = EnvUtils.get_env("UTU_LLM_MODEL")
     """model name"""
-    base_url: str | None = os.getenv("UTU_LLM_BASE_URL")
+    base_url: str | None = EnvUtils.get_env("UTU_LLM_BASE_URL")
     """model provider base url"""
-    api_key: str | None = os.getenv("UTU_LLM_API_KEY")
+    api_key: str | None = EnvUtils.get_env("UTU_LLM_API_KEY")
     """model provider api key"""
 
 
