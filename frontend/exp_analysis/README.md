@@ -5,8 +5,11 @@ Frontend pages for utu-agent `exp_analysis`
 ## Installation
 1. Set env of log sql server
 ```bash
-export DATABASE_URL="postgresql://{sql user}:{sql password}@{server ip}:{server port}/{path}"
+cd Youtu-agent/frontend/exp_analysis
+cp .env.example .env  # config necessary keys...
+source .env
 ```
+
 2. Install npm packages
 ```bash
 npm install --legacy-peer-deps
