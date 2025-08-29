@@ -6,7 +6,7 @@ session-level tracing in @phoenix https://arize.com/docs/phoenix/tracing/how-to-
 
 import os
 
-from agents import add_trace_processor
+from agents import add_trace_processor, set_tracing_disabled
 from openinference.instrumentation.openai import OpenAIInstrumentor
 
 # from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
@@ -43,6 +43,7 @@ def setup_otel_tracing(
     project_name = project_name or os.getenv("PHOENIX_PROJECT_NAME")
     if not endpoint or not project_name:
         logger.warning("PHOENIX_ENDPOINT or PHOENIX_PROJECT_NAME is not set! Skipping OpenTelemetry tracing.")
+        set_tracing_disabled(True)  # we disable the openai's default tracing
         return
 
     logger.info(f"Setting up OpenTelemetry tracing with endpoint: {endpoint}, project name: {project_name}")
