@@ -4,6 +4,7 @@
 <a href="https://tencent.github.io/Youtu-agent/"><img src=https://img.shields.io/badge/📖-Documentation-blue.svg></a>
 <!-- <a href=https://arxiv.org/abs/2502.14345><img src=https://img.shields.io/badge/arXiv-2502.14345-b31b1b.svg></a> -->
 <a href=https://github.com/Tencent/Youtu-agent><img src=https://img.shields.io/badge/GitHub-Tencent-blue.svg></a>
+<a href=https://deepwiki.com/Tencent/Youtu-agent><img src=https://img.shields.io/badge/DeepWiki-Tencent-blue.svg></a>
 </div>
 
 <p align="center">
@@ -191,6 +192,7 @@ git clone https://github.com/Tencent/Youtu-agent.git
 cd Youtu-agent
 uv sync  # or, `make sync`
 source ./.venv/bin/activate
+cp .env.example .env  # config necessary keys...
 ```
 
 > [!NOTE]
@@ -227,6 +229,9 @@ The repository provides multiple ready-to-use examples. For instance, you can ge
 python examples/svg_generator/main_web.py
 ```
 
+> [!NOTE]
+> To use the WebUI, you need to install the `utu_agent_ui` package. Refer to [documentation](https://tencent.github.io/Youtu-agent/frontend/#installation) for more details.
+
 Given a research topic, the agent will automatically search the web, collect relevant information, and output an SVG visualization.
 
 ![svg_generator_ui](https://github.com/user-attachments/assets/337d327f-91ee-434e-bbcf-297dd4b26c28)
@@ -254,14 +259,14 @@ Results are stored and can be further analyzed in the evaluation platform.
 
 📖 Learn more: [Evaluation Documentation](https://tencent.github.io/Youtu-agent/eval)
 
-## Acknowledgements
+## 🙏 Acknowledgements
 
 This project builds upon the excellent work of several open-source projects:
 - [openai-agents](https://github.com/openai/openai-agents-python)
 - [mkdocs-material](https://github.com/squidfunk/mkdocs-material)
 - [model-context-protocol](https://github.com/modelcontextprotocol/python-sdk)
 
-## Citation
+## 📚 Citation
 
 If you find this work useful, please consider citing:
 
@@ -275,3 +280,7 @@ If you find this work useful, please consider citing:
   howpublished = {\url{https://github.com/Tencent/Youtu-agent}},
 }
 ```
+
+## ⭐ Star History
+
+![Star History Chart](https://api.star-history.com/svg?repos=Tencent/Youtu-agent&type=Date)

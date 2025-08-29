@@ -4,6 +4,7 @@
 <a href="https://tencent.github.io/Youtu-agent/"><img src=https://img.shields.io/badge/📖-文档-blue.svg></a>
 <!-- <a href=https://arxiv.org/abs/2502.14345><img src=https://img.shields.io/badge/arXiv-2502.14345-b31b1b.svg></a> -->
 <a href=https://github.com/Tencent/Youtu-agent><img src=https://img.shields.io/badge/GitHub-腾讯-blue.svg></a>
+<a href=https://deepwiki.com/Tencent/Youtu-agent><img src=https://img.shields.io/badge/DeepWiki-Tencent-blue.svg></a>
 </div>
 
 <p align="center">
@@ -158,6 +159,8 @@ Youtu-agent 提供了完整的代码与示例，帮助你快速开始使用。�
 git clone https://github.com/Tencent/Youtu-agent.git
 cd Youtu-agent
 uv sync
+source ./.venv/bin/activate
+cp .env.example .env  # 配置相关环境变量...
 ```
 
 > [!NOTE]
@@ -194,6 +197,9 @@ python scripts/cli_chat.py --stream --config default
 python examples/svg_generator/main_web.py
 ```
 
+> [!NOTE]
+> 要使用 WebUI，你需要安装 `utu_agent_ui` 包。参考 [文档](https://tencent.github.io/Youtu-agent/frontend/#installation)。
+
 给定一个研究主题后，Agent 会自动执行网络搜索，收集相关信息，并输出一张 SVG 可视化图。
 
 ![svg_generator_ui](https://github.com/user-attachments/assets/337d327f-91ee-434e-bbcf-297dd4b26c28)
@@ -222,14 +228,14 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
 
 📖 更多内容请参考：[评测文档](https://tencent.github.io/Youtu-agent/eval)
 
-## 致谢
+## 🙏 致谢
 
 本项目基于以下优秀开源项目：
 - [openai-agents](https://github.com/openai/openai-agents-python)
 - [mkdocs-material](https://github.com/squidfunk/mkdocs-material)
 - [model-context-protocol](https://github.com/modelcontextprotocol/python-sdk)
 
-## 引用
+## 📚 引用
 
 如果您觉得这项工作有帮助，请考虑引用：
 
@@ -243,3 +249,7 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
   howpublished = {\url{https://github.com/Tencent/Youtu-agent}},
 }
 ```
+
+## ⭐ Star History
+
+![Star History Chart](https://api.star-history.com/svg?repos=Tencent/Youtu-agent&type=Date)
