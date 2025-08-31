@@ -1,5 +1,4 @@
 from ..config import ConfigLoader
-from typing import Optional
 from .arxiv_toolkit import ArxivToolkit
 from .audio_toolkit import AudioToolkit
 from .base import AsyncBaseToolkit as AsyncBaseToolkit
@@ -39,7 +38,7 @@ TOOLKIT_MAP = {
 }
 
 
-def get_toolkits_map(names: Optional[list[str]] = None) -> dict[str, AsyncBaseToolkit]:
+def get_toolkits_map(names: list[str] | None = None) -> dict[str, AsyncBaseToolkit]:
     toolkits = {}
     if names is None:
         names = list(TOOLKIT_MAP.keys())
