@@ -66,3 +66,17 @@ class FileUtils:
             raise FileNotFoundError(f"File {file_path} does not exist")
         with file_path.open() as f:
             return yaml.safe_load(f)
+
+    @staticmethod
+    def load_prompts(fn: str | pathlib.Path) -> dict[str, str]:
+        """Load prompts from yaml file.
+
+        - Default path: `DIR_ROOT / "utu/prompts" / fn`
+        """
+        if isinstance(fn, str):
+            if not fn.endswith(".yaml"):
+                fn += ".yaml"
+            fn = DIR_ROOT / "utu" / "prompts" / fn
+        assert fn.exists(), f"File {fn} does not exist!"
+        with fn.open() as f:
+            return yaml.safe_load(f)
