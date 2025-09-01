@@ -10,7 +10,7 @@ from .base_config import ConfigBaseModel
 class DataConfig(ConfigBaseModel):
     """Data config"""
 
-    dataset: str
+    dataset: str  # WebWalkerQA | GAIA_val | XBench | BrowseComp
     """Built-in dataset name or custom dataset path"""
     type: Literal["single", "mixed"]
     """Whether the dataset contains only single benchmark data or multiple benchmarks"""
