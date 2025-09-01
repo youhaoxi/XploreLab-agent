@@ -1,5 +1,6 @@
 from ..config import AgentConfig
 from .base_agent import BaseAgent
+from .llm_agent import LLMAgent
 from .orchestra_agent import OrchestraAgent
 from .simple_agent import SimpleAgent
 
@@ -17,5 +18,6 @@ __all__ = [
     "BaseAgent",
     "SimpleAgent",
     "OrchestraAgent",
+    "LLMAgent",
     "get_agent",
 ]
