@@ -8,8 +8,8 @@ load_dotenv(find_dotenv(raise_error_if_not_found=True), verbose=True, override=T
 
 class EnvUtils:
     @staticmethod
-    def get_env(key: str, default: str | None = None, raise_error_if_not_found: bool = True) -> str | None:
-        if raise_error_if_not_found:
+    def get_env(key: str, default: str | None = None) -> str | None:
+        if default is None:
             res = os.getenv(key)
             if not res:
                 raise ValueError(f"Environment variable {key} is not set")

@@ -4,10 +4,11 @@ import time
 from dataclasses import dataclass
 from enum import Enum
 
-import docker
-import docker.errors
 import requests
 from requests.exceptions import RequestException
+
+import docker
+import docker.errors
 
 from .port_manager import PortManager
 
