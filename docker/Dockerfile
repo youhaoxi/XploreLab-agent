@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 WORKDIR /Youtu-agent
 
 # 4. Clone the repository into the working directory
-RUN git clone --branch feat/docker-setup https://github.com/Tencent/Youtu-agent.git .
+RUN git clone https://github.com/Tencent/Youtu-agent.git .
 
 # 5. Install the 'uv' build tool globally
 RUN pip install uv
