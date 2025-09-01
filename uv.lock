@@ -3034,18 +3034,6 @@ wheels = [
 ]
 
 [[package]]
-name = "tencentcloud-sdk-python"
-version = "3.0.1425"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e5/af/f33bc91e13a3120e020257c402404b9efec280bdba84f836303b14833d36/tencentcloud-sdk-python-3.0.1425.tar.gz", hash = "sha256:d1f1db4be38850d2c460db3b184a714445cdf7d4238ac17023d967874cc4a908", size = 11780320, upload-time = "2025-07-17T20:47:47.076Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f6/e8/c1699064735dddb64018412f91b9c0ecbd1d5d9c4218920f56e3130420d6/tencentcloud_sdk_python-3.0.1425-py2.py3-none-any.whl", hash = "sha256:a6faf29ef888abff8396fee30064be87c5da0f09224803f6e61ba79dbaf83131", size = 12459777, upload-time = "2025-07-17T20:47:30.172Z" },
-]
-
-[[package]]
 name = "termcolor"
 version = "3.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3482,7 +3470,6 @@ dev = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "ruff" },
-    { name = "tencentcloud-sdk-python" },
     { name = "tornado" },
 ]
 documents = [
@@ -3533,7 +3520,6 @@ dev = [
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest-asyncio", specifier = ">=1.0.0" },
     { name = "ruff", specifier = ">=0.12.8" },
-    { name = "tencentcloud-sdk-python", specifier = ">=3.0.1425" },
     { name = "tornado", specifier = ">=6.5.2" },
 ]
 documents = [{ name = "pymupdf", specifier = ">=1.26.3" }]
