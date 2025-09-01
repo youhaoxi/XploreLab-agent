@@ -100,8 +100,9 @@ watch:
 
 nav:
   - Intro: index.md
-  - Getting Started:
-    - Quick Start: quickstart.md
+  - Quickstart: 
+    - QuickStart (for beginner): quickstart_beginner.md
+    - QuickStart: quickstart.md
     - Start with Docker: docker.md
   - Documentation:
     - Config: config.md
