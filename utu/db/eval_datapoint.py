@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from typing import Any
 
 from sqlmodel import JSON, Column, Field, SQLModel
@@ -30,8 +30,8 @@ class EvaluationSample(UTUBaseModel, SQLModel, table=True):
     __tablename__ = "evaluation_data"
 
     id: int | None = Field(default=None, primary_key=True)
-    created_at: datetime | None = Field(default_factory=datetime.utcnow)
-    updated_at: datetime | None = Field(default_factory=datetime.utcnow)
+    created_at: datetime.datetime | None = Field(default_factory=datetime.datetime.now)
+    updated_at: datetime.datetime | None = Field(default_factory=datetime.datetime.now)
 
     # 1) base info
     dataset: str = ""  # dataset name
