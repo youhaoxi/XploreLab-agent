@@ -23,7 +23,7 @@ def main():
     question = f"请分析位于`{fn}`的猫品种数据，提取有价值的信息。"
     ui = WebUIChatbot(runner, example_query=question)
 
-    ui.launch()
+    ui.launch(port=config.frontend_port, ip=config.frontend_ip)
 
 
 if __name__ == "__main__":

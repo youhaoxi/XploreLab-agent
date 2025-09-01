@@ -30,7 +30,7 @@ def main():
         simple_agent,
         example_query="斐波那契数列的第10个数是多少？记这个数为x，数列的第x个数是多少？",
     )
-    chatbot.launch()
+    chatbot.launch(port=config.frontend_port, ip=config.frontend_ip)
 
 
 if __name__ == "__main__":
