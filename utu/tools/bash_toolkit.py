@@ -59,10 +59,10 @@ class BashToolkit(AsyncBaseToolkit):
             child.expect(custom_prompt)
         else:
             if sys.platform == "win32":
-                        child = pexpect.spawn("cmd.exe", encoding="utf-8", echo=False, timeout=timeout)
-                        custom_prompt = "PROMPT_>"
-                        child.sendline(f"prompt {custom_prompt}")
-                        child.expect(custom_prompt)
+                child = pexpect.spawn("cmd.exe", encoding="utf-8", echo=False, timeout=timeout)
+                custom_prompt = "PROMPT_>"
+                child.sendline(f"prompt {custom_prompt}")
+                child.expect(custom_prompt)
             else:
                 child = pexpect.spawn("/bin/bash", encoding="utf-8", echo=False, timeout=timeout)
                 # Set a known, unique prompt

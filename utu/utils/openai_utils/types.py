@@ -18,6 +18,7 @@ class OpenAICreateBaseParams(TypedDict):
     extra_body: Body | None = None
     timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN
 
+
 # CompletionCreateParams | https://platform.openai.com/docs/api-reference/chat/create
 class OpenAIChatCompletionParams(TypedDict, OpenAICreateBaseParams):
     # NOTE: only for typing
