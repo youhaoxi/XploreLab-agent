@@ -45,6 +45,18 @@ The `examples` directory contains some examples for you to play with. You can ru
 python examples/data_analysis/main_web.py
 ```
 
+By default, the WebUI uses port `8848` and IP `127.0.0.1`. You can customize these settings by adding the following configuration to your `.env` file:
+
+```env
+# =============================================
+# frontend
+# =============================================
+FRONTEND_PORT=8848
+FRONTEND_IP=127.0.0.1
+```
+
+If you change the default port or IP, make sure to update the WebSocket URL in your frontend configuration to match the new settings. The default WebSocket URL is `ws://localhost:8848/ws`, and you can find and modify this setting in the right top corner of the frontend page.
+
 ## Installation
 
 We ship the static web pages in the `utu_agent_ui` package, which can be installed by either `pip install`ing the prebuilt wheel file or compiling from source.

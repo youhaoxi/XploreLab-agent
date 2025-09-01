@@ -16,7 +16,7 @@ def main():
     question = f"请分析论文{paper_url}，整理出它的相关工作，并且进行简单的比较。"
 
     ui = WebUIChatbot(runner, example_query=question)
-    ui.launch()
+    ui.launch(port=config.frontend_port, ip=config.frontend_ip)
 
 
 if __name__ == "__main__":

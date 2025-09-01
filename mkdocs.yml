@@ -103,6 +103,7 @@ nav:
   - Quickstart: 
     - QuickStart (for beginner): quickstart_beginner.md
     - QuickStart: quickstart.md
+    - Start with Docker: docker.md
   - Documentation:
     - Config: config.md
     - Agents: agents.md

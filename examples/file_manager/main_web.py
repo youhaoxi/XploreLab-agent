@@ -14,7 +14,7 @@ worker_agent = SimpleAgent(config=config)
 
 def main_gradio():
     chatbot = WebUIChatbot(worker_agent, example_query=EXAMPLE_QUERY)
-    chatbot.launch()
+    chatbot.launch(port=config.frontend_port, ip=config.frontend_ip)
 
 
 if __name__ == "__main__":

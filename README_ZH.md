@@ -153,7 +153,7 @@ python scripts/cli_chat.py --stream --config generated/xxx
 
 ## 🚀 快速上手
 
-Youtu-agent 提供了完整的代码与示例，帮助你快速开始使用。按照以下步骤即可运行你的第一个智能体：
+Youtu-agent 提供了完整的代码与示例，帮助你快速开始使用。按照以下步骤即可运行你的第一个智能体，或者参考 [`docker/README.md`](./docker/README.md) 使用Docker快速运行一个带交互网页的样例.
 
 ### 环境准备
 

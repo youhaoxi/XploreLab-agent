@@ -185,7 +185,7 @@ For more design and implementation details, please refer to our [technical docum
 
 ## 🚀 Getting Started
 
-Youtu-agent provides complete code and examples to help you get started quickly. Follow the steps below to run your first agent:
+Youtu-agent provides complete code and examples to help you get started quickly. Follow the steps below to run your first agent, or refer to [`docker/README.md`](./docker/README.md) for a streamlined Docker-based setup with interactive frontend.
 
 ### Setup
 
