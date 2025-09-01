@@ -80,6 +80,6 @@ class AgentConfig(ConfigBaseModel):
 
     # frontend server config
     frontend_ip: str = EnvUtils.get_env("FRONTEND_IP", "127.0.0.1")
-    """server ip address"""
+    """Frontend server ip address"""
     frontend_port: int = EnvUtils.get_env("FRONTEND_PORT", 8848)
-    """server port"""
+    """Frontend server port"""
