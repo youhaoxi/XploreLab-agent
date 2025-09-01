@@ -16,7 +16,7 @@ def main():
     question = "deepseek-v3.1有哪些亮点更新?"
 
     ui = WebUIChatbot(runner, example_query=question)
-    ui.launch()
+    ui.launch(port=config.frontend_port, ip=config.frontend_ip)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ from typing import Literal
 
 from pydantic import Field
 
+from ..utils import EnvUtils
 from .base_config import ConfigBaseModel
 from .model_config import ModelConfigs
 
@@ -43,6 +44,7 @@ class AgentConfig(ConfigBaseModel):
     type: Literal["simple", "orchestra"] = "simple"
     """Agent type, "simple" or "orchestra". """
 
+    # simple agent config
     model: ModelConfigs = Field(default_factory=ModelConfigs)
     """Model config, with model_provider, model_settings, model_params"""
     agent: ProfileConfig = Field(default_factory=ProfileConfig)
@@ -56,6 +58,7 @@ class AgentConfig(ConfigBaseModel):
     max_turns: int = 20
     """Max turns"""
 
+    # orchestra agent config
     planner_model: ModelConfigs = Field(default_factory=ModelConfigs)
     """Planner model config"""
     planner_config: dict = Field(default_factory=dict)
@@ -74,3 +77,9 @@ class AgentConfig(ConfigBaseModel):
     reporter_config: dict = Field(default_factory=dict)
     """Reporter config (dict)\n
     - `template_path`: template Jinja2 file path, with `question` and `trajectory` variables"""
+
+    # frontend server config
+    frontend_ip: str = EnvUtils.get_env("FRONTEND_IP", "127.0.0.1")
+    """server ip address"""
+    frontend_port: int = EnvUtils.get_env("FRONTEND_PORT", 8848)
+    """server port"""
