@@ -100,7 +100,9 @@ watch:
 
 nav:
   - Intro: index.md
-  - Quickstart: quickstart.md
+  - Quickstart: 
+    - QuickStart (for beginner): quickstart_beginner.md
+    - QuickStart: quickstart.md
   - Documentation:
     - Config: config.md
     - Agents: agents.md
