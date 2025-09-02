@@ -52,7 +52,7 @@ By replacing the `/path/to/your/.env`, please run:
 ```bash
 docker run -it \
     -p 8848:8848 \
-    -v "/path/to/your/.env:/Youtu-agent/.env" \
+    -v "/path/to/your/.env:/youtu-agent/.env" \
     youtu-agent
 ```
 
@@ -64,7 +64,7 @@ To run other examples or custom configurations by replacing the `/path/to/your/.
 ```bash
 docker run -it \
     -p 8848:8848 \
-    -v "/path/to/your/.env:/Youtu-agent/.env" \
+    -v "/path/to/your/.env:/youtu-agent/.env" \
     youtu-agent \
     bash
 ```

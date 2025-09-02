@@ -15,7 +15,7 @@ This guide explains how to deploy the Youtu-agent service with its frontend usin
 Execute the command below to clone the project repository:
 
 ```bash
-git clone https://github.com/Tencent/Youtu-agent.git
+git clone https://github.com/Tencent/youtu-agent.git
 ```
 
 ### Step 2. Build the Docker Image
@@ -65,7 +65,7 @@ Replace /path/to/your/.env with the actual path to your .env file, then run:
 ```bash
 docker run -it \
     -p 8848:8848 \
-    -v "/path/to/your/.env:/Youtu-agent/.env" \
+    -v "/path/to/your/.env:/youtu-agent/.env" \
     youtu-agent
 ```
 
@@ -78,7 +78,7 @@ To run other examples or custom configurations by replacing the `/path/to/your/.
 ```bash
 docker run -it \
     -p 8848:8848 \
-    -v "/path/to/your/.env:/Youtu-agent/.env" \
+    -v "/path/to/your/.env:/youtu-agent/.env" \
     youtu-agent \
     bash
 ```

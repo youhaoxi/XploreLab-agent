@@ -1,10 +1,10 @@
 # <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-agent: A simple yet powerful agent framework that delivers with open-source models
 
 <div align="center">
-<a href="https://tencentcloudadp.github.io/Youtu-agent/"><img src=https://img.shields.io/badge/📖-Documentation-blue.svg></a>
+<a href="https://tencentcloudadp.github.io/youtu-agent/"><img src=https://img.shields.io/badge/📖-Documentation-blue.svg></a>
 <!-- <a href=https://arxiv.org/abs/2502.14345><img src=https://img.shields.io/badge/arXiv-2502.14345-b31b1b.svg></a> -->
-<a href=https://github.com/TencentCloudADP/Youtu-agent><img src=https://img.shields.io/badge/GitHub-Tencent-blue.svg></a>
-<a href=https://deepwiki.com/TencentCloudADP/Youtu-agent><img src=https://img.shields.io/badge/DeepWiki-Tencent-blue.svg></a>
+<a href=https://github.com/TencentCloudADP/youtu-agent><img src=https://img.shields.io/badge/GitHub-Tencent-blue.svg></a>
+<a href=https://deepwiki.com/TencentCloudADP/youtu-agent><img src=https://img.shields.io/badge/DeepWiki-Tencent-blue.svg></a>
 </div>
 
 <p align="center">
@@ -183,7 +183,7 @@ For more detailed examples and advanced use-cases, please refer to the [`example
 - **ContextManager**: A configurable module for managing the agent's context window.
 - **Benchmark**: An encapsulated workflow for a specific dataset, including preprocessing, rollout, and judging logic.
 
-For more design and implementation details, please refer to our [technical documentation](https://tencentcloudadp.github.io/Youtu-agent/).
+For more design and implementation details, please refer to our [technical documentation](https://tencentcloudadp.github.io/youtu-agent/).
 
 ## 🚀 Getting Started
 
@@ -194,7 +194,7 @@ Youtu-agent provides complete code and examples to help you get started quickly.
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/TencentCloudADP/Youtu-agent.git
+git clone https://github.com/TencentCloudADP/youtu-agent.git
 cd Youtu-agent
 uv sync  # or, `make sync`
 source ./.venv/bin/activate
@@ -226,7 +226,7 @@ You can launch an interactive CLI chatbot with this agent by running:
 python scripts/cli_chat.py --stream --config default
 ```
 
-📖 More details: [Quickstart Documentation](https://tencentcloudadp.github.io/Youtu-agent/quickstart)
+📖 More details: [Quickstart Documentation](https://tencentcloudadp.github.io/youtu-agent/quickstart)
 
 ### Explore examples
 The repository provides multiple ready-to-use examples. For instance, you can generate an SVG infographic based on a research topic:
@@ -236,7 +236,7 @@ python examples/svg_generator/main_web.py
 ```
 
 > [!NOTE]
-> To use the WebUI, you need to install the `utu_agent_ui` package. Refer to [documentation](https://tencentcloudadp.github.io/Youtu-agent/frontend/#installation) for more details.
+> To use the WebUI, you need to install the `utu_agent_ui` package. Refer to [documentation](https://tencentcloudadp.github.io/youtu-agent/frontend/#installation) for more details.
 
 Given a research topic, the agent will automatically search the web, collect relevant information, and output an SVG visualization.
 
@@ -244,7 +244,7 @@ Given a research topic, the agent will automatically search the web, collect rel
 
 ![svg_generator_result](https://github.com/user-attachments/assets/41aa7348-5f02-4daa-b5b2-225e35d21067)
 
-📖 Learn more: [Examples Documentation](https://tencentcloudadp.github.io/Youtu-agent/examples)
+📖 Learn more: [Examples Documentation](https://tencentcloudadp.github.io/youtu-agent/examples)
 
 ### Run evaluations
 
@@ -263,7 +263,7 @@ Results are stored and can be further analyzed in the evaluation platform.
 
 ![eval_analysis_detail](https://github.com/user-attachments/assets/4ede525a-5e16-4d88-9ebb-01a7dca3aaec)
 
-📖 Learn more: [Evaluation Documentation](https://tencentcloudadp.github.io/Youtu-agent/eval)
+📖 Learn more: [Evaluation Documentation](https://tencentcloudadp.github.io/youtu-agent/eval)
 
 ## 🙏 Acknowledgements
 
@@ -283,10 +283,10 @@ If you find this work useful, please consider citing:
   year={2025},
   publisher = {GitHub},
   journal = {GitHub repository},
-  howpublished = {\url{https://github.com/TencentCloudADP/Youtu-agent}},
+  howpublished = {\url{https://github.com/TencentCloudADP/youtu-agent}},
 }
 ```
 
 ## ⭐ Star History
 
-![Star History Chart](https://api.star-history.com/svg?repos=TencentCloudADP/Youtu-agent&type=Date)
+![Star History Chart](https://api.star-history.com/svg?repos=TencentCloudADP/youtu-agent&type=Date)

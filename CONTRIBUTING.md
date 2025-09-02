@@ -19,7 +19,7 @@ To ensure a smooth and effective contribution process, please adhere to the foll
 
 ### Environment Setup
 
-For a complete guide on setting up your development environment, please refer to our [Quick Start](https://tencentcloudadp.github.io/Youtu-agent/quickstart/) documentation. Here are the essential steps:
+For a complete guide on setting up your development environment, please refer to our [Quick Start](https://tencentcloudadp.github.io/youtu-agent/quickstart/) documentation. Here are the essential steps:
 
 ```sh
 # Install all dependencies

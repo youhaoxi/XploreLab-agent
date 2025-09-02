@@ -8,7 +8,7 @@ First, clone the repository and set up the Python environment.
 
 ```sh
 # Clone the project repository
-git clone https://github.com/TencentCloudADP/Youtu-agent.git
+git clone https://github.com/TencentCloudADP/youtu-agent.git
 cd Youtu-agent
 
 # We use `uv` to manage the virtual environment and dependencies
