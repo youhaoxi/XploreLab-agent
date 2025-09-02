@@ -10,16 +10,29 @@ This guide explains how to deploy the Youtu-agent service with its frontend usin
 
 ## Deployment Steps
 
-### Step 1. Build Docker Image
+### Step 1. Clone the Repository
 
-Build the Youtu-agent Docker image:
+Execute the command below to clone the project repository:
+
 ```bash
+git clone https://github.com/Tencent/Youtu-agent.git
+```
+
+### Step 2. Build the Docker Image
+
+Build the Youtu-agent Docker image.
+
+> Note: The Dockerfile is located in the docker/ directory.
+
+```bash
+cd Youtu-agent/docker
 docker build -t youtu-agent .
 ```
 
-### Step 2. Configure Environment
+### Step 3. Configure the Environment
 
 1. Create a configuration file by copying the template:
+
 ```bash
 cp .env.docker.example .env
 ```
@@ -27,11 +40,11 @@ cp .env.docker.example .env
 2. Configure the following required variables in `.env`:
 
 ```plaintext
-# LLM Configuration
+# LLM Configuration (required)
 UTU_LLM_TYPE=chat.completions
 UTU_LLM_MODEL=deepseek-chat
 UTU_LLM_BASE_URL=https://api.deepseek.com/v1
-UTU_LLM_API_KEY=<your-api-key>
+UTU_LLM_API_KEY=<your-api-key> # Required
 
 # Serper API Configuration
 # Get your key from https://serper.dev/playground
@@ -43,11 +56,12 @@ FRONTEND_PORT=8848
 FRONTEND_IP=0.0.0.0
 ```
 
-### Step 3. Launch the Service
+### Step 4. Launch the Service
 
 #### Option 1: Run the Default Web Search Agent Demo
 
-By replacing the `/path/to/your/.env`, please run:
+Replace /path/to/your/.env with the actual path to your .env file, then run:
+
 ```bash
 docker run -it \
     -p 8848:8848 \
@@ -58,6 +72,7 @@ docker run -it \
 The service will be accessible at http://127.0.0.1:8848
 
 #### Option 2: Interactive Shell Access
+
 To run other examples or custom configurations by replacing the `/path/to/your/.env`:
 
 ```bash
