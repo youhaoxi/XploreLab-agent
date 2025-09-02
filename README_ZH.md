@@ -1,4 +1,4 @@
-# <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-agent: 一个简单而强大的智能体框架
+# <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-Agent: 一个简单强大的智能体框架
 
 <div align="center">
 <a href="https://tencentcloudadp.github.io/youtu-agent/"><img src=https://img.shields.io/badge/📖-文档-blue.svg></a>
@@ -17,7 +17,7 @@
 </p>
 
 
-`Youtu-agent` 是一个灵活、高性能的框架，用于构建、运行和评估自主智能体。除了在基准测试中名列前茅，该框架还提供了强大的智能体能力，采用开源模型即可实现例如数据分析、文件处理、深度研究等功能。
+`Youtu-Agent` 是一个灵活、高性能的框架，用于构建、运行和评估自主智能体。除了在基准测试中名列前茅，该框架还提供了强大的智能体能力，采用开源模型即可实现例如数据分析、文件处理、深度研究等功能。
 
 <img src="docs/assets/mascot.png" alt="Youtu-agent Logo" width="200" align="left" style="margin-right:20px;">
 
@@ -30,12 +30,12 @@
 
 ## 🗞️ 新闻
 
-- 🎁 [2025-09-02] [腾讯云国际站](https://www.tencentcloud.com/) 为 DeepSeek API 新用户提供 **300 万免费令牌**（**2025年9月1日 – 2025年10月31日**）。如果想在 `Youtu-agent` 中使用 DeepSeek 模型，[点击免费试用](https://www.tencentcloud.com/document/product/1255/70381)！如需企业级智能体解决方案，也可查看 [智能体开发平台 ADP](https://adp.tencentcloud.com)。
-- 📺 [2025-08-28] 我们围绕新发布的 DeepSeek-V3.1 模型进行了直播分享，并介绍了如何在 `Youtu-agent` 框架中使用该模型。[点击这里](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF) 获取所用文档。
+- 🎁 [2025-09-02] [腾讯云国际站](https://www.tencentcloud.com/) 为 DeepSeek API 新用户提供 **300 万免费令牌**（**2025年9月1日 – 2025年10月31日**）。如果想在 `Youtu-Agent` 中使用 DeepSeek 模型，[点击免费试用](https://www.tencentcloud.com/document/product/1255/70381)！如需企业级智能体解决方案，也可查看 [智能体开发平台 ADP](https://adp.tencentcloud.com)。
+- 📺 [2025-08-28] 我们围绕新发布的 DeepSeek-V3.1 模型进行了直播分享，并介绍了如何在 `Youtu-Agent` 框架中使用该模型。[点击这里](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF) 获取所用文档。
 
 ## 🌟 基准性能
 
-`Youtu-agent` 基于开源模型和轻量级工具构建，在具有挑战性的深度搜索和工具使用基准测试中表现出色。
+`Youtu-Agent` 基于开源模型和轻量级工具构建，在具有挑战性的深度搜索和工具使用基准测试中表现出色。
 
 - **[WebWalkerQA](https://huggingface.co/datasets/callanwu/WebWalkerQA)**：使用 `DeepSeek-V3-0324` 实现了 60.71% 的准确率，使用新发布的 `DeepSeek-V3.1` 可进一步提升至 71.47%，创造了新的 SOTA 性能。
 - **[GAIA](https://gaia-benchmark-leaderboard.hf.space/)**：使用 `DeepSeek-V3-0324`（包括工具中使用的模型）在[纯文本验证子集](https://github.com/sunnynexus/WebThinker?tab=readme-ov-file#benchmarks)上实现了 72.8% 的 pass@1。我们正在积极扩展对带有多模态工具的完整 GAIA 基准的评估，将在近期放出完整轨迹，敬请关注！✨
@@ -77,7 +77,7 @@
 
 ### 🤖 自动智能体生成
 
-`Youtu-agent`的突出优势在于其**自动化生成智能体及其配置**的能力。在其他框架中，定义特定任务的智能体通常需要编写代码或是精心设计提示词，而`Youtu-agent`采用基于 YAML 的简洁配置方案，实现了高效自动化：内置的“元智能体”与用户对话并捕获需求，然后自动生成并保存配置。
+`Youtu-Agent`的突出优势在于其**自动化生成智能体及其配置**的能力。在其他框架中，定义特定任务的智能体通常需要编写代码或是精心设计提示词，而`Youtu-Agent`采用基于 YAML 的简洁配置方案，实现了高效自动化：内置的“元智能体”与用户对话并捕获需求，然后自动生成并保存配置。
 
 ```bash
 # Interactively clarify your requirements and auto-generate a config
@@ -125,9 +125,9 @@ python scripts/cli_chat.py --stream --config generated/xxx
 - 网页生成：示例包括根据特定输入生成网页。
 - 轨迹收集：支持用于训练和研究目的的数据收集。
 
-## 🤔 为何选择 Youtu-agent？
+## 🤔 为何选择 Youtu-Agent？
 
-`Youtu-agent` 旨在为不同的用户群体提供价值：
+`Youtu-Agent` 旨在为不同的用户群体提供价值：
 
 ### 对于智能体研究人员和大型语言模型训练师
 - 一个**简单而强大的基线**，比基本的 ReAct 更强大，可作为模型训练和消融研究的绝佳起点。
@@ -154,11 +154,16 @@ python scripts/cli_chat.py --stream --config generated/xxx
 
 ## 🚀 快速上手
 
-Youtu-agent 提供了完整的代码与示例，帮助你快速开始使用。按照以下步骤即可运行你的第一个智能体，或者参考 [`docker/README.md`](./docker/README.md) 使用Docker快速运行一个带交互网页的样例.
+Youtu-Agent 提供了完整的代码与示例，帮助你快速开始使用。按照以下步骤即可运行你的第一个智能体，或者参考 [`docker/README.md`](./docker/README.md) 使用Docker快速运行一个带交互网页的样例.
 
 ### 环境准备
 
 克隆仓库并安装依赖：
+
+> [!NOTE]
+> 本项目使用 **Python 3.12+**。推荐使用 [uv](https://github.com/astral-sh/uv) 进行依赖管理。
+
+首先请确保已在环境安装 Python 和 uv，然后参考以下步骤克隆本项目并同步项目依赖。
 
 ```bash
 git clone https://github.com/TencentCloudADP/youtu-agent.git
@@ -168,12 +173,9 @@ source ./.venv/bin/activate
 cp .env.example .env  # 配置相关环境变量...
 ```
 
-> [!NOTE]
-> 本项目使用 **Python 3.12+**。推荐使用 [uv](https://github.com/astral-sh/uv) 进行依赖管理。
-
 ### 快速开始
 
-Youtu-agent 内置了配置文件。例如，默认配置文件 (`configs/agents/default.yaml`) 定义了一个带有搜索工具的简单 Agent：
+Youtu-Agent 内置了配置文件。例如，默认配置文件 (`configs/agents/default.yaml`) 定义了一个带有搜索工具的简单 Agent：
 
 ```yaml
 defaults:
