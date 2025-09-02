@@ -1,9 +1,9 @@
 from collections.abc import Iterable
-from typing import Any, TypeAlias
+from typing import Any
 
 from pydantic import BaseModel
 
-ReprArgs: TypeAlias = Iterable[tuple[str | None, Any]]
+ReprArgs: type = Iterable[tuple[str | None, Any]]
 
 SECURE_FIELDS = ("api_key", "base_url")
 
