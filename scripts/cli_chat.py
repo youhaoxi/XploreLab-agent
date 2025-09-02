@@ -35,7 +35,7 @@ async def main():
 
     async with SimpleAgent(config=config) as agent:
         while True:
-            user_input = input("> ")
+            user_input = await PrintUtils.async_print_input("> ")
             if user_input.lower() in ["exit", "quit", "q"]:
                 break
             if args.stream:

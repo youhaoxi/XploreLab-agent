@@ -22,7 +22,7 @@ class UserInteractionToolkit(AsyncBaseToolkit):
         """
         if self.ask_function:
             return self.ask_function(question)
-        return PrintUtils.print_input(f"Please answer the question: {question}\n> ")
+        return await PrintUtils.async_print_input(f"Please answer the question: {question}\n> ")
 
     async def final_answer(self, answer: Any) -> str:
         """Provides a final answer to the given problem.
