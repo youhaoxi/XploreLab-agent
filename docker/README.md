@@ -25,7 +25,7 @@ Build the Youtu-agent Docker image.
 > Note: The Dockerfile is located in the docker/ directory.
 
 ```bash
-cd Youtu-agent/docker
+cd youtu-agent/docker
 docker build -t youtu-agent .
 ```
 
