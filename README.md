@@ -206,7 +206,7 @@ cp .env.example .env  # NOTE: You should then config the necessary keys!
 ```
 
 > [!NOTE]
-> After copying the `.env.example` file, you need to fill in the necessary keys in the `.env` file, e.g. LLM API keys.
+> After copying the `.env.example` file, you need to fill in the necessary keys in the `.env` file -- for example, API keys for the LLM service and tools such as web search.
 
 #### Docker Deployment
 
@@ -230,11 +230,12 @@ agent:
 You can launch an interactive CLI chatbot with this agent by running:
 
 ```bash
+# NOTE: You need to set `SERPER_API_KEY` and `JINA_API_KEY` in `.env` for web search access.
+# (We plan to replace these with free alternatives in the future)
 python scripts/cli_chat.py --stream --config default
+# To avoid using the search toolkit, you can run:
+python scripts/cli_chat.py --stream --config base
 ```
-
-> [!NOTE]
-> The search toolkit currently requires `SERPER_API_KEY` and `JINA_API_KEY` for web search access (We plan to replace these with free alternatives in the future). You can run `python scripts/cli_chat.py --stream --config base` to avoid using the search toolkit.
 
 📖 More details: [Quickstart Documentation](https://tencentcloudadp.github.io/youtu-agent/quickstart)
 
