@@ -129,8 +129,6 @@ python scripts/cli_chat.py --stream --config generated/xxx
 
 For more detailed examples and advanced use-cases, please refer to the [`examples`](./examples) directory and our comprehensive documentation at [`docs/examples.md`](./docs/examples.md).
 
-
-
 ## ✨ Features
 
 ![features](docs/assets/images/header.png)
@@ -190,19 +188,26 @@ Youtu-agent provides complete code and examples to help you get started quickly.
 
 ### Setup
 
-Clone the repository and install dependencies:
+#### Source Code Deployment
+
+> [!NOTE]
+> The project requires Python 3.12+. We recommend using [uv](https://github.com/astral-sh/uv) for dependency management.
+
+First, make sure Python and uv are installed.
+
+Then clone the repository and sync dependencies:
 
 ```bash
 git clone https://github.com/TencentCloudADP/youtu-agent.git
-cd Youtu-agent
+cd youtu-agent
 uv sync  # or, `make sync`
 source ./.venv/bin/activate
 cp .env.example .env  # config necessary keys...
 ```
 
-> [!NOTE]
-> The project requires Python 3.12+. We recommend using [uv](https://github.com/astral-sh/uv) for dependency management.
+#### Docker Deployment
 
+Please refer to [`docker/README.md`](./docker/README.md) for a streamlined Docker-based setup with interactive frontend.
 
 ### Quickstart
 
