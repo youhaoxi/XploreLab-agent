@@ -5,7 +5,7 @@ from agents import RunResultStreaming, StopAtTools, trace
 
 from ..agents import SimpleAgent
 from ..tools import UserInteractionToolkit, get_toolkits_map
-from ..utils import DIR_ROOT, AgentsUtils, get_jinja_env, get_logger
+from ..utils import DIR_ROOT, AgentsUtils, PrintUtils, get_jinja_env, get_logger
 
 logger = get_logger(__name__)
 
@@ -67,7 +67,7 @@ class SimpleAgentGenerator:
 
     async def run(self):
         with trace("simple_agent_generator"):
-            user_input = input("> ")
+            user_input = await PrintUtils.async_print_input("> ")
             requirements = await self.step1(user_input)
             selected_tools = await self.step2(requirements)
             instructions = await self.step3(requirements)
