@@ -66,6 +66,7 @@ class SimpleAgent(BaseAgent):
         self._toolkits: list[AsyncBaseToolkit] = []
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
+        self._initialized = False
 
     def _get_config(self, config: AgentConfig | str | None) -> AgentConfig:
         if isinstance(config, AgentConfig):
@@ -94,6 +95,9 @@ class SimpleAgent(BaseAgent):
 
     async def build(self):
         """Build the agent"""
+        if self._initialized:
+            logger.info("Agent already initialized! Skipping build.")
+            return
         self.env = await get_env(self.config, "None")  # FIXME: trace_id
         await self.env.build()
         self.current_agent = Agent(
@@ -107,6 +111,7 @@ class SimpleAgent(BaseAgent):
             mcp_servers=self._mcp_servers,
         )
         self.context_manager = build_context_manager(self.config)
+        self._initialized = True
 
     async def cleanup(self):
         """Cleanup"""
@@ -118,6 +123,7 @@ class SimpleAgent(BaseAgent):
         self._toolkits = []
         logger.info("Cleaning up env...")
         await self.env.cleanup()
+        self._initialized = False
 
     async def get_tools(self) -> list[Tool]:
         if self.tools:
@@ -173,6 +179,8 @@ class SimpleAgent(BaseAgent):
 
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> TaskRecorder:
+        if not self._initialized:
+            await self.build()
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
@@ -195,6 +203,8 @@ class SimpleAgent(BaseAgent):
         return task_recorder
 
     def run_streamed(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResultStreaming:
+        if not self._initialized:
+            raise RuntimeError("Agent is not initialized. Please call `build` first.")
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
