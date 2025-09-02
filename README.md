@@ -227,7 +227,7 @@ UTU_LLM_BASE_URL=https://api.deepseek.com/v1
 UTU_LLM_API_KEY=
 ```
 
-> If you want to use the free DeepSeek API provided by Tencent Cloud, please visit [Tencent Cloud International](https://www.tencentcloud.com/) to apply and refer to the following `.env` configuration.
+> [Tencent Cloud International](https://www.tencentcloud.com/) offers new users of the DeepSeek API **3 million free tokens** (**Sep 1 – Oct 31, 2025**). [Try it out](https://www.tencentcloud.com/document/product/1255/70381) for free if you want to use DeepSeek models in `Youtu-Agent`.
 
 ```bash
 # llm
