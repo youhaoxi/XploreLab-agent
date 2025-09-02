@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 WORKDIR /Youtu-agent
 
 # 4. Clone the repository into the working directory
-RUN git clone https://github.com/Tencent/Youtu-agent.git .
+RUN git clone https://github.com/TencentCloudADP/Youtu-agent.git .
 
 # 5. Install the 'uv' build tool globally
 RUN pip install uv
@@ -20,7 +20,7 @@ RUN uv sync
 ENV PATH="/Youtu-agent/.venv/bin:$PATH"
 
 # 8. Install the frontend UI package
-RUN uv pip install https://github.com/Tencent/Youtu-agent/releases/download/frontend/v0.1.5/utu_agent_ui-0.1.5-py3-none-any.whl
+RUN uv pip install https://github.com/TencentCloudADP/Youtu-agent/releases/download/frontend/v0.1.5/utu_agent_ui-0.1.5-py3-none-any.whl
 
 # 9. Set the default command to start the example application
 CMD ["python", "examples/svg_generator/main_web.py"]

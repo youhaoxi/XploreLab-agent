@@ -31,7 +31,7 @@ theme:
   favicon: assets/logo.svg
 
 repo_name: Youtu-agent
-repo_url: https://github.com/Tencent/Youtu-agent
+repo_url: https://github.com/TencentCloudADP/Youtu-agent
 
 extra:
   # Remove material generation message in footer

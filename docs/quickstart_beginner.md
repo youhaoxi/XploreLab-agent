@@ -24,7 +24,7 @@ Open a terminal (command line) and execute the following commands:
 
 ```sh
 # Clone the project locally
-git clone https://github.com/Tencent/Youtu-agent.git
+git clone https://github.com/TencentCloudADP/Youtu-agent.git
 
 # Enter the project directory
 cd Youtu-agent
@@ -348,8 +348,8 @@ Congratulations! You've successfully run Youtu-agent. Next, you can:
 
 If you encounter issues while using the project, you can:
 
-1. Check the [Complete Documentation](https://tencent.github.io/Youtu-agent/)
-2. Ask questions in [GitHub Issues](https://github.com/Tencent/Youtu-agent/issues)
-3. View the project's [Example Code](https://github.com/Tencent/Youtu-agent/tree/main/examples)
+1. Check the [Complete Documentation](https://tencentcloudadp.github.io/Youtu-agent/)
+2. Ask questions in [GitHub Issues](https://github.com/TencentCloudADP/Youtu-agent/issues)
+3. View the project's [Example Code](https://github.com/TencentCloudADP/Youtu-agent/tree/main/examples)
 
 Happy coding! 🎉

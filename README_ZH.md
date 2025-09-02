@@ -1,10 +1,10 @@
 # <img src="docs/assets/logo.svg" alt="Youtu-agent Logo" height="24px"> Youtu-agent: 一个简单而强大的智能体框架
 
 <div align="center">
-<a href="https://tencent.github.io/Youtu-agent/"><img src=https://img.shields.io/badge/📖-文档-blue.svg></a>
+<a href="https://tencentcloudadp.github.io/Youtu-agent/"><img src=https://img.shields.io/badge/📖-文档-blue.svg></a>
 <!-- <a href=https://arxiv.org/abs/2502.14345><img src=https://img.shields.io/badge/arXiv-2502.14345-b31b1b.svg></a> -->
-<a href=https://github.com/Tencent/Youtu-agent><img src=https://img.shields.io/badge/GitHub-腾讯-blue.svg></a>
-<a href=https://deepwiki.com/Tencent/Youtu-agent><img src=https://img.shields.io/badge/DeepWiki-Tencent-blue.svg></a>
+<a href=https://github.com/TencentCloudADP/Youtu-agent><img src=https://img.shields.io/badge/GitHub-腾讯-blue.svg></a>
+<a href=https://deepwiki.com/TencentCloudADP/Youtu-agent><img src=https://img.shields.io/badge/DeepWiki-Tencent-blue.svg></a>
 </div>
 
 <p align="center">
@@ -149,7 +149,7 @@ python scripts/cli_chat.py --stream --config generated/xxx
 - **上下文管理器（ContextManager）**：一个可配置模块，用于管理智能体的上下文窗口。
 - **基准（Benchmark）**：一个针对特定数据集的封装工作流，包括预处理、执行和判断逻辑。
 
-更多的设计与实现细节，请参阅我们的[在线文档](https://tencent.github.io/Youtu-agent/)。
+更多的设计与实现细节，请参阅我们的[在线文档](https://tencentcloudadp.github.io/Youtu-agent/)。
 
 ## 🚀 快速上手
 
@@ -160,7 +160,7 @@ Youtu-agent 提供了完整的代码与示例，帮助你快速开始使用。�
 克隆仓库并安装依赖：
 
 ```bash
-git clone https://github.com/Tencent/Youtu-agent.git
+git clone https://github.com/TencentCloudADP/Youtu-agent.git
 cd Youtu-agent
 uv sync
 source ./.venv/bin/activate
@@ -191,7 +191,7 @@ agent:
 python scripts/cli_chat.py --stream --config default
 ```
 
-📖 更多内容请参考：[快速开始文档](https://tencent.github.io/Youtu-agent/quickstart)
+📖 更多内容请参考：[快速开始文档](https://tencentcloudadp.github.io/Youtu-agent/quickstart)
 
 ### 示例探索
 
@@ -202,7 +202,7 @@ python examples/svg_generator/main_web.py
 ```
 
 > [!NOTE]
-> 要使用 WebUI，你需要安装 `utu_agent_ui` 包。参考 [文档](https://tencent.github.io/Youtu-agent/frontend/#installation)。
+> 要使用 WebUI，你需要安装 `utu_agent_ui` 包。参考 [文档](https://tencentcloudadp.github.io/Youtu-agent/frontend/#installation)。
 
 给定一个研究主题后，Agent 会自动执行网络搜索，收集相关信息，并输出一张 SVG 可视化图。
 
@@ -210,7 +210,7 @@ python examples/svg_generator/main_web.py
 
 ![svg_generator_result](https://github.com/user-attachments/assets/41aa7348-5f02-4daa-b5b2-225e35d21067)
 
-📖 更多示例请参考：[示例文档](https://tencent.github.io/Youtu-agent/examples)
+📖 更多示例请参考：[示例文档](https://tencentcloudadp.github.io/Youtu-agent/examples)
 
 ### 运行评测
 
@@ -230,7 +230,7 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
 
 ![eval_analysis_detail](https://github.com/user-attachments/assets/4ede525a-5e16-4d88-9ebb-01a7dca3aaec)
 
-📖 更多内容请参考：[评测文档](https://tencent.github.io/Youtu-agent/eval)
+📖 更多内容请参考：[评测文档](https://tencentcloudadp.github.io/Youtu-agent/eval)
 
 ## 🙏 致谢
 
@@ -250,10 +250,10 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
   year={2025},
   publisher = {GitHub},
   journal = {GitHub repository},
-  howpublished = {\url{https://github.com/Tencent/Youtu-agent}},
+  howpublished = {\url{https://github.com/TencentCloudADP/Youtu-agent}},
 }
 ```
 
 ## ⭐ Star History
 
-![Star History Chart](https://api.star-history.com/svg?repos=Tencent/Youtu-agent&type=Date)
+![Star History Chart](https://api.star-history.com/svg?repos=TencentCloudADP/Youtu-agent&type=Date)
