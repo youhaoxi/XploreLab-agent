@@ -30,9 +30,8 @@
 
 ## 🗞️ 新闻
 
-- 🎁 [2025-09-02] 为支持你更便捷地使用 `Youtu-agent` 搭建应用，**2025年9月1日-2025年10月31日**期间，[腾讯云国际站](https://www.tencentcloud.com/)为所有首次使用 DeepSeek API 服务的用户限时免费提供共计 **300w** tokens的 DeepSeek 模型[使用额度](https://www.tencentcloud.com/document/product/1255/70381)，免费额度有效期2个月。欢迎注册体验！
-此外如您对Agent业务方向感兴趣，正在寻求企业版产品，欢迎登陆腾讯云国际站，使用腾讯云[智能体平台](https://adp.tencentcloud.com) (ADP)！
-- 📺 [2025-08-28] 我们发布了 DeepSeek-V3.1 的更新，并介绍了如何在 `Youtu-agent` 框架中应用它。[这里](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF) 是文档。
+- 🎁 [2025-09-02] [腾讯云国际站](https://www.tencentcloud.com/) 为 DeepSeek API 新用户提供 **300 万免费令牌**（**2025年9月1日 – 2025年10月31日**）。如果想在 `Youtu-agent` 中使用 DeepSeek 模型，[点击免费试用](https://www.tencentcloud.com/document/product/1255/70381)！如需企业级智能体解决方案，也可查看 [智能体开发平台 ADP](https://adp.tencentcloud.com)。
+- 📺 [2025-08-28] 我们围绕新发布的 DeepSeek-V3.1 模型进行了直播分享，并介绍了如何在 `Youtu-agent` 框架中使用该模型。[点击这里](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF) 获取所用文档。
 
 ## 🌟 基准性能
 

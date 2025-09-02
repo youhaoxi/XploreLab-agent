@@ -30,8 +30,7 @@ Key highlights:
 
 ## 🗞️ News
 
-- 🎁 [2025-09-02] To help you build chat applications with `Youtu-agent` more easily, [Tencent Cloud International](https://www.tencentcloud.com/) is offering a limited-time [free benefit](https://www.tencentcloud.com/document/product/1255/70381) for users who access the DeepSeek API service for the first time: a total of **3 million** tokens of DeepSeek model usage quota. Promotion Period: **September 1, 2025 – October 31, 2025**. Feel free to try it!
-If you're further interested in the Agent business direction and seeking an enterprise solution, feel free to use [Tencent Cloud Agent Development Platform](https://adp.tencentcloud.com) (ADP)!
+- 🎁 [2025-09-02] [Tencent Cloud International](https://www.tencentcloud.com/) offers new users of the DeepSeek API **3 million free tokens** (**Sep 1 – Oct 31, 2025**). [Try it out](https://www.tencentcloud.com/document/product/1255/70381) for free if you want to use DeepSeek models in `Youtu-agent`! For enterprise agent solutions, also check out [Agent Development Platform](https://adp.tencentcloud.com) (ADP).
 - 📺 [2025-08-28] We made a live sharing updates about DeepSeek-V3.1 and how to use it in the `Youtu-agent` framework. We share the used [documentations](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF).
 
 ## 🌟 Benchmark Performance
