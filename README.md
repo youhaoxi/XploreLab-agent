@@ -202,11 +202,30 @@ git clone https://github.com/TencentCloudADP/youtu-agent.git
 cd youtu-agent
 uv sync  # or, `make sync`
 source ./.venv/bin/activate
-cp .env.example .env  # NOTE: You should then config the necessary keys!
+cp .env.example .env  # NOTE: You should then config the necessary API keys.
 ```
 
-> [!NOTE]
-> After copying the `.env.example` file, you need to fill in the necessary keys in the `.env` file, e.g. LLM API keys.
+After copying the `.env.example` file, you need to fill in the necessary keys in the `.env` file, e.g. LLM API keys. For example:
+
+```bash
+# llm requires OpenAI API format compatibility
+# setup your LLM config , ref https://api-docs.deepseek.com/
+UTU_LLM_TYPE=chat.completions
+UTU_LLM_MODEL=deepseek-chat
+UTU_LLM_BASE_URL=https://api.deepseek.com/v1
+UTU_LLM_API_KEY=replace-to-your-api-key
+```
+
+> [Tencent Cloud International](https://www.tencentcloud.com/) offers new users of the DeepSeek API **3 million free tokens** (**Sep 1 – Oct 31, 2025**). [Try it out](https://www.tencentcloud.com/document/product/1255/70381) for free.
+
+```bash
+# llm
+# setup your LLM config , ref https://www.tencentcloud.com/document/product/1255/70381
+UTU_LLM_TYPE=chat.completions
+UTU_LLM_MODEL=deepseek-v3
+UTU_LLM_BASE_URL=https://api.lkeap.cloud.tencent.com/v1
+UTU_LLM_API_KEY=replace-to-your-api-key
+```
 
 #### Docker Deployment
 
@@ -216,27 +235,7 @@ Please refer to [`docker/README.md`](./docker/README.md) for a streamlined Docke
 
 #### 1. Configure Environment Variables
 
-Youtu-Agent ships with an API key compatible with OpenAI format and built-in configurations. Before running the first example, make sure you have set the necessary API key information in the `.env` file.
-
-```bash
-# llm requires OpenAI API format compatibility
-# setup your LLM config , ref https://api-docs.deepseek.com/
-UTU_LLM_TYPE=chat.completions
-UTU_LLM_MODEL=deepseek-chat
-UTU_LLM_BASE_URL=https://api.deepseek.com/v1
-UTU_LLM_API_KEY=
-```
-
-> [Tencent Cloud International](https://www.tencentcloud.com/) offers new users of the DeepSeek API **3 million free tokens** (**Sep 1 – Oct 31, 2025**). [Try it out](https://www.tencentcloud.com/document/product/1255/70381) for free if you want to use DeepSeek models in `Youtu-Agent`.
-
-```bash
-# llm
-# setup your LLM config , ref https://api-docs.deepseek.com/
-UTU_LLM_TYPE=chat.completions
-UTU_LLM_MODEL=deepseek-v3
-UTU_LLM_BASE_URL=https://api.lkeap.cloud.tencent.com/v1
-UTU_LLM_API_KEY=
-```
+Youtu-Agent ships with an API key compatible with OpenAI format and built-in configurations. 
 
 #### 2. Run the First Example
 
