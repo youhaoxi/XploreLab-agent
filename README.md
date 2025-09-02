@@ -211,7 +211,33 @@ Please refer to [`docker/README.md`](./docker/README.md) for a streamlined Docke
 
 ### Quickstart
 
-Youtu-agent ships with built-in configurations. For example, the default config (`configs/agents/default.yaml`) defines a simple agent equipped with a search tool:
+#### 1. Configure Environment Variables
+
+Youtu-Agent ships with an API key compatible with OpenAI format and built-in configurations. Before running the first example, make sure you have set the necessary API key information in the `.env` file.
+
+```bash
+# llm requires OpenAI API format compatibility
+# setup your LLM config , ref https://api-docs.deepseek.com/
+UTU_LLM_TYPE=chat.completions
+UTU_LLM_MODEL=deepseek-chat
+UTU_LLM_BASE_URL=https://api.deepseek.com/v1
+UTU_LLM_API_KEY=
+```
+
+> If you want to use the free DeepSeek API provided by Tencent Cloud, please visit [Tencent Cloud International](https://www.tencentcloud.com/) to apply and refer to the following `.env` configuration.
+
+```bash
+# llm
+# setup your LLM config , ref https://api-docs.deepseek.com/
+UTU_LLM_TYPE=chat.completions
+UTU_LLM_MODEL=deepseek-v3
+UTU_LLM_BASE_URL=https://api.lkeap.cloud.tencent.com/v1
+UTU_LLM_API_KEY=
+```
+
+#### 2. Run the First Example
+
+For example, the default config (`configs/agents/default.yaml`) defines a simple agent equipped with a search tool:
 
 ```yaml
 defaults:
@@ -232,7 +258,8 @@ python scripts/cli_chat.py --stream --config default
 
 📖 More details: [Quickstart Documentation](https://tencentcloudadp.github.io/youtu-agent/quickstart)
 
-### Explore examples
+### Explore More Examples
+
 The repository provides multiple ready-to-use examples. For instance, you can generate an SVG infographic based on a research topic:
 
 ```bash
@@ -250,7 +277,7 @@ Given a research topic, the agent will automatically search the web, collect rel
 
 📖 Learn more: [Examples Documentation](https://tencentcloudadp.github.io/youtu-agent/examples)
 
-### Run evaluations
+### Run Evaluations
 
 Youtu-Agent also supports benchmarking on standard datasets. For example, to evaluate on `WebWalkerQA`:
 
