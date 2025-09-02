@@ -231,15 +231,9 @@ UTU_LLM_API_KEY=replace-to-your-api-key
 
 Please refer to [`docker/README.md`](./docker/README.md) for a streamlined Docker-based setup with interactive frontend.
 
-### Quickstart
+### Quick Start
 
-#### 1. Configure Environment Variables
-
-Youtu-Agent ships with an API key compatible with OpenAI format and built-in configurations. 
-
-#### 2. Run the First Example
-
-For example, the default config (`configs/agents/default.yaml`) defines a simple agent equipped with a search tool:
+Youtu-agent ships with built-in configurations. For example, the default config (`configs/agents/default.yaml`) defines a simple agent equipped with a search tool:
 
 ```yaml
 defaults:
