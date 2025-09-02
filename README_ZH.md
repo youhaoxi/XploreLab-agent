@@ -170,8 +170,11 @@ git clone https://github.com/TencentCloudADP/youtu-agent.git
 cd Youtu-agent
 uv sync
 source ./.venv/bin/activate
-cp .env.example .env  # 配置相关环境变量...
+cp .env.example .env  # NOTE: 你需要配置相关环境变量!
 ```
+
+> [!NOTE]
+> 请配置 `.env` 文件中的相关环境变量，例如 LLM API keys。
 
 ### 快速开始
 
@@ -193,6 +196,9 @@ agent:
 ```bash
 python scripts/cli_chat.py --stream --config default
 ```
+
+> [!NOTE]
+> 这里使用了搜索工具，需要配置 `SERPER_API_KEY` 和 `JINA_API_KEY` (我们计划在未来替换为免费工具)。你可以运行 `python scripts/cli_chat.py --stream --config base` 来避免使用搜索工具。
 
 📖 更多内容请参考：[快速开始文档](https://tencentcloudadp.github.io/youtu-agent/quickstart)
 

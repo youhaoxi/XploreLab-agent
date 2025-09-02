@@ -202,8 +202,11 @@ git clone https://github.com/TencentCloudADP/youtu-agent.git
 cd youtu-agent
 uv sync  # or, `make sync`
 source ./.venv/bin/activate
-cp .env.example .env  # config necessary keys...
+cp .env.example .env  # NOTE: You should then config the necessary keys!
 ```
+
+> [!NOTE]
+> After copying the `.env.example` file, you need to fill in the necessary keys in the `.env` file, e.g. LLM API keys.
 
 #### Docker Deployment
 
@@ -229,6 +232,9 @@ You can launch an interactive CLI chatbot with this agent by running:
 ```bash
 python scripts/cli_chat.py --stream --config default
 ```
+
+> [!NOTE]
+> The search toolkit currently requires `SERPER_API_KEY` and `JINA_API_KEY` for web search access (We plan to replace these with free alternatives in the future). You can run `python scripts/cli_chat.py --stream --config base` to avoid using the search toolkit.
 
 📖 More details: [Quickstart Documentation](https://tencentcloudadp.github.io/youtu-agent/quickstart)
 
