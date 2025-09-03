@@ -72,7 +72,7 @@ class ExecutorAgent:
         task.task_result = final_result
         task.task_status = "completed"
 
-        # DISCUSS: use the history (res.get_run_result().to_input_list()) during summary?
+        # TODO: use the history (res.get_run_result().to_input_list()) during summary?
         if return_summary:
             summary_prompt = PROMPTS["TASK_SUMMARY_USER_PROMPT"].format(
                 task_name=task.task_name, task_description=task.task_description

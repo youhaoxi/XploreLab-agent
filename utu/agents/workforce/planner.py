@@ -63,6 +63,7 @@ class PlannerAgent:
         return choice
 
     def _parse_update_response(self, response: str) -> tuple[str, list[str] | None]:
+        # TODO: split "stop" into "early_completion" and "task_collapse"
         # Parse choice
         pattern_choice = r"<choice>(.*?)</choice>"
         match_choice = re.search(pattern_choice, response, re.DOTALL)
