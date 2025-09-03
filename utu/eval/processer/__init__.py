@@ -6,7 +6,7 @@ from .base_match_processor import BaseMatchProcesser as BaseMatchProcesser
 from .base_processor import BaseProcesser
 from .browse_comp import BrowseCompProcesser as BrowseCompProcesser, BrowseCompZHProcesser as BrowseCompZHProcesser
 from .gaia import GAIAProcesser as GAIAProcesser
-from .web_walker import WebWalkerProcesser as WebWalkerProcesser
+from .web_walker import WebWalkerQAProcesser as WebWalkerQAProcesser
 from .xbench import XBenchProcesser as XBenchProcesser
 
 
@@ -102,10 +102,10 @@ BUILTIN_BENCHMARKS = {
         "processer": "XBench",
         "description": "XBench benchmark for evaluation",
     },
-    "WebWalker": {
-        "data_path": DIR_ROOT / "data" / "web_walker" / "test.jsonl",
+    "WebWalkerQA": {
+        "data_path": DIR_ROOT / "data" / "web_walker_qa" / "test.jsonl",
         "type": "single",
-        "processer": "WebWalker",
-        "description": "WebWalker benchmark for evaluation",
+        "processer": "WebWalkerQA",
+        "description": "WebWalkerQA benchmark for evaluation",
     },
 }

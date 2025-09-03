@@ -5,7 +5,7 @@ Frontend pages for utu-agent `exp_analysis`
 ## Installation
 1. Set env of log sql server
 ```bash
-cd Youtu-agent/frontend/exp_analysis
+cd frontend/exp_analysis
 cp .env.example .env  # config necessary keys...
 source .env
 ```

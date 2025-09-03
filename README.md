@@ -202,17 +202,36 @@ git clone https://github.com/TencentCloudADP/youtu-agent.git
 cd youtu-agent
 uv sync  # or, `make sync`
 source ./.venv/bin/activate
-cp .env.example .env  # NOTE: You should then config the necessary keys!
+cp .env.example .env  # NOTE: You should then config the necessary API keys.
 ```
 
-> [!NOTE]
-> After copying the `.env.example` file, you need to fill in the necessary keys in the `.env` file -- for example, API keys for the LLM service and tools such as web search.
+After copying the `.env.example` file, you need to fill in the necessary keys in the `.env` file, e.g. LLM API keys. For example:
+
+```bash
+# llm requires OpenAI API format compatibility
+# setup your LLM config , ref https://api-docs.deepseek.com/
+UTU_LLM_TYPE=chat.completions
+UTU_LLM_MODEL=deepseek-chat
+UTU_LLM_BASE_URL=https://api.deepseek.com/v1
+UTU_LLM_API_KEY=replace-to-your-api-key
+```
+
+> [Tencent Cloud International](https://www.tencentcloud.com/) offers new users of the DeepSeek API **3 million free tokens** (**Sep 1 – Oct 31, 2025**). [Try it out](https://www.tencentcloud.com/document/product/1255/70381) for free. Once you’ve applied, replace the API key in the .env file below:
+
+```bash
+# llm
+# setup your LLM config , ref https://www.tencentcloud.com/document/product/1255/70381
+UTU_LLM_TYPE=chat.completions
+UTU_LLM_MODEL=deepseek-v3
+UTU_LLM_BASE_URL=https://api.lkeap.cloud.tencent.com/v1
+UTU_LLM_API_KEY=replace-with-your-api-key
+```
 
 #### Docker Deployment
 
 Please refer to [`docker/README.md`](./docker/README.md) for a streamlined Docker-based setup with interactive frontend.
 
-### Quickstart
+### Quick Start
 
 Youtu-agent ships with built-in configurations. For example, the default config (`configs/agents/default.yaml`) defines a simple agent equipped with a search tool:
 
@@ -239,36 +258,74 @@ python scripts/cli_chat.py --stream --config base
 
 📖 More details: [Quickstart Documentation](https://tencentcloudadp.github.io/youtu-agent/quickstart)
 
-### Explore examples
-The repository provides multiple ready-to-use examples. For instance, you can generate an SVG infographic based on a research topic:
+### Explore More Examples
+
+The repository provides multiple ready-to-use examples. Some examples require the agent to have internet search capabilities, so you’ll need to configure the tool APIs in the `.env` file under the tools module:
+
+```bash
+# tools
+# serper api key, ref https://serper.dev/playground
+SERPER_API_KEY=<Access the URL in the comments to get the API Key>
+# jina api key, ref https://jina.ai/reader
+JINA_API_KEY=<Access the URL in the comments to get the API Key>
+```
+
+For example, to enable the agent to automatically search online for information and generate an SVG image on the topic of “DeepSeek V3.1 New Features,” run the following command:
+
+```bash
+python examples/svg_generator/main.py
+```
+
+Alternatively, you can generate an SVG infographic based on a research topic by running:
 
 ```bash
 python examples/svg_generator/main_web.py
 ```
 
-> [!NOTE]
-> To use the WebUI, you need to install the `utu_agent_ui` package. Refer to [documentation](https://tencentcloudadp.github.io/youtu-agent/frontend/#installation) for more details.
+If you want to visualize the agent’s runtime status using the web UI, download the frontend package from the Youtu-Agent releases and install it locally:
 
-Given a research topic, the agent will automatically search the web, collect relevant information, and output an SVG visualization.
+```bash
+# Download the frontend package
+curl -LO https://github.com/Tencent/Youtu-agent/releases/download/frontend%2Fv0.1.5/utu_agent_ui-0.1.5-py3-none-any.whl
+
+# Install the frontend package
+uv pip install utu_agent_ui-0.1.5-py3-none-any.whl
+```
+
+Next, run the web version of the SVG image generation command:
+
+```bash
+python examples/svg_generator/main_web.py
+```
+
+Once the terminal shows the following message, the deployment is successful. You can access the project by clicking the local link:
+
+```bash
+Server started at http://127.0.0.1:8848/
+```
 
 ![svg_generator_ui](https://github.com/user-attachments/assets/337d327f-91ee-434e-bbcf-297dd4b26c28)
+
+Given a research topic, the agent will automatically search the web, collect relevant information, and output an SVG visualization.
 
 ![svg_generator_result](https://github.com/user-attachments/assets/41aa7348-5f02-4daa-b5b2-225e35d21067)
 
 📖 Learn more: [Examples Documentation](https://tencentcloudadp.github.io/youtu-agent/examples)
 
-### Run evaluations
+### Run Evaluations
 
 Youtu-Agent also supports benchmarking on standard datasets. For example, to evaluate on `WebWalkerQA`:
 
 ```bash
-# prepare dataset
+# Prepare dataset. This script will download and process WebWalkerQA dataset, and save it to DB.
 python scripts/data/process_web_walker_qa.py
-# run evaluation with config ww.yaml with your custom exp_id
-python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA --concurrency 5
+
+# Run evaluation with config `ww.yaml` with your custom `exp_id`. We choose the sampled small dataset `WebWalkerQA_15` for quick evaluation.
+# NOTE: `JUDGE_LLM_TYPE, JUDGE_LLM_MODEL, JUDGE_LLM_BASE_URL, JUDGE_LLM_API_KEY` should be set in `.env`. Ref `.env.full`.
+python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA_15 --concurrency 5
 ```
 
-Results are stored and can be further analyzed in the evaluation platform.
+Results are stored and can be further analyzed in the evaluation platform. See [Evaluation Analysis](./frontend/exp_analysis/README.md).
 
 ![eval_analysis_overview](https://github.com/user-attachments/assets/4a285b9e-d096-437e-9b8e-e5bf6b1924b6)
 

@@ -55,8 +55,8 @@ You can instantiate `SimpleAgent` directly and override its configuration, such 
 ```python
 from utu.agents import SimpleAgent
 
-async with SimpleAgent(instructions="Always answeer with prefix `Aloha!`") as agent:
-    await agent.chat("That's the weather in Beijing today?")
+async with SimpleAgent(instructions="Always answer with prefix `Aloha!`") as agent:
+    await agent.chat("What's the weather in Beijing today?")
 ```
 > Besides `chat`, you can also use the `chat_streamed` method for streaming output.
 
@@ -68,7 +68,7 @@ For more complex behavior, you can use a YAML configuration file to define the a
 from utu.agents import SimpleAgent
 
 async with SimpleAgent(config="sample_tool.yaml") as agent:
-    await agent.chat("That's the weather in Beijing today?")
+    await agent.chat("What's the weather in Beijing today?")
 ```
 
 **YAML Configuration (`configs/agents/sample_tool.yaml`):**
@@ -92,7 +92,7 @@ agent:
 from utu.agents import SimpleAgent
 
 async with SimpleAgent(config="sample_mcp.yaml") as agent:
-    await agent.chat("That's the time now")
+    await agent.chat("What's the time now")
 ```
 
 **YAML Configuration (`configs/agents/sample_mcp.yaml`):**
@@ -113,7 +113,7 @@ toolkits:
 
 agent:
     name: simple-mcp
-    instructions: "Always answeer with prefix `Aloha!`"
+    instructions: "Always answer with prefix `Aloha!`"
 ```
 
 ---

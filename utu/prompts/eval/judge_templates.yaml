@@ -41,7 +41,7 @@ BrowseComp_ZH: |
 
 # https://github.com/Alibaba-NLP/WebAgent/blob/main/WebWalker/src/evaluate.py
 # https://github.com/langchain-ai/langchain/blob/master/libs/langchain/langchain/evaluation/qa/eval_prompt.py#L59
-WebWalker: |
+WebWalkerQA: |
   You are a teacher grading a quiz.
   You are given a question, the context the question is about, and the student's answer. You are asked to score the student's answer as either CORRECT or INCORRECT, based on the context.
   Write out in a step by step manner your reasoning to be sure that your conclusion is correct. Avoid simply stating the correct answer at the outset.

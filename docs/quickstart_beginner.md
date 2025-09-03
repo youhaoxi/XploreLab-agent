@@ -27,7 +27,7 @@ Open a terminal (command line) and execute the following commands:
 git clone https://github.com/TencentCloudADP/youtu-agent.git
 
 # Enter the project directory
-cd Youtu-agent
+cd youtu-agent
 ```
 
 **Beginner Tip:** If you see `git: command not found`, it means Git is not installed. Please install Git first.
