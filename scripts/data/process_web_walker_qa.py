@@ -77,4 +77,4 @@ def sampling(dataset_name: str = "WebWalkerQA", n: int = 150):
 
 if __name__ == "__main__":
     build_dataset()
-    # sampling(n=150)
+    sampling(n=15)  # randomly sample 15 datapoints for testing
