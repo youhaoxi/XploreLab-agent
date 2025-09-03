@@ -50,6 +50,8 @@ Youtu-Agent is a powerful and modular framework for building, running, and evalu
 
 The framework's design is centered on a clear separation of concerns, enabling robust and scalable agent development.
 
+Note: Youtu-Agent is abbreviated as `utu` in the code.
+
 ## Core Architecture
 
 At a high level, the framework's components interact as follows: An `AgentConfig` defines an `Agent`, which operates within an `Environment` and uses `Toolkits` to perform actions. The entire system can be benchmarked using the `Evaluation Framework`.
