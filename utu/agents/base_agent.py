@@ -5,6 +5,8 @@ from .common import TaskRecorder
 
 
 class BaseAgent:
+    name: str
+
     @abc.abstractmethod
     async def run(self, input: Any, trace_id: str = None, **kwargs) -> TaskRecorder:
         raise NotImplementedError

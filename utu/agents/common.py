@@ -74,9 +74,9 @@ class TaskRecorder(DataClassWithStreamEvents):
 
     additional_infos: dict = field(default_factory=dict)
 
-    def add_run_result(self, run_result: RunResult):
+    def add_run_result(self, run_result: RunResult, agent_name: str = None):
         self.raw_run_results.append(run_result)
-        self.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(run_result))
+        self.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(run_result, agent_name))
 
     def get_run_result(self) -> RunResult:
         return self.raw_run_results[-1]

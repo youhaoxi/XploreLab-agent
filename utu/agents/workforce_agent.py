@@ -1,6 +1,6 @@
 """
-- [ ] setup tracing
-- [ ] purify logging
+- [x] setup tracing
+- [x] purify logging
 - [ ] support stream?
 """
 
@@ -15,6 +15,8 @@ logger = get_logger(__name__)
 
 
 class WorkforceAgent(BaseAgent):
+    name = "workforce_agent"
+
     def __init__(self, config: AgentConfig | str):
         """Initialize the workforce agent"""
         if isinstance(config, str):
@@ -32,15 +34,17 @@ class WorkforceAgent(BaseAgent):
         for name, config in self.config.workforce_executor_agents.items():
             executor_agent_group[name] = ExecutorAgent(config=config)
 
-        recorder = WorkspaceTaskRecorder(input, self.config.workforce_executor_infos)
+        recorder = WorkspaceTaskRecorder(
+            overall_task=input, executor_agent_kwargs_list=self.config.workforce_executor_infos
+        )
 
-        with trace(workflow_name="workforce_agent", trace_id=trace_id):
+        with trace(workflow_name=self.name, trace_id=trace_id):
             # * 1. generate plan
             logger.info("Generating plan...")
             await planner_agent.plan_task(recorder)
             logger.info(f"Plan: {recorder.task_plan}")
 
-            # TODO: merge .get_next_task and .has_uncompleted_tasks (while True)
+            # DISCUSS: merge .get_next_task and .has_uncompleted_tasks? (while True)
             while recorder.has_uncompleted_tasks:
                 # * 2. assign tasks
                 next_task = await assigner_agent.assign_task(recorder)
@@ -74,12 +78,4 @@ class WorkforceAgent(BaseAgent):
             #     model_answer=final_answer,
             #     ground_truth=task["Final answer"]
             # )
-
-        # result_entry = {
-        #     "task_id": task["task_id"],
-        #     "question": task["Question"],
-        #     "model_answer": final_answer,
-        #     "planner_reflections": planner_reflections,
-        #     "error": error_msg if not ('task_completed' in locals() and task_completed) else None,
-        # }
         return recorder
