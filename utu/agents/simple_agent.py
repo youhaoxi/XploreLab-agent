@@ -177,6 +177,16 @@ class SimpleAgent(BaseAgent):
             "env": self.env,
         }
 
+    def _prepare_run_kwargs(self, input: str | list[TResponseInputItem]) -> dict:
+        return {
+            "starting_agent": self.current_agent,
+            "input": input,
+            "context": self._get_context(),
+            "max_turns": self.config.max_turns,
+            "hooks": self._run_hooks,
+            "run_config": self._get_run_config(),
+        }
+
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> TaskRecorder:
         if not self._initialized:
@@ -185,14 +195,8 @@ class SimpleAgent(BaseAgent):
         logger.info(f"> trace_id: {trace_id}")
 
         task_recorder = TaskRecorder(input, trace_id)
-        run_kwargs = {
-            "starting_agent": self.current_agent,
-            "input": input,
-            "context": self._get_context(),
-            "max_turns": self.config.max_turns,
-            "hooks": self._run_hooks,
-            "run_config": self._get_run_config(),
-        }
+        run_kwargs = self._prepare_run_kwargs(input)
+
         if AgentsUtils.get_current_trace():
             run_result = await Runner.run(**run_kwargs)
         else:
@@ -208,14 +212,8 @@ class SimpleAgent(BaseAgent):
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
-        run_kwargs = {
-            "starting_agent": self.current_agent,
-            "input": input,
-            "context": self._get_context(),
-            "max_turns": self.config.max_turns,
-            "hooks": self._run_hooks,
-            "run_config": self._get_run_config(),
-        }
+        run_kwargs = self._prepare_run_kwargs(input)
+
         if AgentsUtils.get_current_trace():
             return Runner.run_streamed(**run_kwargs)
         else:
