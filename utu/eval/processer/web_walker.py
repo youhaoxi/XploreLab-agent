@@ -5,10 +5,10 @@ from .base_llm_processor import BaseLLMJudgeProcesser
 from .utils import MetricsUtils
 
 
-class WebWalkerProcesser(BaseLLMJudgeProcesser):
-    """Processer for WebWalker evaluation."""
+class WebWalkerQAProcesser(BaseLLMJudgeProcesser):
+    """Processer for WebWalkerQA evaluation."""
 
-    name: str = "WebWalker"
+    name: str = "WebWalkerQA"
 
     def preprocess_one(self, sample: EvaluationSample) -> EvaluationSample:
         # MODE 1: use root_url
