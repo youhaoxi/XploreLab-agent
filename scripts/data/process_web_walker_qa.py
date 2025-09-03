@@ -11,6 +11,13 @@ engine = SQLModelUtils.get_engine()
 
 
 def build_dataset():
+    # check if exists
+    with Session(engine) as session:
+        data = session.exec(select(DatasetSample).where(DatasetSample.dataset == "WebWalkerQA")).all()
+        if len(data) > 0:
+            print("Dataset already exists! Skip.")
+            return
+
     ds = load_dataset("callanwu/WebWalkerQA", split="main")
     data: list[DatasetSample] = []
     for i, row in enumerate(ds.to_list()):
@@ -24,7 +31,7 @@ def build_dataset():
             DatasetSample(
                 dataset="WebWalkerQA",
                 index=i + 1,
-                source="WebWalker",
+                source="WebWalkerQA",
                 source_index=i + 1,
                 question=row["question"],
                 answer=row["answer"],
