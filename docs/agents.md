@@ -55,7 +55,7 @@ You can instantiate `SimpleAgent` directly and override its configuration, such 
 ```python
 from utu.agents import SimpleAgent
 
-async with SimpleAgent(instructions="Always answeer with prefix `Aloha!`") as agent:
+async with SimpleAgent(instructions="Always answer with prefix `Aloha!`") as agent:
     await agent.chat("That's the weather in Beijing today?")
 ```
 > Besides `chat`, you can also use the `chat_streamed` method for streaming output.
