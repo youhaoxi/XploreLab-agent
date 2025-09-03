@@ -93,12 +93,12 @@ class SimpleAgent(BaseAgent):
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.cleanup()
 
-    async def build(self):
+    async def build(self, trace_id: str = None):
         """Build the agent"""
         if self._initialized:
             logger.info("Agent already initialized! Skipping build.")
             return
-        self.env = await get_env(self.config, "None")  # FIXME: trace_id
+        self.env = await get_env(self.config, trace_id or AgentsUtils.gen_trace_id())  # Pass trace_id
         await self.env.build()
         self.current_agent = Agent(
             name=self.config.agent.name,
@@ -189,9 +189,9 @@ class SimpleAgent(BaseAgent):
 
     # wrap `Runner` apis in @openai-agents
     async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> TaskRecorder:
-        if not self._initialized:
-            await self.build()
         trace_id = trace_id or AgentsUtils.gen_trace_id()
+        if not self._initialized:
+            await self.build(trace_id)
         logger.info(f"> trace_id: {trace_id}")
 
         task_recorder = TaskRecorder(input, trace_id)
@@ -207,9 +207,9 @@ class SimpleAgent(BaseAgent):
         return task_recorder
 
     def run_streamed(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResultStreaming:
+        trace_id = trace_id or AgentsUtils.gen_trace_id()
         if not self._initialized:
             raise RuntimeError("Agent is not initialized. Please call `build` first.")
-        trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
         run_kwargs = self._prepare_run_kwargs(input)
