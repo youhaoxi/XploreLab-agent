@@ -262,13 +262,15 @@ Given a research topic, the agent will automatically search the web, collect rel
 Youtu-Agent also supports benchmarking on standard datasets. For example, to evaluate on `WebWalkerQA`:
 
 ```bash
-# prepare dataset
+# Prepare dataset. This script will download and process WebWalkerQA dataset, and save it to DB.
 python scripts/data/process_web_walker_qa.py
-# run evaluation with config ww.yaml with your custom exp_id
-python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA --concurrency 5
+
+# Run evaluation with config `ww.yaml` with your custom `exp_id`. We choose the sampled small dataset `WebWalkerQA_15` for quick evaluation.
+# NOTE: `JUDGE_LLM_TYPE, JUDGE_LLM_MODEL, JUDGE_LLM_BASE_URL, JUDGE_LLM_API_KEY` should be set in `.env`. Ref `.env.full`.
+python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA_15 --concurrency 5
 ```
 
-Results are stored and can be further analyzed in the evaluation platform.
+Results are stored and can be further analyzed in the evaluation platform. See [Evaluation Analysis](./frontend/exp_analysis/README.md).
 
 ![eval_analysis_overview](https://github.com/user-attachments/assets/4a285b9e-d096-437e-9b8e-e5bf6b1924b6)
 
