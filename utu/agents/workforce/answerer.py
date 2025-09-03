@@ -24,7 +24,7 @@ class AnswererAgent:
             .strip()
             .format(
                 question=recorder.overall_task,
-                task_results=recorder.formatted_task_plan_list_with_task_results,
+                task_results="\n".join(recorder.formatted_task_plan_list_with_task_results),
             )
         )
         final_recorder = await self.llm.run(final_prompt)
