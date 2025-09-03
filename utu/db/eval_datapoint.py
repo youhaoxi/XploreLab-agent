@@ -23,7 +23,7 @@ class DatasetSample(SQLModel, table=True):
 
     meta: Any | None = Field(
         default=None, sa_column=Column(JSON)
-    )  # e.g. annotator_metadata in GAIA, extra_info in WebWalker
+    )  # e.g. annotator_metadata in GAIA, extra_info in WebWalkerQA
 
 
 class EvaluationSample(UTUBaseModel, SQLModel, table=True):

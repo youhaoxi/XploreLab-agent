@@ -1,4 +1,4 @@
-site_name: Youtu-agent
+site_name: Youtu-Agent
 theme:
   name: material
   palette:
@@ -30,7 +30,7 @@ theme:
   logo: assets/logo.svg
   favicon: assets/logo.svg
 
-repo_name: Youtu-agent
+repo_name: Youtu-Agent
 repo_url: https://github.com/TencentCloudADP/youtu-agent
 
 extra:

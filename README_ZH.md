@@ -226,14 +226,15 @@ python examples/svg_generator/main_web.py
 Youtu-agent 还支持在标准数据集上进行基准测试。例如，在 **WebWalkerQA** 上运行评测：
 
 ```bash
-# 数据集预处理
+# 数据集预处理. 该脚本会下载并处理 WebWalkerQA 数据集，然后保存到数据库中。
 python scripts/data/process_web_walker_qa.py
 
-# 使用配置 ww.yaml 运行评测
-python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA --concurrency 5
+# 使用配置 ww.yaml 运行评测. 我们选择采样小数据集 WebWalkerQA_15 用于快速评测。
+# NOTE: 需要在 `.env` 中配置 `JUDGE_LLM_TYPE, JUDGE_LLM_MODEL, JUDGE_LLM_BASE_URL, JUDGE_LLM_API_KEY`，参考 `.env.full`。
+python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset WebWalkerQA_15 --concurrency 5
 ```
 
-结果会保存到本地，并可在分析平台中进一步查看。
+结果会保存到本地，并可在分析平台中进一步查看。详见 [评测分析](./frontend/exp_analysis/README.md)。
 
 ![eval_analysis_overview](https://github.com/user-attachments/assets/4a285b9e-d096-437e-9b8e-e5bf6b1924b6)
 

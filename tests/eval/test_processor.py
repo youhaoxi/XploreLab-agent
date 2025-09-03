@@ -1,6 +1,6 @@
 from utu.config import ConfigLoader
 from utu.eval.data import DBDataManager
-from utu.eval.processer import GAIAProcesser, WebWalkerProcesser
+from utu.eval.processer import GAIAProcesser, WebWalkerQAProcesser
 
 config = ConfigLoader.load_eval_config("ww")
 
@@ -19,7 +19,7 @@ def test_gaia_processor():
 def test_webwalker_processor():
     config.data.dataset = "WebWalkerQA"
     data_manager = DBDataManager(config)
-    processor = WebWalkerProcesser(config)
+    processor = WebWalkerQAProcesser(config)
 
     sample = data_manager.load()[0]
     print(f"> raw sample: {sample.as_dict()}")
