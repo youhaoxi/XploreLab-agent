@@ -1,3 +1,7 @@
+"""
+- [ ] error tracing
+"""
+
 from ...config import AgentConfig
 from ...utils import FileUtils, get_logger
 from ..llm_agent import LLMAgent
@@ -20,20 +24,22 @@ class ExecutorAgent:
         self.executor_agent = SimpleAgent(config=config)
         self.llm = LLMAgent(config.model)  # summary llm, use the same model as executor_agent
         # self._reflection_history = []
+        executor_config = config.workforce_executor_config
+        self.max_tries = executor_config.get("max_tries", 1)
+        self.return_summary = executor_config.get("return_summary", False)
 
     async def execute_task(
         self,
         recorder: WorkspaceTaskRecorder,
         task: Subtask,
-        max_tries=1,  # TODO: move into config
-        return_summary=True,
     ) -> None:
         """Execute the task and check the result."""
         task.task_status = "in progress"
 
         tries = 1
         final_result = None
-        while tries <= max_tries:
+        executor_res = None
+        while tries <= self.max_tries:
             try:
                 # * 1. Task execution
                 user_prompt = PROMPTS["TASK_EXECUTE_USER_PROMPT"].format(
@@ -42,8 +48,8 @@ class ExecutorAgent:
                     task_name=task.task_name,
                     task_description=task.task_description,
                 )
-                res = await self.executor_agent.run(user_prompt)
-                final_result = res.final_output
+                executor_res = await self.executor_agent.run(user_prompt)
+                final_result = executor_res.final_output
 
                 break
                 # TODO: task check
@@ -64,16 +70,17 @@ class ExecutorAgent:
             except Exception as e:
                 logger.error(f"Error executing task `{task.task_name}` on attempt {tries}: {str(e)}")
                 tries += 1
-                if tries > max_tries:
+                if tries > self.max_tries:
                     final_result = f"Task execution failed: {str(e)}"
                     break
 
-        recorder.add_run_result(res.get_run_result(), "executor")  # add executor trajectory
+        if executor_res:
+            recorder.add_run_result(executor_res.get_run_result(), "executor")  # add executor trajectory
         task.task_result = final_result
         task.task_status = "completed"
 
         # TODO: use the history (res.get_run_result().to_input_list()) during summary?
-        if return_summary:
+        if self.return_summary:
             summary_prompt = PROMPTS["TASK_SUMMARY_USER_PROMPT"].format(
                 task_name=task.task_name, task_description=task.task_description
             )
