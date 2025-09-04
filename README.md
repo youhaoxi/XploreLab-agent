@@ -13,7 +13,7 @@
 | <a href="#-examples"><b>💡 Examples</b> </a> 
 | <a href="#-features"><b>✨ Features</b> </a> 
 | <a href="#-getting-started"><b>🚀 Getting Started</b> </a> 
-| 
+| <a href="https://discord.gg/svwuqgUx"><b>📢 Join Community</b> </a> 
 </p>
 
 
