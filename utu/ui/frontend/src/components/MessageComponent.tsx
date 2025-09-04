@@ -389,7 +389,7 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
         icon = "🌐";
       } else if ((message.content as ToolCallMessage).toolName == "document_qa") {
         icon = "📖";
-      } else if ((message.content as ToolCallMessage).toolName == "search_google_api") {
+      } else if ((message.content as ToolCallMessage).toolName == "search") {
         icon = "🔍";
       }
       return (
