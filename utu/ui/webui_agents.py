@@ -10,6 +10,7 @@ import agents as ag
 import tornado.web
 import tornado.websocket
 
+from utu.agents import simple_agent
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.agents.orchestra_agent import OrchestraAgent
 from utu.agents.simple_agent import SimpleAgent
@@ -103,7 +104,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     async def _handle_list_agents(self):
         config_path = Path(CONFIG_PATH).resolve()
-        config_files = config_path.glob("**/*.yaml")
+        example_config_files = config_path.glob("examples/*.yaml")
+        simple_agent_config_files = config_path.glob("simple_agents/*.yaml")
+        base_config_files = config_path.glob("*.yaml")
+        config_files = list(example_config_files) + list(simple_agent_config_files) + list(base_config_files)
         agents = [str(file.relative_to(config_path)) for file in config_files]
         await self.send_event(
             Event(
