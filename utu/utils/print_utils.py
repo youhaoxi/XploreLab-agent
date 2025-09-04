@@ -1,6 +1,8 @@
 from collections import defaultdict
 
+import prompt_toolkit
 from colorama import Fore, Style, init
+from prompt_toolkit.patch_stdout import patch_stdout
 
 init(autoreset=True)  # Reset color to default (autoreset=True handles this automatically)
 
@@ -23,11 +25,22 @@ COLOR_DICT.update(
 
 class PrintUtils:
     @staticmethod
-    def print_input(prompt_text: str, prompt_color="blue", input_color="bold_blue"):
+    def print_input(prompt_text: str):
         """styled user input"""
-        user_input = input(COLOR_DICT[prompt_color] + prompt_text + COLOR_DICT[input_color])
-        print(Style.RESET_ALL, end="")
+        # https://github.com/prompt-toolkit/python-prompt-toolkit
+        # user_input = input(COLOR_DICT[prompt_color] + prompt_text + COLOR_DICT[input_color])
+        # print(Style.RESET_ALL, end="")
+        user_input = prompt_toolkit.prompt(prompt_text)
         return user_input
+
+    @staticmethod
+    async def async_print_input(prompt_text: str):
+        # https://python-prompt-toolkit.readthedocs.io/en/master/pages/asking_for_input.html#prompt-in-an-asyncio-application  # noqa: E501
+        session = prompt_toolkit.PromptSession()
+        while True:
+            with patch_stdout():
+                result = await session.prompt_async(prompt_text)
+                return result
 
     @staticmethod
     def print_info(

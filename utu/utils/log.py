@@ -65,9 +65,9 @@ def setup_logging(level: Literal["WARNING", "INFO", "DEBUG"] = "WARNING") -> Non
     _LOGGING_INITIALIZED = True
 
 
-def get_logger(name: str, level: int | Literal["INFO", "WARNING", "ERROR", "CRITICAL"] = _ROOT_LEVEL) -> logging.Logger:
+def get_logger(name: str, level: int | Literal["INFO", "WARNING", "ERROR", "CRITICAL"] = None) -> logging.Logger:
     logger = logging.getLogger(name)
-    logger.setLevel(level)
+    logger.setLevel(level or _ROOT_LEVEL)
 
     def log_error_with_exc(msg, *args, **kwargs):
         kwargs["exc_info"] = True

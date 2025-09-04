@@ -1,8 +1,8 @@
-import os
 from typing import Literal
 
 from pydantic import Field
 
+from ..utils import EnvUtils
 from .agent_config import AgentConfig, ModelConfigs
 from .base_config import ConfigBaseModel
 
@@ -27,7 +27,7 @@ class EvalConfig(ConfigBaseModel):
     """Experiment ID"""
 
     # data
-    db_url: str = os.getenv("DB_URL", "sqlite:///tesxt.db")
+    db_url: str = EnvUtils.get_env("DB_URL", "sqlite:///test.db")
     """Database URL"""
     data: DataConfig = None
     """Data config"""

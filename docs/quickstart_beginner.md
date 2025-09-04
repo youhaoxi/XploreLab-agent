@@ -24,10 +24,10 @@ Open a terminal (command line) and execute the following commands:
 
 ```sh
 # Clone the project locally
-git clone https://github.com/Tencent/Youtu-agent.git
+git clone https://github.com/TencentCloudADP/youtu-agent.git
 
 # Enter the project directory
-cd Youtu-agent
+cd youtu-agent
 ```
 
 **Beginner Tip:** If you see `git: command not found`, it means Git is not installed. Please install Git first.
@@ -80,7 +80,7 @@ source .venv/bin/activate
 **Beginner Tip:** After activating the virtual environment, you'll see `(Youtu-agent)` identifier before your command line prompt as follow:
 ```sh
 # Linux/macOS
-(Youtu-agent) your-username:~/path/to/Youtu-agent$
+(Youtu-agent) your-username:~/path/to/youtu-agent$
 
 # Windows
 # (Youtu-agent) path\to\Youtu-agent>
@@ -348,8 +348,8 @@ Congratulations! You've successfully run Youtu-agent. Next, you can:
 
 If you encounter issues while using the project, you can:
 
-1. Check the [Complete Documentation](https://tencent.github.io/Youtu-agent/)
-2. Ask questions in [GitHub Issues](https://github.com/Tencent/Youtu-agent/issues)
-3. View the project's [Example Code](https://github.com/Tencent/Youtu-agent/tree/main/examples)
+1. Check the [Complete Documentation](https://tencentcloudadp.github.io/youtu-agent/)
+2. Ask questions in [GitHub Issues](https://github.com/TencentCloudADP/youtu-agent/issues)
+3. View the project's [Example Code](https://github.com/TencentCloudADP/youtu-agent/tree/main/examples)
 
 Happy coding! 🎉

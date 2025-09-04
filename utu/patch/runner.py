@@ -56,7 +56,9 @@ class UTUAgentRunner(AgentRunner):
 
         # FIXME: set context manage as a hook?
         # ADD: context manager
-        context_manager: BaseContextManager | None = context_wrapper.context.get("context_manager", None)
+        context_manager: BaseContextManager | None = None
+        if context_wrapper.context:
+            context_manager = context_wrapper.context.get("context_manager", None)
         if context_manager:
             input = context_manager.preprocess(input, context_wrapper)
         # print(f"< [DEBUG] input: {input}")

@@ -15,7 +15,7 @@ JUDGE_PROMPT_MAP = {
     "BrowseComp": JUDGE_PROMPTS["default"],
     "GAIA": JUDGE_PROMPTS["default"],
     "BrowseComp_ZH": JUDGE_PROMPTS["BrowseComp_ZH"],
-    "WebWalker": JUDGE_PROMPTS["WebWalker"],
+    "WebWalkerQA": JUDGE_PROMPTS["WebWalkerQA"],
     "XBench": JUDGE_PROMPTS["XBench"],
 }
 

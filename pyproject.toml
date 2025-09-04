@@ -88,7 +88,10 @@ index-url = "https://pypi.org/simple"
 
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py312"
+exclude = [
+    "**/*.pyi",
+]
 
 [tool.ruff.lint]
 select = [

@@ -41,7 +41,7 @@ class EnvConfig(ConfigBaseModel):
 class AgentConfig(ConfigBaseModel):
     """Overall agent config"""
 
-    type: Literal["simple", "orchestra"] = "simple"
+    type: Literal["simple", "orchestra", "workforce"] = "simple"
     """Agent type, "simple" or "orchestra". """
 
     # simple agent config
@@ -77,6 +77,24 @@ class AgentConfig(ConfigBaseModel):
     reporter_config: dict = Field(default_factory=dict)
     """Reporter config (dict)\n
     - `template_path`: template Jinja2 file path, with `question` and `trajectory` variables"""
+
+    # workforce agent config
+    workforce_planner_model: ModelConfigs = Field(default_factory=ModelConfigs)
+    """Workforce planner model config"""
+    workforce_planner_config: dict = Field(default_factory=dict)
+    """Workforce planner config (dict)"""
+    workforce_assigner_model: ModelConfigs = Field(default_factory=ModelConfigs)
+    """Workforce assigner model config"""
+    workforce_assigner_config: dict = Field(default_factory=dict)
+    """Workforce assigner config (dict)"""
+    workforce_answerer_model: ModelConfigs = Field(default_factory=ModelConfigs)
+    """Workforce answerer model config"""
+    workforce_answerer_config: dict = Field(default_factory=dict)
+    """Workforce answerer config (dict)"""
+    workforce_executor_agents: dict[str, "AgentConfig"] = Field(default_factory=dict)
+    """Workforce executor agents config"""
+    workforce_executor_infos: list[dict] = Field(default_factory=list)
+    """Workforce executor infos, list of {name, desc, strengths, weaknesses}"""
 
     # frontend server config
     frontend_ip: str = EnvUtils.get_env("FRONTEND_IP", "127.0.0.1")
