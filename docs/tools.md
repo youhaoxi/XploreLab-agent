@@ -16,7 +16,7 @@ Here is a summary of some key toolkits available in the framework:
 
 | Toolkit Class | Provided Tools (Functions) | Core Functionality & Mechanism |
 | :--- | :--- | :--- |
-| **[SearchToolkit][utu.tools.search_toolkit.SearchToolkit]** | `search_google_api`, `web_qa` | Performs web searches using the Serper API and reads webpage content using the Jina API. It can use an LLM to answer questions based on page content. |
+| **[SearchToolkit][utu.tools.search_toolkit.SearchToolkit]** | `search`, `web_qa` | Performs web searches using the Serper API and reads webpage content using the Jina API. It can use an LLM to answer questions based on page content. |
 | **[DocumentToolkit][utu.tools.document_toolkit.DocumentToolkit]** | `document_qa` | Processes local or remote documents (PDF, DOCX, etc.). It uses the `chunkr.ai` service to parse the document and an LLM to answer questions or provide a summary. |
 | **[PythonExecutorToolkit][utu.tools.python_executor_toolkit.PythonExecutorToolkit]** | `execute_python_code` | Executes Python code snippets in an isolated environment using `IPython.core.interactiveshell`. It runs in a separate thread to prevent blocking and can capture outputs, errors, and even `matplotlib` plots. |
 | **[BashToolkit][utu.tools.bash_toolkit.BashToolkit]** | `run_bash` | Provides a persistent local shell session using the `pexpect` library. This allows the agent to run a series of commands that maintain state (e.g., current directory). |

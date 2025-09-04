@@ -1,12 +1,43 @@
-import hashlib
 import json
 
 import pytest
 
 from utu.config import ConfigLoader
 from utu.tools import SearchToolkit
+from utu.tools.search.baidu_search import BaiduSearch
+from utu.tools.search.crawl4ai_crawl import Crawl4aiCrawl
+from utu.tools.search.duckduckgo_search import DuckDuckGoSearch
+from utu.tools.search.google_search import GoogleSearch
+from utu.tools.search.jina_crawl import JinaCrawl
+from utu.tools.search.jina_search import JinaSearch
 
 
+# ----------------------------------------------------------------------------
+async def test_baidu_search():
+    baidu_search = BaiduSearch()
+    result = await baidu_search.search_baidu("上海天气")
+    print(result)
+
+
+async def test_google_search():
+    google_search = GoogleSearch()
+    result = await google_search.search_google("上海天气")
+    print(result)
+
+
+async def test_jina_search():
+    jina_search = JinaSearch()
+    result = await jina_search.search_jina("明天上海天气")
+    print(result)
+
+
+async def test_duckduckgo_search():
+    duckduckgo_search = DuckDuckGoSearch()
+    result = await duckduckgo_search.search_duckduckgo("明天上海天气")
+    print(result)
+
+
+# ----------------------------------------------------------------------------
 @pytest.fixture
 def search_toolkit() -> SearchToolkit:
     config = ConfigLoader.load_toolkit_config("search")
@@ -25,28 +56,30 @@ async def test_tool_schema(search_toolkit: SearchToolkit):
 TEST_QUERY = "南京工业大学计算机与信息工程学院 更名 报道"
 
 
-async def test_search_google_api(search_toolkit: SearchToolkit):
-    result = await search_toolkit.search_google_api(TEST_QUERY, num_results=10)
+async def test_search(search_toolkit: SearchToolkit):
+    result = await search_toolkit.search(TEST_QUERY, num_results=10)
     print(result)
 
 
+# ----------------------------------------------------------------------------
 TEST_URL = "https://docs.crawl4ai.com/core/simple-crawling/"
 
 
-async def test_get_content(search_toolkit: SearchToolkit):
-    result = await search_toolkit.get_content(TEST_URL)
+async def test_jina_crawl():
+    jina_crawl = JinaCrawl()
+    result = await jina_crawl.crawl(TEST_URL)
     print(result)
 
 
-async def test_cache(search_toolkit: SearchToolkit):
-    for _ in range(2):
-        res = await search_toolkit.get_content(TEST_URL)
-        hash = hashlib.md5(res.encode()).hexdigest()
-        print(hash)
+async def test_crawl4ai_crawl():
+    crawl4ai_crawl = Crawl4aiCrawl()
+    result = await crawl4ai_crawl.crawl(TEST_URL)
+    print(result)
 
 
+# ----------------------------------------------------------------------------
 queries = (
-    ("https://docs.crawl4ai.com/core/simple-crawling/", ""),
+    ("https://github.com/TencentCloudADP/Youtu-agent", ""),
     ("https://docs.crawl4ai.com/core/simple-crawling/", "How to log?"),
     ("https://github.com/theskumar/python-dotenv", "Summary this page"),
 )

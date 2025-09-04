@@ -34,10 +34,10 @@ tools: dict[str, ChatCompletionToolParam] = {
             },
         },
     },
-    "search_google_api": {
+    "search": {
         "type": "function",
         "function": {
-            "name": "search_google_api",
+            "name": "search",
             "description": "Search the query via Google api, the query should be a search query like humans search in Google, concrete and not vague or super long. More the single most important items.",  # pylint: disable=line-too-long
             "parameters": {
                 "type": "object",
@@ -86,7 +86,7 @@ tasks_multi = [
                     {
                         "id": "0",
                         "type": "function",
-                        "function": {"name": "search_google_api", "arguments": str({"query": "smolagents package"})},
+                        "function": {"name": "search", "arguments": str({"query": "smolagents package"})},
                     }
                 ],
             },
@@ -118,7 +118,7 @@ tasks_multi = [
                 ),
             },
         ],
-        "tools": [tools["search_google_api"], tools["web_qa"]],
+        "tools": [tools["search"], tools["web_qa"]],
     }
 ]
 
