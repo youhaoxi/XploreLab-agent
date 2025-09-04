@@ -2,9 +2,10 @@
 - [ ] error tracing
 """
 
+import re
+
 from ...config import AgentConfig
 from ...utils import FileUtils, get_logger
-from ..llm_agent import LLMAgent
 from ..simple_agent import SimpleAgent
 from .data import Subtask, WorkspaceTaskRecorder
 
@@ -22,16 +23,12 @@ class ExecutorAgent:
     def __init__(self, config: AgentConfig, workforce_config: AgentConfig):
         self.config = config
         self.executor_agent = SimpleAgent(config=config)
-        print(f"workforce_config: {workforce_config}")
 
         executor_config = workforce_config.workforce_executor_config
         self.max_tries = executor_config.get("max_tries", 1)
         self.return_summary = executor_config.get("return_summary", False)
 
-        self.llm = LLMAgent(config.model)  # summary llm, use the same model as executor_agent
-        self.llm.set_instructions(PROMPTS["TASK_SUMMARY_SYSTEM_PROMPT"])
-
-        # self._reflection_history = []
+        self.reflection_history = []
 
     async def execute_task(
         self,
@@ -46,31 +43,48 @@ class ExecutorAgent:
         executor_res = None
         while tries <= self.max_tries:
             try:
+                self.executor_agent.clear_input_items()  # clear chat history!
+
                 # * 1. Task execution
-                user_prompt = PROMPTS["TASK_EXECUTE_USER_PROMPT"].format(
-                    overall_task=recorder.overall_task,
-                    overall_plan=recorder.formatted_task_plan,
+                if tries == 1:
+                    user_prompt = PROMPTS["TASK_EXECUTE_USER_PROMPT"].format(
+                        overall_task=recorder.overall_task,
+                        overall_plan=recorder.formatted_task_plan,
+                        task_name=task.task_name,
+                        task_description=task.task_description,
+                    )
+                else:
+                    user_prompt = PROMPTS["TASK_EXECUTE_WITH_REFLECTION_USER_PROMPT"].format(
+                        overall_task=recorder.overall_task,
+                        overall_plan=recorder.formatted_task_plan,
+                        task_name=task.task_name,
+                        task_description=task.task_description,
+                        previous_attempts=self.reflection_history[-1] if self.reflection_history else "",
+                    )
+                executor_res = await self.executor_agent.run(user_prompt, save=True)  # save chat history!
+                final_result = executor_res.final_output
+
+                # * 2. Task check
+                task_check_prompt = PROMPTS["TASK_CHECK_PROMPT"].format(
                     task_name=task.task_name,
                     task_description=task.task_description,
                 )
-                executor_res = await self.executor_agent.run(user_prompt)
-                final_result = executor_res.final_output
+                response_content = await self.executor_agent.run(task_check_prompt)  # do not save chat history!
+                if self._parse_task_check_result(response_content.final_output):
+                    logger.info(f"Task '{task.task_name}' completed successfully.")
+                    break
 
-                break
-                # TODO: task check
-                # # * 2. Task check
-                # task_check_prompt = PROMPTS["TASK_CHECK_PROMPT"].format(
-                #     task_name=task_name,
-                #     task_description=task_description,
-                # )
+                # * 3. Task reflection (when failed)
+                reflection_prompt = PROMPTS["TASK_REFLECTION_PROMPT"].format(
+                    task_name=task.task_name,
+                    task_description=task.task_description,
+                )
+                reflection_res = await self.executor_agent.run(reflection_prompt)  # do not save chat history!
+                self.reflection_history.append(reflection_res.final_output)
+                logger.info(f"Task '{task.task_name}' reflection: {reflection_res.final_output}")
 
-                # parsed_response_content = self._parse_task_check_result(response_content)
-                # if parsed_response_content is True:
-                #     logger.info(f"Task '{task_name}' completed successfully.")
-                #     break
-                # else:
-                #     logger.warning(f"Task '{task_name}' not completed. Retrying... (Attempt {tries}/{max_tries})")
-                #     reflection_prompt = TASK_REFLECTION_PROMPT.format()
+                logger.warning(f"Task '{task.task_name}' not completed. Retrying... (Attempt {tries}/{self.max_tries})")
+                tries += 1
 
             except Exception as e:
                 logger.error(f"Error executing task `{task.task_name}` on attempt {tries}: {str(e)}")
@@ -90,12 +104,19 @@ class ExecutorAgent:
         task.task_status = "completed"
 
         if self.return_summary:
+            # WARNING: reset instructions is dangerous! DONOT use here!
+            # self.executor_agent.set_instructions(PROMPTS["TASK_SUMMARY_SYSTEM_PROMPT"])
             summary_prompt = PROMPTS["TASK_SUMMARY_USER_PROMPT"].format(
                 task_name=task.task_name,
                 task_description=task.task_description,
-                trajectory=executor_res.get_run_result().to_input_list(),  # FIXME: format the trajectory
             )
-            summary_response = await self.llm.run(summary_prompt)
-            recorder.add_run_result(summary_response.get_run_result(), "executor")  # add executor trajectory
+            summary_response = await self.executor_agent.run(summary_prompt)
+            recorder.add_run_result(summary_response.get_run_result(), "executor_summary")  # add executor trajectory
             task.task_result_detailed, task.task_result = summary_response.final_output, summary_response.final_output
             logger.info(f"Task result summarized: {task.task_result_detailed} -> {task.task_result}")
+
+    def _parse_task_check_result(self, response) -> bool:
+        task_check_result = re.search(r"<task_check>(.*?)</task_check>", response, re.DOTALL)
+        if task_check_result and task_check_result.group(1).strip().lower() == "yes":
+            return True
+        return False
