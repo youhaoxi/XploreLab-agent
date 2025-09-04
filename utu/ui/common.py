@@ -1,65 +1,87 @@
-from dataclasses import dataclass
 from typing import Literal
 
 import agents as ag
+from pydantic import BaseModel
 
 from utu.agents.orchestra import OrchestraStreamEvent
 
 
-@dataclass
-class TextDeltaContent:
-    type: Literal["reason", "tool_call_argument", "tool_call_output", "text"]
+class TextDeltaContent(BaseModel):
+    type: Literal["reason", "tool_call", "tool_call_argument", "tool_call_output", "text"]
     delta: str
     inprogress: bool = False
     callid: str | None = None
     argument: str | None = None
 
 
-@dataclass
-class PlanItem:
+class PlanItem(BaseModel):
     analysis: str
     todo: list[str]
 
 
-@dataclass
-class WorkerItem:
+class WorkerItem(BaseModel):
     task: str
     output: str
 
 
-@dataclass
-class ReportItem:
+class ReportItem(BaseModel):
     output: str
 
 
-@dataclass
-class OrchestraContent:
+class OrchestraContent(BaseModel):
     type: Literal["plan", "worker", "report"]
     item: PlanItem | WorkerItem | ReportItem
 
 
-@dataclass
-class ExampleContent:
-    type: Literal["example"]
+class ExampleContent(BaseModel):
+    type: Literal["example"] = "example"
     query: str
 
 
-@dataclass
-class NewAgentContent:
-    type: Literal["new"]
+class NewAgentContent(BaseModel):
+    type: Literal["new"] = "new"
     name: str
 
 
-@dataclass
-class Event:
-    type: Literal["raw", "orchestra", "finish", "example", "new"]
-    data: TextDeltaContent | OrchestraContent | ExampleContent | NewAgentContent | None = None
+class ListAgentsContent(BaseModel):
+    type: Literal["list_agents"] = "list_agents"
+    agents: list[str]
 
 
-@dataclass
-class UserQuery:
-    type: Literal["query"]
+class SwitchAgentContent(BaseModel):
+    type: Literal["switch_agent"] = "switch_agent"
+    ok: bool
+    name: str
+
+
+class InitContent(BaseModel):
+    type: Literal["init"] = "init"
+    default_agent: str
+
+
+class Event(BaseModel):
+    type: Literal["raw", "init", "orchestra", "finish", "example", "new", "list_agents", "switch_agent"]
+    data: TextDeltaContent |\
+        OrchestraContent |\
+        ExampleContent |\
+        NewAgentContent |\
+        ListAgentsContent |\
+        SwitchAgentContent |\
+        InitContent |\
+        None = None
+
+
+class UserQuery(BaseModel):
     query: str
+
+
+class SwitchAgentRequest(BaseModel):
+    config_file: str
+
+
+class UserRequest(BaseModel):
+    type: Literal["query", "list_agents", "switch_agent"]
+    content: UserQuery | SwitchAgentRequest | None = None
 
 
 async def handle_raw_stream_events(event: ag.RawResponsesStreamEvent) -> Event | None:
@@ -155,7 +177,7 @@ async def handle_tool_call_output(event: ag.RunItemStreamEvent) -> Event | None:
             type="raw",
             data=TextDeltaContent(
                 type="tool_call_output",
-                delta=item.output,
+                delta=str(item.output),
                 callid=item.raw_item["call_id"],
                 inprogress=False,
             ),
