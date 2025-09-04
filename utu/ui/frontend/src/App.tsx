@@ -21,8 +21,6 @@ import type {
 } from './types/events';
 import type {
   UserRequest,
-  UserQuery,
-  UserSwitchAgent,
 } from './types/requests';
 import type {
   Message,
@@ -305,13 +303,6 @@ const App: React.FC = () => {
     }
 
     sendQuery(inputValue);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isModelResponding) {
-      e.preventDefault();
-      handleSendMessage();
-    }
   };
 
   const downloadReport = (content: any) => {

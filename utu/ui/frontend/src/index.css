@@ -392,9 +392,9 @@ body {
   color: var(--color-text);
 }
 
-.send-button:hover:not(:disabled) {
-  /* background: #0056b3; */
-}
+/* .send-button:hover:not(:disabled) {
+  background: #0056b3;
+} */
 
 .send-button:disabled {
   /* background: #cccccc; */
