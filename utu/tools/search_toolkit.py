@@ -1,5 +1,4 @@
 import asyncio
-import re
 from collections.abc import Callable
 
 import aiohttp
@@ -12,8 +11,8 @@ logger = get_logger(__name__)
 
 # https://huggingface.co/datasets/callanwu/WebWalkerQA
 # https://huggingface.co/spaces/dobval/WebThinker
-banned_sites = ("https://huggingface.co/", "https://grok.com/share/", "https://modelscope.cn/datasets/")
-RE_MATCHED_SITES = re.compile(r"^(" + "|".join(banned_sites) + r")")
+# banned_sites = ("https://huggingface.co/", "https://grok.com/share/", "https://modelscope.cn/datasets/")
+# RE_MATCHED_SITES = re.compile(r"^(" + "|".join(banned_sites) + r")")
 
 
 class SearchToolkit(AsyncBaseToolkit):
@@ -22,24 +21,33 @@ class SearchToolkit(AsyncBaseToolkit):
 
         - Required env variables: `JINA_API_KEY`, `SERPER_API_KEY`"""
         super().__init__(config)
+        search_engine = self.config.config.get("search_engine", "google")
+        match search_engine:
+            case "google":
+                from .search.google_search import GoogleSearch
+
+                self.search_engine = GoogleSearch(self.config.config)
+            case "jina":
+                from .search.jina_search import JinaSearch
+
+                self.search_engine = JinaSearch(self.config.config)
+            case "baidu":
+                from .search.baidu_search import BaiduSearch
+
+                self.search_engine = BaiduSearch(self.config.config)
+            case "duckduckgo":
+                from .search.duckduckgo_search import DuckDuckGoSearch
+
+                self.search_engine = DuckDuckGoSearch(self.config.config)
+            case _:
+                raise ValueError(f"Unsupported search engine: {search_engine}")
         self.jina_url_template = r"https://r.jina.ai/{url}"
         self.jina_header = {"Authorization": f"Bearer {self.config.config.get('JINA_API_KEY')}"}
-        self.serper_url = r"https://google.serper.dev/search"
-        self.serper_header = {"X-API-KEY": self.config.config.get("SERPER_API_KEY"), "Content-Type": "application/json"}
         # config
         self.llm = SimplifiedAsyncOpenAI(
             **self.config.config_llm.model_provider.model_dump() if self.config.config_llm else {}
         )
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
-
-    @async_file_cache(expire_time=None)
-    async def search_google(self, query: str):
-        params = {"q": query, "gl": "cn", "hl": "zh-cn", "num": 100}
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.serper_url, headers=self.serper_header, json=params) as response:
-                response.raise_for_status()  # avoid cache error!
-                results = await response.json()
-                return results
 
     async def search_google_api(self, query: str, num_results: int = 5) -> dict:
         """web search to gather information from the web.
@@ -60,29 +68,8 @@ class SearchToolkit(AsyncBaseToolkit):
         """
         # https://serper.dev/playground
         logger.info(f"[tool] search_google_api: {oneline_object(query)}")
-        res = await self.search_google(query)
-        # filter the search results
-        results = self._filter_results(res["organic"], num_results)
-        formatted_results = []
-        for i, r in enumerate(results, 1):
-            formatted_results.append(f"{i}. {r['title']} ({r['link']})")
-            if "snippet" in r:
-                formatted_results[-1] += f"\nsnippet: {r['snippet']}"
-            if "sitelinks" in r:
-                formatted_results[-1] += f"\nsitelinks: {r['sitelinks']}"
-        msg = "\n".join(formatted_results)
-        logger.info(oneline_object(msg))
-        return msg
-
-    def _filter_results(self, results: list[dict], limit: int) -> list[dict]:
-        # can also use search operator `-site:huggingface.co`
-        # ret: {title, link, snippet, position, | sitelinks}
-        res = []
-        for result in results:
-            if not RE_MATCHED_SITES.match(result["link"]):
-                res.append(result)
-            if len(res) >= limit:
-                break
+        res = await self.search_engine.search(query, num_results)
+        logger.info(oneline_object(res))
         return res
 
     @async_file_cache(expire_time=None)

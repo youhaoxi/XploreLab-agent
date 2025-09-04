@@ -3,7 +3,9 @@ mode: builtin
 activated_tools: null
 config:
   summary_token_limit: 10_000
-  SERPER_API_KEY: ${oc.env:SERPER_API_KEY}
+  search_engine: google  # google | jina | baidu | duckduckgo
+  search_params: {"gl": "cn", "hl": "zh-cn"}  # search params for google & jina
+  search_banned_sites: []
   JINA_API_KEY: ${oc.env:JINA_API_KEY}
 config_llm:
   model_provider:
