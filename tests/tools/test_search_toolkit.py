@@ -5,8 +5,38 @@ import pytest
 
 from utu.config import ConfigLoader
 from utu.tools import SearchToolkit
+from utu.tools.search.baidu_search import BaiduSearch
+from utu.tools.search.duckduckgo_search import DuckDuckGoSearch
+from utu.tools.search.google_search import GoogleSearch
+from utu.tools.search.jina_search import JinaSearch
 
 
+# ----------------------------------------------------------------------------
+async def test_baidu_search():
+    baidu_search = BaiduSearch()
+    result = await baidu_search.search_baidu("上海天气")
+    print(result)
+
+
+async def test_google_search():
+    google_search = GoogleSearch()
+    result = await google_search.search_google("上海天气")
+    print(result)
+
+
+async def test_jina_search():
+    jina_search = JinaSearch()
+    result = await jina_search.search_jina("明天上海天气")
+    print(result)
+
+
+async def test_duckduckgo_search():
+    duckduckgo_search = DuckDuckGoSearch()
+    result = await duckduckgo_search.search_duckduckgo("明天上海天气")
+    print(result)
+
+
+# ----------------------------------------------------------------------------
 @pytest.fixture
 def search_toolkit() -> SearchToolkit:
     config = ConfigLoader.load_toolkit_config("search")
