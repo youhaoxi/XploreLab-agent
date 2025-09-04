@@ -32,7 +32,7 @@ class WorkforceAgent(BaseAgent):
         answerer_agent = AnswererAgent(config=self.config)
         executor_agent_group: dict[str, ExecutorAgent] = {}
         for name, config in self.config.workforce_executor_agents.items():
-            executor_agent_group[name] = ExecutorAgent(config=config)
+            executor_agent_group[name] = ExecutorAgent(config=config, workforce_config=self.config)
 
         recorder = WorkspaceTaskRecorder(
             overall_task=input, executor_agent_kwargs_list=self.config.workforce_executor_infos

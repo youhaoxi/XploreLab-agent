@@ -115,6 +115,10 @@ TASK_SUMMARY_USER_PROMPT: |
   {task_description}
   </task_description>
 
+  <trajectory>
+  {trajectory}
+  </trajectory>
+
   Please provide a concise summary that includes:
   1. Your initial answer or solution to the task
   2. Any files that were created, modified, or generated during execution. If no files were created, skip this point.

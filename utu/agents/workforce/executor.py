@@ -19,14 +19,19 @@ class ExecutorAgent:
     - TODO: self-reflection
     """
 
-    def __init__(self, config: AgentConfig):
+    def __init__(self, config: AgentConfig, workforce_config: AgentConfig):
         self.config = config
         self.executor_agent = SimpleAgent(config=config)
-        self.llm = LLMAgent(config.model)  # summary llm, use the same model as executor_agent
-        # self._reflection_history = []
-        executor_config = config.workforce_executor_config
+        print(f"workforce_config: {workforce_config}")
+
+        executor_config = workforce_config.workforce_executor_config
         self.max_tries = executor_config.get("max_tries", 1)
         self.return_summary = executor_config.get("return_summary", False)
+
+        self.llm = LLMAgent(config.model)  # summary llm, use the same model as executor_agent
+        self.llm.set_instructions(PROMPTS["TASK_SUMMARY_SYSTEM_PROMPT"])
+
+        # self._reflection_history = []
 
     async def execute_task(
         self,
@@ -74,15 +79,21 @@ class ExecutorAgent:
                     final_result = f"Task execution failed: {str(e)}"
                     break
 
-        if executor_res:
-            recorder.add_run_result(executor_res.get_run_result(), "executor")  # add executor trajectory
+        if executor_res is None:
+            logger.error(f"Task `{task.task_name}` execution failed after {tries} attempts!")
+            task.task_result = final_result
+            task.task_status = "failed"
+            return
+
+        recorder.add_run_result(executor_res.get_run_result(), "executor")  # add executor trajectory
         task.task_result = final_result
         task.task_status = "completed"
 
-        # TODO: use the history (res.get_run_result().to_input_list()) during summary?
         if self.return_summary:
             summary_prompt = PROMPTS["TASK_SUMMARY_USER_PROMPT"].format(
-                task_name=task.task_name, task_description=task.task_description
+                task_name=task.task_name,
+                task_description=task.task_description,
+                trajectory=executor_res.get_run_result().to_input_list(),  # FIXME: format the trajectory
             )
             summary_response = await self.llm.run(summary_prompt)
             recorder.add_run_result(summary_response.get_run_result(), "executor")  # add executor trajectory
