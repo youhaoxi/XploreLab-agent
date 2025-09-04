@@ -257,6 +257,7 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
             ? String(message.content).substring(8)
             : String(message.content);
 
+        let isSvg = /<svg(.*)<\/svg>/s.test(reportContent);
         let isHtml = /^\s*</.test(reportContent);
         if (!isHtml && /^\s*```html/s.test(reportContent)) {
           const match = reportContent.match(/```html(.*)```/s);
@@ -268,68 +269,75 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
 
         const newWindow = window.open();
         if (newWindow) {
-            if (isHtml) {
-                newWindow.document.write(reportContent);
-            } else {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Report</title>
-                        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-                        <style>
-                            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 2rem; }
-                            table {
-                              border-collapse: collapse;
-                              width: 100%;
-                              margin: 1em 0;
-                              font-size: 0.9em;
-                              /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); */
-                              overflow-x: scroll;
-                              border-radius: 5px;
-                            }
-
-                            th,
-                            td {
-                              padding: 12px 15px;
-                              text-align: left;
-                              border: 1px solid #e0e0e0;
-                            }
-
-                            thead tr {
-                              background-color: #f5f5f5;
-                              color: var(--color-header-text);
-                              text-align: left;
-                              font-weight: bold;
-                            }
-
-                            tbody tr {
-                              border-bottom: 1px solid #e0e0e0;
-                            }
-
-                            tbody tr:nth-of-type(even) {
-                              background-color: #f8f8f8;
-                            }
-
-                            tbody tr:last-of-type {
-                              border-bottom: 2px solid var(--color-header-bg);
-                            }
-
-                            tbody tr:hover {
-                              background-color: var(--color-row-hover);
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div id="content"></div>
-                        <script>
-                            document.getElementById('content').innerHTML = marked.parse(${JSON.stringify(reportContent)});
-                        </script>
-                    </body>
-                    </html>
-                `);
+          if (isSvg) {
+            // extract svg content
+            const match = reportContent.match(/<svg(.*)<\/svg>/s);
+            if (match) {
+              reportContent = "<svg" + match[1] + "</svg>";
             }
-            newWindow.document.close();
+            newWindow.document.write(reportContent);
+          } else if (isHtml) {
+            newWindow.document.write(reportContent);
+          } else {
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Report</title>
+                    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+                    <style>
+                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 2rem; }
+                        table {
+                          border-collapse: collapse;
+                          width: 100%;
+                          margin: 1em 0;
+                          font-size: 0.9em;
+                          /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); */
+                          overflow-x: scroll;
+                          border-radius: 5px;
+                        }
+
+                        th,
+                        td {
+                          padding: 12px 15px;
+                          text-align: left;
+                          border: 1px solid #e0e0e0;
+                        }
+
+                        thead tr {
+                          background-color: #f5f5f5;
+                          color: var(--color-header-text);
+                          text-align: left;
+                          font-weight: bold;
+                        }
+
+                        tbody tr {
+                          border-bottom: 1px solid #e0e0e0;
+                        }
+
+                        tbody tr:nth-of-type(even) {
+                          background-color: #f8f8f8;
+                        }
+
+                        tbody tr:last-of-type {
+                          border-bottom: 2px solid var(--color-header-bg);
+                        }
+
+                        tbody tr:hover {
+                          background-color: var(--color-row-hover);
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="content"></div>
+                    <script>
+                        document.getElementById('content').innerHTML = marked.parse(${JSON.stringify(reportContent)});
+                    </script>
+                </body>
+                </html>
+            `);
+          }
+          newWindow.document.close();
         }
       };
 
