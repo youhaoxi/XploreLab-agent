@@ -3,7 +3,7 @@ planner: |
   
   You should obey the following workflow:
   1. **Clarify the user query**: investigate the user's query carefully, and figure out the subtasks.
-    - Use the "search_google_api" when you need to gather background information from the web. 
+    - Use the "search" when you need to gather background information from the web. 
     - The returned snippet is very simple, so use the "web_qa" to collect detailed information from a specific webpage.
   2. **Collect information parallelly**: 
     - use the "search_wide" tool to collect structured information from the web.

@@ -66,9 +66,13 @@ agent:
           mode: builtin
           activated_tools: null
           config:
+            search_engine: google  # google | jina | baidu | duckduckgo
+            search_params: {"gl": "cn", "hl": "zh-cn"}  # search params for google & jina
+            # https://huggingface.co/datasets/callanwu/WebWalkerQA
+            # https://huggingface.co/spaces/dobval/WebThinker
+            search_banned_sites: ["https://huggingface.co/", "https://grok.com/share/", "https://modelscope.cn/datasets/"]
+            crawl_engine: jina  # jina | crawl4ai
             summary_token_limit: 10_000
-            SERPER_API_KEY: ${oc.env:SERPER_API_KEY}
-            JINA_API_KEY: ${oc.env:JINA_API_KEY}
           config_llm:
             model_provider:
               type: ${oc.env:UTU_LLM_TYPE}
