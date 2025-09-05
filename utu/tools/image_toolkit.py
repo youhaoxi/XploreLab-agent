@@ -13,7 +13,7 @@ import requests
 from PIL import Image
 
 from ..config import ToolkitConfig
-from ..utils import SimplifiedAsyncOpenAI, get_logger
+from ..utils import EnvUtils, SimplifiedAsyncOpenAI, get_logger
 from .base import TOOL_PROMPTS, AsyncBaseToolkit
 
 logger = get_logger(__name__)
@@ -22,7 +22,13 @@ logger = get_logger(__name__)
 class ImageToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        self.llm = SimplifiedAsyncOpenAI(**self.config.config_llm.model_provider.model_dump())
+        image_llm_config = {
+            "type": EnvUtils.get_env("UTU_IMAGE_LLM_TYPE", "chat.completions"),
+            "model": EnvUtils.get_env("UTU_IMAGE_LLM_MODEL"),
+            "api_key": EnvUtils.get_env("UTU_IMAGE_LLM_API_KEY"),
+            "base_url": EnvUtils.get_env("UTU_IMAGE_LLM_BASE_URL"),
+        }
+        self.llm = SimplifiedAsyncOpenAI(**image_llm_config)
 
     def _load_image(self, image_path: str) -> str:
         parsed = urlparse(image_path)

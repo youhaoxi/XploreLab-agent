@@ -32,7 +32,7 @@ class ModelParamsConfig(ConfigBaseModel):
 
     temperature: float | None = None
     top_p: float | None = None
-    parallel_tool_calls: bool = False
+    parallel_tool_calls: bool | None = None
 
 
 class ModelConfigs(ConfigBaseModel):
