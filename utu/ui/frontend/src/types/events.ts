@@ -28,13 +28,29 @@ export interface NewAgentContent {
   name: string;
 }
 
-export type OrchestraContent = 
+export interface InitContent {
+  type: 'init';
+  default_agent: string;
+}
+
+export type OrchestraContent =
   | { type: 'plan'; item: PlanItem }
   | { type: 'worker'; item: WorkerItem }
   | { type: 'report'; item: ReportItem };
 
+export interface ListAgentsContent {
+  type: 'list_agents';
+  agents: string[];
+}
+
+export interface SwitchAgentContent {
+  type: 'switch_agent';
+  ok: boolean;
+  name: string;
+}
+
 export interface Event {
-  type: 'raw' | 'orchestra' | 'finish' | 'example' | 'new';
-  data: TextDeltaContent | OrchestraContent | ExampleContent | NewAgentContent | null;
+  type: 'raw' | 'orchestra' | 'finish' | 'example' | 'new' | 'init' | 'list_agents' | 'switch_agent';
+  data: TextDeltaContent | OrchestraContent | ExampleContent | NewAgentContent | InitContent | ListAgentsContent | SwitchAgentContent | null;
   requireConfirm?: boolean;
 }
