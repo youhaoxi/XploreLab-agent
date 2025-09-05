@@ -18,7 +18,7 @@ class DatasetSample(SQLModel, table=True):
     question: str = ""
     answer: str | None = ""
     topic: str | None = ""
-    level: str | None = ""
+    level: int | None = 0  # hardness level of the question, if applicable
     file_name: str | None = ""  # for GAIA
 
     meta: Any | None = Field(
