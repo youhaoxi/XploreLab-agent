@@ -1,0 +1,6 @@
+# @package _global_
+
+exp_id: "gaia_test"
+
+data:
+  dataset: "GAIA_validation"

@@ -1,6 +1,5 @@
 from utu.config import EvalConfig
 
-from ...utils import DIR_ROOT
 from .base_llm_processor import BaseLLMJudgeProcesser as BaseLLMJudgeProcesser
 from .base_match_processor import BaseMatchProcesser as BaseMatchProcesser
 from .base_processor import BaseProcesser
@@ -69,43 +68,3 @@ class ProcesserFactory:
 
 
 PROCESSER_FACTORY = ProcesserFactory()
-
-
-BUILTIN_BENCHMARKS = {
-    "GAIA_val": {
-        "data_path": DIR_ROOT / "data" / "gaia" / "val.jsonl",
-        "type": "single",
-        "processer": "GAIA",
-        "description": "GAIA validation set for evaluation",
-    },
-    "GAIA_test": {
-        "data_path": DIR_ROOT / "data" / "gaia" / "test.jsonl",
-        "type": "single",
-        "processer": "GAIA",
-        "description": "GAIA test set for evaluation",
-    },
-    "BrowseComp": {
-        "data_path": DIR_ROOT / "data" / "browse_comp" / "test.jsonl",
-        "type": "single",
-        "processer": "BrowseComp",
-        "description": "BrowseComp benchmark for evaluation",
-    },
-    "BrowseComp_ZH": {
-        "data_path": DIR_ROOT / "data" / "browse_comp_zh" / "test.jsonl",
-        "type": "single",
-        "processer": "BrowseComp_ZH",
-        "description": "BrowseComp Chinese benchmark for evaluation",
-    },
-    "XBench": {
-        "data_path": DIR_ROOT / "data" / "xbench" / "test.jsonl",
-        "type": "single",
-        "processer": "XBench",
-        "description": "XBench benchmark for evaluation",
-    },
-    "WebWalkerQA": {
-        "data_path": DIR_ROOT / "data" / "web_walker_qa" / "test.jsonl",
-        "type": "single",
-        "processer": "WebWalkerQA",
-        "description": "WebWalkerQA benchmark for evaluation",
-    },
-}

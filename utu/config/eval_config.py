@@ -10,13 +10,13 @@ from .base_config import ConfigBaseModel
 class DataConfig(ConfigBaseModel):
     """Data config"""
 
-    dataset: str  # WebWalkerQA | GAIA_val | XBench | BrowseComp
+    dataset: str  # WebWalkerQA | GAIA_validation | XBench | BrowseComp
     """Built-in dataset name or custom dataset path"""
-    type: Literal["single", "mixed"]
+    type: Literal["single", "mixed"] = "single"
     """Whether the dataset contains only single benchmark data or multiple benchmarks"""
-    question_field: str
+    question_field: str = "question"
     """Question field name in the dataset"""
-    gt_field: str
+    gt_field: str = "answer"
     """Ground truth field name in the dataset"""
 
 
@@ -35,13 +35,13 @@ class EvalConfig(ConfigBaseModel):
     # rollout
     agent: AgentConfig | None = None
     """Agent config for rollout"""
-    concurrency: int
+    concurrency: int = 1
     """Rollout parallelism"""
 
     # judgement
     judge_model: ModelConfigs = Field(default_factory=ModelConfigs)
     """Judge model config"""
-    judge_concurrency: int
+    judge_concurrency: int = 1
     """Judgement parallelism"""
     eval_method: str = None
     """Evaluation method"""
