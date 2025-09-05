@@ -167,7 +167,7 @@ Youtu-Agent 提供了完整的代码与示例，帮助你快速开始使用。�
 
 ```bash
 git clone https://github.com/TencentCloudADP/youtu-agent.git
-cd Youtu-agent
+cd youtu-agent
 uv sync
 source ./.venv/bin/activate
 cp .env.example .env  # NOTE: 你需要配置相关环境变量!

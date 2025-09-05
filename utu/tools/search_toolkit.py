@@ -1,47 +1,65 @@
 import asyncio
-import re
 from collections.abc import Callable
 
-import aiohttp
-
 from ..config import ToolkitConfig
-from ..utils import SimplifiedAsyncOpenAI, async_file_cache, get_logger, oneline_object
+from ..utils import SimplifiedAsyncOpenAI, get_logger, oneline_object
 from .base import TOOL_PROMPTS, AsyncBaseToolkit
 
 logger = get_logger(__name__)
 
-# https://huggingface.co/datasets/callanwu/WebWalkerQA
-# https://huggingface.co/spaces/dobval/WebThinker
-banned_sites = ("https://huggingface.co/", "https://grok.com/share/", "https://modelscope.cn/datasets/")
-RE_MATCHED_SITES = re.compile(r"^(" + "|".join(banned_sites) + r")")
-
 
 class SearchToolkit(AsyncBaseToolkit):
-    def __init__(self, config: ToolkitConfig = None):
-        """Initialize the SearchToolkit.
+    """Search Toolkit
 
-        - Required env variables: `JINA_API_KEY`, `SERPER_API_KEY`"""
+    NOTE:
+        - Please configure the required env variables! See `configs/agents/tools/search.yaml`
+
+    Methods:
+        - search(query: str, num_results: int = 5)
+        - web_qa(url: str, query: str)
+    """
+
+    def __init__(self, config: ToolkitConfig = None):
         super().__init__(config)
-        self.jina_url_template = r"https://r.jina.ai/{url}"
-        self.jina_header = {"Authorization": f"Bearer {self.config.config.get('JINA_API_KEY')}"}
-        self.serper_url = r"https://google.serper.dev/search"
-        self.serper_header = {"X-API-KEY": self.config.config.get("SERPER_API_KEY"), "Content-Type": "application/json"}
-        # config
+        search_engine = self.config.config.get("search_engine", "google")
+        match search_engine:
+            case "google":
+                from .search.google_search import GoogleSearch
+
+                self.search_engine = GoogleSearch(self.config.config)
+            case "jina":
+                from .search.jina_search import JinaSearch
+
+                self.search_engine = JinaSearch(self.config.config)
+            case "baidu":
+                from .search.baidu_search import BaiduSearch
+
+                self.search_engine = BaiduSearch(self.config.config)
+            case "duckduckgo":
+                from .search.duckduckgo_search import DuckDuckGoSearch
+
+                self.search_engine = DuckDuckGoSearch(self.config.config)
+            case _:
+                raise ValueError(f"Unsupported search engine: {search_engine}")
+        crawl_engine = self.config.config.get("crawl_engine", "jina")
+        match crawl_engine:
+            case "jina":
+                from .search.jina_crawl import JinaCrawl
+
+                self.crawl_engine = JinaCrawl(self.config.config)
+            case "crawl4ai":
+                from .search.crawl4ai_crawl import Crawl4aiCrawl
+
+                self.crawl_engine = Crawl4aiCrawl(self.config.config)
+            case _:
+                raise ValueError(f"Unsupported crawl engine: {crawl_engine}")
+        # llm for web_qa
         self.llm = SimplifiedAsyncOpenAI(
             **self.config.config_llm.model_provider.model_dump() if self.config.config_llm else {}
         )
         self.summary_token_limit = self.config.config.get("summary_token_limit", 1_000)
 
-    @async_file_cache(expire_time=None)
-    async def search_google(self, query: str):
-        params = {"q": query, "gl": "cn", "hl": "zh-cn", "num": 100}
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.serper_url, headers=self.serper_header, json=params) as response:
-                response.raise_for_status()  # avoid cache error!
-                results = await response.json()
-                return results
-
-    async def search_google_api(self, query: str, num_results: int = 5) -> dict:
+    async def search(self, query: str, num_results: int = 5) -> dict:
         """web search to gather information from the web.
 
         Tips:
@@ -59,41 +77,10 @@ class SearchToolkit(AsyncBaseToolkit):
             num_results (int, optional): The number of results to return. Defaults to 5.
         """
         # https://serper.dev/playground
-        logger.info(f"[tool] search_google_api: {oneline_object(query)}")
-        res = await self.search_google(query)
-        # filter the search results
-        results = self._filter_results(res["organic"], num_results)
-        formatted_results = []
-        for i, r in enumerate(results, 1):
-            formatted_results.append(f"{i}. {r['title']} ({r['link']})")
-            if "snippet" in r:
-                formatted_results[-1] += f"\nsnippet: {r['snippet']}"
-            if "sitelinks" in r:
-                formatted_results[-1] += f"\nsitelinks: {r['sitelinks']}"
-        msg = "\n".join(formatted_results)
-        logger.info(oneline_object(msg))
-        return msg
-
-    def _filter_results(self, results: list[dict], limit: int) -> list[dict]:
-        # can also use search operator `-site:huggingface.co`
-        # ret: {title, link, snippet, position, | sitelinks}
-        res = []
-        for result in results:
-            if not RE_MATCHED_SITES.match(result["link"]):
-                res.append(result)
-            if len(res) >= limit:
-                break
+        logger.info(f"[tool] search: {oneline_object(query)}")
+        res = await self.search_engine.search(query, num_results)
+        logger.info(oneline_object(res))
         return res
-
-    @async_file_cache(expire_time=None)
-    async def get_content(self, url: str) -> str:
-        # Get the content of the url
-        logger.info(f"[tool] get_content: {oneline_object(url)}")
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self.jina_url_template.format(url=url), headers=self.jina_header) as response:
-                text = await response.text()
-                logger.info(f"[tool] get_content: {oneline_object(text)}...")
-                return text
 
     async def web_qa(self, url: str, query: str) -> str:
         """Ask question to a webpage, you will get the answer and related links from the specified url.
@@ -106,7 +93,7 @@ class SearchToolkit(AsyncBaseToolkit):
             query (str): The question to ask. Should be clear, concise, and specific.
         """
         logger.info(f"[tool] web_qa: {oneline_object({url, query})}")
-        content = await self.get_content(url)
+        content = await self.crawl_engine.crawl(url)
         query = (
             query or "Summarize the content of this webpage, in the same language as the webpage."
         )  # use the same language
@@ -130,7 +117,7 @@ class SearchToolkit(AsyncBaseToolkit):
 
     async def get_tools_map(self) -> dict[str, Callable]:
         return {
-            "search_google_api": self.search_google_api,
+            "search": self.search,
             # "get_content": self.get_content,
             "web_qa": self.web_qa,
         }

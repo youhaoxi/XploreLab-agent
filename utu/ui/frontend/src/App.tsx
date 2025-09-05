@@ -305,14 +305,23 @@ const App: React.FC = () => {
     sendQuery(inputValue);
   };
 
-  const downloadReport = (content: any) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !isModelResponding) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const downloadReport = (content: any, contentType: "html" | "svg" | "markdown") => {
     try {
       const data = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
       
-      // Determine file extension based on content
-      const isHtml = /^\s*</.test(data);
-      const fileExtension = isHtml ? '.html' : '.txt';
-      const mimeType = isHtml ? 'text/html' : 'text/plain';
+      const contentTypeMap = {
+        html: { extension: '.html', mimeType: 'text/html' },
+        svg: { extension: '.svg', mimeType: 'image/svg+xml' },
+        markdown: { extension: '.md', mimeType: 'text/markdown' }
+      };
+      const { extension: fileExtension, mimeType } = contentTypeMap[contentType] || { extension: '.md', mimeType: 'text/markdown' };
 
       const blob = new Blob([data], { type: mimeType });
       const url = URL.createObjectURL(blob);
@@ -447,8 +456,8 @@ const App: React.FC = () => {
                   <MessageComponent
                     message={message}
                     showSender={showSender}
-                    onDownloadReport={message.type === 'report' ? (content) => {
-                      downloadReport(content);
+                    onDownloadReport={message.type === 'report' ? (content, contentType) => {
+                      downloadReport(content, contentType);
                     } : undefined}
                   />
                 </div>
