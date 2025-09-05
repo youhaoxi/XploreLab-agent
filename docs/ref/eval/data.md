@@ -4,5 +4,4 @@
     options:
         members:
             - BaseDataManager
-            - FileDataManager
             - DBDataManager
