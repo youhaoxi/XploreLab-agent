@@ -16,6 +16,7 @@ from utu.agents.orchestra_agent import OrchestraAgent
 from utu.agents.simple_agent import SimpleAgent
 from utu.config import AgentConfig
 from utu.config.loader import ConfigLoader
+import uuid
 
 from .common import (
     Event,
@@ -25,6 +26,8 @@ from .common import (
     SwitchAgentRequest,
     UserQuery,
     UserRequest,
+    UserAnswer,
+    AskContent,
     handle_new_agent,
     handle_orchestra_events,
     handle_raw_stream_events,
@@ -46,6 +49,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             logging.info("instantiate default agent")
             self.default_config = ConfigLoader.load_agent_config(self.default_config_filename)
             await self.instantiate_agent(self.default_config)
+        
+        self.query_queue = asyncio.Queue()
 
     def check_origin(self, origin):
         # Allow all origins to connect
@@ -53,8 +58,24 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     def _get_config_name(self):
         return os.path.basename(self.default_config_filename)
+    
+    async def ask_user(self, question: str) -> str:
+        event_to_send = Event(
+            type="ask",
+            data=AskContent(type="ask", question=question, ask_id=str(uuid.uuid4())),
+        )
+        await self.send_event(event_to_send)
+        answer = await self.answer_queue.get()
+        
+        assert isinstance(answer, UserAnswer)
+        assert answer.ask_id == event_to_send.data.ask_id
+        return answer.answer
 
     async def open(self):
+        # start query worker
+        self.query_worker_task = asyncio.create_task(self.handle_query_worker())
+        self.answer_queue = asyncio.Queue()
+        
         event_to_send = Event(type="init", data=InitContent(type="init", default_agent=self._get_config_name()))
         await self.send_event(event_to_send)
 
@@ -62,7 +83,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         logging.debug(f"Sending event: {event.model_dump()}")
         self.write_message(event.model_dump())
 
-    async def _handle_query(self, query: UserQuery):
+    async def _handle_query_noexcept(self, query: UserQuery):
         if query.query.strip() == "":
             raise ValueError("Query cannot be empty")
 
@@ -102,7 +123,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             self.agent.input_items = input_list
             self.agent.current_agent = stream.last_agent
 
-    async def _handle_list_agents(self):
+    async def _handle_list_agents_noexcept(self):
         config_path = Path(CONFIG_PATH).resolve()
         example_config_files = config_path.glob("examples/*.yaml")
         simple_agent_config_files = config_path.glob("simple_agents/*.yaml")
@@ -126,40 +147,85 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         else:
             raise ValueError(f"Unsupported agent type: {config.type}")
 
-    async def _handle_switch_agent(self, switch_agent_request: SwitchAgentRequest):
+    async def _handle_switch_agent_noexcept(self, switch_agent_request: SwitchAgentRequest):
         config = ConfigLoader.load_agent_config(switch_agent_request.config_file)
         await self.instantiate_agent(config)
 
+    async def _handle_query(self, query: UserQuery):
+        try:
+            await self._handle_query_noexcept(query)
+        except Exception as e:
+            logging.error(f"Error processing query: {str(e)}")
+            logging.debug(traceback.format_exc())
+            
+    async def _handle_list_agents(self):
+        try:
+            await self._handle_list_agents_noexcept()
+        except Exception as e:
+            logging.error(f"Error processing list agents: {str(e)}")
+            logging.debug(traceback.format_exc())
+    
+    async def _handle_switch_agent(self, switch_agent_request: SwitchAgentRequest):
+        try:
+            await self._handle_switch_agent_noexcept(switch_agent_request)
+            await self.send_event(
+                Event(
+                    type="switch_agent",
+                    data=SwitchAgentContent(type="switch_agent", ok=True, name=switch_agent_request.config_file),
+                )
+            )
+        except Exception as e:
+            logging.error(f"Error processing switch agent: {str(e)}")
+            logging.debug(traceback.format_exc())
+            await self.send_event(
+                Event(
+                    type="switch_agent",
+                    data=SwitchAgentContent(type="switch_agent", ok=False, name=switch_agent_request.config_file),
+                )
+            )
+    
+    async def _handle_answer_noexcept(self, answer: UserAnswer):
+        await self.answer_queue.put(answer)
+            
+    async def _handle_answer(self, answer: UserAnswer):
+        try:
+            await self._handle_answer_noexcept(answer)
+        except Exception as e:
+            logging.error(f"Error processing answer: {str(e)}")
+            logging.debug(traceback.format_exc())
+    
+    async def _handle_gen_agent_noexcept(self):
+        #!TODO (fpg2012) switch self.agent to SimpleAgentGenerator workflow
+        pass
+    
+    async def _handle_gen_agent(self):
+        try:
+            await self._handle_gen_agent_noexcept()
+        except Exception as e:
+            logging.error(f"Error processing gen agent: {str(e)}")
+            logging.debug(traceback.format_exc())
+    
+    async def handle_query_worker(self):
+        while True:
+            query = await self.query_queue.get()
+            await self._handle_query(query)
+    
     async def on_message(self, message: str):
         try:
             data = json.loads(message)
             print(data)
             request = UserRequest(**data)
             if request.type == "query":
-                try:
-                    await self._handle_query(request.content)
-                except Exception as e:
-                    logging.error(f"Error processing query: {str(e)}")
-                    logging.debug(traceback.format_exc())
+                # put query into queue, let query worker handle it
+                await self.query_queue.put(request.content)
+            elif request.type == "answer":
+                await self._handle_answer(request.content)
             elif request.type == "list_agents":
                 await self._handle_list_agents()
             elif request.type == "switch_agent":
-                try:
-                    await self._handle_switch_agent(request.content)
-                    await self.send_event(
-                        Event(
-                            type="switch_agent",
-                            data=SwitchAgentContent(type="switch_agent", ok=True, name=request.content.config_file),
-                        )
-                    )
-                except Exception:
-                    await self.send_event(
-                        Event(
-                            type="switch_agent",
-                            data=SwitchAgentContent(type="switch_agent", ok=False, name=request.content.config_file),
-                        )
-                    )
-                    logging.debug(traceback.format_exc())
+                await self._handle_switch_agent(request.content)
+            elif request.type == "gen_agent":
+                await self._handle_gen_agent()
             else:
                 logging.error(f"Unhandled message type: {data.get('type')}")
         except json.JSONDecodeError:

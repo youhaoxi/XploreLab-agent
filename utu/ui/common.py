@@ -53,14 +53,17 @@ class SwitchAgentContent(BaseModel):
     ok: bool
     name: str
 
-
 class InitContent(BaseModel):
     type: Literal["init"] = "init"
     default_agent: str
 
+class AskContent(BaseModel):
+    type: Literal["ask"] = "ask"
+    question: str
+    ask_id: str
 
 class Event(BaseModel):
-    type: Literal["raw", "init", "orchestra", "finish", "example", "new", "list_agents", "switch_agent"]
+    type: Literal["raw", "init", "orchestra", "finish", "example", "new", "list_agents", "switch_agent", "ask", "gen_agent"]
     data: TextDeltaContent |\
         OrchestraContent |\
         ExampleContent |\
@@ -68,6 +71,7 @@ class Event(BaseModel):
         ListAgentsContent |\
         SwitchAgentContent |\
         InitContent |\
+        AskContent |\
         None = None
 
 
@@ -78,11 +82,13 @@ class UserQuery(BaseModel):
 class SwitchAgentRequest(BaseModel):
     config_file: str
 
+class UserAnswer(BaseModel):
+    answer: str
+    ask_id: str
 
 class UserRequest(BaseModel):
-    type: Literal["query", "list_agents", "switch_agent"]
-    content: UserQuery | SwitchAgentRequest | None = None
-
+    type: Literal["query", "list_agents", "switch_agent", "answer"]
+    content: UserQuery | SwitchAgentRequest | UserAnswer | None = None
 
 async def handle_raw_stream_events(event: ag.RawResponsesStreamEvent) -> Event | None:
     def _send_delta(
