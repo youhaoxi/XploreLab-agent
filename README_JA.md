@@ -98,8 +98,8 @@ python scripts/cli_chat.py --stream --config generated/xxx
 </table>
 
 より詳細な例や高度な使用例については、[`examples`](./examples)ディレクトリおよびドキュメント[`docs/examples.md`](./docs/examples.md)をご覧ください。
-## ✨ 特徴
 
+## ✨ 特徴
 ![features](docs/assets/images/header.png)
 
 ### デザインコンセプト
@@ -121,8 +121,8 @@ python scripts/cli_chat.py --stream --config generated/xxx
 - 深層/広範な研究：一般的な検索指向のタスクをカバーします。
 - ページ生成：特定の入力に基づいてページを生成する例があります。
 - トレース収集：トレーニングや研究目的でのデータ収集をサポートします。
-## 🤔 なぜYoutu-Agentを選ぶのか？
 
+## 🤔 なぜYoutu-Agentを選ぶのか？
 `Youtu-Agent`は、さまざまなユーザーグループに価値を提供することを目的としています：
 
 ### エージェント研究者や大規模言語モデルのトレーナー向け
@@ -137,6 +137,7 @@ python scripts/cli_chat.py --stream --config generated/xxx
 ### 人工知能やエージェントの愛好家向け
 - **実際の使用例**：`/examples`ディレクトリには、ディープラーニングレポートの生成、データ分析、個人ファイルの整理などのタスクが含まれています。
 - **シンプルさとデバッグの容易さ**：豊富なツールセットと可視化トレーキングツールにより、開発とデバッグが直感的で簡単になります。
+
 ## 🧩 コアコンセプト
 
 - **エージェント（Agent）**：ヒント、ツール、環境が設定された大規模言語モデル。
@@ -146,6 +147,7 @@ python scripts/cli_chat.py --stream --config generated/xxx
 - **ベンチマーク（Benchmark）**：特定のデータセットに対応したワークフローの集合体で、前処理、実行、判断ロジックを含む。
 
 設計および実装の詳細については、[オンラインドキュメント](https://tencentcloudadp.github.io/youtu-agent/)をご覧ください。
+
 ## 🚀 すぐに始める
 
 Youtu-Agent は完全なコードとサンプルを提供しており、すぐに使用を開始するのに役立ちます。以下の手順に従って、最初のエージェントを実行するか、[`docker/README.md`](./docker/README.md)を参照してDockerを使用してインタラクティブなウェブページを備えたサンプルを迅速に実行できます。
@@ -235,12 +237,14 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
 ![eval_analysis_detail](https://github.com/user-attachments/assets/4ede525a-5e16-4d88-9ebb-01a7dca3aaec)
 
 📖 詳細については：[評価ドキュメント](https://tencentcloudadp.github.io/youtu-agent/eval) を参照してください。
+
 ## 🙏 お礼の言葉
 
 このプロジェクトは、以下の優れたオープンソースプロジェクトをベースにしています：
 - [openai-agents](https://github.com/openai/openai-agents-python)
 - [mkdocs-material](https://github.com/squidfunk/mkdocs-material)
 - [model-context-protocol](https://github.com/modelcontextprotocol/python-sdk)
+
 ## 📚 引用
 
 この研究が役立つと思われる場合は、引用を検討してください：
