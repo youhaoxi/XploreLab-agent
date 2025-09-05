@@ -188,14 +188,17 @@ class SimpleAgent(BaseAgent):
         }
 
     # wrap `Runner` apis in @openai-agents
-    async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> TaskRecorder:
+    async def run(
+        self, input: str | list[TResponseInputItem], trace_id: str = None, save: bool = False
+    ) -> TaskRecorder:
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         if not self._initialized:
             await self.build(trace_id)
         logger.info(f"> trace_id: {trace_id}")
 
         task_recorder = TaskRecorder(input, trace_id)
-        run_kwargs = self._prepare_run_kwargs(input)
+        self.input_items.append({"content": input, "role": "user"})
+        run_kwargs = self._prepare_run_kwargs(self.input_items)
 
         if AgentsUtils.get_current_trace():
             run_result = await Runner.run(**run_kwargs)
@@ -204,6 +207,10 @@ class SimpleAgent(BaseAgent):
                 run_result = await Runner.run(**run_kwargs)
         task_recorder.add_run_result(run_result)
         task_recorder.set_final_output(run_result.final_output)
+        # save the input_items and current_agent for next run
+        if save:
+            self.input_items = run_result.to_input_list()
+            self.current_agent = run_result.last_agent  # NOTE: acturally, there are only one agent in SimpleAgent
         return task_recorder
 
     def run_streamed(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResultStreaming:
@@ -224,12 +231,9 @@ class SimpleAgent(BaseAgent):
     async def chat(self, input: str) -> RunResult:
         # TODO: set "session-level" tracing for multi-turn chat
         self.input_items.append({"content": input, "role": "user"})
-        # print(f"< {self.input_items}")
-        recorder = await self.run(self.input_items)
+        recorder = await self.run(self.input_items, save=True)
         run_result = recorder.get_run_result()
         AgentsUtils.print_new_items(run_result.new_items)
-        self.input_items = run_result.to_input_list()
-        self.current_agent = run_result.last_agent
         return run_result
 
     async def chat_streamed(self, input: str) -> RunResultStreaming:
@@ -239,6 +243,14 @@ class SimpleAgent(BaseAgent):
         self.input_items = run_result_streaming.to_input_list()
         self.current_agent = run_result_streaming.last_agent
         return run_result_streaming
+
+    def set_instructions(self, instructions: str):
+        logger.warning("WARNING: reset instructions is dangerous!")
+        self.current_agent.instructions = instructions
+
+    def clear_input_items(self):
+        # reset chat history
+        self.input_items = []
 
     def set_run_hooks(self, run_hooks: RunHooks):
         # WIP

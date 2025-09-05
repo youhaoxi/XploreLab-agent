@@ -118,6 +118,5 @@ class SearchToolkit(AsyncBaseToolkit):
     async def get_tools_map(self) -> dict[str, Callable]:
         return {
             "search": self.search,
-            # "get_content": self.get_content,
             "web_qa": self.web_qa,
         }

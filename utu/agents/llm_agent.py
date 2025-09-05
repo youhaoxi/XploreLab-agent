@@ -25,6 +25,7 @@ class LLMAgent(BaseAgent):
         self.agent.instructions = instructions
 
     async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> TaskRecorder:
+        # TODO: customized the agent name
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         task_recorder = TaskRecorder(input, trace_id)
 

@@ -69,15 +69,24 @@ class TaskRecorder(DataClassWithStreamEvents):
     trace_id: str = ""
 
     final_output: str = ""
-    trajectories: list = field(default_factory=list)
+    trajectories: list = field(default_factory=list)  # record agent trajectories
     raw_run_results: list[RunResult] = field(default_factory=list)
 
-    def add_run_result(self, run_result: RunResult):
+    additional_infos: dict = field(default_factory=dict)
+
+    def add_run_result(self, run_result: RunResult, agent_name: str = None):
         self.raw_run_results.append(run_result)
-        self.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(run_result))
+        self.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(run_result, agent_name))
 
     def get_run_result(self) -> RunResult:
         return self.raw_run_results[-1]
 
     def set_final_output(self, final_output: str):
         self.final_output = final_output
+
+    # set additional infos. NOT USED NOW!
+    def set_attr(self, key: str, value: Any):
+        self.additional_infos[key] = value
+
+    def get_attr(self, key: str) -> Any:
+        return self.additional_infos.get(key)
