@@ -13,7 +13,7 @@
 | <a href="#-examples"><b>💡 Examples</b> </a> 
 | <a href="#-features"><b>✨ Features</b> </a> 
 | <a href="#-getting-started"><b>🚀 Getting Started</b> </a> 
-| 
+| <a href="https://discord.gg/svwuqgUx"><b>📢 Join Community</b> </a> 
 </p>
 
 
@@ -274,12 +274,6 @@ For example, to enable the agent to automatically search online for information 
 
 ```bash
 python examples/svg_generator/main.py
-```
-
-Alternatively, you can generate an SVG infographic based on a research topic by running:
-
-```bash
-python examples/svg_generator/main_web.py
 ```
 
 If you want to visualize the agent’s runtime status using the web UI, download the frontend package from the Youtu-Agent releases and install it locally:

@@ -6,7 +6,7 @@ import type { PlanItem } from '../types/events';
 interface MessageComponentProps {
   message: Message;
   showSender: boolean;
-  onDownloadReport?: (content: any) => void;
+  onDownloadReport?: (content: any, contentType: "html" | "svg" | "markdown") => void;
 }
 
 const MessageComponent: React.FC<MessageComponentProps> = ({ 
@@ -105,24 +105,6 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
     }
   };
 
-  // Render download button
-  const renderDownloadButton = () => {
-    if (message.type !== 'report' || !onDownloadReport) return null;
-    
-    return (
-      <button
-        className="download-button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onDownloadReport(message.content);
-        }}
-        title="Download Report"
-      >
-        <i className="fas fa-download"></i>
-      </button>
-    );
-  };
-
   // Render plan content
   const renderPlanContent = (plan: PlanItem) => (
     <div className="plan-content">
@@ -156,39 +138,42 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
     </div>
   );
 
+  const postprocessReportContent = (content: string) => {
+    let contentType: "html" | "svg" | "markdown" = "markdown"; 
+
+    let processedContent = content.startsWith('report: ') ? content.substring(8) : content;
+
+    // test if it is svg
+    if (/<svg(.*)<\/svg>/s.test(processedContent)) {
+      contentType = "svg";
+      const match = processedContent.match(/<svg(.*)<\/svg>/s);
+      if (match) {
+        processedContent = "<svg" + match[1] + "</svg>";
+      }
+      return {content: processedContent, contentType};
+    }
+    
+    // test if it is html
+    if (/^\s*</.test(processedContent)) {
+      contentType = "html";
+      return {content: processedContent, contentType};
+    }
+    if (/^\s*```html/s.test(processedContent)) {
+      contentType = "html";
+      const match = processedContent.match(/```html(.*)```/s);
+      if (match) {
+        processedContent = match[1];
+      }
+      return {content: processedContent, contentType};
+    }
+    
+    return {content: processedContent, contentType};
+  }
+
   const renderReportContent = (content: string) => {
-    // Remove 'report: ' prefix if it exists
-    let reportContent = content.startsWith('report: ')
-      ? content.substring(8)
-      : content;
+    let {content: processedContent, contentType} = postprocessReportContent(content);
 
-    // Basic check for HTML content by looking for a starting tag
-    const isSVG = /<svg(.*)<\/svg>/s.test(reportContent);
-    let isHtml = /^\s*</.test(reportContent);
-
-    console.log("ishtml, isSVG", isHtml, isSVG);
-
-    if (!isHtml && /^\s*```html/s.test(reportContent)) {
-      const match = reportContent.match(/```html(.*)```/s);
-      if (match) {
-        reportContent = match[1];
-      }
-      isHtml = true;
-      console.log("ishtml!!!!");
-      console.log(reportContent);
-    }
-
-    if (isSVG) {
-      const match = reportContent.match(/<svg(.*)<\/svg>/s);
-      if (match) {
-        reportContent = "<svg" + match[1] + "</svg>";
-      }
-      return (
-        <div className="report-svg" dangerouslySetInnerHTML={{ __html: reportContent }} />
-      );
-    }
-
-    if (isHtml) {
+    if (contentType === "html") {
       const resetStyles = `
         <style>
           * {
@@ -208,7 +193,7 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
 
       return (
         <iframe
-          srcDoc={`<!DOCTYPE html><html><head>${resetStyles}</head><body>${reportContent}</body></html>`}
+          srcDoc={`<!DOCTYPE html><html><head>${resetStyles}</head><body>${processedContent}</body></html>`}
           className="report-iframe"
           style={{ 
             width: '100%', 
@@ -224,7 +209,13 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
       );
     }
 
-    return <SafeMarkdown>{reportContent}</SafeMarkdown>;
+    if (contentType === "svg") {
+      return (
+        <div className="report-svg" dangerouslySetInnerHTML={{ __html: processedContent }} />
+      );
+    }
+
+    return <SafeMarkdown>{processedContent}</SafeMarkdown>;
   };
 
   const renderMessageContent = () => {
@@ -240,96 +231,83 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
     
     // Report message - render in details/summary with code block content
     if (message.type === 'report') {
+      let {content: processedContent, contentType} = postprocessReportContent(String(message.content));
+
       const handleDownload = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (onDownloadReport) {
-          // Remove 'report: ' prefix if it exists before downloading
-          const content = String(message.content).startsWith('report: ')
-            ? String(message.content).substring(8)
-            : String(message.content);
-          onDownloadReport(content);
+          onDownloadReport(processedContent, contentType);
         }
       };
 
       const handleOpenInNewTab = (e: React.MouseEvent) => {
         e.stopPropagation();
-        let reportContent = String(message.content).startsWith('report: ')
-            ? String(message.content).substring(8)
-            : String(message.content);
-
-        let isHtml = /^\s*</.test(reportContent);
-        if (!isHtml && /^\s*```html/s.test(reportContent)) {
-          const match = reportContent.match(/```html(.*)```/s);
-          if (match) {
-            reportContent = match[1];
-          }
-          isHtml = true;
-        }
-
         const newWindow = window.open();
         if (newWindow) {
-            if (isHtml) {
-                newWindow.document.write(reportContent);
-            } else {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Report</title>
-                        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-                        <style>
-                            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 2rem; }
-                            table {
-                              border-collapse: collapse;
-                              width: 100%;
-                              margin: 1em 0;
-                              font-size: 0.9em;
-                              /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); */
-                              overflow-x: scroll;
-                              border-radius: 5px;
-                            }
+          if (contentType === "svg") {
+            newWindow.document.write(processedContent);
+          } else if (contentType === "html") {
+            newWindow.document.write(processedContent);
+          } else {
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Report</title>
+                    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+                    <style>
+                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 2rem; }
+                        table {
+                          border-collapse: collapse;
+                          width: 100%;
+                          margin: 1em 0;
+                          font-size: 0.9em;
+                          /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); */
+                          overflow-x: scroll;
+                          border-radius: 5px;
+                        }
 
-                            th,
-                            td {
-                              padding: 12px 15px;
-                              text-align: left;
-                              border: 1px solid #e0e0e0;
-                            }
+                        th,
+                        td {
+                          padding: 12px 15px;
+                          text-align: left;
+                          border: 1px solid #e0e0e0;
+                        }
 
-                            thead tr {
-                              background-color: #f5f5f5;
-                              color: var(--color-header-text);
-                              text-align: left;
-                              font-weight: bold;
-                            }
+                        thead tr {
+                          background-color: #f5f5f5;
+                          color: var(--color-header-text);
+                          text-align: left;
+                          font-weight: bold;
+                        }
 
-                            tbody tr {
-                              border-bottom: 1px solid #e0e0e0;
-                            }
+                        tbody tr {
+                          border-bottom: 1px solid #e0e0e0;
+                        }
 
-                            tbody tr:nth-of-type(even) {
-                              background-color: #f8f8f8;
-                            }
+                        tbody tr:nth-of-type(even) {
+                          background-color: #f8f8f8;
+                        }
 
-                            tbody tr:last-of-type {
-                              border-bottom: 2px solid var(--color-header-bg);
-                            }
+                        tbody tr:last-of-type {
+                          border-bottom: 2px solid var(--color-header-bg);
+                        }
 
-                            tbody tr:hover {
-                              background-color: var(--color-row-hover);
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div id="content"></div>
-                        <script>
-                            document.getElementById('content').innerHTML = marked.parse(${JSON.stringify(reportContent)});
-                        </script>
-                    </body>
-                    </html>
-                `);
-            }
-            newWindow.document.close();
+                        tbody tr:hover {
+                          background-color: var(--color-row-hover);
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="content"></div>
+                    <script>
+                        document.getElementById('content').innerHTML = marked.parse(${JSON.stringify(processedContent)});
+                    </script>
+                </body>
+                </html>
+            `);
+          }
+          newWindow.document.close();
         }
       };
 
@@ -416,7 +394,6 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
             {...(message.inprogress ? { 'data-inprogress': 'true' } : {})}
           >
             <span>{getStatusText()}</span>
-            {renderDownloadButton()}
           </summary>
           <div className="message-detail-content">
             <SafeMarkdown>{String(message.content)}</SafeMarkdown>

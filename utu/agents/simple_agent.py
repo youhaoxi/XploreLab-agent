@@ -93,12 +93,12 @@ class SimpleAgent(BaseAgent):
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.cleanup()
 
-    async def build(self):
+    async def build(self, trace_id: str = None):
         """Build the agent"""
         if self._initialized:
             logger.info("Agent already initialized! Skipping build.")
             return
-        self.env = await get_env(self.config, "None")  # FIXME: trace_id
+        self.env = await get_env(self.config, trace_id or AgentsUtils.gen_trace_id())  # Pass trace_id
         await self.env.build()
         self.current_agent = Agent(
             name=self.config.agent.name,
@@ -177,18 +177,8 @@ class SimpleAgent(BaseAgent):
             "env": self.env,
         }
 
-    # wrap `Runner` apis in @openai-agents
-    async def run(
-        self, input: str | list[TResponseInputItem], trace_id: str = None, save: bool = False
-    ) -> TaskRecorder:
-        if not self._initialized:
-            await self.build()
-        trace_id = trace_id or AgentsUtils.gen_trace_id()
-        logger.info(f"> trace_id: {trace_id}")
-
-        task_recorder = TaskRecorder(input, trace_id)
-        self.input_items.append({"content": input, "role": "user"})
-        run_kwargs = {
+    def _prepare_run_kwargs(self, input: str | list[TResponseInputItem]) -> dict:
+        return {
             "starting_agent": self.current_agent,
             "input": self.input_items,
             "context": self._get_context(),
@@ -196,6 +186,17 @@ class SimpleAgent(BaseAgent):
             "hooks": self._run_hooks,
             "run_config": self._get_run_config(),
         }
+
+    # wrap `Runner` apis in @openai-agents
+    async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> TaskRecorder:
+        trace_id = trace_id or AgentsUtils.gen_trace_id()
+        if not self._initialized:
+            await self.build(trace_id)
+        logger.info(f"> trace_id: {trace_id}")
+
+        task_recorder = TaskRecorder(input, trace_id)
+        run_kwargs = self._prepare_run_kwargs(input)
+
         if AgentsUtils.get_current_trace():
             run_result = await Runner.run(**run_kwargs)
         else:
@@ -210,19 +211,13 @@ class SimpleAgent(BaseAgent):
         return task_recorder
 
     def run_streamed(self, input: str | list[TResponseInputItem], trace_id: str = None) -> RunResultStreaming:
+        trace_id = trace_id or AgentsUtils.gen_trace_id()
         if not self._initialized:
             raise RuntimeError("Agent is not initialized. Please call `build` first.")
-        trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
-        run_kwargs = {
-            "starting_agent": self.current_agent,
-            "input": input,
-            "context": self._get_context(),
-            "max_turns": self.config.max_turns,
-            "hooks": self._run_hooks,
-            "run_config": self._get_run_config(),
-        }
+        run_kwargs = self._prepare_run_kwargs(input)
+
         if AgentsUtils.get_current_trace():
             return Runner.run_streamed(**run_kwargs)
         else:
