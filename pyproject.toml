@@ -28,6 +28,7 @@ dependencies = [
     "pandas>=2.3.0",
     "pexpect>=4.9.0",
     "psycopg2-binary>=2.9.10",
+    "requests>=2.32.4",
     "rich>=14.1.0",
     "sqlmodel>=0.0.24",
     "tiktoken>=0.9.0",
@@ -59,9 +60,18 @@ documents = [
 ]
 gaia = [
     "astor>=0.8.1",
+    "docx2markdown>=0.1.1",
+    "nest-asyncio>=1.6.0",
     "openpyxl>=3.1.5",
+    "pillow>=11.3.0",
+    "pydub>=0.25.1",
+    "pymupdf>=1.26.3",
+    "retry>=0.9.2",
     "tabulate>=0.9.0",
+    "unstructured[docx,pptx]>=0.18.14",
+    "validators>=0.35.0",
     "xls2xlsx>=0.2.0",
+    "xmltodict>=0.15.0",
 ]
 
 
