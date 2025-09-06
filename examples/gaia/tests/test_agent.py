@@ -10,6 +10,7 @@ async def test_agent():
     await agent.build()
     print(f"agent with tools: {agent.tools}")
     await agent.chat_streamed("What tools do you have?")
+    await agent.chat_streamed("analysis data/gaia/2023/validation/3da89939-209c-4086-8520-7eb734e6b4ef.xlsx")
     await agent.cleanup()
 
 
