@@ -5,6 +5,7 @@ from examples.gaia.tools.code_execution_toolkit import CodeExecutionToolkit
 from examples.gaia.tools.document_processing_toolkit import DocumentProcessingToolkit
 from examples.gaia.tools.excel_toolkit import ExcelToolkit
 from examples.gaia.tools.image_analysis_toolkit import ImageAnalysisToolkit
+from examples.gaia.tools.search_toolkit import SearchToolkit
 from utu.config import ConfigLoader
 
 
@@ -78,12 +79,25 @@ async def test_document_processing_toolkit():
         print(f"> res: {res}")
 
 
+async def test_search_toolkit():
+    config = ConfigLoader.load_toolkit_config("arxiv")
+    search_toolkit = SearchToolkit(config)
+
+    res = await search_toolkit.search_google("What is the capital of France?")
+    print(f"> res: {res}")
+    res = await search_toolkit.multi_query_deep_search(["France", "capital France"], "What is the capital of France?")
+    print(f"> res: {res}")
+    res = await search_toolkit.parallel_search(["France", "capital France"], "What is the capital of France?")
+    print(f"> res: {res}")
+
+
 async def test_main():
     # await test_excel_toolkit()
     # await test_code_execution_toolkit()
     # await test_image_analysis_toolkit()
     # await test_audio_analysis_toolkit()
-    await test_document_processing_toolkit()
+    # await test_document_processing_toolkit()
+    await test_search_toolkit()
 
 
 if __name__ == "__main__":
