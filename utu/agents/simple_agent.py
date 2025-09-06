@@ -24,7 +24,7 @@ from ..config import AgentConfig, ConfigLoader, ToolkitConfig
 from ..context import BaseContextManager, build_context_manager
 from ..env import BaseEnv, get_env
 from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
-from ..utils import AgentsUtils, get_logger
+from ..utils import AgentsUtils, get_logger, load_class_from_file
 from .base_agent import BaseAgent
 from .common import TaskRecorder
 
@@ -138,6 +138,9 @@ class SimpleAgent(BaseAgent):
             elif toolkit_config.mode == "builtin":
                 toolkit = await self._load_toolkit(toolkit_config)
                 tools_list.extend(await toolkit.get_tools_in_agents())
+            elif toolkit_config.mode == "customized":
+                toolkit = await self._load_customized_toolkit(toolkit_config)
+                tools_list.extend(await toolkit.get_tools_in_agents())
             else:
                 raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
         tool_names = [tool.name for tool in tools_list]
@@ -148,6 +151,14 @@ class SimpleAgent(BaseAgent):
     async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
         toolkit = await self._tools_exit_stack.enter_async_context(TOOLKIT_MAP[toolkit_config.name](toolkit_config))
+        self._toolkits.append(toolkit)
+        return toolkit
+
+    async def _load_customized_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
+        logger.info(f"Loading customized toolkit `{toolkit_config.name}` with config {toolkit_config}")
+        assert toolkit_config.customized_filepath is not None and toolkit_config.customized_classname is not None
+        toolkit_class = load_class_from_file(toolkit_config.customized_filepath, toolkit_config.customized_classname)
+        toolkit = await self._tools_exit_stack.enter_async_context(toolkit_class(toolkit_config))
         self._toolkits.append(toolkit)
         return toolkit
 
