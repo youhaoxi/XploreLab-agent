@@ -67,6 +67,7 @@ class GAIAProcesser(BaseLLMJudgeProcesser):
         """Formulate the file name to the absolute path of the file."""
         if not file_name:
             return ""
-        dataset_dir = DIR_ROOT / "data" / "gaia"
-        attach_file_path = dataset_dir / "files" / file_name
+        split = self.config.data.dataset.split("_")[-1]  # GAIA_validation
+        dataset_dir = DIR_ROOT / "data" / "gaia" / "2023" / split
+        attach_file_path = dataset_dir / file_name
         return str(attach_file_path)

@@ -10,7 +10,7 @@ def image_toolkit() -> ImageToolkit:
     return ImageToolkit(config=config)
 
 
-IMAGE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"  # pylint: disable=line-too-long
+IMAGE_URL = "https://github.com/TencentCloudADP/youtu-agent/raw/main/docs/assets/mascot.png"
 tasks = ((IMAGE_URL, "What is main colors of this image?"), (IMAGE_URL,))
 
 

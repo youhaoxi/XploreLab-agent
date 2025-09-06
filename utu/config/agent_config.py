@@ -93,6 +93,8 @@ class AgentConfig(ConfigBaseModel):
     """Workforce answerer config (dict)"""
     workforce_executor_agents: dict[str, "AgentConfig"] = Field(default_factory=dict)
     """Workforce executor agents config"""
+    workforce_executor_config: dict = Field(default_factory=dict)
+    """Workforce executor config (dict)"""
     workforce_executor_infos: list[dict] = Field(default_factory=list)
     """Workforce executor infos, list of {name, desc, strengths, weaknesses}"""
 

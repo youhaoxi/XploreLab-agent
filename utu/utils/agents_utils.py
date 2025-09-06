@@ -133,9 +133,11 @@ class AgentsUtils:
             raise ValueError("Invalid type: " + type)
 
     @staticmethod
-    def get_trajectory_from_agent_result(agent_result: RunResult) -> dict:
+    def get_trajectory_from_agent_result(agent_result: RunResult, agent_name: str = None) -> dict:
+        if agent_name is None:
+            agent_name = agent_result.last_agent.name
         return {
-            "agent": agent_result.last_agent.name,
+            "agent": agent_name,
             "trajectory": ChatCompletionConverter.items_to_messages(agent_result.to_input_list()),
         }
 

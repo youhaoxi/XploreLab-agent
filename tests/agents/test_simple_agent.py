@@ -22,3 +22,12 @@ async def test_chat_streamed(agent: SimpleAgent):
 async def test_chat(agent: SimpleAgent):
     run_result = await agent.chat("That's the weather in Beijing today?")
     print(json.dumps(run_result.to_input_list(), ensure_ascii=False, indent=2))
+
+
+async def test_run(agent: SimpleAgent):
+    res = await agent.run("Hello! I'm Eason", save=True)
+    print(f"res.final_output: {res.final_output}")
+    res = await agent.run("You know my name?")
+    print(f"res.final_output: {res.final_output}")
+    res = await agent.run("You know my name?")
+    print(f"res.final_output: {res.final_output}")

@@ -39,7 +39,8 @@ dependencies = [
 dev = [
     "arize-phoenix-client>=1.14.1",
     "arize-phoenix-otel>=0.11.0",
-    "datasets>=4.0.0",
+    # datasets == 4.0.0 remove scripts, https://github.com/huggingface/datasets/issues/7693
+    "datasets==3.6.0",
     "gpt-oss>=0.0.0",
     "gradio>=5.42.0",
     "mkdocs>=1.6.1",
