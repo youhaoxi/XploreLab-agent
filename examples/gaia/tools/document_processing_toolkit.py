@@ -228,7 +228,7 @@ class DocumentProcessingToolkit(AsyncBaseToolkit):
         r"""Process the extracted content with Q&A using LLM."""
         prompt = PROMPTS["FINAL_QA"].format(content=content, query=query)
         logger.debug(f"Processing Q&A with content length: {len(content)}")
-        return await self.llm.query_one(prompt)
+        return await self.llm.query_one(messages=prompt)
 
     async def _post_process_result(self, result: str, query: Optional[str]) -> str:
         r"""Identify whether the result is too long. If so, split it into multiple parts, and leverage a model to identify which part contains the relevant information."""
@@ -236,7 +236,7 @@ class DocumentProcessingToolkit(AsyncBaseToolkit):
         async def _identify_relevant_part_async(part_idx: int, part: str, query: str) -> Tuple[bool, int, str]:
             logger.debug(f"Doc understanding with length {len(part)}, query: {query}")
             prompt = PROMPTS["POSTPROCESS_QA_RELEVANCE"].format(part=part, query=query)
-            response = await self.llm.query_one(prompt)
+            response = await self.llm.query_one(messages=prompt)
             flag = "true" in response.lower()
             return flag, part_idx, part
 
@@ -301,7 +301,7 @@ class DocumentProcessingToolkit(AsyncBaseToolkit):
 
             prompt = PROMPTS["POSTPROCESS_QA_RELEVANCE"].format(part=part, query=query)
 
-            response = await self.llm.query_one(prompt)
+            response = await self.llm.query_one(messages=prompt)
             flag = "true" in response.lower()
             return flag, part_idx, part
 
@@ -314,7 +314,7 @@ class DocumentProcessingToolkit(AsyncBaseToolkit):
             else:
                 prompt = PROMPTS["POSTPROCESS_QA_FIRST"].format(part=part, query=query)
 
-            return await self.llm.query_one(prompt)
+            return await self.llm.query_one(messages=prompt)
 
         max_length = 100000
         max_cut_length = 200000
@@ -376,7 +376,7 @@ class DocumentProcessingToolkit(AsyncBaseToolkit):
             # For shorter documents, perform single Q&A
             logger.debug("Document is short enough, performing single Q&A")
             prompt = PROMPTS["POSTPROCESS_QA_SHORT"].format(result=result, query=query)
-            return await self.llm.query_one(prompt)
+            return await self.llm.query_one(messages=prompt)
 
     def _is_webpage(self, url: str) -> bool:
         r"""Judge whether the given URL is a webpage."""
