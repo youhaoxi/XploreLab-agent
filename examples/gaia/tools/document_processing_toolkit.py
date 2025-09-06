@@ -127,7 +127,7 @@ class DocumentProcessingToolkit(AsyncBaseToolkit):
             return data
 
         if self._is_webpage(document_path):
-            extracted_text = self._extract_webpage_content(document_path)
+            extracted_text = await self.crawler.crawl(document_path)
             result_filtered = await self._post_process_result(extracted_text, query)
             return result_filtered
         else:
@@ -208,7 +208,7 @@ class DocumentProcessingToolkit(AsyncBaseToolkit):
             return f"The provided URL is not a valid webpage: {url}"
 
         # Extract webpage content
-        extracted_text = self._extract_webpage_content(url)
+        extracted_text = await self.crawler.crawl(url)
         if not extracted_text or extracted_text.startswith("Error while extracting"):
             return f"Failed to extract content from webpage: {url}"
         logger.debug(f"Successfully extracted content from webpage: {url}")
@@ -381,9 +381,6 @@ class DocumentProcessingToolkit(AsyncBaseToolkit):
     def _is_webpage(self, url: str) -> bool:
         r"""Judge whether the given URL is a webpage."""
         return validators.url(url) is True
-
-    def _extract_webpage_content(self, url: str) -> str:
-        return self.crawler.crawl_jina(url)
 
     def _download_file(self, url: str):
         r"""Download a file from a URL and save it to the cache directory."""
