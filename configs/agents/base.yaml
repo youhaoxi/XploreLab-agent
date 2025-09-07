@@ -1,5 +1,6 @@
+# @package _global_
 defaults:
-  - model: base
+  - /model/base@model
   - _self_
 
 agent:

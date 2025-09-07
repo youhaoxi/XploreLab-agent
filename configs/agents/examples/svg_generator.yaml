@@ -2,7 +2,7 @@
 defaults:
   - /model/base@planner_model
   - /model/base@reporter_model
-  - /simple_agents/search_agent@workers.SearchAgent
+  - /agents/simple_agents/search_agent@workers.SearchAgent
   - _self_
 
 
