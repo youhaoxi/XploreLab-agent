@@ -2,9 +2,9 @@
 defaults:
   - /model/base@planner_model
   - /model/base@reporter_model
-  - /simple_agents/search_agent@workers.SearchAgent
-  - /simple_agents/data_analysis_agent@workers.DataAnalysisAgent
-  - /simple_agents/analysis_agent@workers.AnalysisAgent
+  - /agents/simple_agents/search_agent@workers.SearchAgent
+  - /agents/simple_agents/data_analysis_agent@workers.DataAnalysisAgent
+  - /agents/simple_agents/analysis_agent@workers.AnalysisAgent
   - _self_
 
 
