@@ -1,12 +1,13 @@
+# @package _global_
 defaults:
   # - model: base
-  - model/base@workforce_planner_model
-  - model/base@workforce_assigner_model
-  - model/base@workforce_answerer_model
-  - simple_agents/gaia_web_search@workforce_executor_agents.Web Search Agent
-  # - simple_agents/gaia_web_browsing@workforce_executor_agents.Web Browsing Agent
-  - simple_agents/gaia_document_processing@workforce_executor_agents.Document Processing Agent
-  - simple_agents/gaia_reasoning_coding@workforce_executor_agents.Reasoning Coding Agent
+  - /model/base@workforce_planner_model
+  - /model/base@workforce_assigner_model
+  - /model/base@workforce_answerer_model
+  - /agents/simple_agents/gaia_web_search@workforce_executor_agents.Web Search Agent
+  # - /agents/simple_agents/gaia_web_browsing@workforce_executor_agents.Web Browsing Agent
+  - /agents/simple_agents/gaia_document_processing@workforce_executor_agents.Document Processing Agent
+  - /agents/simple_agents/gaia_reasoning_coding@workforce_executor_agents.Reasoning Coding Agent
   - _self_
 
 type: workforce
