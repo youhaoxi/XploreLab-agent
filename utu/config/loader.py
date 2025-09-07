@@ -33,19 +33,19 @@ class ConfigLoader:
 
     @classmethod
     def load_model_config(cls, name: str = "base") -> ModelConfigs:
-        """Load model config from /configs/agents/model"""
+        """Load model config"""
         cfg = cls._load_config_to_dict(name, config_path="../../configs/model")
         return ModelConfigs(**cfg)
 
     @classmethod
     def load_toolkit_config(cls, name: str = "search") -> ToolkitConfig:
-        """Load toolkit config from /configs/agents/tools"""
+        """Load toolkit config"""
         cfg = cls._load_config_to_dict(name, config_path="../../configs/tools")
         return ToolkitConfig(**cfg)
 
     @classmethod
     def load_agent_config(cls, name: str = "default") -> AgentConfig:
-        """Load agent config from /configs/agents"""
+        """Load agent config"""
         if not name.startswith("agents/"):
             name = "agents/" + name
         cfg = cls._load_config_to_dict(name, config_path="../../configs")
@@ -53,7 +53,7 @@ class ConfigLoader:
 
     @classmethod
     def load_eval_config(cls, name: str = "default") -> EvalConfig:
-        """Load eval config from /configs"""
+        """Load eval config"""
         if not name.startswith("eval/"):
             name = "eval/" + name
         cfg = cls._load_config_to_dict(name, config_path="../../configs")
