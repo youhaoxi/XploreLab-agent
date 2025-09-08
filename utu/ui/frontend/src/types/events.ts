@@ -49,8 +49,20 @@ export interface SwitchAgentContent {
   name: string;
 }
 
+export interface AskContent {
+  type: 'ask';
+  question: string;
+  ask_id: string;
+}
+
+export interface GeneratedAgentContent {
+  type: 'generated_agent_config';
+  filename: string;
+  config_content: string;
+}
+
 export interface Event {
-  type: 'raw' | 'orchestra' | 'finish' | 'example' | 'new' | 'init' | 'list_agents' | 'switch_agent';
-  data: TextDeltaContent | OrchestraContent | ExampleContent | NewAgentContent | InitContent | ListAgentsContent | SwitchAgentContent | null;
+  type: 'raw' | 'orchestra' | 'finish' | 'example' | 'new' | 'init' | 'list_agents' | 'switch_agent' | 'gen_agent' | 'ask' | 'generated_agent_config';
+  data: TextDeltaContent | OrchestraContent | ExampleContent | NewAgentContent | InitContent | ListAgentsContent | SwitchAgentContent | AskContent | GeneratedAgentContent | null;
   requireConfirm?: boolean;
 }

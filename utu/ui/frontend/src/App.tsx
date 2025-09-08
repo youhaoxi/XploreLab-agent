@@ -17,7 +17,9 @@ import type {
   OrchestraContent,
   InitContent,
   SwitchAgentContent,
-  ListAgentsContent
+  ListAgentsContent,
+  AskContent,
+  GeneratedAgentContent
 } from './types/events';
 import type {
   UserRequest,
@@ -56,6 +58,8 @@ const App: React.FC = () => {
   const [hasUserSentMessage, setHasUserSentMessage] = useState(false);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [availableConfigs, setAvailableConfigs] = useState<string[]>([]);
+  const [isGeneratingAgent, setIsGeneratingAgent] = useState(false);
+  const [askId, setAskId] = useState<string | null>(null);
 
   const getConfigList = () => {
     let request: UserRequest = {
@@ -78,6 +82,7 @@ const App: React.FC = () => {
       return;
     }
 
+    // handle raw event
     if (event.type === 'raw') {
       const data = event.data as TextDeltaContent;
 
@@ -157,7 +162,9 @@ const App: React.FC = () => {
 
         return prev
       });
-    } else if (event.type === 'new') {
+    } 
+    // handle new agent event
+    else if (event.type === 'new') {
       const data = event.data as { name: string };
       const message: Message = {
         id: Date.now() + 1,
@@ -184,7 +191,9 @@ const App: React.FC = () => {
           return updatedMessages;
         });
       }, 1500);
-    } else if (event.type === 'orchestra') {
+    } 
+    // handle orchestra event
+    else if (event.type === 'orchestra') {
       const data = event.data as OrchestraContent;
       if (data.type === 'plan') {
         const item = data.item as PlanItem;
@@ -221,21 +230,83 @@ const App: React.FC = () => {
         };
         setMessages(prev => [...prev, message]);
       }
-    } else if (event.type === 'finish') {
+    } 
+    // handle finish event
+    else if (event.type === 'finish') {
       setIsModelResponding(false); // Call save function on finish
-    } else if (event.type === 'init') {
+    } 
+    // handle generated config event
+    else if (event.type === 'generated_agent_config') {
+      let data = event.data as GeneratedAgentContent;
+      let config = data.config_content;
+      let filename = data.filename;
+      const content = "```\n" + config + "\n```\n\n" + "filename: " + '`' + filename + '`';
+      const message: Message = {
+        id: Date.now() + 1,
+        content: content,
+        sender: 'assistant',
+        timestamp: new Date(),
+        type: 'text',
+        requireConfirm: event.requireConfirm,
+      }
+      setMessages(prev => [...prev, message]);
+    }
+    // handle init event
+    else if (event.type === 'init') {
       setCurrentConfig((event.data as InitContent).default_agent);
-    } else if (event.type === 'switch_agent') {
+    } 
+    // handle switch agent event
+    else if (event.type === 'switch_agent') {
       let data = event.data as SwitchAgentContent;
       if (data.ok) {
         setCurrentConfig(data.name);
+        setIsGeneratingAgent(false);
       } else {
         console.error('Switch agent failed');
       }
-    } else if (event.type === 'list_agents') {
+    } 
+    // handle list agents event
+    else if (event.type === 'list_agents') {
       let data = event.data as ListAgentsContent;
       setAvailableConfigs(data.agents);
       setChatInputLoadingState("ready");
+    } 
+    // handle ask event
+    else if (event.type === 'ask') {
+      let data = event.data as AskContent;
+      let ask_id = data.ask_id;
+      setAskId(ask_id);
+      const Message: Message = {
+        id: Date.now(),
+        content: data.question,
+        sender: 'assistant',
+        timestamp: new Date(),
+        type: 'text',
+        inprogress: false,
+        requireConfirm: false,
+      };
+      setMessages(prev => [...prev, Message]);
+      setIsModelResponding(false);
+    }
+    // handle gen agent event
+    else if (event.type === 'gen_agent') {
+      // clean up message
+      setMessages([]);
+      setIsModelResponding(true);
+      // add a prompt message
+      const message: Message = {
+        id: Date.now(),
+        content: "Hello, please let me know your requirement",
+        sender: 'assistant',
+        timestamp: new Date(),
+        type: 'text',
+        inprogress: false,
+        requireConfirm: false,
+      };
+      setMessages(prev => [...prev, message]);
+      setIsModelResponding(false);
+      setIsGeneratingAgent(true);
+      setCurrentConfig("generate_agent");
     } else {
       console.error('Unknown event type:', event.type);
     }
@@ -302,7 +373,18 @@ const App: React.FC = () => {
       return;
     }
 
-    sendQuery(inputValue);
+    if (askId) {
+      sendRequest({
+        type: 'answer',
+        content: {
+          answer: inputValue,
+          ask_id: askId,
+        },
+      });
+      setAskId(null);
+    } else {
+      sendQuery(inputValue);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -402,7 +484,11 @@ const App: React.FC = () => {
   };
 
   const handleAddConfig = () => {
-    console.log('add config');
+    let request: UserRequest = {
+      type: 'gen_agent', 
+      content: null 
+    };
+    sendRequest(request);
   };
 
   return (

@@ -4,7 +4,7 @@ import agents as ag
 from pydantic import BaseModel
 
 from utu.agents.orchestra import OrchestraStreamEvent
-
+from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent
 
 class TextDeltaContent(BaseModel):
     type: Literal["reason", "tool_call", "tool_call_argument", "tool_call_output", "text"]
@@ -62,10 +62,16 @@ class AskContent(BaseModel):
     question: str
     ask_id: str
 
+class GeneratedAgentContent(BaseModel):
+    type: Literal["generated_agent_config"] = "generated_agent_config"
+    filename: str
+    config_content: str
+
 class Event(BaseModel):
-    type: Literal["raw", "init", "orchestra", "finish", "example", "new", "list_agents", "switch_agent", "ask", "gen_agent"]
+    type: Literal["raw", "init", "orchestra", "finish", "example", "new", "list_agents", "switch_agent", "ask", "gen_agent", "generated_agent_config"]
     data: TextDeltaContent |\
         OrchestraContent |\
+        GeneratedAgentContent |\
         ExampleContent |\
         NewAgentContent |\
         ListAgentsContent |\
@@ -87,7 +93,7 @@ class UserAnswer(BaseModel):
     ask_id: str
 
 class UserRequest(BaseModel):
-    type: Literal["query", "list_agents", "switch_agent", "answer"]
+    type: Literal["query", "list_agents", "switch_agent", "answer", "gen_agent"]
     content: UserQuery | SwitchAgentRequest | UserAnswer | None = None
 
 async def handle_raw_stream_events(event: ag.RawResponsesStreamEvent) -> Event | None:
@@ -205,4 +211,11 @@ async def handle_new_agent(event: ag.AgentUpdatedStreamEvent) -> Event | None:
         )
     else:
         pass
+    return event_to_send
+
+async def handle_generated_agent(event: SimpleAgentGeneratedEvent) -> Event | None:
+    event_to_send = Event(
+        type="generated_agent_config",
+        data=GeneratedAgentContent(filename=event.filename, config_content=event.config_content),
+    )
     return event_to_send

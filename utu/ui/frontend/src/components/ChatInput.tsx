@@ -47,7 +47,6 @@ const ChatInput: FC<ChatInputProps> = ({
     }
   };
 
-  const [isConfigOpen, setIsConfigOpen] = useState(false);
   const configRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside

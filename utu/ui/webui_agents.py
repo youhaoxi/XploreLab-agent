@@ -16,6 +16,7 @@ from utu.agents.orchestra_agent import OrchestraAgent
 from utu.agents.simple_agent import SimpleAgent
 from utu.config import AgentConfig
 from utu.config.loader import ConfigLoader
+from utu.meta import SimpleAgentGenerator
 import uuid
 
 from .common import (
@@ -97,6 +98,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         elif isinstance(self.agent, SimpleAgent):
             self.agent.input_items.append({"role": "user", "content": query.query})
             stream = self.agent.run_streamed(self.agent.input_items)
+        elif isinstance(self.agent, SimpleAgentGenerator):
+            stream = self.agent.run_streamed(query.query)
         else:
             raise ValueError(f"Unsupported agent type: {type(self.agent).__name__}")
 
@@ -111,6 +114,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 event_to_send = await handle_new_agent(event)
             elif isinstance(event, OrchestraStreamEvent):
                 event_to_send = await handle_orchestra_events(event)
+            elif isinstance(event, SimpleAgentGeneratedEvent):
+                pass
             else:
                 pass
             if event_to_send:
@@ -196,7 +201,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     
     async def _handle_gen_agent_noexcept(self):
         #!TODO (fpg2012) switch self.agent to SimpleAgentGenerator workflow
-        pass
+        self.agent = SimpleAgentGenerator(ask_function=self.ask_user, mode="webui")
+        await self.send_event(Event(type="gen_agent", data=None))
     
     async def _handle_gen_agent(self):
         try:
