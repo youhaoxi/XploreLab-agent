@@ -158,12 +158,12 @@ Youtu-Agent 提供了完整的代码与示例，帮助你快速开始使用。�
 
 ### 环境准备
 
-克隆仓库并安装依赖：
+### 源代码部署
 
 > [!NOTE]
 > 本项目使用 **Python 3.12+**。推荐使用 [uv](https://github.com/astral-sh/uv) 进行依赖管理。
 
-首先请确保已在环境安装 Python 和 uv，然后参考以下步骤克隆本项目并同步项目依赖。
+首先请确保已在环境安装 Python 和 uv，接着参考以下步骤克隆本项目并同步项目依赖。
 
 ```bash
 git clone https://github.com/TencentCloudADP/youtu-agent.git
@@ -173,8 +173,30 @@ source ./.venv/bin/activate
 cp .env.example .env  # NOTE: 你需要配置相关环境变量!
 ```
 
-> [!NOTE]
-> 请配置 `.env` 文件中的相关环境变量，例如 LLM API keys。
+复制 `.env.example` 文件后，参考以下 `.env` 文件配置，填写 LLM API。
+
+```bash
+# llm API 需兼容 OpenAI API 格式
+# 配置你的 LLM , 可参考 https://api-docs.deepseek.com/
+UTU_LLM_TYPE=chat.completions
+UTU_LLM_MODEL=deepseek-chat
+UTU_LLM_BASE_URL=https://api.deepseek.com/v1
+UTU_LLM_API_KEY=<替换为你的 API Key>
+```
+
+> 腾讯云为新用户提供免费 DeepSeek API 额度。点击[此处](https://lke.cloud.tencent.com/lke/#/trialProduct?source=act)申请，完成后请参考以下 `.env` 文件配置。如果赠送额度已失效，可以点击[此处](https://buy.cloud.tencent.com/tcadp)购买额度包，或前往[系统管理设置页](https://console.cloud.tencent.com/lkeap/settings)启用“原子能力_DeepSeek API”后付费以激活 API Key：
+
+```bash
+# 设置你的 LLM 配置, 可参考 https://www.tencentcloud.com/document/product/1255/70381
+UTU_LLM_TYPE=chat.completions
+UTU_LLM_MODEL=deepseek-v3
+UTU_LLM_BASE_URL=https://api.lkeap.cloud.tencent.com/v1
+UTU_LLM_API_KEY=<替换为你的 API Key>
+```
+
+### Docker 部署
+
+请参阅 [docker/README.md](https://github.com/TencentCloudADP/youtu-agent/blob/main/docker/README.md) 了解如何通过 Docker 一键部署带有交互网页的 Youtu-Agent。
 
 ### 快速开始
 
@@ -204,18 +226,47 @@ python scripts/cli_chat.py --stream --config base
 
 ### 示例探索
 
-本仓库提供了多个可直接运行的示例。例如，你可以基于某个研究主题自动生成一张 **SVG 信息图**：
+本仓库提供了多个可直接运行的示例。某些示例要求 Agent 具备联网搜索功能，因此需要在 tools 模块下的 `.env` 文件中配置工具 API：
+
+```bash
+# tools
+# serper api key, ref https://serper.dev/playground
+SERPER_API_KEY=<Access the URL in the comments to get the API Key>
+# jina api key, ref https://jina.ai/reader
+JINA_API_KEY=<Access the URL in the comments to get the API Key>
+```
+
+例如希望Agent围绕"DeepSeek V3.1 新特性"主题，自动联网检索信息并生成SVG介绍图片，可以直接运行下面的代码：
 
 ```bash
 python examples/svg_generator/main_web.py
 ```
 
-> [!NOTE]
-> 要使用 WebUI，你需要安装 `utu_agent_ui` 包。参考 [文档](https://tencentcloudadp.github.io/youtu-agent/frontend/#installation)。
+如果想要借助 web-ui 以可视化方式预览 Agent 的运行情况，你可以在 Youtu-Agent 的 [releases](https:////github.com/Tencent/Youtu-agent/releases/tag/frontend%2Fv0.1.5) 中下载前端 ui 的打包文件并安装到本地：
 
-给定一个研究主题后，Agent 会自动执行网络搜索，收集相关信息，并输出一张 SVG 可视化图。
+```bash
+# fetch and download the frontend package
+curl -LO https://github.com/Tencent/Youtu-agent/releases/download/frontend%2Fv0.1.5/utu_agent_ui-0.1.5-py3-none-any.whl
+
+# install frontend package
+uv pip install utu_agent_ui-0.1.5-py3-none-any.whl
+```
+
+然后运行web版本的SVG图片生成命令：
+
+```bash
+python examples/svg_generator/main_web.py
+```
+
+当终端出现以下提示时，说明部署成功。点击本地链接访问项目：
+
+```bash
+Server started at http://127.0.0.1:8848/
+```
 
 ![svg_generator_ui](https://github.com/user-attachments/assets/337d327f-91ee-434e-bbcf-297dd4b26c28)
+
+给定一个研究主题后，Agent 会自动执行网络搜索，收集相关信息，并输出一张 SVG 可视化图。
 
 ![svg_generator_result](https://github.com/user-attachments/assets/41aa7348-5f02-4daa-b5b2-225e35d21067)
 

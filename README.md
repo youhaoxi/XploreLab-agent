@@ -8,7 +8,8 @@
 </div>
 
 <p align="center">
-| <a href="README_ZH.md"><b>中文版</b></a>
+| <a href="README_ZH.md"><b>中文</b></a>
+| <a href="README_JA.md"><b>日本語</b></a>
 | <a href="#-benchmark-performance"><b>🌟 Performance</b></a> 
 | <a href="#-examples"><b>💡 Examples</b> </a> 
 | <a href="#-features"><b>✨ Features</b> </a> 
