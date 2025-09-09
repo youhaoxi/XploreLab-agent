@@ -8,17 +8,15 @@
 import asyncio
 import json
 from collections import defaultdict
-from typing import Tuple, Union
-import logging
+from typing import Literal
 
-from agents import RunResultStreaming, StopAtTools, trace, RunItemStreamEvent, RawResponsesStreamEvent
+from agents import RawResponsesStreamEvent, RunItemStreamEvent, RunResultStreaming, trace
+from pydantic import BaseModel
 
 from ..agents import SimpleAgent
 from ..tools import UserInteractionToolkit, get_toolkits_map
 from ..utils import DIR_ROOT, AgentsUtils, get_jinja_env, get_logger
 from .common import GeneratorTaskRecorder
-from pydantic import BaseModel
-from typing import Literal
 
 logger = get_logger(__name__)
 
@@ -51,6 +49,7 @@ class SimpleAgentGeneratedEvent(BaseModel):
     config_content: str
     filename: str
 
+
 def add_indented_lines(lines: str | list[str], indent: int = 2) -> str:
     if isinstance(lines, str):
         lines = lines.split("\n")
@@ -58,12 +57,12 @@ def add_indented_lines(lines: str | list[str], indent: int = 2) -> str:
 
 
 class SimpleAgentGenerator:
-    def __init__(self, ask_function = None, mode="local"):
+    def __init__(self, ask_function=None, mode="local"):
         self.jinja_env = get_jinja_env(DIR_ROOT / "utu/prompts/meta")
         self.output_dir = DIR_ROOT / "configs/agents/generated"
         self.output_dir.mkdir(exist_ok=True)
 
-        self.mode = mode # local | webui
+        self.mode = mode  # local | webui
         self._initialized = False
         self.ask_function = ask_function
         self.final_answer_call_id = None
@@ -73,11 +72,12 @@ class SimpleAgentGenerator:
             return
         self.interaction_toolkit = UserInteractionToolkit()
         self.interaction_toolkit.set_ask_function(self.ask_function)
+
         self.agent_1 = SimpleAgent(
             name="clarification_agent",
             instructions=self.jinja_env.get_template("requirements_clarification.j2").render(),
             tools=await self.interaction_toolkit.get_tools_in_agents(),
-            tool_use_behavior=StopAtTools(stop_at_tool_names=["final_answer"]),
+            # tool_use_behavior=StopAtTools(stop_at_tool_names=["final_answer"]),
         )
         self.agent_2 = SimpleAgent(
             name="tool_selection_agent",
@@ -111,20 +111,19 @@ class SimpleAgentGenerator:
         return task_recorder
 
     async def _start_streaming(self, task_recorder: GeneratorTaskRecorder, user_input: str):
-        await self.build()
+        # await self.build()
         await self.step1(task_recorder, user_input)
         await self.step2(task_recorder)
         await self.step3(task_recorder)
         await self.step4(task_recorder)
-        logging.info(f"generated final answer: {task_recorder.final_answer}")
         ofn, config = self.format_config(task_recorder)
-        task_recorder._event_queue.put_nowait(SimpleAgentGeneratedEvent(filename=ofn.name, config_content=config))
-        task_recorder._is_complete = True
         print(f"Config saved to {ofn}")
         print(f"task_recorder: {task_recorder}")
+        task_recorder._event_queue.put_nowait(SimpleAgentGeneratedEvent(filename=ofn.name, config_content=config))
+        task_recorder._is_complete = True
         return ofn
 
-    def format_config(self, task_recorder: GeneratorTaskRecorder) -> Union[str | Tuple[str, str]]:
+    def format_config(self, task_recorder: GeneratorTaskRecorder) -> str | tuple[str, str]:
         toolkits_includes = []
         toolkits_configs = []
         for toolkit_name, tool_names in task_recorder.selected_tools.items():
@@ -138,7 +137,7 @@ class SimpleAgentGenerator:
         )
         ofn = self.output_dir / f"{task_recorder.name}.yaml"
         ofn.write_text(config)
-        
+
         if self.mode == "webui":
             return ofn, config
         return ofn
@@ -186,12 +185,13 @@ class SimpleAgentGenerator:
         async with self.agent_4 as agent:
             result = agent.run_streamed(task_recorder.requirements)
             await self._process_streamed(result, task_recorder)
+            print(f"\033[91mresult.final_output: {result.final_output}\033[0m")
             name = result.final_output
             if len(name) > 50 or " " in name:
                 logger.warning(f"Generated name is too long or contains spaces: {name}")
                 name = name[:50].replace(" ", "_")
             task_recorder.name = name
-    
+
     async def _handle_final_answer_event(self, event):
         if isinstance(event, RawResponsesStreamEvent):
             if event.data.type == "response.output_item.done":
@@ -207,15 +207,19 @@ class SimpleAgentGenerator:
                 call_id = item.raw_item["call_id"]
                 if call_id == self.final_answer_call_id:
                     self.final_answer_call_id = None
-                    return True
-        return False
+                    return item.raw_item["output"]
+        return None
 
     async def _process_streamed(self, run_result_streaming: RunResultStreaming, task_recorder: GeneratorTaskRecorder):
         if self.mode == "local":
             await AgentsUtils.print_stream_events(run_result_streaming.stream_events())
         else:
-            async for event in run_result_streaming.stream_events():
+            stream = run_result_streaming
+            async for event in stream.stream_events():
                 task_recorder._event_queue.put_nowait(event)
+                # red print
+                print(f"\033[91mevent: {event}\033[0m")
+                print("\033[91mwait for next event\033[0m")
                 should_stop = await self._handle_final_answer_event(event)
                 if should_stop:
                     break

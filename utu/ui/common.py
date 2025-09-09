@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent
 
+
 class TextDeltaContent(BaseModel):
     type: Literal["reason", "tool_call", "tool_call_argument", "tool_call_output", "text"]
     delta: str
@@ -68,7 +69,19 @@ class GeneratedAgentContent(BaseModel):
     config_content: str
 
 class Event(BaseModel):
-    type: Literal["raw", "init", "orchestra", "finish", "example", "new", "list_agents", "switch_agent", "ask", "gen_agent", "generated_agent_config"]
+    type: Literal[
+        "raw",
+        "init",
+        "orchestra",
+        "finish",
+        "example",
+        "new",
+        "list_agents",
+        "switch_agent",
+        "ask",
+        "gen_agent",
+        "generated_agent_config"
+    ]
     data: TextDeltaContent |\
         OrchestraContent |\
         GeneratedAgentContent |\
