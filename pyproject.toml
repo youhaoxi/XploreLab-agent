@@ -73,6 +73,12 @@ gaia = [
     "xls2xlsx>=0.2.0",
     "xmltodict>=0.15.0",
 ]
+python-executor = [
+    "matplotlib>=3.10.3",
+    "pandas>=2.3.1",
+    "scipy>=1.16.1",
+    "seaborn>=0.13.2",
+]
 
 
 [build-system]
