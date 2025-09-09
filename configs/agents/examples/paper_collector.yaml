@@ -2,8 +2,8 @@
 defaults:
   - /model/base@planner_model
   - /model/base@reporter_model
-  - /simple_agents/search_agent@workers.SearchAgent
-  - /simple_agents/paper_summarize_agent@workers.PaperSummarizeAgent
+  - /agents/simple_agents/search_agent@workers.SearchAgent
+  - /agents/simple_agents/paper_summarize_agent@workers.PaperSummarizeAgent
   - _self_
 
 
