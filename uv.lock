@@ -4234,6 +4234,7 @@ gaia = [
     { name = "xmltodict" },
 ]
 python-executor = [
+    { name = "chardet" },
     { name = "matplotlib" },
     { name = "pandas" },
     { name = "scipy" },
@@ -4305,6 +4306,7 @@ gaia = [
     { name = "xmltodict", specifier = ">=0.15.0" },
 ]
 python-executor = [
+    { name = "chardet", specifier = ">=5.2.0" },
     { name = "matplotlib", specifier = ">=3.10.3" },
     { name = "pandas", specifier = ">=2.3.1" },
     { name = "scipy", specifier = ">=1.16.1" },

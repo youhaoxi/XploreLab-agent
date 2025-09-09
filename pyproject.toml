@@ -74,6 +74,7 @@ gaia = [
     "xmltodict>=0.15.0",
 ]
 python-executor = [
+    "chardet>=5.2.0",
     "matplotlib>=3.10.3",
     "pandas>=2.3.1",
     "scipy>=1.16.1",
