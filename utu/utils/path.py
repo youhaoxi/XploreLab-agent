@@ -78,5 +78,5 @@ class FileUtils:
                 fn += ".yaml"
             fn = DIR_ROOT / "utu" / "prompts" / fn
         assert fn.exists(), f"File {fn} does not exist!"
-        with fn.open() as f:
+        with open(fn, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
