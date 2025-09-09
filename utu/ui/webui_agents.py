@@ -32,6 +32,7 @@ from .common import (
     handle_orchestra_events,
     handle_raw_stream_events,
     handle_tool_call_output,
+    handle_generated_agent,
 )
 
 CONFIG_PATH = "configs/agents"
@@ -114,7 +115,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             elif isinstance(event, OrchestraStreamEvent):
                 event_to_send = await handle_orchestra_events(event)
             elif isinstance(event, SimpleAgentGeneratedEvent):
-                pass
+                event_to_send = await handle_generated_agent(event)
             else:
                 pass
             if event_to_send:

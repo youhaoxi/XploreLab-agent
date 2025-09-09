@@ -141,7 +141,7 @@ class SimpleAgentGenerator:
         ofn, config = self.format_config(task_recorder)
         print(f"Config saved to {ofn}")
         print(f"task_recorder: {task_recorder}")
-        event = SimpleAgentGeneratedEvent(filename=ofn, config_content=config)
+        event = SimpleAgentGeneratedEvent(filename=str(ofn), config_content=config)
         yield event
 
     # async def _start_streaming(self, task_recorder: GeneratorTaskRecorder, user_input: str):

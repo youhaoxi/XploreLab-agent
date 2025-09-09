@@ -296,17 +296,22 @@ const App: React.FC = () => {
       // add a prompt message
       const message: Message = {
         id: Date.now(),
-        content: "Hello, please let me know your requirement",
+        content: "Hello, please let me know your requirement. What agent do you want to generate?",
         sender: 'assistant',
         timestamp: new Date(),
         type: 'text',
         inprogress: false,
         requireConfirm: false,
       };
-      setMessages(prev => [...prev, message]);
-      setIsModelResponding(false);
+      // after 1s
+      setTimeout(() => {
+        setMessages(prev => [...prev, message]);
+        setIsModelResponding(false);
+      }, 500);
       setIsGeneratingAgent(true);
       setCurrentConfig("generate_agent");
+      // collapse config panel
+      setChatInputLoadingState("hide");
     } else {
       console.error('Unknown event type:', event.type);
     }

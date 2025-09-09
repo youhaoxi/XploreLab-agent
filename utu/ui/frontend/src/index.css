@@ -38,7 +38,7 @@
   --action-button-primary-text: #2e7d32;
   --action-button-primary-border: rgba(76, 175, 80, 0.3);
   --action-button-primary-hover: rgba(76, 175, 80, 0.2);
-  --config-display-color: rgba(216, 216, 216, 0.84);
+  --config-display-color: rgb(222, 222, 222);
 }
 
 body {
@@ -370,8 +370,9 @@ body {
   bottom: 50px;
   z-index: 100;
   background: rgba(255, 255, 255, 0);
-  width: min(100vw, 40rem);
-  left: calc((100vw - min(100vw, 40rem))/2);
+  --width: min(100vw, 40rem);
+  width: var(--width);
+  left: calc((100vw - var(--width))/2);
 }
 
 .send-button {
@@ -836,7 +837,7 @@ details[open] > .message-detail-content:has(.report-content) {
     --action-button-primary-text: #81c784;
     --action-button-primary-border: rgba(102, 187, 106, 0.4);
     --action-button-primary-hover: rgba(102, 187, 106, 0.3);
-    --config-display-color: rgba(46, 46, 46, 0.278);
+    --config-display-color: rgba(13, 13, 13);
   }
 }
 
@@ -1266,8 +1267,9 @@ details[open] > .message-detail-content:has(.report-content) {
   background-color: var(--config-display-color);
   position: fixed;
   bottom: calc(50px + 0.5rem);
-  width: min(100vw, calc(40rem - 1rem));
-  left: calc((100vw - min(100vw, calc(40rem - 1rem)))/2);
+  --width: min(100vw - 1rem, calc(40rem - 1rem));
+  width: var(--width);
+  left: calc((100vw - var(--width))/2);
   padding-bottom: 2.7rem;
 }
 
@@ -1302,11 +1304,15 @@ details[open] > .message-detail-content:has(.report-content) {
   margin: 0.5rem;
   flex-wrap: wrap;
   align-items: center;
-  border: 1px solid var(--color-subtle-text);
-  border-radius: 1.2rem;
+  /* border: 1px solid var(--color-subtle-text); */
+  /* border-radius: 1.2rem; */
+  max-height: min(40vh, 30rem);
+  overflow-y: scroll;
+  /* background-color: #1e1e1e; */
 }
 
 .config-option {
+  flex: 1;
   font-size: 0.8rem;
   color: var(--color-subtle-text);
   background-color: var(--color-detail-bg);
@@ -1322,6 +1328,7 @@ details[open] > .message-detail-content:has(.report-content) {
 }
 
 .config-option.config-option-add {
+  flex: 0;
   color: white;
   background-color: var(--color-accent);
 }
