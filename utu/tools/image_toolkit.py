@@ -24,9 +24,9 @@ class ImageToolkit(AsyncBaseToolkit):
         super().__init__(config)
         image_llm_config = {
             "type": EnvUtils.get_env("UTU_IMAGE_LLM_TYPE", "chat.completions"),
-            "model": EnvUtils.get_env("UTU_IMAGE_LLM_MODEL"),
-            "api_key": EnvUtils.get_env("UTU_IMAGE_LLM_API_KEY"),
-            "base_url": EnvUtils.get_env("UTU_IMAGE_LLM_BASE_URL"),
+            "model": EnvUtils.get_env("UTU_IMAGE_LLM_MODEL", "please_set_image_llm_model"),
+            "api_key": EnvUtils.get_env("UTU_IMAGE_LLM_API_KEY", "please_set_image_llm_api_key"),
+            "base_url": EnvUtils.get_env("UTU_IMAGE_LLM_BASE_URL", "please_set_image_llm_base_url"),
         }
         self.llm = SimplifiedAsyncOpenAI(**image_llm_config)
 

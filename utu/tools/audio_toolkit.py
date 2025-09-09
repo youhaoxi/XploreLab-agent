@@ -15,8 +15,8 @@ class AudioToolkit(AsyncBaseToolkit):
         # For audio transcribe, we use OpenAI's API
         self.client = SimplifiedAsyncOpenAI(
             model=config.config["audio_model"]["model"],
-            api_key=EnvUtils.get_env("OPENAI_API_KEY"),
-            base_url=EnvUtils.get_env("OPENAI_BASE_URL"),
+            api_key=EnvUtils.get_env("OPENAI_API_KEY", "please_set_openai_api_key"),
+            base_url=EnvUtils.get_env("OPENAI_BASE_URL", "please_set_openai_base_url"),
         )
         self.llm = SimplifiedAsyncOpenAI(**config.config_llm.model_provider.model_dump())
         self.md5_to_path = {}
