@@ -32,6 +32,10 @@ class ToolkitConfig(ConfigBaseModel):
     """Customized toolkit filepath."""
     customized_classname: str | None = None
     """Customized toolkit classname."""
+    mcp_transport: Literal["stdio", "sse", "http"] = "stdio"
+    """MCP transport."""
+    mcp_client_session_timeout_seconds: int = 5
+    """The read timeout passed to the MCP ClientSession."""
 
 
 class ContextManagerConfig(ConfigBaseModel):

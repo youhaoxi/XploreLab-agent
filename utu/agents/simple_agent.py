@@ -18,7 +18,7 @@ from agents import (
     TResponseInputItem,
     trace,
 )
-from agents.mcp import MCPServer, MCPServerStdio
+from agents.mcp import MCPServer, MCPServerSse, MCPServerStdio, MCPServerStreamableHttp
 
 from ..config import AgentConfig, ConfigLoader, ToolkitConfig
 from ..context import BaseContextManager, build_context_manager
@@ -133,14 +133,14 @@ class SimpleAgent(BaseAgent):
         tools_list += await self.env.get_tools()  # add env tools
         # TODO: handle duplicate tool names
         for _, toolkit_config in self.config.toolkits.items():
-            if toolkit_config.mode == "mcp":
-                await self._load_mcp_server(toolkit_config)
-            elif toolkit_config.mode == "builtin":
+            if toolkit_config.mode == "builtin":
                 toolkit = await self._load_toolkit(toolkit_config)
                 tools_list.extend(await toolkit.get_tools_in_agents())
             elif toolkit_config.mode == "customized":
                 toolkit = await self._load_customized_toolkit(toolkit_config)
                 tools_list.extend(await toolkit.get_tools_in_agents())
+            elif toolkit_config.mode == "mcp":
+                await self._load_mcp_server(toolkit_config)
             else:
                 raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
         tool_names = [tool.name for tool in tools_list]
@@ -164,13 +164,33 @@ class SimpleAgent(BaseAgent):
 
     async def _load_mcp_server(self, toolkit_config: ToolkitConfig) -> MCPServer:
         logger.info(f"Loading MCP server `{toolkit_config.name}` with params {toolkit_config.config}")
-        server = await self._mcps_exit_stack.enter_async_context(
-            MCPServerStdio(  # FIXME: support other types of servers
-                name=toolkit_config.name,
-                params=toolkit_config.config,
-                client_session_timeout_seconds=20,
-            )
-        )
+        match toolkit_config.mcp_transport:
+            case "stdio":
+                server = await self._mcps_exit_stack.enter_async_context(
+                    MCPServerStdio(
+                        name=toolkit_config.name,
+                        params=toolkit_config.config,
+                        client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
+                    )
+                )
+            case "sse":
+                server = await self._mcps_exit_stack.enter_async_context(
+                    MCPServerSse(
+                        name=toolkit_config.name,
+                        params=toolkit_config.config,
+                        client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
+                    )
+                )
+            case "http":
+                server = await self._mcps_exit_stack.enter_async_context(
+                    MCPServerStreamableHttp(
+                        name=toolkit_config.name,
+                        params=toolkit_config.config,
+                        client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
+                    )
+                )
+            case _:
+                raise ValueError(f"Unknown MCP transport: {toolkit_config.mcp_transport}")
         self._mcp_servers.append(server)
         return server
 
