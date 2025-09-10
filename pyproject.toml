@@ -1,7 +1,7 @@
 [project]
 name = "Youtu-agent"
 version = "0.1.0"
-description = "a simple yet powerful agents framework"
+description = "Youtu-Agent is a simple but powerful framework for building, running, and evaluating agents."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
