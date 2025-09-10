@@ -10,6 +10,7 @@ import json
 from collections import defaultdict
 
 from agents import RunResultStreaming, StopAtTools, trace
+from agents._run_impl import QueueCompleteSentinel
 
 from ..agents import SimpleAgent
 from ..tools import UserInteractionToolkit, get_toolkits_map
@@ -92,7 +93,7 @@ class SimpleAgentGenerator:
             ofn = self.format_config(task_recorder)
             print(f"Config saved to {ofn}")
 
-    def run_streamed(self):
+    def run_streamed(self) -> GeneratorTaskRecorder:
         with trace("simple_agent_generator"):
             task_recorder = GeneratorTaskRecorder()
             task_recorder._run_impl_task = asyncio.create_task(self._start_streaming(task_recorder))
@@ -105,9 +106,9 @@ class SimpleAgentGenerator:
         await self.step3(task_recorder)
         await self.step4(task_recorder)
         ofn = self.format_config(task_recorder)
+        task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
         task_recorder._is_complete = True
         print(f"Config saved to {ofn}")
-        print(f"task_recorder: {task_recorder}")
         return ofn
 
     def format_config(self, task_recorder: GeneratorTaskRecorder) -> str:

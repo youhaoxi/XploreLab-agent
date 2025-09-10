@@ -29,11 +29,13 @@ class DataClassWithStreamEvents:
                 self._is_complete = True
                 break
 
+            # print(f"self._is_complete: {self._is_complete}, self._event_queue: {self._event_queue}")
             if self._is_complete and self._event_queue.empty():
                 break
             try:
                 item = await self._event_queue.get()
             except asyncio.CancelledError:
+                logger.debug("Breaking due to asyncio.CancelledError")
                 break
             if isinstance(item, QueueCompleteSentinel):
                 self._event_queue.task_done()
