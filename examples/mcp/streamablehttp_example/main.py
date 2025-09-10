@@ -1,4 +1,4 @@
-"""Example usage of MCP with SSE transport
+"""Example usage of MCP with streamable_http transport
 
 - config: configs/agents/examples/mcp/streamablehttp_example.yaml
 
