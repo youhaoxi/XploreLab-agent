@@ -25,11 +25,18 @@ def register_tool(name: str = None):
         @register_tool  # uses method name
         @register_tool()  # uses method name
         @register_tool("custom_name")  # uses custom name
+
+    Args:
+        name (str, optional): The name of the tool. (Also support passing the function)
     """
 
     def decorator(func: Callable):
+        if isinstance(name, str):
+            tool_name = name
+        else:
+            tool_name = func.__name__
         func._is_tool = True
-        func._tool_name = name or func.__name__
+        func._tool_name = tool_name
         return func
 
     if callable(name):
