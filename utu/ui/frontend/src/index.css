@@ -33,6 +33,18 @@
   --color-example-text: #f0f0f0;
   --color-message-confirm-bg: #f9f9f9;
   
+  /* Modal Colors */
+  --modal-bg: #ffffff;
+  --modal-text: #333333;
+  --modal-border: #e0e0e0;
+  --modal-button-bg: #f5f5f5;
+  --modal-button-hover: #e0e0e0;
+  --modal-button-primary: #4a6cf7;
+  --modal-button-primary-hover: #3a5bd9;
+  --modal-input-bg: #ffffff;
+  --modal-input-border: #e0e0e0;
+  --modal-input-text: #333333;
+  
   /* Action Button Colors */
   --action-button-primary-bg: rgba(76, 175, 80, 0.1);
   --action-button-primary-text: #2e7d32;
@@ -919,7 +931,167 @@ details[open] > .message-detail-content:has(.report-content) {
   gap: 1rem;
 }
 
-/* Responsive adjustments */
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background-color: var(--modal-bg);
+  color: var(--modal-text);
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--color-text);
+  font-size: 1.25rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--modal-input-border);
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: var(--modal-input-bg);
+  color: var(--modal-input-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input[type="text"]:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--modal-button-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.modal-actions button:hover {
+  background-color: var(--modal-button-hover);
+}
+
+.modal-actions button.primary {
+  background-color: var(--modal-button-primary);
+  color: white;
+  border-color: var(--modal-button-primary);
+}
+
+.modal-actions button.primary:hover {
+  background-color: var(--modal-button-primary-hover);
+  border-color: var(--modal-button-primary-hover);
+}
+
+/* Settings button */
+.settings-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  z-index: 100;
+  padding: 8px;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background-color: var(--color-button-bg);
+  border: 1px solid var(--color-border);
+}
+
+.settings-button:hover {
+  background-color: var(--color-row-hover);
+  color: var(--color-accent);
+  transform: rotate(30deg);
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --modal-bg: #2d3748;
+    --modal-text: #e2e8f0;
+    --modal-border: #4a5568;
+    --modal-button-bg: #4a5568;
+    --modal-button-hover: #2d3748;
+    --modal-button-primary: #4a6cf7;
+    --modal-button-primary-hover: #3a5bd9;
+    --modal-input-bg: #2d3748;
+    --modal-input-border: #4a5568;
+    --modal-input-text: #e2e8f0;
+  }
+  
+  .settings-button {
+    background-color: var(--modal-button-bg);
+    border-color: var(--modal-border);
+  }
+  
+  .settings-button:hover {
+    background-color: var(--modal-button-hover);
+  }
+}
+
+/* Responsive Design */adjustments */
 @media (max-width: 600px) {
   .settings-modal {
     width: 90%;
@@ -1338,7 +1510,6 @@ details[open] > .message-detail-content:has(.report-content) {
 }
 
 .modal-content {
-  background-color: white;
   padding: 20px;
   border-radius: 8px;
   max-width: 500px;
