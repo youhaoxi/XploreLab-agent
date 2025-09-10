@@ -58,8 +58,8 @@ Click on the images to view detailed videos.
   </tr>
   <tr>
     <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
-      <video src="https://github.com/user-attachments/assets/b6aba820-368e-427f-ba71-85543a751775" 
-             poster="https://img.youtube.com/vi/SCR4Ru8_h5Q/sddefault.jpg" 
+      <video src="https://github.com/user-attachments/assets/60193435-b89d-47d3-8153-5799d6ff2920" 
+             poster="https://img.youtube.com/vi/r9we4m1cB6M/sddefault.jpg" 
              controls muted preload="metadata" 
              width="100%" height="300"
              style="object-fit: cover; border-radius: 8px;"></video>
@@ -328,12 +328,24 @@ Results are stored and can be further analyzed in the evaluation platform. See [
 
 📖 Learn more: [Evaluation Documentation](https://tencentcloudadp.github.io/youtu-agent/eval)
 
+## 📖 Dive Deeper
+
+After getting started, you can learn more about the framework and its capabilities through our full documentation:
+
+- 📖 **[Full Documentation](https://tencentcloudadp.github.io/youtu-agent/)**: Explore the core concepts, architecture, and advanced features.
+- 🚀 **[Quickstart Guide](https://tencentcloudadp.github.io/youtu-agent/quickstart/)**: A detailed guide to get you up and running.
+- ❓ **[FAQ](https://tencentcloudadp.github.io/youtu-agent/faq)**: Find answers to common questions and issues.
+
 ## 🙏 Acknowledgements
 
 This project builds upon the excellent work of several open-source projects:
 - [openai-agents](https://github.com/openai/openai-agents-python)
 - [mkdocs-material](https://github.com/squidfunk/mkdocs-material)
 - [model-context-protocol](https://github.com/modelcontextprotocol/python-sdk)
+
+## 🙌 Contributing
+
+We welcome contributions from the community! If you'd like to help improve Youtu-Agent, please read our [**Contributing Guidelines**](./CONTRIBUTING.md) to get started.
 
 ## 📚 Citation
 

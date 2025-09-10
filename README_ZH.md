@@ -47,8 +47,8 @@
 <table border="1" style="border-collapse: collapse;">
   <tr>
     <td style="border: 1px solid black; padding: 10px;">
-      <a href="https://www.youtube.com/watch?v=SCR4Ru8_h5Q">
-        <img src="https://img.youtube.com/vi/SCR4Ru8_h5Q/0.jpg" alt="Data Analysis" width="420" height="236">
+      <a href="https://www.youtube.com/watch?v=r9we4m1cB6M">
+        <img src="https://img.youtube.com/vi/r9we4m1cB6M/0.jpg" alt="Data Analysis" width="420" height="236">
       </a>
       <br><strong>数据分析</strong><br>分析 CSV 文件并生成 HTML 报告。
     </td>
@@ -293,12 +293,24 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
 
 📖 更多内容请参考：[评测文档](https://tencentcloudadp.github.io/youtu-agent/eval)
 
+## 📖 深入了解
+
+快速上手之后，您可以通过我们的完整文档深入了解框架及其功能：
+
+- 📖 **[完整文档](https://tencentcloudadp.github.io/youtu-agent/)**: 探索核心概念、架构和高级功能。
+- 🚀 **[快速入门指南](https://tencentcloudadp.github.io/youtu-agent/quickstart/)**: 详细的入门指南，助您快速启动和运行。
+- ❓ **[常见问题解答](https://tencentcloudadp.github.io/youtu-agent/faq)**: 查找常见问题与解答。
+
 ## 🙏 致谢
 
 本项目基于以下优秀开源项目：
 - [openai-agents](https://github.com/openai/openai-agents-python)
 - [mkdocs-material](https://github.com/squidfunk/mkdocs-material)
 - [model-context-protocol](https://github.com/modelcontextprotocol/python-sdk)
+
+## 🙌 参与贡献
+
+我们欢迎来自社区的贡献！如果您希望帮助改进 Youtu-Agent，请阅读我们的 [**贡献指南**](./CONTRIBUTING.md) 开始。
 
 ## 📚 引用
 

@@ -18,13 +18,13 @@ from agents import (
     TResponseInputItem,
     trace,
 )
-from agents.mcp import MCPServer, MCPServerStdio
+from agents.mcp import MCPServer, MCPServerSse, MCPServerStdio, MCPServerStreamableHttp
 
 from ..config import AgentConfig, ConfigLoader, ToolkitConfig
 from ..context import BaseContextManager, build_context_manager
 from ..env import BaseEnv, get_env
 from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
-from ..utils import AgentsUtils, get_logger
+from ..utils import AgentsUtils, get_logger, load_class_from_file
 from .base_agent import BaseAgent
 from .common import TaskRecorder
 
@@ -133,11 +133,14 @@ class SimpleAgent(BaseAgent):
         tools_list += await self.env.get_tools()  # add env tools
         # TODO: handle duplicate tool names
         for _, toolkit_config in self.config.toolkits.items():
-            if toolkit_config.mode == "mcp":
-                await self._load_mcp_server(toolkit_config)
-            elif toolkit_config.mode == "builtin":
+            if toolkit_config.mode == "builtin":
                 toolkit = await self._load_toolkit(toolkit_config)
                 tools_list.extend(await toolkit.get_tools_in_agents())
+            elif toolkit_config.mode == "customized":
+                toolkit = await self._load_customized_toolkit(toolkit_config)
+                tools_list.extend(await toolkit.get_tools_in_agents())
+            elif toolkit_config.mode == "mcp":
+                await self._load_mcp_server(toolkit_config)
             else:
                 raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
         tool_names = [tool.name for tool in tools_list]
@@ -151,15 +154,43 @@ class SimpleAgent(BaseAgent):
         self._toolkits.append(toolkit)
         return toolkit
 
+    async def _load_customized_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
+        logger.info(f"Loading customized toolkit `{toolkit_config.name}` with config {toolkit_config}")
+        assert toolkit_config.customized_filepath is not None and toolkit_config.customized_classname is not None
+        toolkit_class = load_class_from_file(toolkit_config.customized_filepath, toolkit_config.customized_classname)
+        toolkit = await self._tools_exit_stack.enter_async_context(toolkit_class(toolkit_config))
+        self._toolkits.append(toolkit)
+        return toolkit
+
     async def _load_mcp_server(self, toolkit_config: ToolkitConfig) -> MCPServer:
         logger.info(f"Loading MCP server `{toolkit_config.name}` with params {toolkit_config.config}")
-        server = await self._mcps_exit_stack.enter_async_context(
-            MCPServerStdio(  # FIXME: support other types of servers
-                name=toolkit_config.name,
-                params=toolkit_config.config,
-                client_session_timeout_seconds=20,
-            )
-        )
+        match toolkit_config.mcp_transport:
+            case "stdio":
+                server = await self._mcps_exit_stack.enter_async_context(
+                    MCPServerStdio(
+                        name=toolkit_config.name,
+                        params=toolkit_config.config,
+                        client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
+                    )
+                )
+            case "sse":
+                server = await self._mcps_exit_stack.enter_async_context(
+                    MCPServerSse(
+                        name=toolkit_config.name,
+                        params=toolkit_config.config,
+                        client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
+                    )
+                )
+            case "streamable_http":
+                server = await self._mcps_exit_stack.enter_async_context(
+                    MCPServerStreamableHttp(
+                        name=toolkit_config.name,
+                        params=toolkit_config.config,
+                        client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
+                    )
+                )
+            case _:
+                raise ValueError(f"Unknown MCP transport: {toolkit_config.mcp_transport}")
         self._mcp_servers.append(server)
         return server
 

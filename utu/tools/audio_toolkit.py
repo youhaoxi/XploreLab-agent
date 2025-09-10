@@ -10,12 +10,11 @@ logger = get_logger(__name__)
 class AudioToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        # For audio transcribe, we use OpenAI's API
-        self.client = SimplifiedAsyncOpenAI(
-            model=config.config["audio_model"]["model"],
-            api_key=EnvUtils.get_env("OPENAI_API_KEY"),  # NOTE: you should set these envs in .env
-            base_url=EnvUtils.get_env("OPENAI_BASE_URL"),
+        self.audio_client = SimplifiedAsyncOpenAI(
+            api_key=EnvUtils.get_env("UTU_AUDIO_LLM_API_KEY"),  # NOTE: you should set these envs in .env
+            base_url=EnvUtils.get_env("UTU_AUDIO_LLM_BASE_URL"),
         )
+        self.audio_model = EnvUtils.get_env("UTU_AUDIO_LLM_MODEL")
         self.llm = SimplifiedAsyncOpenAI(**config.config_llm.model_provider.model_dump())
         self.md5_to_path = {}
 
@@ -23,8 +22,8 @@ class AudioToolkit(AsyncBaseToolkit):
     async def transcribe(self, md5: str) -> dict:
         # model: gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1
         fn = self.md5_to_path[md5]
-        transcript: TranscriptionVerbose = await self.client.audio.transcriptions.create(
-            model=self.config.config["audio_model"]["model"],
+        transcript: TranscriptionVerbose = await self.audio_client.audio.transcriptions.create(
+            model=self.audio_model,
             file=open(fn, "rb"),
             response_format="verbose_json",
             timestamp_granularities=["segment"],
