@@ -1091,7 +1091,7 @@ details[open] > .message-detail-content:has(.report-content) {
   }
 }
 
-/* Responsive Design */adjustments */
+/* Responsive Design adjustments */
 @media (max-width: 600px) {
   .settings-modal {
     width: 90%;
