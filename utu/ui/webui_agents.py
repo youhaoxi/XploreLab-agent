@@ -28,6 +28,8 @@ from .common import (
     UserAnswer,
     UserQuery,
     UserRequest,
+    WorkerDescription,
+    OrchestraDescription,
     handle_generated_agent,
     handle_new_agent,
     handle_orchestra_events,
@@ -58,7 +60,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         return True
 
     def _get_config_name(self):
-        return os.path.basename(self.default_config_filename)
+        return os.path.relpath(self.default_config_filename)
 
     async def ask_user(self, question: str) -> str:
         event_to_send = Event(
@@ -71,14 +73,37 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         assert isinstance(answer, UserAnswer)
         assert answer.ask_id == event_to_send.data.ask_id
         return answer.answer
+    
+    def _get_current_agent_content(self):
+        agent = self._get_config_name()
+        agent_type = "simple"
+        sub_agents = None
+        if isinstance(self.agent, OrchestraAgent):
+            agent_type = "orchestra"
+            sub_agents = [worker for worker in self.agent.config.workers.keys()]
+            sub_agents.append("PlannerAgent")
+            sub_agents.append("ReporterAgent")
+        elif isinstance(self.agent, SimpleAgent):
+            agent_type = "simple"
+        else:
+            agent_type = "other"
+            if isinstance(self.agent, SimpleAgentGenerator):
+                sub_agents = ["clarification_agent", "tool_selection_agent", "instructions_generation_agent", "name_generation_agent"]
+    
+        return dict(
+            type="init", 
+            default_agent=agent, 
+            agent_type=agent_type, 
+            sub_agents=sub_agents,
+        )
 
     async def open(self):
         # start query worker
         self.query_worker_task = asyncio.create_task(self.handle_query_worker())
         self.answer_queue = asyncio.Queue()
 
-        event_to_send = Event(type="init", data=InitContent(type="init", default_agent=self._get_config_name()))
-        await self.send_event(event_to_send)
+        content = self._get_current_agent_content()
+        await self.send_event(Event(type="init", data=InitContent(**content)))
 
     async def send_event(self, event: Event):
         logging.debug(f"Sending event: {event.model_dump()}")
@@ -161,6 +186,19 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     async def _handle_switch_agent_noexcept(self, switch_agent_request: SwitchAgentRequest):
         config = ConfigLoader.load_agent_config(switch_agent_request.config_file)
         await self.instantiate_agent(config)
+        content = self._get_current_agent_content()
+        await self.send_event(
+            Event(
+                type="switch_agent",
+                data=SwitchAgentContent(
+                    type="switch_agent", 
+                    ok=True, 
+                    name=switch_agent_request.config_file,
+                    agent_type=content["agent_type"],
+                    sub_agents=content["sub_agents"],
+                ),
+            )
+        )
 
     async def _handle_query(self, query: UserQuery):
         try:
@@ -179,12 +217,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     async def _handle_switch_agent(self, switch_agent_request: SwitchAgentRequest):
         try:
             await self._handle_switch_agent_noexcept(switch_agent_request)
-            await self.send_event(
-                Event(
-                    type="switch_agent",
-                    data=SwitchAgentContent(type="switch_agent", ok=True, name=switch_agent_request.config_file),
-                )
-            )
         except Exception as e:
             logging.error(f"Error processing switch agent: {str(e)}")
             logging.debug(traceback.format_exc())

@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 import agents as ag
 from pydantic import BaseModel
@@ -6,6 +6,17 @@ from pydantic import BaseModel
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent
 
+class WorkerDescription(BaseModel):
+    name: str
+    desc: str
+    strengths: list[str]
+    weaknesses: list[str]
+
+
+class OrchestraDescription(BaseModel):
+    workers: list[WorkerDescription]
+    planner: str
+    reporter: str
 
 class TextDeltaContent(BaseModel):
     type: Literal["reason", "tool_call", "tool_call_argument", "tool_call_output", "text"]
@@ -53,11 +64,15 @@ class SwitchAgentContent(BaseModel):
     type: Literal["switch_agent"] = "switch_agent"
     ok: bool
     name: str
+    agent_type: Literal["simple", "orchestra", "other"]
+    sub_agents: Optional[list[str]] = None
 
 
 class InitContent(BaseModel):
     type: Literal["init"] = "init"
     default_agent: str
+    agent_type: Literal["simple", "orchestra", "other"]
+    sub_agents: Optional[list[str]] = None
 
 
 class AskContent(BaseModel):
