@@ -155,7 +155,7 @@ class SimpleAgentGenerator:
 
     async def step2(self, task_recorder: GeneratorTaskRecorder) -> None:
         """Select useful tools from available toolkits. Return: {toolkit_name: [tool_name, ...]}"""
-        available_toolkits = ["search", "document", "image", "audio", "bash", "tabular"]
+        available_toolkits = ["search", "document", "image", "audio", "bash"]
         toolkits_map = get_toolkits_map(names=available_toolkits)
         tools_descs = []
         tool_to_toolkit_name = {}
