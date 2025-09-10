@@ -58,7 +58,7 @@ const App: React.FC = () => {
   const [hasUserSentMessage, setHasUserSentMessage] = useState(false);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [availableConfigs, setAvailableConfigs] = useState<string[]>([]);
-  const [isGeneratingAgent, setIsGeneratingAgent] = useState(false);
+  const [_isGeneratingAgent, setIsGeneratingAgent] = useState(false);
   const [askId, setAskId] = useState<string | null>(null);
 
   const getConfigList = () => {
@@ -392,12 +392,12 @@ const App: React.FC = () => {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isModelResponding) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter' && !e.shiftKey && !isModelResponding) {
+  //     e.preventDefault();
+  //     handleSendMessage();
+  //   }
+  // };
 
   const downloadReport = (content: any, contentType: "html" | "svg" | "markdown") => {
     try {

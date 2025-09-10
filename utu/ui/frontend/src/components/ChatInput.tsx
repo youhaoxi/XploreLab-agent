@@ -1,4 +1,4 @@
-import React, { type FC, type KeyboardEvent, useState, useRef, useEffect } from 'react';
+import React, { type FC, type KeyboardEvent, useRef, useEffect } from 'react';
 
 export type ChatInputLoadingState = "loading" | "ready" | "hide";
 
