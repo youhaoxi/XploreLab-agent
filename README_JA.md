@@ -247,12 +247,24 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
 
 📖 詳細については：[評価ドキュメント](https://tencentcloudadp.github.io/youtu-agent/eval) を参照してください。
 
+## 📖 さらに詳しく
+
+クイックスタートを終えたら、完全なドキュメントを通じてフレームワークとその機能についてさらに学ぶことができます：
+
+- 📖 **[完全なドキュメント](https://tencentcloudadp.github.io/youtu-agent/)**: コアコンセプト、アーキテクチャ、および高度な機能をご覧ください。
+- 🚀 **[クイックスタートガイド](https://tencentcloudadp.github.io/youtu-agent/quickstart/)**: 迅速にセットアップして実行するための詳細なガイドです。
+- ❓ **[よくある質問](https://tencentcloudadp.github.io/youtu-agent/faq)**: よくある質問とその回答をご覧ください。
+
 ## 🙏 お礼の言葉
 
 このプロジェクトは、以下の優れたオープンソースプロジェクトをベースにしています：
 - [openai-agents](https://github.com/openai/openai-agents-python)
 - [mkdocs-material](https://github.com/squidfunk/mkdocs-material)
 - [model-context-protocol](https://github.com/modelcontextprotocol/python-sdk)
+
+## 🙌 貢献
+
+私たちはコミュニティからの貢献を歓迎します！Youtu-Agentの改善にご協力いただける場合は、まず[**貢献ガイドライン**](./CONTRIBUTING.md)をお読みください。
 
 ## 📚 引用
 
