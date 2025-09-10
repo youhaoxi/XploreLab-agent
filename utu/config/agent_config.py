@@ -18,14 +18,20 @@ class ProfileConfig(ConfigBaseModel):
 class ToolkitConfig(ConfigBaseModel):
     """Toolkit config."""
 
-    mode: Literal["builtin", "mcp"] = "builtin"
+    mode: Literal["builtin", "customized", "mcp"] = "builtin"
+    """Toolkit mode."""
     name: str | None = None
+    """Toolkit name."""
     activated_tools: list[str] | None = None
     """Activated tools, if None, all tools will be activated."""
     config: dict | None = Field(default_factory=dict)
     """Toolkit config."""
     config_llm: ModelConfigs | None = None
     """LLM config if used in toolkit."""
+    customized_filepath: str | None = None
+    """Customized toolkit filepath."""
+    customized_classname: str | None = None
+    """Customized toolkit classname."""
 
 
 class ContextManagerConfig(ConfigBaseModel):
