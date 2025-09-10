@@ -36,14 +36,11 @@ class AudioAnalysisToolkit(AsyncBaseToolkit):
         self.cache_dir = "workspace/transcription_cache"
         os.makedirs(self.cache_dir, exist_ok=True)
 
-        self.client = SimplifiedAsyncOpenAI(
-            # model=os.getenv("ZHIPUAI_MODEL"),  # "glm-asr"
-            # api_key=os.getenv("ZHIPUAI_API_KEY"),
-            # base_url=os.getenv("ZHIPUAI_API_BASE"),
-            model=config.config["audio_model"]["model"],
-            api_key=EnvUtils.get_env("OPENAI_API_KEY"),
-            base_url=EnvUtils.get_env("OPENAI_BASE_URL"),
+        self.audio_client = SimplifiedAsyncOpenAI(
+            api_key=EnvUtils.get_env("UTU_AUDIO_LLM_API_KEY"),
+            base_url=EnvUtils.get_env("UTU_AUDIO_LLM_BASE_URL"),
         )
+        self.audio_model = EnvUtils.get_env("UTU_AUDIO_LLM_MODEL")
         self.llm = SimplifiedAsyncOpenAI(**config.config_llm.model_provider.model_dump())
 
     def get_audio_duration(self, file_path):
@@ -92,8 +89,8 @@ class AudioAnalysisToolkit(AsyncBaseToolkit):
             with open(os.path.join(self.cache_dir, f"{os.path.basename(audio_path)}.txt")) as f:
                 transcript = f.read().strip()
         else:
-            transcription = await self.client.audio.transcriptions.create(
-                model=self.config.config["audio_model"]["model"], file=open(audio_path, "rb")
+            transcription = await self.audio_client.audio.transcriptions.create(
+                model=self.audio_model, file=open(audio_path, "rb")
             )
 
             transcript = transcription.text
