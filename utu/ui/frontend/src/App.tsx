@@ -406,6 +406,7 @@ const App: React.FC = () => {
                 <div key={message.id} id={`message-${message.id}`}>
                   <MessageComponent
                     message={message}
+                    messageId={message.id.toString()}
                     showSender={showSender}
                     onDownloadReport={message.type === 'report' ? (content, contentType) => {
                       downloadReport(content, contentType);
