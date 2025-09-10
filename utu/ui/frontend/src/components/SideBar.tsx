@@ -128,9 +128,9 @@ const SideBar: React.FC<SideBarProps> = ({
         
         <div className="sidebar-divider" />
         
-        {/* History Section */}
+        {/* Agent History Section */}
         <div className="sidebar-section">
-          <div className="sidebar-section-title">HISTORY</div>
+          <div className="sidebar-section-title">AGENT HISTORY</div>
           <div className="agent-toc-list">
             {messages.filter(msg => msg.type === 'new_agent' && typeof msg.content === 'string').length > 0 ? (
               messages
