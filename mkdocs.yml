@@ -110,10 +110,11 @@ nav:
   - Documentation:
     - Config: config.md
     - Agents: agents.md
-    - Agent Environments: env.md
     - Tools: tools.md
     - Evaluation: eval.md
+    - Agent Environments: env.md
     - WebUI: frontend.md
+    - Environment Variables: environment_variables.md
   - Examples: 
     - Examples: examples.md
     - Examples Output:
