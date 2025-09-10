@@ -370,9 +370,6 @@ body {
   bottom: 50px;
   z-index: 100;
   background: rgba(255, 255, 255, 0);
-  --width: min(100vw, 40rem);
-  width: var(--width);
-  left: calc((100vw - var(--width))/2);
 }
 
 .send-button {
@@ -475,8 +472,38 @@ body {
 /* Desktop styles (min-width: 768px) */
 @media (min-width: 768px) {
   .chat-container {
-    width: 50%;
-    margin: 0 25%;
+    width: min(100%, 40rem);
+  }
+
+  .config-display {
+    --width: min(100vw - 250px - 1rem, 40rem);
+    width: var(--width);
+    left: calc((100vw - 250px - var(--width))/2 + 250px);
+  }
+
+  .chat-input-container {
+    --width: min(100vw - 250px - 1rem, 40rem);
+    width: var(--width);
+    left: calc((100vw - 250px - var(--width))/2 + 250px);
+  }
+}
+
+/* Mobile styles (max-width: 768px) */
+@media (max-width: 768px) {
+  .chat-container {
+    width: min(100%, 40rem);
+  }
+
+  .config-display {
+    --width: min(100vw - 1rem, 40rem);
+    width: var(--width);
+    left: calc((100vw - var(--width))/2);
+  }
+
+  .chat-input-container {
+    --width: min(100vw - 1rem, 40rem);
+    width: var(--width);
+    left: calc((100vw - var(--width))/2);
   }
 }
 
@@ -1254,6 +1281,133 @@ details[open] > .message-detail-content:has(.report-content) {
 }
 
 /* Config display styles */
+/* Sidebar Layout */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 250px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Adjust main content margin on mobile */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+.settings-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin: 15px 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-actions button.primary {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.header-container {
+  margin-bottom: 20px;
+}
+
+.chat-title {
+  margin: 0;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title-logo {
+  height: 32px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  margin-right: -10px;
+  padding-bottom: 20px;
+}
+
 .config-display {
   border-radius: 1.2rem;
   padding: 0.25rem;
@@ -1267,9 +1421,6 @@ details[open] > .message-detail-content:has(.report-content) {
   background-color: var(--config-display-color);
   position: fixed;
   bottom: calc(50px + 0.5rem);
-  --width: min(100vw - 1rem, calc(40rem - 1rem));
-  width: var(--width);
-  left: calc((100vw - var(--width))/2);
   padding-bottom: 2.7rem;
 }
 

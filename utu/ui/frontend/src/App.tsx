@@ -4,6 +4,8 @@ import { ReadyState } from 'react-use-websocket';
 import MessageComponent from './components/MessageComponent';
 import AgentTOC from './components/AgentTOC';
 import ChatInput from './components/ChatInput';
+import SideBar from './components/SideBar';
+import HamburgerButton from './components/HamburgerButton';
 import { simulateEvents } from './placeholderData';
 import logoUrl from './assets/pic.png';
 import logoSquareUrl from './assets/logo-square.png';
@@ -42,6 +44,8 @@ const initialMessages: Message[] = [
 
 
 const App: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [exampleQuery, setExampleQuery] = useState<string[]>([]);
   const [hideExampleQuery, setHideExampleQuery] = useState(false);
@@ -496,43 +500,79 @@ const App: React.FC = () => {
     sendRequest(request);
   };
 
-  return (
-    <div className="app">
-      <button 
-        className="settings-button"
-        onClick={handleOpenSettings}
-        title="Settings"
-      >
-        <i className="fas fa-cog"></i>
-      </button>
+  // Handle window resize for responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth <= 768;
+      setIsMobileView(isMobile);
       
-      {settingsOpen && (
-        <div className="modal-overlay" onClick={handleCloseSettings}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3>Settings</h3>
-            <div className="form-group">
-              <label htmlFor="wsUrl">WebSocket URL</label>
-              <input
-                id="wsUrl"
-                type="text"
-                value={wsUrl}
-                onChange={(e) => setWsUrl(e.target.value)}
-                placeholder="ws://localhost:8848/ws"
-              />
-            </div>
-            <div className="modal-actions">
-              <button onClick={handleCloseSettings}>Cancel</button>
-              <button onClick={handleSaveSettings} className="primary">Save</button>
-            </div>
-          </div>
-        </div>
+      // Close sidebar when switching to mobile view
+      if (!isMobile) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  return (
+    <div className="app-container">
+      {isMobileView && (
+        <HamburgerButton 
+          isOpen={isSidebarOpen} 
+          onClick={toggleSidebar} 
+        />
       )}
+      <SideBar 
+        isOpen={!isMobileView || isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
       
       <div className="main-content">
+        <button 
+          className="settings-button"
+          onClick={handleOpenSettings}
+          title="Settings"
+        >
+          <i className="fas fa-cog"></i>
+        </button>
+        
+        {settingsOpen && (
+          <div className="modal-overlay" onClick={handleCloseSettings}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <h3>Settings</h3>
+              <div className="form-group">
+                <label htmlFor="wsUrl">WebSocket URL</label>
+                <input
+                  id="wsUrl"
+                  type="text"
+                  value={wsUrl}
+                  onChange={(e) => setWsUrl(e.target.value)}
+                  placeholder="ws://localhost:8848/ws"
+                />
+              </div>
+              <div className="modal-actions">
+                <button onClick={handleCloseSettings}>
+                  Cancel
+                </button>
+                <button onClick={handleSaveSettings} className="primary">
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="chat-container" ref={mainContainerRef}>
           <div className="header-container">
-            <h1 className="chat-title"><img className="title-logo" src={logoSquareUrl} alt="logo" />Youtu Agent</h1>
-            
+            <h1 className="chat-title">
+              <img className="title-logo" src={logoSquareUrl} alt="logo" />
+              Youtu Agent
+            </h1>
           </div>
 
           <div className="chat-messages">
