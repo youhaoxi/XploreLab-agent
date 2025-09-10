@@ -8,11 +8,11 @@ import rehypeRaw from 'rehype-raw';
 import Mermaid from './Mermaid';
 import BrokenImagePlaceholder from './BrokenImagePlaceholder';
 
-type CodeProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-  inline?: boolean;
-  className?: string;
-  children?: React.ReactNode;
-};
+// type CodeProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+//   inline?: boolean;
+//   className?: string;
+//   children?: React.ReactNode;
+// };
 
 interface MarkdownContentPart {
   type: "text" | "mermaid";
@@ -135,16 +135,16 @@ const SafeMarkdown: React.FC<{ children: React.ReactNode, messageId: String }> =
       h3: ({node, ...props}) => <h3 className="markdown-h3" {...props} />,
     };
 
-    const DebouncedMermaid = memo(({ chart, mermaidId }: { chart: string, mermaidId: string }) => {
-      const [isVisible, setIsVisible] = useState(false);
+    // const DebouncedMermaid = memo(({ chart, mermaidId }: { chart: string, mermaidId: string }) => {
+    //   const [isVisible, setIsVisible] = useState(false);
 
-      useEffect(() => {
-        const timer = setTimeout(() => setIsVisible(true), 200);
-        return () => clearTimeout(timer);
-      }, []);
+    //   useEffect(() => {
+    //     const timer = setTimeout(() => setIsVisible(true), 200);
+    //     return () => clearTimeout(timer);
+    //   }, []);
 
-      return isVisible ? <Mermaid chart={chart} mermaidId={mermaidId} /> : <BrokenImagePlaceholder src={chart} alt="Mermaid Chart" />;
-    });
+    //   return isVisible ? <Mermaid chart={chart} mermaidId={mermaidId} /> : <BrokenImagePlaceholder src={chart} alt="Mermaid Chart" />;
+    // });
 
     return (
       <div className="markdown-content">
