@@ -28,11 +28,11 @@ from .common import (
     UserAnswer,
     UserQuery,
     UserRequest,
+    handle_generated_agent,
     handle_new_agent,
     handle_orchestra_events,
     handle_raw_stream_events,
     handle_tool_call_output,
-    handle_generated_agent,
 )
 
 CONFIG_PATH = "configs/agents"
