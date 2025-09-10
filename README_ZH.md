@@ -47,8 +47,8 @@
 <table border="1" style="border-collapse: collapse;">
   <tr>
     <td style="border: 1px solid black; padding: 10px;">
-      <a href="https://www.youtube.com/watch?v=SCR4Ru8_h5Q">
-        <img src="https://img.youtube.com/vi/SCR4Ru8_h5Q/0.jpg" alt="Data Analysis" width="420" height="236">
+      <a href="https://www.youtube.com/watch?v=r9we4m1cB6M">
+        <img src="https://img.youtube.com/vi/r9we4m1cB6M/0.jpg" alt="Data Analysis" width="420" height="236">
       </a>
       <br><strong>数据分析</strong><br>分析 CSV 文件并生成 HTML 报告。
     </td>

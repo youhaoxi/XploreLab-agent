@@ -58,8 +58,8 @@ Click on the images to view detailed videos.
   </tr>
   <tr>
     <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
-      <video src="https://github.com/user-attachments/assets/b6aba820-368e-427f-ba71-85543a751775" 
-             poster="https://img.youtube.com/vi/SCR4Ru8_h5Q/sddefault.jpg" 
+      <video src="https://github.com/user-attachments/assets/60193435-b89d-47d3-8153-5799d6ff2920" 
+             poster="https://img.youtube.com/vi/r9we4m1cB6M/sddefault.jpg" 
              controls muted preload="metadata" 
              width="100%" height="300"
              style="object-fit: cover; border-radius: 8px;"></video>

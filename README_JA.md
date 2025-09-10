@@ -46,8 +46,8 @@
 <table border="1" style="border-collapse: collapse;">
   <tr>
     <td style="border: 1px solid black; padding: 10px;">
-      <a href="https://www.youtube.com/watch?v=SCR4Ru8_h5Q">
-        <img src="https://img.youtube.com/vi/SCR4Ru8_h5Q/0.jpg" alt="データ分析" width="420" height="236">
+      <a href="https://www.youtube.com/watch?v=r9we4m1cB6M">
+        <img src="https://img.youtube.com/vi/r9we4m1cB6M/0.jpg" alt="データ分析" width="420" height="236">
       </a>
       <br><strong>データ分析</strong><br>CSVファイルを分析し、HTMLレポートを生成します。
     </td>
