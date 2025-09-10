@@ -15,7 +15,7 @@ from agents._run_impl import QueueCompleteSentinel
 from pydantic import BaseModel
 
 from ..agents import SimpleAgent
-from ..tools import UserInteractionToolkit, get_toolkits_map
+from ..tools import TOOLKIT_MAP, UserInteractionToolkit, get_tools_schema
 from ..utils import DIR_ROOT, get_jinja_env, get_logger
 from .common import GeneratorTaskRecorder
 
@@ -155,14 +155,15 @@ class SimpleAgentGenerator:
 
     async def step2(self, task_recorder: GeneratorTaskRecorder) -> None:
         """Select useful tools from available toolkits. Return: {toolkit_name: [tool_name, ...]}"""
-        available_toolkits = ["search", "document", "image", "audio", "bash", "tabular"]
-        toolkits_map = get_toolkits_map(names=available_toolkits)
+        available_toolkits = ["search", "document", "image", "audio", "bash", "python_executor"]
         tools_descs = []
         tool_to_toolkit_name = {}
-        for toolkit_name, toolkit in toolkits_map.items():
-            tools = await toolkit.get_tools_in_agents()
-            tools_descs.extend(f"- {tool.name}: {tool.description}" for tool in tools)
-            tool_to_toolkit_name.update({tool.name: toolkit_name for tool in tools})
+        for toolkit_name in available_toolkits:
+            assert toolkit_name in TOOLKIT_MAP, f"Unknown toolkit: {toolkit_name}"
+            tools_schema = get_tools_schema(TOOLKIT_MAP[toolkit_name])
+            tools_descs.extend(f"- {tool.name}: {tool.description}" for tool in tools_schema.values())
+            tool_to_toolkit_name.update({tool.name: toolkit_name for tool in tools_schema.values()})
+        logger.info(f"Available tools: {tool_to_toolkit_name}")
         tools_str = "\n".join(tools_descs)
         query = TOOL_SELECTION_TEMPLATE.format(
             available_tools=tools_str,

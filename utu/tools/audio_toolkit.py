@@ -1,10 +1,8 @@
-from collections.abc import Callable
-
 from openai.types.audio import TranscriptionVerbose
 
 from ..config import ToolkitConfig
 from ..utils import DIR_ROOT, EnvUtils, FileUtils, SimplifiedAsyncOpenAI, async_file_cache, get_logger
-from .base import TOOL_PROMPTS, AsyncBaseToolkit
+from .base import TOOL_PROMPTS, AsyncBaseToolkit, register_tool
 
 logger = get_logger(__name__)
 
@@ -15,8 +13,8 @@ class AudioToolkit(AsyncBaseToolkit):
         # For audio transcribe, we use OpenAI's API
         self.client = SimplifiedAsyncOpenAI(
             model=config.config["audio_model"]["model"],
-            api_key=EnvUtils.get_env("OPENAI_API_KEY", "please_set_openai_api_key"),
-            base_url=EnvUtils.get_env("OPENAI_BASE_URL", "please_set_openai_base_url"),
+            api_key=EnvUtils.get_env("OPENAI_API_KEY"),  # NOTE: you should set these envs in .env
+            base_url=EnvUtils.get_env("OPENAI_BASE_URL"),
         )
         self.llm = SimplifiedAsyncOpenAI(**config.config_llm.model_provider.model_dump())
         self.md5_to_path = {}
@@ -46,6 +44,7 @@ class AudioToolkit(AsyncBaseToolkit):
         self.md5_to_path[md5] = path  # record md5 to map
         return md5
 
+    @register_tool
     async def audio_qa(self, audio_path: str, question: str) -> str:
         """Asks a question about the audio and gets an answer.
 
@@ -68,8 +67,3 @@ class AudioToolkit(AsyncBaseToolkit):
         ]
         output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         return output
-
-    async def get_tools_map(self) -> dict[str, Callable]:
-        return {
-            "audio_qa": self.audio_qa,
-        }
