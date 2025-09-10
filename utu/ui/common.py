@@ -1,10 +1,11 @@
-from typing import Literal, Optional
+from typing import Literal
 
 import agents as ag
 from pydantic import BaseModel
 
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent
+
 
 class WorkerDescription(BaseModel):
     name: str
@@ -65,14 +66,14 @@ class SwitchAgentContent(BaseModel):
     ok: bool
     name: str
     agent_type: Literal["simple", "orchestra", "other"]
-    sub_agents: Optional[list[str]] = None
+    sub_agents: list[str] | None = None
 
 
 class InitContent(BaseModel):
     type: Literal["init"] = "init"
     default_agent: str
     agent_type: Literal["simple", "orchestra", "other"]
-    sub_agents: Optional[list[str]] = None
+    sub_agents: list[str] | None = None
 
 
 class AskContent(BaseModel):

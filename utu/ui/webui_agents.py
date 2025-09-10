@@ -28,8 +28,6 @@ from .common import (
     UserAnswer,
     UserQuery,
     UserRequest,
-    WorkerDescription,
-    OrchestraDescription,
     handle_generated_agent,
     handle_new_agent,
     handle_orchestra_events,
@@ -73,14 +71,14 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         assert isinstance(answer, UserAnswer)
         assert answer.ask_id == event_to_send.data.ask_id
         return answer.answer
-    
+
     def _get_current_agent_content(self):
         agent = self._get_config_name()
         agent_type = "simple"
         sub_agents = None
         if isinstance(self.agent, OrchestraAgent):
             agent_type = "orchestra"
-            sub_agents = [worker for worker in self.agent.config.workers.keys()]
+            sub_agents = list(self.agent.config.workers.keys())
             sub_agents.append("PlannerAgent")
             sub_agents.append("ReporterAgent")
         elif isinstance(self.agent, SimpleAgent):
@@ -88,13 +86,18 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         else:
             agent_type = "other"
             if isinstance(self.agent, SimpleAgentGenerator):
-                sub_agents = ["clarification_agent", "tool_selection_agent", "instructions_generation_agent", "name_generation_agent"]
-    
-        return dict(
-            default_agent=agent, 
-            agent_type=agent_type, 
-            sub_agents=sub_agents,
-        )
+                sub_agents = [
+                    "clarification_agent",
+                    "tool_selection_agent",
+                    "instructions_generation_agent",
+                    "name_generation_agent",
+                ]
+
+        return {
+            "default_agent": agent,
+            "agent_type": agent_type,
+            "sub_agents": sub_agents,
+        }
 
     async def open(self):
         # start query worker
@@ -190,8 +193,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             Event(
                 type="switch_agent",
                 data=SwitchAgentContent(
-                    type="switch_agent", 
-                    ok=True, 
+                    type="switch_agent",
+                    ok=True,
                     name=switch_agent_request.config_file,
                     agent_type=content["agent_type"],
                     sub_agents=content["sub_agents"],
