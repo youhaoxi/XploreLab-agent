@@ -134,10 +134,12 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         simple_agent_config_files = config_path.glob("simple_agents/*.yaml")
         generated_agent_config_files = config_path.glob("generated/*.yaml")
         base_config_files = config_path.glob("*.yaml")
-        config_files = list(example_config_files) \
-            + list(simple_agent_config_files) \
-            + list(generated_agent_config_files) \
+        config_files = (
+            list(example_config_files)
+            + list(simple_agent_config_files)
+            + list(generated_agent_config_files)
             + list(base_config_files)
+        )
         agents = [str(file.relative_to(config_path)) for file in config_files]
         await self.send_event(
             Event(

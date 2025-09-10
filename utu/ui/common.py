@@ -54,19 +54,23 @@ class SwitchAgentContent(BaseModel):
     ok: bool
     name: str
 
+
 class InitContent(BaseModel):
     type: Literal["init"] = "init"
     default_agent: str
+
 
 class AskContent(BaseModel):
     type: Literal["ask"] = "ask"
     question: str
     ask_id: str
 
+
 class GeneratedAgentContent(BaseModel):
     type: Literal["generated_agent_config"] = "generated_agent_config"
     filename: str
     config_content: str
+
 
 class Event(BaseModel):
     type: Literal[
@@ -80,18 +84,20 @@ class Event(BaseModel):
         "switch_agent",
         "ask",
         "gen_agent",
-        "generated_agent_config"
+        "generated_agent_config",
     ]
-    data: TextDeltaContent |\
-        OrchestraContent |\
-        GeneratedAgentContent |\
-        ExampleContent |\
-        NewAgentContent |\
-        ListAgentsContent |\
-        SwitchAgentContent |\
-        InitContent |\
-        AskContent |\
-        None = None
+    data: (
+        TextDeltaContent
+        | OrchestraContent
+        | GeneratedAgentContent
+        | ExampleContent
+        | NewAgentContent
+        | ListAgentsContent
+        | SwitchAgentContent
+        | InitContent
+        | AskContent
+        | None
+    ) = None
 
 
 class UserQuery(BaseModel):
@@ -101,13 +107,16 @@ class UserQuery(BaseModel):
 class SwitchAgentRequest(BaseModel):
     config_file: str
 
+
 class UserAnswer(BaseModel):
     answer: str
     ask_id: str
 
+
 class UserRequest(BaseModel):
     type: Literal["query", "list_agents", "switch_agent", "answer", "gen_agent"]
     content: UserQuery | SwitchAgentRequest | UserAnswer | None = None
+
 
 async def handle_raw_stream_events(event: ag.RawResponsesStreamEvent) -> Event | None:
     def _send_delta(
@@ -225,6 +234,7 @@ async def handle_new_agent(event: ag.AgentUpdatedStreamEvent) -> Event | None:
     else:
         pass
     return event_to_send
+
 
 async def handle_generated_agent(event: SimpleAgentGeneratedEvent) -> Event | None:
     event_to_send = Event(
