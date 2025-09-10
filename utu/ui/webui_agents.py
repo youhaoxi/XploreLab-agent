@@ -17,6 +17,7 @@ from utu.agents.simple_agent import SimpleAgent
 from utu.config import AgentConfig
 from utu.config.loader import ConfigLoader
 from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent, SimpleAgentGenerator
+from utu.utils import EnvUtils
 
 from .common import (
     AskContent,
@@ -259,7 +260,9 @@ class WebUIAgents:
         with resources.as_file(resources.files("utu_agent_ui.static").joinpath("index.html")) as static_dir:
             self.static_path = str(static_dir).replace("index.html", "")
 
-    def make_app(self) -> tornado.web.Application:
+    def make_app(self, autoload: bool | None = None) -> tornado.web.Application:
+        if autoload is None:
+            autoload = EnvUtils.get_env("UTU_WEBUI_AUTOLOAD", "false") == "true"
         return tornado.web.Application(
             [
                 (r"/ws", WebSocketHandler, {"default_config_filename": self.default_config}),
@@ -274,20 +277,20 @@ class WebUIAgents:
                     {"path": self.static_path, "default_filename": "index.html"},
                 ),
             ],
-            debug=True,
+            debug=autoload,
         )
 
-    async def __launch(self, port: int = 8848, ip: str = "127.0.0.1"):
-        app = self.make_app()
+    async def __launch(self, port: int = 8848, ip: str = "127.0.0.1", autoload: bool | None = None):
+        app = self.make_app(autoload=autoload)
         app.listen(port, address=ip)
         logging.info(f"Server started at http://{ip}:{port}/")
         await asyncio.Event().wait()
 
-    async def launch_async(self, port: int = 8848, ip: str = "127.0.0.1"):
-        await self.__launch(port=port, ip=ip)
+    async def launch_async(self, port: int = 8848, ip: str = "127.0.0.1", autoload: bool | None = None):
+        await self.__launch(port=port, ip=ip, autoload=autoload)
 
-    def launch(self, port: int = 8848, ip: str = "127.0.0.1"):
-        asyncio.run(self.__launch(port=port, ip=ip))
+    def launch(self, port: int = 8848, ip: str = "127.0.0.1", autoload: bool | None = None):
+        asyncio.run(self.__launch(port=port, ip=ip, autoload=autoload))
 
 
 if __name__ == "__main__":

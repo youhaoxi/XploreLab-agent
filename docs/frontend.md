@@ -89,4 +89,6 @@ The `WebUIChatbot` class is basically a tornado based WebSocket server, which tr
 
 The frontend (in `utu/ui/frontend`, or installed as `utu_agent_ui` package) is a React application, which visualizes the events, and provides a simple UI for users to interact with the agent.
 
-By default, the `WebUIChatbot` will listen on `127.0.0.1:8848` and the front end will try to connect to `ws://127.0.0.1:8848/ws`.
+You can customize the port and IP of `WebUIChatbot` by setting the `FRONTEND_PORT` and `FRONTEND_IP` environment variables (default: `127.0.0.1:8848`). The default WebSocket URL is `ws://localhost:8848/ws`, and you can find and modify this setting in the right top corner of the frontend page.
+
+For development, you can set `UTU_WEBUI_AUTOLOAD=true` to enable auto reload for tornado server.
