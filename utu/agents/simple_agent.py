@@ -181,7 +181,7 @@ class SimpleAgent(BaseAgent):
                         client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
                     )
                 )
-            case "http":
+            case "streamable_http":
                 server = await self._mcps_exit_stack.enter_async_context(
                     MCPServerStreamableHttp(
                         name=toolkit_config.name,
