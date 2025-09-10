@@ -15,6 +15,7 @@ from .search_toolkit import SearchToolkit
 from .serper_toolkit import SerperToolkit
 from .tabular_data_toolkit import TabularDataToolkit
 from .user_interaction_toolkit import UserInteractionToolkit as UserInteractionToolkit
+from .utils import get_tools_map as get_tools_map, get_tools_schema as get_tools_schema
 from .video_toolkit import VideoToolkit
 from .wikipedia_toolkit import WikipediaSearchTool
 
@@ -39,6 +40,10 @@ TOOLKIT_MAP = {
 
 
 def get_toolkits_map(names: list[str] | None = None) -> dict[str, AsyncBaseToolkit]:
+    """Get all the toolkits specified by names
+
+    WARNING: not used for now
+    """
     toolkits = {}
     if names is None:
         names = list(TOOLKIT_MAP.keys())
