@@ -170,7 +170,7 @@ class AgentsUtils:
             if isinstance(event, RawResponsesStreamEvent):
                 # event.data -- ResponseStreamEvent
                 if event.data.type == "response.output_text.delta":
-                    PrintUtils.print_info(f"{event.data.delta}", end="")
+                    PrintUtils.print_bot(f"{event.data.delta}", end="")
                 elif event.data.type == "response.reasoning_text.delta":
                     PrintUtils.print_info(f"{event.data.delta}", end="")
                 elif event.data.type == "response.reasoning_text.done":
@@ -195,7 +195,8 @@ class AgentsUtils:
             elif isinstance(event, RunItemStreamEvent):
                 item: RunItem = event.item
                 if item.type == "message_output_item":
-                    PrintUtils.print_bot(f"<{item.agent.name}> {ItemHelpers.text_message_output(item).strip()}")
+                    pass  # do not print twice to avoid duplicate! (already handled `response.output_text.delta`)
+                    # PrintUtils.print_bot(f"<{item.agent.name}> {ItemHelpers.text_message_output(item).strip()}")
                 elif item.type == "handoff_call_item":  # same as `ToolCallItem`
                     PrintUtils.print_bot(f"[handoff_call] {item.raw_item.name}({item.raw_item.arguments})")
                 elif item.type == "handoff_output_item":
