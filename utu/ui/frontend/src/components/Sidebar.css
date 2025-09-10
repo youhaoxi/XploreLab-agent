@@ -343,7 +343,45 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 0;
+  margin-bottom: 12px;
+}
+
+/* Sub-agents section */
+.sub-agents-section {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--color-border, #e0e0e0);
+}
+
+.sub-agents-title {
+  font-size: 0.7em;
+  color: var(--color-subtle-text, #6c757d);
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.sub-agents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+  font-size: 0.8em;
+  color: var(--color-text, #555);
+}
+
+.sub-agent-item {
+  padding: 2px 0;
+  line-height: 1.3;
+}
+
+.sub-agent-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  padding-left: 4px;
 }
 
 .current-config-display {

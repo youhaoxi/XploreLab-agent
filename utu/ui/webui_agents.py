@@ -91,7 +91,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 sub_agents = ["clarification_agent", "tool_selection_agent", "instructions_generation_agent", "name_generation_agent"]
     
         return dict(
-            type="init", 
             default_agent=agent, 
             agent_type=agent_type, 
             sub_agents=sub_agents,

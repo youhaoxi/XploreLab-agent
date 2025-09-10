@@ -31,6 +31,8 @@ export interface NewAgentContent {
 export interface InitContent {
   type: 'init';
   default_agent: string;
+  agent_type: "simple" | "orchestra" | "other";
+  sub_agents: string[] | null;
 }
 
 export type OrchestraContent =
@@ -47,6 +49,8 @@ export interface SwitchAgentContent {
   type: 'switch_agent';
   ok: boolean;
   name: string;
+  agent_type: "simple" | "orchestra" | "other";
+  sub_agents: string[] | null;
 }
 
 export interface AskContent {

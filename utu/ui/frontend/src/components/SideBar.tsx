@@ -8,6 +8,8 @@ interface SideBarProps {
   messages?: Message[];
   onNavigate?: (id: number) => void;
   currentConfig?: string;
+  agentType?: 'simple' | 'orchestra' | 'other';
+  subAgents?: string[] | null;
   onConfigSelect?: (config: string) => void;
   handleAddConfig?: () => void;
   getConfigList: () => void;
@@ -72,6 +74,8 @@ const SideBar: React.FC<SideBarProps> = ({
   messages = [],
   onNavigate = () => {},
   currentConfig = '',
+  agentType = 'simple',
+  subAgents = null,
   onConfigSelect = () => {},
   handleAddConfig = () => {},
   getConfigList,
@@ -165,8 +169,20 @@ const SideBar: React.FC<SideBarProps> = ({
                 <span className="current-config-title">{getFilename(currentConfig)}</span>
               </div>
               <div className="current-config-path">
-                {currentConfig}
+              {currentConfig}
+            </div>
+            {agentType === 'orchestra' && subAgents && subAgents.length > 0 && (
+              <div className="sub-agents-section">
+                <div className="sub-agents-title">Sub-Agents</div>
+                <div className="sub-agents-list">
+                  {subAgents.map((agent, index) => (
+                    <div key={index} className="sub-agent-item">
+                      <span className="sub-agent-name">{agent}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
+            )}
             </div>
             <div 
               className="sidebar-button-text agent-toc-item add-config-button"

@@ -63,6 +63,8 @@ const App: React.FC = () => {
   const [availableConfigs, setAvailableConfigs] = useState<string[]>([]);
   const [_isGeneratingAgent, setIsGeneratingAgent] = useState(false);
   const [askId, setAskId] = useState<string | null>(null);
+  const [agentType, setAgentType] = useState<'simple' | 'orchestra' | 'other'>('simple');
+  const [subAgents, setSubAgents] = useState<string[] | null>(null);
 
   const getConfigList = () => {
     let request: UserRequest = {
@@ -258,6 +260,8 @@ const App: React.FC = () => {
     else if (event.type === 'init') {
       const initData = event.data as InitContent;
       setCurrentConfig(initData.default_agent);
+      setAgentType(initData.agent_type);
+      setSubAgents(initData.sub_agents);
       
       // Send list_agents command on init
       sendRequest({
@@ -270,6 +274,8 @@ const App: React.FC = () => {
       let data = event.data as SwitchAgentContent;
       if (data.ok) {
         setCurrentConfig(data.name);
+        setAgentType(data.agent_type);
+        setSubAgents(data.sub_agents);
         setIsGeneratingAgent(false);
       } else {
         console.error('Switch agent failed');
@@ -306,6 +312,14 @@ const App: React.FC = () => {
       // clean up message
       setMessages([]);
       setIsModelResponding(true);
+      // Set agent type to orchestra and specify sub-agents
+      setAgentType('orchestra');
+      setSubAgents([
+        'clarification_agent',
+        'tool_selection_agent',
+        'instructions_generation_agent',
+        'name_generation_agent'
+      ]);
       // add a prompt message
       const message: Message = {
         id: Date.now(),
@@ -545,6 +559,8 @@ const App: React.FC = () => {
         messages={messages}
         onNavigate={scrollToMessage}
         currentConfig={currentConfig}
+        agentType={agentType}
+        subAgents={subAgents}
         onConfigSelect={handleConfigSelect}
         handleAddConfig={handleAddConfig}
         getConfigList={getConfigList}
