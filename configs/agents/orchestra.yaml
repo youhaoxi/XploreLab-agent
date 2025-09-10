@@ -1,8 +1,9 @@
+# @package _global_
 defaults:
   # - model: base
-  - model/base@planner_model
-  - model/base@reporter_model
-  - simple_agents/search_agent@workers.SearchAgent
+  - /model/base@planner_model
+  - /model/base@reporter_model
+  - /agents/simple_agents/search_agent@workers.SearchAgent
   - _self_
 
 

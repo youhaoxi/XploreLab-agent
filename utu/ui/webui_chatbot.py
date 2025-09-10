@@ -1,7 +1,6 @@
 import asyncio
 import json
 import traceback
-from dataclasses import asdict
 from importlib import resources
 
 import agents as ag
@@ -15,7 +14,7 @@ from utu.agents.simple_agent import SimpleAgent
 from .common import (
     Event,
     ExampleContent,
-    UserQuery,
+    UserRequest,
     handle_new_agent,
     handle_orchestra_events,
     handle_raw_stream_events,
@@ -35,29 +34,32 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         # print("WebSocket opened")
         # send example query
-        self.write_message(asdict(Event("example", ExampleContent(type="example", query=self.example_query))))
+        self.write_message(
+            Event(type="example", data=ExampleContent(type="example", query=self.example_query)).model_dump()
+        )
 
     async def send_event(self, event: Event):
         # print in green color
-        print(f"\033[92mSending event: {asdict(event)}\033[0m")
-        self.write_message(asdict(event))
+        print(f"\033[92mSending event: {event.model_dump()}\033[0m")
+        self.write_message(event.model_dump())
 
     async def on_message(self, message: str):
         try:
             data = json.loads(message)
-            if data.get("type") == "query":
+            user_request = UserRequest(**data)
+            if user_request.type == "query":
                 try:
-                    query = UserQuery(**data)
+                    content = user_request.content
                     # check query not empty
-                    if query.query.strip() == "":
+                    if content.query.strip() == "":
                         raise ValueError("Query cannot be empty")
 
                     # print(f"Received query: {query.query}")
                     # Echo back the query in the response
                     if isinstance(self.agent, OrchestraAgent):
-                        stream = self.agent.run_streamed(query.query)
+                        stream = self.agent.run_streamed(content.query)
                     elif isinstance(self.agent, SimpleAgent):
-                        self.agent.input_items.append({"role": "user", "content": query.query})
+                        self.agent.input_items.append({"role": "user", "content": content.query})
                         # print in red color
                         print(f"\033[91mInput items: {self.agent.input_items}\033[0m")
                         stream = self.agent.run_streamed(self.agent.input_items)

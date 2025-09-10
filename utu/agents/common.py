@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 from collections.abc import AsyncIterator
 from dataclasses import asdict, dataclass, field
 from typing import Any
@@ -59,6 +60,8 @@ class DataClassWithStreamEvents:
             if run_impl_exc and isinstance(run_impl_exc, Exception):
                 # if isinstance(run_impl_exc, AgentsException) and run_impl_exc.run_data is None:
                 #     run_impl_exc.run_data = self._create_error_details()
+                logger.error(f"run_impl_exc: {run_impl_exc}")
+                logger.error(traceback.format_exc())
                 self._stored_exception = run_impl_exc
 
     def to_dict(self):

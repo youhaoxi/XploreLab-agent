@@ -68,6 +68,14 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
       console.log('Not a JSON string, using original content');
     }
 
+    if (message.content.toolName == "final_answer") {
+      return (
+        <div className="tool-call-argument">
+          <SafeMarkdown>{displayContent}</SafeMarkdown>
+        </div>
+      )
+    }
+
     return (
       <>
         {displayContent && (
@@ -369,9 +377,18 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
         icon = "📖";
       } else if ((message.content as ToolCallMessage).toolName == "search") {
         icon = "🔍";
+      } else if ((message.content as ToolCallMessage).toolName == "ask_user") {
+        icon = "💬";
+      } else if ((message.content as ToolCallMessage).toolName == "final_answer") {
+        icon = "💡";
       }
+
+      // if ask_user or final answer, don't open
+
+      let shouldHide = (message.content as ToolCallMessage).toolName == "ask_user";
+
       return (
-        <details className="message-detail tool-call-message" open>
+        <details className="message-detail tool-call-message" open={!shouldHide}>
           <summary
             className="message-detail-summary"
             {...(message.inprogress ? { 'data-inprogress': 'true' } : {})}
