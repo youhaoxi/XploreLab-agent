@@ -328,12 +328,24 @@ Results are stored and can be further analyzed in the evaluation platform. See [
 
 📖 Learn more: [Evaluation Documentation](https://tencentcloudadp.github.io/youtu-agent/eval)
 
+## 📖 Dive Deeper
+
+After getting started, you can learn more about the framework and its capabilities through our full documentation:
+
+- 📖 **[Full Documentation](https://tencentcloudadp.github.io/youtu-agent/)**: Explore the core concepts, architecture, and advanced features.
+- 🚀 **[Quickstart Guide](https://tencentcloudadp.github.io/youtu-agent/quickstart/)**: A detailed guide to get you up and running.
+- ❓ **[FAQ](https://tencentcloudadp.github.io/youtu-agent/faq)**: Find answers to common questions and issues.
+
 ## 🙏 Acknowledgements
 
 This project builds upon the excellent work of several open-source projects:
 - [openai-agents](https://github.com/openai/openai-agents-python)
 - [mkdocs-material](https://github.com/squidfunk/mkdocs-material)
 - [model-context-protocol](https://github.com/modelcontextprotocol/python-sdk)
+
+## 🙌 Contributing
+
+We welcome contributions from the community! If you'd like to help improve Youtu-Agent, please read our [**Contributing Guidelines**](./CONTRIBUTING.md) to get started.
 
 ## 📚 Citation
 
