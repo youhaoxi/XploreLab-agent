@@ -100,6 +100,7 @@ class AsyncBaseToolkit(abc.ABC):
         return await tool(**arguments)
 
     # -------------------------------------------------------------------------------------------------------------
+    # Sync methods [WIP]
     def get_tools_map_sync(self) -> dict[str, Callable]:
         if self.tools_map is None:
             loop = get_event_loop()

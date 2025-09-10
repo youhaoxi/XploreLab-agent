@@ -1,4 +1,7 @@
+# https://github.com/squidfunk/mkdocs-material
+
 site_name: Youtu-Agent
+site_url: https://tencentcloudadp.github.io/youtu-agent/
 theme:
   name: material
   palette:

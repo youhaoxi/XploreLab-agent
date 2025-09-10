@@ -8,7 +8,8 @@
 </div>
 
 <p align="center">
-| <a href="README_ZH.md"><b>中文版</b></a>
+| <a href="README_ZH.md"><b>中文</b></a>
+| <a href="README_JA.md"><b>日本語</b></a>
 | <a href="#-benchmark-performance"><b>🌟 Performance</b></a> 
 | <a href="#-examples"><b>💡 Examples</b> </a> 
 | <a href="#-features"><b>✨ Features</b> </a> 
@@ -280,10 +281,10 @@ If you want to visualize the agent’s runtime status using the web UI, download
 
 ```bash
 # Download the frontend package
-curl -LO https://github.com/Tencent/Youtu-agent/releases/download/frontend%2Fv0.1.5/utu_agent_ui-0.1.5-py3-none-any.whl
+curl -LO https://github.com/Tencent/Youtu-agent/releases/download/frontend%2Fv0.1.6/utu_agent_ui-0.1.6-py3-none-any.whl
 
 # Install the frontend package
-uv pip install utu_agent_ui-0.1.5-py3-none-any.whl
+uv pip install utu_agent_ui-0.1.6-py3-none-any.whl
 ```
 
 Next, run the web version of the SVG image generation command:
