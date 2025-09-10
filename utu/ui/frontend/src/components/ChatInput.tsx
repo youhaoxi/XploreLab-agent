@@ -76,7 +76,8 @@ const ChatInput: FC<ChatInputProps> = ({
 
   return (
     <div className="chat-input-container">
-      {currentConfig && (
+      {/* Config section is now hidden by default */}
+      {false && currentConfig && (
         <div className="config-display" ref={configRef}>
           <div className="config-header">
             <span className="config-label">Config: </span>

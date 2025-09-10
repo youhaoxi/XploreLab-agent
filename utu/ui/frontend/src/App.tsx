@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useChatWebSocket } from './services/websocket.service';
 import { ReadyState } from 'react-use-websocket';
 import MessageComponent from './components/MessageComponent';
-import AgentTOC from './components/AgentTOC';
 import ChatInput from './components/ChatInput';
 import SideBar from './components/SideBar';
 import HamburgerButton from './components/HamburgerButton';
@@ -257,7 +256,14 @@ const App: React.FC = () => {
     }
     // handle init event
     else if (event.type === 'init') {
-      setCurrentConfig((event.data as InitContent).default_agent);
+      const initData = event.data as InitContent;
+      setCurrentConfig(initData.default_agent);
+      
+      // Send list_agents command on init
+      sendRequest({
+        type: 'list_agents',
+        content: null
+      });
     } 
     // handle switch agent event
     else if (event.type === 'switch_agent') {
@@ -273,7 +279,10 @@ const App: React.FC = () => {
     else if (event.type === 'list_agents') {
       let data = event.data as ListAgentsContent;
       setAvailableConfigs(data.agents);
-      setChatInputLoadingState("ready");
+      // Set loading to false when we receive the agents list
+      if (chatInputLoadingState === 'loading') {
+        setChatInputLoadingState('ready');
+      }
     } 
     // handle ask event
     else if (event.type === 'ask') {
@@ -532,7 +541,14 @@ const App: React.FC = () => {
       )}
       <SideBar 
         isOpen={isMobileView ? isSidebarOpen : true}
-        onClose={() => {}}
+        onClose={() => {setTimeout(() => {setIsSidebarOpen(false)}, 100)}}
+        messages={messages}
+        onNavigate={scrollToMessage}
+        currentConfig={currentConfig}
+        onConfigSelect={handleConfigSelect}
+        handleAddConfig={handleAddConfig}
+        getConfigList={getConfigList}
+        availableConfigs={availableConfigs}
       />
       
       <div className="main-content">
@@ -619,11 +635,6 @@ const App: React.FC = () => {
             )}
           </div>
           
-          {/* Agent TOC */}
-          <AgentTOC 
-            messages={messages} 
-            onNavigate={scrollToMessage} 
-          />
 
           <ChatInput
             inputValue={inputValue}

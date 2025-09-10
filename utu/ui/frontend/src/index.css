@@ -39,6 +39,8 @@
   --action-button-primary-border: rgba(76, 175, 80, 0.3);
   --action-button-primary-hover: rgba(76, 175, 80, 0.2);
   --config-display-color: rgb(222, 222, 222);
+
+  --side-bar-width: 250px;
 }
 
 body {
@@ -476,15 +478,15 @@ body {
   }
 
   .config-display {
-    --width: min(100vw - 250px - 1rem, 40rem);
+    --width: min(100vw - var(--side-bar-width) - 1rem, 40rem);
     width: var(--width);
-    left: calc((100vw - 250px - var(--width))/2 + 250px);
+    left: calc((100vw - var(--side-bar-width) - var(--width))/2 + var(--side-bar-width));
   }
 
   .chat-input-container {
-    --width: min(100vw - 250px - 1rem, 40rem);
+    --width: min(100vw - var(--side-bar-width) - 1rem, 40rem);
     width: var(--width);
-    left: calc((100vw - 250px - var(--width))/2 + 250px);
+    left: calc((100vw - var(--side-bar-width) - var(--width))/2 + var(--side-bar-width));
   }
 }
 
@@ -504,6 +506,10 @@ body {
     --width: min(100vw - 1rem, 40rem);
     width: var(--width);
     left: calc((100vw - var(--width))/2);
+  }
+
+  .app-footer {
+    margin-left: auto !important;
   }
 }
 
@@ -708,6 +714,7 @@ details[open] > .message-detail-content:has(.report-content) {
   z-index: 90;
   background-color: var(--color-bg);
   border-top: 1px solid var(--color-border);
+  margin-left: var(--side-bar-width);
 }
 
 .footer-content {
