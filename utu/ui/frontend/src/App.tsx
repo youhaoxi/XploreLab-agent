@@ -45,7 +45,7 @@ const initialMessages: Message[] = [
 
 const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
+  // Track mobile view for responsive behavior
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [exampleQuery, setExampleQuery] = useState<string[]>([]);
   const [hideExampleQuery, setHideExampleQuery] = useState(false);
@@ -500,13 +500,14 @@ const App: React.FC = () => {
     sendRequest(request);
   };
 
-  // Handle window resize for responsive design
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
+
+  // Handle window resize for responsive behavior
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth <= 768;
       setIsMobileView(isMobile);
       
-      // Close sidebar when switching to mobile view
       if (!isMobile) {
         setIsSidebarOpen(false);
       }
@@ -517,6 +518,7 @@ const App: React.FC = () => {
   }, []);
 
   const toggleSidebar = () => {
+    console.log("toggleSidebar", isSidebarOpen, !isSidebarOpen);
     setIsSidebarOpen(!isSidebarOpen);
   };
 
@@ -529,8 +531,8 @@ const App: React.FC = () => {
         />
       )}
       <SideBar 
-        isOpen={!isMobileView || isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
+        isOpen={isMobileView ? isSidebarOpen : true}
+        onClose={() => {}}
       />
       
       <div className="main-content">

@@ -8,14 +8,12 @@ interface HamburgerButtonProps {
 const HamburgerButton: React.FC<HamburgerButtonProps> = ({ isOpen, onClick }) => {
   return (
     <button 
-      className={`hamburger-button ${isOpen ? 'open' : ''}`}
+      className="hamburger-button"
       onClick={onClick}
       aria-label="Toggle menu"
       aria-expanded={isOpen}
     >
-      <span className={`hamburger-line ${isOpen ? 'rotate-45' : ''}`}></span>
-      <span className={`hamburger-line ${isOpen ? 'opacity-0' : ''}`}></span>
-      <span className={`hamburger-line ${isOpen ? '-rotate-45' : ''}`}></span>
+      <i className={`fas ${isOpen ? 'fa-times' : 'fa-bars'}`}></i>
     </button>
   );
 };
