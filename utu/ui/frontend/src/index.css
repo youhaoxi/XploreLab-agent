@@ -38,6 +38,7 @@
   --action-button-primary-text: #2e7d32;
   --action-button-primary-border: rgba(76, 175, 80, 0.3);
   --action-button-primary-hover: rgba(76, 175, 80, 0.2);
+  --config-display-color: rgb(222, 222, 222);
 }
 
 body {
@@ -275,7 +276,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   position: relative;
-  padding-bottom: 100px; /* Space for input and footer */
+  padding-bottom: calc(100px + 2rem); /* Space for input and footer */
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -363,16 +364,15 @@ body {
 }
 
 .chat-input-container {
-  padding: 16px;
+  padding: 0.5rem;
   background: var(--color-bg);
   position: fixed;
-  bottom: 50px; /* Height of footer */
-  left: 0;
-  right: 0;
+  bottom: 50px;
   z-index: 100;
   background: rgba(255, 255, 255, 0);
-  width: 40em;
-  left: calc((100vw - 40em)/2)
+  --width: min(100vw, 40rem);
+  width: var(--width);
+  left: calc((100vw - var(--width))/2);
 }
 
 .send-button {
@@ -393,9 +393,9 @@ body {
   color: var(--color-text);
 }
 
-.send-button:hover:not(:disabled) {
-  /* background: #0056b3; */
-}
+/* .send-button:hover:not(:disabled) {
+  background: #0056b3;
+} */
 
 .send-button:disabled {
   /* background: #cccccc; */
@@ -441,6 +441,7 @@ body {
   background: var(--color-chat-bg);
   overflow: hidden;
   border-radius: 1000px;
+  margin-top: 0.5rem;
 }
 
 .chat-input {
@@ -836,6 +837,7 @@ details[open] > .message-detail-content:has(.report-content) {
     --action-button-primary-text: #81c784;
     --action-button-primary-border: rgba(102, 187, 106, 0.4);
     --action-button-primary-hover: rgba(102, 187, 106, 0.3);
+    --config-display-color: rgba(13, 13, 13);
   }
 }
 
@@ -1249,4 +1251,84 @@ details[open] > .message-detail-content:has(.report-content) {
 
 .modal-actions button.primary:hover {
   opacity: 0.9;
+}
+
+/* Config display styles */
+.config-display {
+  border-radius: 1.2rem;
+  padding: 0.25rem;
+  font-size: 0.6em;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: -1;
+  background-color: var(--config-display-color);
+  position: fixed;
+  bottom: calc(50px + 0.5rem);
+  --width: min(100vw - 1rem, calc(40rem - 1rem));
+  width: var(--width);
+  left: calc((100vw - var(--width))/2);
+  padding-bottom: 2.7rem;
+}
+
+.config-label {
+  color: var(--color-subtle-text);
+  margin-left: 1rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.config-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  text-align: center;
+  border-radius: 1000px;
+  padding: 0.1rem 0.5rem 0.1rem 0.5rem;
+  min-width: 3rem;
+  cursor: pointer;
+  color: var(--color-subtle-text);
+  background-color: var(--color-detail-bg);
+}
+
+.config-header {
+  align-items: center;
+  display: flex;
+}
+
+.config-options-container {
+  padding: 0.5rem 1rem;
+  display: flex;
+  margin: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  /* border: 1px solid var(--color-subtle-text); */
+  /* border-radius: 1.2rem; */
+  max-height: min(40vh, 30rem);
+  overflow-y: scroll;
+  /* background-color: #1e1e1e; */
+}
+
+.config-option {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--color-subtle-text);
+  background-color: var(--color-detail-bg);
+  border-radius: 0.5rem;
+  margin: 0.25rem;
+  padding: 0.5rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+.config-option:hover {
+  opacity: 0.8;
+}
+
+.config-option.config-option-add {
+  flex: 0;
+  color: white;
+  background-color: var(--color-accent);
 }

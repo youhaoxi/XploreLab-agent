@@ -3,6 +3,7 @@ import { useChatWebSocket } from './services/websocket.service';
 import { ReadyState } from 'react-use-websocket';
 import MessageComponent from './components/MessageComponent';
 import AgentTOC from './components/AgentTOC';
+import ChatInput from './components/ChatInput';
 import { simulateEvents } from './placeholderData';
 import logoUrl from './assets/pic.png';
 import logoSquareUrl from './assets/logo-square.png';
@@ -13,12 +14,21 @@ import type {
   PlanItem,
   WorkerItem,
   ReportItem,
-  OrchestraContent
+  OrchestraContent,
+  InitContent,
+  SwitchAgentContent,
+  ListAgentsContent,
+  AskContent,
+  GeneratedAgentContent
 } from './types/events';
+import type {
+  UserRequest,
+} from './types/requests';
 import type {
   Message,
   ToolCallMessage,
 } from './types/message';
+import type { ChatInputLoadingState } from './components/ChatInput';
 
 const initialMessages: Message[] = [
   {
@@ -29,23 +39,40 @@ const initialMessages: Message[] = [
   }
 ];
 
+
+
 const App: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [exampleQuery, setExampleQuery] = useState<string[]>([]);
   const [hideExampleQuery, setHideExampleQuery] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [wsUrl, setWsUrl] = useState(localStorage.getItem('wsUrl') || 'ws://localhost:8848/ws');
-  const { sendQuery, lastMessage, readyState } = useChatWebSocket(wsUrl);
+  const { sendQuery, sendRequest, lastMessage, readyState } = useChatWebSocket(wsUrl);
   const [inputValue, setInputValue] = useState('');
   const [isModelResponding, setIsModelResponding] = useState(false);
   // const messagesEndRef = useRef<HTMLDivElement>(null);
   const mainContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  
+  const [currentConfig, setCurrentConfig] = useState<string>("");
+  const [chatInputLoadingState, setChatInputLoadingState] = useState<ChatInputLoadingState>("hide");
   const [hasUserSentMessage, setHasUserSentMessage] = useState(false);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
+  const [availableConfigs, setAvailableConfigs] = useState<string[]>([]);
+  const [_isGeneratingAgent, setIsGeneratingAgent] = useState(false);
+  const [askId, setAskId] = useState<string | null>(null);
+
+  const getConfigList = () => {
+    let request: UserRequest = {
+      type: 'list_agents',
+      content: null,
+    }
+    setChatInputLoadingState("loading");
+    sendRequest(request);
+  }
+
   const handleEvent = (event: Event) => {
     console.log('current messages', messages);
+    
     if (event.type === 'example') {
       const data = event.data as ExampleContent;
       const query = data.query;
@@ -54,6 +81,8 @@ const App: React.FC = () => {
       }
       return;
     }
+
+    // handle raw event
     if (event.type === 'raw') {
       const data = event.data as TextDeltaContent;
 
@@ -133,7 +162,9 @@ const App: React.FC = () => {
 
         return prev
       });
-    } else if (event.type === 'new') {
+    } 
+    // handle new agent event
+    else if (event.type === 'new') {
       const data = event.data as { name: string };
       const message: Message = {
         id: Date.now() + 1,
@@ -160,7 +191,9 @@ const App: React.FC = () => {
           return updatedMessages;
         });
       }, 1500);
-    } else if (event.type === 'orchestra') {
+    } 
+    // handle orchestra event
+    else if (event.type === 'orchestra') {
       const data = event.data as OrchestraContent;
       if (data.type === 'plan') {
         const item = data.item as PlanItem;
@@ -197,8 +230,88 @@ const App: React.FC = () => {
         };
         setMessages(prev => [...prev, message]);
       }
-    } else if (event.type === 'finish') {
+    } 
+    // handle finish event
+    else if (event.type === 'finish') {
       setIsModelResponding(false); // Call save function on finish
+    } 
+    // handle generated config event
+    else if (event.type === 'generated_agent_config') {
+      let data = event.data as GeneratedAgentContent;
+      let config = data.config_content;
+      let filename = data.filename;
+      const content = "```\n" + config + "\n```\n\n" + "filename: " + '`' + filename + '`';
+      const message: Message = {
+        id: Date.now() + 1,
+        content: content,
+        sender: 'assistant',
+        timestamp: new Date(),
+        type: 'text',
+        requireConfirm: event.requireConfirm,
+      }
+      setMessages(prev => [...prev, message]);
+    }
+    // handle init event
+    else if (event.type === 'init') {
+      setCurrentConfig((event.data as InitContent).default_agent);
+    } 
+    // handle switch agent event
+    else if (event.type === 'switch_agent') {
+      let data = event.data as SwitchAgentContent;
+      if (data.ok) {
+        setCurrentConfig(data.name);
+        setIsGeneratingAgent(false);
+      } else {
+        console.error('Switch agent failed');
+      }
+    } 
+    // handle list agents event
+    else if (event.type === 'list_agents') {
+      let data = event.data as ListAgentsContent;
+      setAvailableConfigs(data.agents);
+      setChatInputLoadingState("ready");
+    } 
+    // handle ask event
+    else if (event.type === 'ask') {
+      let data = event.data as AskContent;
+      let ask_id = data.ask_id;
+      setAskId(ask_id);
+      const Message: Message = {
+        id: Date.now(),
+        content: data.question,
+        sender: 'assistant',
+        timestamp: new Date(),
+        type: 'text',
+        inprogress: false,
+        requireConfirm: false,
+      };
+      setMessages(prev => [...prev, Message]);
+      setIsModelResponding(false);
+    }
+    // handle gen agent event
+    else if (event.type === 'gen_agent') {
+      // clean up message
+      setMessages([]);
+      setIsModelResponding(true);
+      // add a prompt message
+      const message: Message = {
+        id: Date.now(),
+        content: "Hello, please let me know your requirement. What agent do you want to generate?",
+        sender: 'assistant',
+        timestamp: new Date(),
+        type: 'text',
+        inprogress: false,
+        requireConfirm: false,
+      };
+      // after 1s
+      setTimeout(() => {
+        setMessages(prev => [...prev, message]);
+        setIsModelResponding(false);
+      }, 500);
+      setIsGeneratingAgent(true);
+      setCurrentConfig("generate_agent");
+      // collapse config panel
+      setChatInputLoadingState("hide");
     } else {
       console.error('Unknown event type:', event.type);
     }
@@ -265,15 +378,26 @@ const App: React.FC = () => {
       return;
     }
 
-    sendQuery(inputValue);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isModelResponding) {
-      e.preventDefault();
-      handleSendMessage();
+    if (askId) {
+      sendRequest({
+        type: 'answer',
+        content: {
+          answer: inputValue,
+          ask_id: askId,
+        },
+      });
+      setAskId(null);
+    } else {
+      sendQuery(inputValue);
     }
   };
+
+  // const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter' && !e.shiftKey && !isModelResponding) {
+  //     e.preventDefault();
+  //     handleSendMessage();
+  //   }
+  // };
 
   const downloadReport = (content: any, contentType: "html" | "svg" | "markdown") => {
     try {
@@ -354,6 +478,22 @@ const App: React.FC = () => {
     handleCloseSettings();
     // Reload the page to reconnect with the new WebSocket URL
     window.location.reload();
+  };
+
+  const handleConfigSelect = (config: string) => {
+    let request: UserRequest = {
+      type: 'switch_agent', 
+      content: { config_file: config } 
+    };
+    sendRequest(request);
+  };
+
+  const handleAddConfig = () => {
+    let request: UserRequest = {
+      type: 'gen_agent', 
+      content: null 
+    };
+    sendRequest(request);
   };
 
   return (
@@ -443,34 +583,20 @@ const App: React.FC = () => {
             onNavigate={scrollToMessage} 
           />
 
-          <div className="chat-input-container">
-            <div className="chat-input-wrapper">
-              <div className="input-group">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  className="chat-input"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={isModelResponding ? 'AI is thinking...' : 'Type a message...'}
-                  disabled={isModelResponding}
-                />
-                <button
-                  className="send-button"
-                  onClick={handleSendMessage}
-                  disabled={isModelResponding}
-                  title={isModelResponding ? 'AI is thinking...' : 'Send message'}
-                >
-                  {isModelResponding ? (
-                    <i className="breathing-circle fa fa-circle"></i>
-                  ) : (
-                    <i className="fas fa-paper-plane"></i>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
+          <ChatInput
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+            onSendMessage={handleSendMessage}
+            isModelResponding={isModelResponding}
+            inputRef={inputRef}
+            currentConfig={currentConfig}
+            onConfigSelect={handleConfigSelect}
+            handleAddConfig={handleAddConfig}
+            chatInputLoadingState={chatInputLoadingState}
+            setChatInputLoadingState={setChatInputLoadingState}
+            availableConfigs={availableConfigs}
+            getConfigList={getConfigList}
+          />
 
           {/* Footer with pic.png */}
           <footer className="app-footer">
