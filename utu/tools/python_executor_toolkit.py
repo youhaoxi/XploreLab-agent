@@ -12,7 +12,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from ..config import ToolkitConfig
-from .base import AsyncBaseToolkit
+from .base import AsyncBaseToolkit, register_tool
 
 # Used to clean ANSI escape sequences
 ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]")
@@ -123,11 +123,7 @@ class PythonExecutorToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig | dict | None = None):
         super().__init__(config)
 
-    async def get_tools_map(self) -> dict[str, callable]:
-        return {
-            "execute_python_code": self.execute_python_code,
-        }
-
+    @register_tool
     async def execute_python_code(self, code: str, workdir: str = "./run_workdir", timeout: int = 30) -> dict:
         """
         Executes Python code and returns the output.

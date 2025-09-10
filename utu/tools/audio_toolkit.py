@@ -1,10 +1,8 @@
-from collections.abc import Callable
-
 from openai.types.audio import TranscriptionVerbose
 
 from ..config import ToolkitConfig
 from ..utils import DIR_ROOT, EnvUtils, FileUtils, SimplifiedAsyncOpenAI, async_file_cache, get_logger
-from .base import TOOL_PROMPTS, AsyncBaseToolkit
+from .base import TOOL_PROMPTS, AsyncBaseToolkit, register_tool
 
 logger = get_logger(__name__)
 
@@ -46,6 +44,7 @@ class AudioToolkit(AsyncBaseToolkit):
         self.md5_to_path[md5] = path  # record md5 to map
         return md5
 
+    @register_tool
     async def audio_qa(self, audio_path: str, question: str) -> str:
         """Asks a question about the audio and gets an answer.
 
@@ -68,8 +67,3 @@ class AudioToolkit(AsyncBaseToolkit):
         ]
         output = await self.llm.query_one(messages=messages, **self.config.config_llm.model_params.model_dump())
         return output
-
-    async def get_tools_map(self) -> dict[str, Callable]:
-        return {
-            "audio_qa": self.audio_qa,
-        }

@@ -1,7 +1,7 @@
 from ..config import ConfigLoader
 from .arxiv_toolkit import ArxivToolkit
 from .audio_toolkit import AudioToolkit
-from .base import AsyncBaseToolkit as AsyncBaseToolkit
+from .base import AsyncBaseToolkit as AsyncBaseToolkit, register_tool as register_tool
 from .bash_remote_tool import BashRemoteToolkit
 from .bash_toolkit import BashToolkit
 from .codesnip_toolkit import CodesnipToolkit
