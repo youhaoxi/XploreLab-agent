@@ -14,9 +14,9 @@ from agents import function_tool
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
 from utu.tools import SearchToolkit
+from utu.ui import ExampleConfig
 from utu.ui.webui_chatbot import WebUIChatbot
 from utu.utils import FileUtils, schema_to_basemodel
-from utu.ui import ExampleConfig
 
 PROMPTS = FileUtils.load_yaml(pathlib.Path(__file__).parent / "prompts.yaml")
 SEARCH_TOOLKIT = SearchToolkit(ConfigLoader.load_toolkit_config("search"))

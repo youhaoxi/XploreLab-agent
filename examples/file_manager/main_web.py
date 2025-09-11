@@ -1,7 +1,7 @@
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
-from utu.ui.webui_chatbot import WebUIChatbot
 from utu.ui import ExampleConfig
+from utu.ui.webui_chatbot import WebUIChatbot
 
 EXAMPLE_QUERY = (
     "整理一下当前文件夹下面的所有文件，按照 学号-姓名 的格式重命名。"

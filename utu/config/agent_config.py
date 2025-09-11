@@ -3,7 +3,6 @@ from typing import Literal
 
 from pydantic import Field
 
-from ..utils import EnvUtils
 from .base_config import ConfigBaseModel
 from .model_config import ModelConfigs
 

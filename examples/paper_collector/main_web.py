@@ -2,8 +2,9 @@ import pathlib
 
 from utu.agents import OrchestraAgent
 from utu.config import ConfigLoader
-from utu.ui.webui_chatbot import WebUIChatbot
 from utu.ui import ExampleConfig
+from utu.ui.webui_chatbot import WebUIChatbot
+
 
 def main():
     env_and_args = ExampleConfig()

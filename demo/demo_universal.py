@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     parser.add_argument("--autoload", type=bool, default=DEFAULT_AUTOLOAD)
     args = parser.parse_args()
-    
+
     webui = WebUIAgents(default_config=args.config)
     print(f"Server started at http://{args.ip}:{args.port}/")
     webui.launch(ip=args.ip, port=args.port, autoload=args.autoload)
