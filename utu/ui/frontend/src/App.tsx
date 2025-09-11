@@ -40,6 +40,9 @@ const initialMessages: Message[] = [
   }
 ];
 
+// 根据当前协议自动选择 ws:// 或 wss://
+const defaultProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const defaultWsUrl = import.meta.env.VITE_WS_URL || `${defaultProtocol}//${window.location.host}/ws`;
 
 
 const App: React.FC = () => {
@@ -49,7 +52,7 @@ const App: React.FC = () => {
   const [exampleQuery, setExampleQuery] = useState<string[]>([]);
   const [hideExampleQuery, setHideExampleQuery] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [wsUrl, setWsUrl] = useState(localStorage.getItem('wsUrl') || 'ws://localhost:8848/ws');
+  const [wsUrl, setWsUrl] = useState(localStorage.getItem('wsUrl') || defaultWsUrl);
   const { sendQuery, sendRequest, lastMessage, readyState } = useChatWebSocket(wsUrl);
   const [inputValue, setInputValue] = useState('');
   const [isModelResponding, setIsModelResponding] = useState(false);
