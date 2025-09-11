@@ -16,6 +16,7 @@ from utu.config import ConfigLoader
 from utu.tools import SearchToolkit
 from utu.ui.webui_chatbot import WebUIChatbot
 from utu.utils import FileUtils, schema_to_basemodel
+from utu.ui import ExampleConfig
 
 PROMPTS = FileUtils.load_yaml(pathlib.Path(__file__).parent / "prompts.yaml")
 SEARCH_TOOLKIT = SearchToolkit(ConfigLoader.load_toolkit_config("search"))
@@ -93,11 +94,12 @@ class WideResearch:
             return output
 
     async def run_webui(self):
+        env_and_args = ExampleConfig()
         chatbot = WebUIChatbot(
             self.planner_agent,
             example_query=TASK,
         )
-        await chatbot.launch_async()
+        await chatbot.launch_async(port=env_and_args.port, ip=env_and_args.ip, autoload=env_and_args.autoload)
 
 
 async def main():

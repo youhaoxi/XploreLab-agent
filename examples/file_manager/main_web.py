@@ -1,6 +1,7 @@
 from utu.agents import SimpleAgent
 from utu.config import ConfigLoader
 from utu.ui.webui_chatbot import WebUIChatbot
+from utu.ui import ExampleConfig
 
 EXAMPLE_QUERY = (
     "整理一下当前文件夹下面的所有文件，按照 学号-姓名 的格式重命名。"
@@ -13,8 +14,9 @@ worker_agent = SimpleAgent(config=config)
 
 
 def main_gradio():
+    env_and_args = ExampleConfig()
     chatbot = WebUIChatbot(worker_agent, example_query=EXAMPLE_QUERY)
-    chatbot.launch(port=config.frontend_port, ip=config.frontend_ip)
+    chatbot.launch(port=env_and_args.port, ip=env_and_args.ip, autoload=env_and_args.autoload)
 
 
 if __name__ == "__main__":
