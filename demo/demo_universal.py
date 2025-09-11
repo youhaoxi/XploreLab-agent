@@ -17,4 +17,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     webui = WebUIAgents(default_config=args.config)
+    print(f"Server started at http://{args.ip}:{args.port}/")
     webui.launch(ip=args.ip, port=args.port, autoload=args.autoload)
