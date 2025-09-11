@@ -14,6 +14,8 @@ interface SideBarProps {
   handleAddConfig?: () => void;
   getConfigList: () => void;
   availableConfigs: string[];
+  showNewChatButton?: boolean;
+  showAgentConfigs?: boolean;
 }
 
 // Helper function to convert path to a more readable format
@@ -79,7 +81,9 @@ const SideBar: React.FC<SideBarProps> = ({
   onConfigSelect = () => {},
   handleAddConfig = () => {},
   getConfigList,
-  availableConfigs = []
+  availableConfigs = [],
+  showNewChatButton = true,
+  showAgentConfigs = true
 }) => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -120,17 +124,21 @@ const SideBar: React.FC<SideBarProps> = ({
       className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}
     >
       <div className="sidebar-content">
-        <div className="sidebar-section">
-          <button 
-            className="sidebar-button primary"
-            onClick={handleNewChat}
-          >
-            <i className="fas fa-plus" />
-            New Chat
-          </button>
-        </div>
-        
-        <div className="sidebar-divider" />
+        {showNewChatButton && (
+          <>
+            <div className="sidebar-section">
+              <button 
+                className="sidebar-button primary"
+                onClick={handleNewChat}
+              >
+                <i className="fas fa-plus" />
+                New Chat
+              </button>
+            </div>
+            
+            <div className="sidebar-divider" />
+          </>
+        )}
         
         {/* Agent History Section */}
         <div className="sidebar-section">
@@ -194,67 +202,71 @@ const SideBar: React.FC<SideBarProps> = ({
           </div>
         ) : null}
         
-        <div className="sidebar-divider" style={{ margin: '12px 0' }} />
+        {showAgentConfigs && (
+          <>
+            <div className="sidebar-divider" style={{ margin: '12px 0' }} />
 
-        {/* Configs Section */}
-        <div className="sidebar-section">
-          <div className="sidebar-section-header">
-            <div className="sidebar-section-title">AVAILABLE CONFIGS</div>
-            <button 
-              className={`refresh-button ${isRefreshing ? 'refreshing' : ''}`} 
-              onClick={async (e) => {
-                e.stopPropagation();
-                if (isRefreshing) return;
-                
-                setIsRefreshing(true);
-                try {
-                  await getConfigList();
-                } finally {
-                  // Keep spinning for at least 1 second for better UX
-                  setTimeout(() => setIsRefreshing(false), 1000);
-                }
-              }}
-              title="Refresh config list"
-              disabled={isRefreshing}
-            >
-              <i className="fas fa-sync-alt"></i>
-            </button>
-          </div>
-          <div className="config-list">
-            {availableConfigs.length > 0 ? (
-              <>
-                {[...availableConfigs]
-                  .sort((a, b) => getFilename(a).localeCompare(getFilename(b)))
-                  .map((config) => (
-                  <div 
-                    key={config}
-                    className={`sidebar-button-text config-item ${config === currentConfig ? 'active' : ''}`}
-                    onClick={() => onConfigSelect(config)}
-                  >
-                    <Tooltip content={config}>
-                      <div className="config-list-item">
-                        <div className="config-icon-container">
-                          {config.includes('generated/') ? (
-                            <i className="fas fa-robot config-icon" title="自动生成配置"></i>
-                          ) : config.includes('examples/') ? (
-                            <i className="fas fa-flask config-icon" title="示例配置"></i>
-                          ) : null}
-                        </div>
-                        <span className="config-name">
-                          {getFilename(config)}
-                        </span>
-                      </div>
-                    </Tooltip>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <div className="sidebar-button-text" style={{ padding: '8px 16px', color: 'var(--color-subtle-text, #6c757d)' }}>
-                No configs available
+            {/* Configs Section */}
+            <div className="sidebar-section">
+              <div className="sidebar-section-header">
+                <div className="sidebar-section-title">AVAILABLE CONFIGS</div>
+                <button 
+                  className={`refresh-button ${isRefreshing ? 'refreshing' : ''}`} 
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    if (isRefreshing) return;
+                    
+                    setIsRefreshing(true);
+                    try {
+                      await getConfigList();
+                    } finally {
+                      // Keep spinning for at least 1 second for better UX
+                      setTimeout(() => setIsRefreshing(false), 1000);
+                    }
+                  }}
+                  title="Refresh config list"
+                  disabled={isRefreshing}
+                >
+                  <i className="fas fa-sync-alt"></i>
+                </button>
               </div>
-            )}
-          </div>
-        </div>
+              <div className="config-list">
+                {availableConfigs.length > 0 ? (
+                  <>
+                    {[...availableConfigs]
+                      .sort((a, b) => getFilename(a).localeCompare(getFilename(b)))
+                      .map((config) => (
+                      <div 
+                        key={config}
+                        className={`sidebar-button-text config-item ${config === currentConfig ? 'active' : ''}`}
+                        onClick={() => onConfigSelect(config)}
+                      >
+                        <Tooltip content={config}>
+                          <div className="config-list-item">
+                            <div className="config-icon-container">
+                              {config.includes('generated/') ? (
+                                <i className="fas fa-robot config-icon" title="自动生成配置"></i>
+                              ) : config.includes('examples/') ? (
+                                <i className="fas fa-flask config-icon" title="示例配置"></i>
+                              ) : null}
+                            </div>
+                            <span className="config-name">
+                              {getFilename(config)}
+                            </span>
+                          </div>
+                        </Tooltip>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className="sidebar-button-text" style={{ padding: '8px 16px', color: 'var(--color-subtle-text, #6c757d)' }}>
+                    No configs available
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

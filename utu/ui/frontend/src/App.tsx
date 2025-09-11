@@ -66,6 +66,9 @@ const App: React.FC = () => {
   const [agentType, setAgentType] = useState<'simple' | 'orchestra' | 'other'>('simple');
   const [subAgents, setSubAgents] = useState<string[] | null>(null);
 
+  const [showNewChatButton, setShowNewChatButton] = useState(false);
+  const [showAgentConfigs, setShowAgentConfigs] = useState(false);
+
   const getConfigList = () => {
     let request: UserRequest = {
       type: 'list_agents',
@@ -262,6 +265,8 @@ const App: React.FC = () => {
       setCurrentConfig(initData.default_agent);
       setAgentType(initData.agent_type);
       setSubAgents(initData.sub_agents);
+      setShowNewChatButton(true);
+      setShowAgentConfigs(true);
       
       // Send list_agents command on init
       sendRequest({
@@ -277,6 +282,8 @@ const App: React.FC = () => {
         setAgentType(data.agent_type);
         setSubAgents(data.sub_agents);
         setIsGeneratingAgent(false);
+        // clear messages
+        setMessages(initialMessages);
       } else {
         console.error('Switch agent failed');
       }
@@ -565,6 +572,8 @@ const App: React.FC = () => {
         handleAddConfig={handleAddConfig}
         getConfigList={getConfigList}
         availableConfigs={availableConfigs}
+        showNewChatButton={showNewChatButton}
+        showAgentConfigs={showAgentConfigs}
       />
       
       <div className="main-content">
