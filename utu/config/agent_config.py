@@ -107,9 +107,3 @@ class AgentConfig(ConfigBaseModel):
     """Workforce executor config (dict)"""
     workforce_executor_infos: list[dict] = Field(default_factory=list)
     """Workforce executor infos, list of {name, desc, strengths, weaknesses}"""
-
-    # frontend server config
-    frontend_ip: str = EnvUtils.get_env("FRONTEND_IP", "127.0.0.1")
-    """Frontend server ip address"""
-    frontend_port: int = EnvUtils.get_env("FRONTEND_PORT", 8848)
-    """Frontend server port"""
