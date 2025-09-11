@@ -7,6 +7,18 @@ from utu.agents.orchestra import OrchestraStreamEvent
 from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent
 
 
+class WorkerDescription(BaseModel):
+    name: str
+    desc: str
+    strengths: list[str]
+    weaknesses: list[str]
+
+
+class OrchestraDescription(BaseModel):
+    workers: list[WorkerDescription]
+    planner: str
+    reporter: str
+
 class TextDeltaContent(BaseModel):
     type: Literal["reason", "tool_call", "tool_call_argument", "tool_call_output", "text"]
     delta: str
@@ -53,11 +65,15 @@ class SwitchAgentContent(BaseModel):
     type: Literal["switch_agent"] = "switch_agent"
     ok: bool
     name: str
+    agent_type: Literal["simple", "orchestra", "other"]
+    sub_agents: list[str] | None = None
 
 
 class InitContent(BaseModel):
     type: Literal["init"] = "init"
     default_agent: str
+    agent_type: Literal["simple", "orchestra", "other"]
+    sub_agents: list[str] | None = None
 
 
 class AskContent(BaseModel):
