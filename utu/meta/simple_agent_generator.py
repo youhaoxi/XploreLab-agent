@@ -143,7 +143,7 @@ class SimpleAgentGenerator:
             toolkits_configs=add_indented_lines(toolkits_configs, 2),
         )
         ofn = self.output_dir / f"{task_recorder.name}.yaml"
-        ofn.write_text(config)
+        ofn.write_text(config, encoding="utf-8")
         return ofn, config
 
     async def step1(self, task_recorder: GeneratorTaskRecorder, user_input: str) -> None:
