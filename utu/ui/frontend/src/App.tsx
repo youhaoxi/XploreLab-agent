@@ -378,6 +378,22 @@ const App: React.FC = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Set favicon using logoSquareUrl on mount
+  useEffect(() => {
+    try {
+      let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null;
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.type = 'image/png';
+      link.href = logoSquareUrl;
+    } catch (e) {
+      console.error('Failed to set favicon', e);
+    }
+  }, []);
+
   useEffect(() => {
     if (lastMessage !== null) {
       const message_raw = lastMessage;
