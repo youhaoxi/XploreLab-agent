@@ -107,7 +107,7 @@ class SimpleAgentGenerator:
             await self.step3(task_recorder)
             # step 4: generate name
             await self.step4(task_recorder)
-            ofn = self.format_config(task_recorder)
+            ofn, _ = self.format_config(task_recorder)
             print(f"Config saved to {ofn}")
 
     def run_streamed(self, user_input: str) -> GeneratorTaskRecorder:
