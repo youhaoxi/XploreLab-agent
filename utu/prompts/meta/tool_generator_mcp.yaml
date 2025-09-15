@@ -62,11 +62,11 @@ SETP_3_MANIFEST: |
   ```
 
 TEMPLATE_MAIN: |
-  from mcp.server.fastmcp import FastMCP
+  import importlib
   import json
   import pathlib
-  import importlib
 
+  from mcp.server.fastmcp import FastMCP
 
   schema = json.loads(pathlib.Path("manifest.json").read_text())
 
@@ -83,6 +83,7 @@ TEMPLATE_MAIN: |
   if __name__ == "__main__":
       mcp.run()
 
+
 TEMPLATE_MANIFEST: |
   {
       "name": "{{ name }}",
@@ -97,7 +98,7 @@ TEMPLATE_MANIFEST: |
 
 TEMPLATE_CONFIG: |
   # @package _global_
-  
+
   name: {{ name }}
   mode: mcp
   activated_tools: null
