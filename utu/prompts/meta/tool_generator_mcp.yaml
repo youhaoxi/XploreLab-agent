@@ -61,3 +61,49 @@ SETP_3_MANIFEST: |
   }
   ```
 
+TEMPLATE_MAIN: |
+  from mcp.server.fastmcp import FastMCP
+  import json
+  import pathlib
+  import importlib
+
+
+  schema = json.loads(pathlib.Path("manifest.json").read_text())
+
+  cls_module = importlib.import_module("runner")
+  inst = getattr(cls_module, schema["impl_class_name"])()
+
+  mcp = FastMCP(schema["impl_class_name"])
+  for method in schema["impl_methods"]:
+      mcp.add_tool(
+          fn=getattr(inst, method),
+          name=method,
+      )
+
+  if __name__ == "__main__":
+      mcp.run()
+
+TEMPLATE_MANIFEST: |
+  {
+      "name": "{{ name }}",
+      "command": ".venv/bin/python",
+      "args": ["main.py"],
+      "transport": "stdio",
+      "impl_fn": "runner.py",
+      "impl_class_name": "{{ class_name }}",
+      "impl_requirements": {{ requirements }},
+      "impl_methods": {{ methods }}
+  }
+
+TEMPLATE_CONFIG: |
+  # @package _global_
+  
+  name: {{ name }}
+  mode: mcp
+  activated_tools: null
+  mcp_transport: stdio
+  mcp_client_session_timeout_seconds: 20
+  config:
+    command: .venv/bin/python
+    args: ["main.py"]
+    cwd: configs/tools/generated/{{ name }}
