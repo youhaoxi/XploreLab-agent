@@ -33,3 +33,15 @@ def test_extract_code_json():
     print(code)
     code = LLMOutputParser.extract_code_json(I_CODE_BLOCK, try_parse=True)
     print(code)
+
+
+def test_camel_to_snake():
+    code = LLMOutputParser.camel_to_snake("ExtractVideoFrames")
+    print(code)
+
+
+def test_snake_to_camel():
+    code = LLMOutputParser.snake_to_camel("extract_video_frames")
+    print(code)
+    code = LLMOutputParser.snake_to_camel("extract_video_frames", pascal=False)
+    print(code)

@@ -10,8 +10,8 @@ LANGUAGE_TO_CANDS = {
 
 
 class LLMOutputParser:
-    @classmethod
-    def extract_code_blocks(self, s: str) -> list[tuple[str, str]]:
+    @staticmethod
+    def extract_code_blocks(s: str) -> list[tuple[str, str]]:
         """Parse all code blocks (language, code) from the given string."""
         pattern = re.compile(r"```(\w*)\n(.*?)```", re.DOTALL)
         code_blocks = []
@@ -21,9 +21,9 @@ class LLMOutputParser:
             code_blocks.append((language, code))
         return code_blocks
 
-    @classmethod
-    def extract_code_block_with_language(self, s: str, language: str) -> str:
-        code_blocks = self.extract_code_blocks(s)
+    @staticmethod
+    def extract_code_block_with_language(s: str, language: str) -> str:
+        code_blocks = LLMOutputParser.extract_code_blocks(s)
         if not code_blocks:
             return s  # fallback
         for lang, code in code_blocks:
@@ -31,18 +31,34 @@ class LLMOutputParser:
                 return code
         return code_blocks[0][1]  # fallback
 
-    @classmethod
-    def extract_code_python(self, s: str) -> str:
+    @staticmethod
+    def extract_code_python(s: str) -> str:
         """Extract the first code block with the given language from the given string."""
-        return self.extract_code_block_with_language(s, "python")
+        return LLMOutputParser.extract_code_block_with_language(s, "python")
 
-    @classmethod
-    def extract_code_json(self, s: str, try_parse: bool = True) -> str | dict:
+    @staticmethod
+    def extract_code_json(s: str, try_parse: bool = True) -> str | dict:
         """Extract the first json code block from the given string."""
-        code = self.extract_code_block_with_language(s, "json")
+        code = LLMOutputParser.extract_code_block_with_language(s, "json")
         if try_parse:
             try:
                 return json.loads(code)
             except json.JSONDecodeError:
                 return code
         return code
+
+    @staticmethod
+    def camel_to_snake(name: str) -> str:
+        """Convert CamelCase / PascalCase to snake_case."""
+        s1 = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", name)
+        s2 = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", s1)
+        return s2.lower()
+
+    @staticmethod
+    def snake_to_camel(name: str, pascal: bool = True) -> str:
+        """Convert snake_case to CamelCase / PascalCase."""
+        components = name.split("_")
+        if pascal:
+            return "".join(x.title() for x in components)
+        else:
+            return components[0].lower() + "".join(x.title() for x in components[1:])
