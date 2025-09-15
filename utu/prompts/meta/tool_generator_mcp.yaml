@@ -1,0 +1,63 @@
+SETP_1_REQUIREMENT: |
+  User Requirement:
+  "{{ user_request }}"
+
+  Task:
+  Generate a function schema that represents this requirement. The schema must include:
+  - name: a concise function name (snake_case)
+  - description: a short English description of what the function does
+
+  Output ONLY JSON, example format:
+  ```json
+  {
+      "name": "download_bilibili_video",
+      "description": "Download a video from Bilibili given its URL."
+  }
+  ```
+
+SETP_2_IMPLEMENTATION: |
+  Task:
+  Generate a Python class implementing this function. Requirements:
+  - Use asyncio if needed
+  - Include minimal error handling
+  - Do NOT include extra explanations, only code
+
+  Example:
+  ```python
+  import yt_dlp
+
+  class DownloadBilibiliVideo:
+      def download_video(self, url: str, output_path: str = None) -> str:
+          """Download a Bilibili video
+
+          Args:
+              url (str): The URL of the video to download.
+              output_path (str, optional): The path to save the downloaded video. Defaults to None.
+          """
+          ydl_opts = {"format": "bestvideo+bestaudio/best"}
+          if output_path:
+              ydl_opts["outtmpl"] = output_path
+          with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+              ydl.download([url])
+          return f"Downloaded video to {output_path}"
+  ```
+
+  Output:
+  Complete Python code for `runner.py`
+
+SETP_3_MANIFEST: |
+  Task:
+  Generate a manifest.json for this MCP tool with fields:
+  - class_name
+  - requirements
+  - methods
+
+  Output ONLY valid JSON, example:
+  ```json
+  {
+      "class_name": "DownloadBilibiliVideo",
+      "requirements": ["yt-dlp"],
+      "methods": ["download_video"],
+  }
+  ```
+
