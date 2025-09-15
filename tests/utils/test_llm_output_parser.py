@@ -31,3 +31,5 @@ def test_extract_code_python():
 def test_extract_code_json():
     code = LLMOutputParser.extract_code_json(I_CODE_BLOCK)
     print(code)
+    code = LLMOutputParser.extract_code_json(I_CODE_BLOCK, try_parse=True)
+    print(code)
