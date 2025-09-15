@@ -89,6 +89,16 @@ const SideBar: React.FC<SideBarProps> = ({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const COLLAPSE_STORAGE_KEY = 'sidebar.availableConfigsCollapsed';
+  const [isConfigsCollapsed, setIsConfigsCollapsed] = useState<boolean>(() => {
+    try {
+      if (typeof window === 'undefined') return false;
+      const saved = window.localStorage.getItem(COLLAPSE_STORAGE_KEY);
+      return saved === 'true';
+    } catch {
+      return false;
+    }
+  });
   const { t } = useTranslation();
   const filteredConfigs = availableConfigs
     .filter(config => config.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -120,6 +130,17 @@ const SideBar: React.FC<SideBarProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen, onClose]);
+
+  // Persist collapse state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(COLLAPSE_STORAGE_KEY, String(isConfigsCollapsed));
+      }
+    } catch {
+      // noop
+    }
+  }, [isConfigsCollapsed]);
 
   const handleNewChat = () => {
     window.open(window.location.href, '_blank');
@@ -216,7 +237,11 @@ const SideBar: React.FC<SideBarProps> = ({
             {/* Available Configs Section */}
             <div className="sidebar-section">
               <div className="sidebar-section-header">
-                <div className="sidebar-section-title">{t('sidebar.availableConfigsTitle')}</div>
+                <div className="sidebar-section-left">
+                  <div className="sidebar-section-title">
+                    {t('sidebar.availableConfigsTitle')}
+                  </div>
+                </div>
                 <button 
                   className={`refresh-button ${isRefreshing ? 'refreshing' : ''}`}
                   onClick={() => {
@@ -230,6 +255,7 @@ const SideBar: React.FC<SideBarProps> = ({
                   <i className="fas fa-sync-alt" />
                 </button>
               </div>
+              {/* Search box should stay visible regardless of collapse state */}
               <div className="search-box-container" style={{ marginBottom: '12px' }}>
                 <div className="search-box">
                   <i className="fas fa-search search-icon" />
@@ -237,7 +263,14 @@ const SideBar: React.FC<SideBarProps> = ({
                     type="text"
                     placeholder={t('sidebar.searchConfigs')}
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={() => {
+                      if (isConfigsCollapsed) setIsConfigsCollapsed(false);
+                    }}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setSearchTerm(val);
+                      if (val && isConfigsCollapsed) setIsConfigsCollapsed(false);
+                    }}
                     className="search-input"
                   />
                   {searchTerm && (
@@ -251,35 +284,50 @@ const SideBar: React.FC<SideBarProps> = ({
                   )}
                 </div>
               </div>
-              <div className="config-list">
-                {filteredConfigs.length > 0 ? (
-                  filteredConfigs.map((config) => (
-                    <Tooltip key={config} content={config}>
-                      <div
-                        className={`config-toc-item ${currentConfig === config ? 'active' : ''}`}
-                        onClick={() => onConfigSelect(config)}
-                      >
-                        <div className="config-list-item">
-                          <div className="config-icon-container">
-                            {config.includes('generated/') ? (
-                              <i className="fas fa-robot config-icon" title={t('sidebar.generatedConfigTooltip')} />
-                            ) : config.includes('examples/') ? (
-                              <i className="fas fa-flask config-icon" title={t('sidebar.exampleConfigTooltip')} />
-                            ) : null}
-                          </div>
-                          <span className="config-name">
-                            {getFilename(config)}
-                          </span>
-                        </div>
-                      </div>
-                    </Tooltip>
-                  ))
-                ) : (
-                  <div className="sidebar-button-text" style={{ padding: '8px 16px', color: 'var(--color-subtle-text, #6c757d)' }}>
-                    {availableConfigs.length === 0 ? t('sidebar.noConfigsShort') : t('sidebar.noMatchingConfigs')}
-                  </div>
-                )}
+              {/* Collapse/Expand control on its own row */}
+              <div className="collapse-row">
+                <button
+                  className="collapse-action"
+                  onClick={() => setIsConfigsCollapsed(prev => !prev)}
+                  aria-expanded={!isConfigsCollapsed}
+                >
+                  <i className={`fas ${isConfigsCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'}`} />
+                  <span>{isConfigsCollapsed ? t('sidebar.expand') : t('sidebar.collapse')}</span>
+                </button>
               </div>
+              {!isConfigsCollapsed && (
+                <>
+                  <div className="config-list">
+                    {filteredConfigs.length > 0 ? (
+                      filteredConfigs.map((config) => (
+                        <Tooltip key={config} content={config}>
+                          <div
+                            className={`config-toc-item ${currentConfig === config ? 'active' : ''}`}
+                            onClick={() => onConfigSelect(config)}
+                          >
+                            <div className="config-list-item">
+                              <div className="config-icon-container">
+                                {config.includes('generated/') ? (
+                                  <i className="fas fa-robot config-icon" title={t('sidebar.generatedConfigTooltip')} />
+                                ) : config.includes('examples/') ? (
+                                  <i className="fas fa-flask config-icon" title={t('sidebar.exampleConfigTooltip')} />
+                                ) : null}
+                              </div>
+                              <span className="config-name">
+                                {getFilename(config)}
+                              </span>
+                            </div>
+                          </div>
+                        </Tooltip>
+                      ))
+                    ) : (
+                      <div className="sidebar-button-text" style={{ padding: '8px 16px', color: 'var(--color-subtle-text, #6c757d)' }}>
+                        {availableConfigs.length === 0 ? t('sidebar.noConfigsShort') : t('sidebar.noMatchingConfigs')}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </>
         )}

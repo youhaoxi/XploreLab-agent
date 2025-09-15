@@ -22,7 +22,9 @@
     "generatedConfigTooltip": "自动生成配置",
     "exampleConfigTooltip": "示例配置",
     "noConfigsShort": "没有可用的配置",
-    "noMatchingConfigs": "未找到匹配的配置"
+    "noMatchingConfigs": "未找到匹配的配置",
+    "expand": "点击展开",
+    "collapse": "点击折叠"
   },
   "app": {
     "welcome": "你好！我是你的AI助手，有什么可以帮你的吗？",

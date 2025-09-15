@@ -22,7 +22,9 @@
     "generatedConfigTooltip": "Auto-generated config",
     "exampleConfigTooltip": "Example config",
     "noConfigsShort": "No configs available",
-    "noMatchingConfigs": "No matching configs found"
+    "noMatchingConfigs": "No matching configs found",
+    "expand": "Expand",
+    "collapse": "Collapse"
   },
   "app": {
     "welcome": "Hello! I am your AI assistant. How can I help you today?",
