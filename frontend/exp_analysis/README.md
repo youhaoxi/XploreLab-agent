@@ -10,7 +10,12 @@ cp .env.example .env  # config necessary keys...
 source .env
 ```
 
-2. Install npm packages
+2. Install next
+```bash
+npm install next
+```
+
+3. Install npm packages
 ```bash
 npm install --legacy-peer-deps
 ```
