@@ -29,8 +29,9 @@
 
 ## 🗞️ ニュース
 
+- 📺 [2025-09-09] 「Youtu-Agent」の設計思想と基本的な使い方についてライブ配信を行いました。[[動画](https://www.bilibili.com/video/BV1mypqz4EvS)] [[資料](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNLgt3CbnxRWaYWnW4)]。
 - 🎁 [2025-09-02] [テンセントクラウド国際サイト](https://www.tencentcloud.com/)では、DeepSeek APIの新規ユーザーに対して**300万枚の無料トークン**を提供しています（**2025年9月1日から2025年10月31日まで**）。`Youtu-Agent`でDeepSeekモデルを使用したい場合は、[無料トライアルをクリック](https://www.tencentcloud.com/document/product/1255/70381)してください！企業向けのエージェントソリューションについては、[エージェント開発プラットフォームADP](https://adp.tencentcloud.com)もご覧ください。
-- 📺 [2025-08-28] 新しくリリースされたDeepSeek-V3.1モデルについてライブ配信を行い、`Youtu-Agent`フレームワークでの使用方法を紹介しました。[こちらをクリック](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF)で使用したドキュメントを入手できます。
+- 📺 [2025-08-28] 新しくリリースされたDeepSeek-V3.1モデルについてライブ配信を行い、`Youtu-Agent`フレームワークでの使用方法を紹介しました。[[動画](https://www.bilibili.com/video/BV1XwayzrETi/)] [[資料](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF)]。
 
 ## 🌟 ベンチマークパフォーマンス
 
