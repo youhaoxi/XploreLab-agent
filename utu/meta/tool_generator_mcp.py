@@ -1,3 +1,17 @@
+""" 
+Experimental feature of tool generation
+
+generation workflow:
+1. query -> requirement (function schema);
+2. schema -> implementation(python code);
+3. schema+code -> manifest
+4. postprocess
+
+- [ ] debug agent
+- [ ] doc for coding-agent integration (e.g. Claude Code)
+- [ ] toolkit hub?
+"""
+
 import asyncio
 import subprocess
 from dataclasses import dataclass, field
@@ -101,6 +115,7 @@ class ToolGenerator:
                     class_name=task_recorder.manifest["class_name"],
                     requirements=PrintUtils.format_json(task_recorder.manifest["requirements"]),
                     methods=PrintUtils.format_json(task_recorder.manifest["methods"]),
+                    api_keys=PrintUtils.format_json(task_recorder.manifest["api_keys"]),
                 )
             )
         with open(odir / "requirements.txt", "w") as f:

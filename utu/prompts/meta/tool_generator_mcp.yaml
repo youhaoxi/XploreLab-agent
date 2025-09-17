@@ -48,16 +48,18 @@ STEP_2_IMPLEMENTATION: |
 STEP_3_MANIFEST: |
   Task:
   Generate a manifest.json for this MCP tool with fields:
-  - class_name
-  - requirements
-  - methods
+  - class_name: the implemented Python class name
+  - methods: the implemented function names
+  - requirements: required Python packages for this tool
+  - api_keys: required API keys for this tool (if any)
 
   Output ONLY valid JSON, example:
   ```json
   {
       "class_name": "DownloadBilibiliVideo",
-      "requirements": ["yt-dlp"],
       "methods": ["download_video"],
+      "requirements": ["yt-dlp"],
+      "api_keys": []
   }
   ```
 
@@ -92,8 +94,9 @@ TEMPLATE_MANIFEST: |
       "transport": "stdio",
       "impl_fn": "runner.py",
       "impl_class_name": "{{ class_name }}",
+      "impl_methods": {{ methods }},
       "impl_requirements": {{ requirements }},
-      "impl_methods": {{ methods }}
+      "impl_api_keys": {{ api_keys }}
   }
 
 TEMPLATE_CONFIG: |
