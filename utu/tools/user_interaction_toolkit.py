@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Any
 
 from ..config import ToolkitConfig
 from ..utils import PrintUtils
@@ -24,11 +23,11 @@ class UserInteractionToolkit(AsyncBaseToolkit):
         if self.ask_function:
             return await self.ask_function(question)
 
-    @register_tool
-    async def final_answer(self, answer: Any) -> str:
-        """Provides a final answer to the given problem.
+    # @register_tool
+    # async def final_answer(self, answer: Any) -> str:
+    #     """Provides a final answer to the given problem.
 
-        Args:
-            answer (any): The answer to ask.
-        """
-        return answer
+    #     Args:
+    #         answer (any): The answer to ask.
+    #     """
+    #     return answer
