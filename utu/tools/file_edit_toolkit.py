@@ -20,13 +20,18 @@ logger = get_logger(__name__)
 class FileEditToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        self.work_dir = Path(self.config.config.get("work_dir", "./")).resolve()
-        self.work_dir.mkdir(parents=True, exist_ok=True)
+        workspace_root = self.config.config.get("workspace_root", "/tmp/")
+        self.setup_workspace(workspace_root)
+
         self.default_encoding = self.config.config.get("default_encoding", "utf-8")
         self.backup_enabled = self.config.config.get("backup_enabled", False)
         logger.info(
             f"FileEditToolkit initialized with output directory: {self.work_dir}, encoding: {self.default_encoding}"
         )
+
+    def setup_workspace(self, workspace_root: str):
+        self.work_dir = Path(workspace_root).resolve()
+        self.work_dir.mkdir(parents=True, exist_ok=True)
 
     def _sanitize_filename(self, filename: str) -> str:
         safe = re.sub(r"[^\w\-.]", "_", filename)

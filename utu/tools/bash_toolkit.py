@@ -30,7 +30,6 @@ logger = get_logger(__name__)
 class BashToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        self.workspace_root = self.config.config.get("workspace_root", "/tmp/")
         # self.require_confirmation = self.config.config.get("require_confirmation", False)
         # self.command_filters = self.config.config.get("command_filters", [])
         self.timeout = self.config.config.get("timeout", 60)
@@ -41,11 +40,14 @@ class BashToolkit(AsyncBaseToolkit):
         ]
 
         self.child, self.custom_prompt = self.start_persistent_shell(timeout=self.timeout)
-        self.setup_workspace(self.workspace_root)
+
+        workspace_root = self.config.config.get("workspace_root", "/tmp/")
+        self.setup_workspace(workspace_root)
 
     def setup_workspace(self, workspace_root: str):
         workspace_dir = pathlib.Path(workspace_root)
         workspace_dir.mkdir(parents=True, exist_ok=True)
+        self.workspace_root = workspace_root
         self.run_command(self.child, self.custom_prompt, f"cd {workspace_root}")
 
     @staticmethod
