@@ -31,7 +31,7 @@
 
 ## Commit & Pull Request Guidelines
 - Link PRs to an issue; keep changes focused and documented.
-- Commit style: prefer Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`) or scoped prefixes (e.g., `tool_maker:`) observed in history.
+- Commit style: prefer Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`) or scoped prefixes (e.g., `tool_auto_gen:`) observed in history.
 - PRs must pass lint, format, and tests; include a clear description, rationale, and any screenshots/logs for UI or eval changes.
 
 ## Security & Configuration Tips
