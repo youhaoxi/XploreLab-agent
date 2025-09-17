@@ -42,10 +42,12 @@ class SimpleAgent(BaseAgent):
         instructions: str | Callable | None = None,
         model: str | Model | None = None,
         model_settings: ModelSettings | None = None,
-        tools: list[Tool] = None,
+        tools: list[Tool] = None,  # config tools
+        toolkits: list[str] | None = None,  # load tools from toolkit configs
         output_type: type[Any] | AgentOutputSchemaBase | None = None,
         tool_use_behavior: Literal["run_llm_again", "stop_on_first_tool"] | StopAtTools = "run_llm_again",
     ):
+        assert not (tools and toolkits), "You can't pass both tools and toolkits."
         self.config = self._get_config(config)
         if name:
             self.config.agent.name = name
@@ -54,6 +56,7 @@ class SimpleAgent(BaseAgent):
         self.model = self._get_model(self.config, model)
         self.model_settings = self._get_model_settings(self.config, model_settings)
         self.tools: list[Tool] = tools or []
+        self.toolkits: list[str] = toolkits or []
         self.output_type: type[Any] | AgentOutputSchemaBase | None = output_type
         self.tool_use_behavior: Literal["run_llm_again", "stop_on_first_tool"] | StopAtTools = tool_use_behavior
         self.context_manager: BaseContextManager = None
@@ -129,6 +132,10 @@ class SimpleAgent(BaseAgent):
         if self.tools:
             return self.tools
 
+        if self.toolkits:
+            await self._load_toolkits_config()
+            return self.tools
+
         tools_list: list[Tool] = []
         tools_list += await self.env.get_tools()  # add env tools
         # TODO: handle duplicate tool names
@@ -139,6 +146,15 @@ class SimpleAgent(BaseAgent):
         logger.info(f"Loaded {len(tool_names)} tools: {tool_names}")
         self.tools = tools_list
         return self.tools
+
+    async def _load_toolkits_config(self):
+        assert isinstance(self.toolkits, list) and all(isinstance(tool, str) for tool in self.toolkits)
+        parsed_tools = []
+        for tool_name in self.toolkits:
+            config = ConfigLoader.load_toolkit_config(tool_name)
+            toolkit = await self._load_toolkit(config)
+            parsed_tools.extend(await toolkit.get_tools_in_agents())
+        self.tools = parsed_tools
 
     async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         if toolkit_config.mode == "builtin":
