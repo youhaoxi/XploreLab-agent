@@ -35,7 +35,7 @@ async def test_run(agent: SimpleAgent):
 
 async def test_init_toolkit():
     """test init SimpleAgent with toolkits config"""
-    agent = SimpleAgent(toolkits=["search"])
+    agent = SimpleAgent(toolkits=["user_interaction"])
     async with agent:
         tools = await agent.get_tools()
         print(f"Loaded {len(tools)} tools: {tools}")

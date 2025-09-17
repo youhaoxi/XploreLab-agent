@@ -7,6 +7,7 @@ generation workflow:
 3. schema+code -> manifest
 4. postprocess
 
+- [x] add clarification tool
 - [ ] debug agent
 - [ ] doc for coding-agent integration (e.g. Claude Code)
 - [ ] toolkit hub?
@@ -38,7 +39,11 @@ class TaskRecorder(DataClassWithStreamEvents):
 class ToolGenerator:
     def __init__(self):
         self.prompts = FileUtils.load_prompts("meta/tool_generator_mcp.yaml")
-        self.llm = SimpleAgent(name="tool_generator", instructions="You are a Python software engineer assistant.")
+        self.llm = SimpleAgent(
+            name="tool_generator",
+            instructions="You are a Python software engineer assistant.",
+            toolkits=["user_interaction"],
+        )
         self.output_dir = DIR_ROOT / "configs/tools/generated"
         self.output_dir.mkdir(exist_ok=True)
 
