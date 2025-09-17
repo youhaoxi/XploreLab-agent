@@ -106,7 +106,7 @@ TEMPLATE_CONFIG: |
   mode: mcp
   activated_tools: null
   mcp_transport: stdio
-  mcp_client_session_timeout_seconds: 20
+  mcp_client_session_timeout_seconds: 60
   config:
     command: .venv/bin/python
     args: ["main.py"]
