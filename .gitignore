@@ -59,4 +59,7 @@ logs/
 .env
 test.yaml
 # requirements.txt
-GEMINI.md
+
+.gemini
+.claude
+.codex
