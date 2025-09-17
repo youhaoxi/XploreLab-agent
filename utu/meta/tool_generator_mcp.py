@@ -29,10 +29,11 @@ logger = get_logger(__name__)
 
 @dataclass
 class TaskRecorder(DataClassWithStreamEvents):
-    requirements: str = field(default_factory=str)  # structured, but not used for now
+    name: str = field(default_factory=str)
+    description: str = field(default_factory=str)
     implementation: str = field(default_factory=str)
     manifest: dict = field(default_factory=dict)
-    # class_name, requirements, methods
+    # class_name, requirements, methods, etc
     output_file: str = field(default_factory=str)
 
 
@@ -42,7 +43,7 @@ class ToolGenerator:
         self.llm = SimpleAgent(
             name="tool_generator",
             instructions="You are a Python software engineer assistant.",
-            toolkits=["user_interaction"],
+            toolkits=["user_interaction", "search"],
         )
         self.output_dir = DIR_ROOT / "configs/tools/generated"
         self.output_dir.mkdir(exist_ok=True)
@@ -89,7 +90,9 @@ class ToolGenerator:
             query = FileUtils.get_jinja_template_str(self.prompts["STEP_1_REQUIREMENT"]).render(user_request=user_input)
             res = agent.run_streamed(query)
             await self._process_streamed(res, task_recorder)
-            task_recorder.requirements = res.final_output  # DISCUSS: parse requirements
+            parsed_res = LLMOutputParser.extract_code_json(res.final_output)
+            task_recorder.name = parsed_res["name"]
+            task_recorder.description = parsed_res["description"]
 
     async def step2(self, task_recorder: TaskRecorder) -> None:
         async with self.llm as agent:
@@ -106,7 +109,7 @@ class ToolGenerator:
             task_recorder.manifest = LLMOutputParser.extract_code_json(res.final_output)
 
     def postprocess(self, task_recorder: TaskRecorder) -> None:
-        name = LLMOutputParser.camel_to_snake(task_recorder.manifest["class_name"])
+        name = task_recorder.name
         odir = self.output_dir / name
         odir.mkdir(exist_ok=True)
         with open(odir / "runner.py", "w") as f:
