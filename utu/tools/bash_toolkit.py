@@ -14,6 +14,7 @@ Run commands in a bash shell\n
 * Please run long lived commands in the background, e.g. 'sleep 10 &' or start a server in the background."
 """
 
+import pathlib
 import re
 import sys
 
@@ -40,10 +41,11 @@ class BashToolkit(AsyncBaseToolkit):
         ]
 
         self.child, self.custom_prompt = self.start_persistent_shell(timeout=self.timeout)
-        if self.workspace_root:
-            self.setup_workspace(self.workspace_root)
+        self.setup_workspace(self.workspace_root)
 
     def setup_workspace(self, workspace_root: str):
+        workspace_dir = pathlib.Path(workspace_root)
+        workspace_dir.mkdir(parents=True, exist_ok=True)
         self.run_command(self.child, self.custom_prompt, f"cd {workspace_root}")
 
     @staticmethod
