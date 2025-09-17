@@ -66,7 +66,7 @@ class SimpleAgent(BaseAgent):
 
         self._run_hooks: RunHooks = None
         self._mcp_servers: list[MCPServer] = []
-        self._toolkits: list[AsyncBaseToolkit] = []
+        self._toolkits: dict[str, AsyncBaseToolkit] = {}
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
         self._initialized = False
@@ -123,7 +123,7 @@ class SimpleAgent(BaseAgent):
         self._mcp_servers = []
         logger.info("Cleaning up tools...")
         await self._tools_exit_stack.aclose()
-        self._toolkits = []
+        self._toolkits = {}
         logger.info("Cleaning up env...")
         await self.env.cleanup()
         self._initialized = False
@@ -169,7 +169,7 @@ class SimpleAgent(BaseAgent):
     async def _load_builtin_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
         toolkit = await self._tools_exit_stack.enter_async_context(TOOLKIT_MAP[toolkit_config.name](toolkit_config))
-        self._toolkits.append(toolkit)
+        self._toolkits[toolkit_config.name] = toolkit
         return toolkit
 
     async def _load_customized_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
@@ -177,7 +177,7 @@ class SimpleAgent(BaseAgent):
         assert toolkit_config.customized_filepath is not None and toolkit_config.customized_classname is not None
         toolkit_class = load_class_from_file(toolkit_config.customized_filepath, toolkit_config.customized_classname)
         toolkit = await self._tools_exit_stack.enter_async_context(toolkit_class(toolkit_config))
-        self._toolkits.append(toolkit)
+        self._toolkits[toolkit_config.name] = toolkit
         return toolkit
 
     async def _load_mcp_server(self, toolkit_config: ToolkitConfig) -> MCPServer:
