@@ -67,21 +67,21 @@ class ToolGenerator:
 
     async def step1(self, task_recorder: TaskRecorder, user_input: str) -> None:
         async with self.llm as agent:
-            query = FileUtils.get_jinja_template_str(self.prompts["SETP_1_REQUIREMENT"]).render(user_request=user_input)
+            query = FileUtils.get_jinja_template_str(self.prompts["STEP_1_REQUIREMENT"]).render(user_request=user_input)
             res = agent.run_streamed(query)
             await self._process_streamed(res, task_recorder)
             task_recorder.requirements = res.final_output  # DISCUSS: parse requirements
 
     async def step2(self, task_recorder: TaskRecorder) -> None:
         async with self.llm as agent:
-            query = FileUtils.get_jinja_template_str(self.prompts["SETP_2_IMPLEMENTATION"]).render()
+            query = FileUtils.get_jinja_template_str(self.prompts["STEP_2_IMPLEMENTATION"]).render()
             res = agent.run_streamed(query)
             await self._process_streamed(res, task_recorder)
             task_recorder.implementation = LLMOutputParser.extract_code_python(res.final_output)
 
     async def step3(self, task_recorder: TaskRecorder) -> None:
         async with self.llm as agent:
-            query = FileUtils.get_jinja_template_str(self.prompts["SETP_3_MANIFEST"]).render()
+            query = FileUtils.get_jinja_template_str(self.prompts["STEP_3_MANIFEST"]).render()
             res = agent.run_streamed(query)
             await self._process_streamed(res, task_recorder)
             task_recorder.manifest = LLMOutputParser.extract_code_json(res.final_output)

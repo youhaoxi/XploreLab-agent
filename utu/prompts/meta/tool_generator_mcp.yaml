@@ -1,4 +1,4 @@
-SETP_1_REQUIREMENT: |
+STEP_1_REQUIREMENT: |
   User Requirement:
   "{{ user_request }}"
 
@@ -15,7 +15,7 @@ SETP_1_REQUIREMENT: |
   }
   ```
 
-SETP_2_IMPLEMENTATION: |
+STEP_2_IMPLEMENTATION: |
   Task:
   Generate a Python class implementing this function. Requirements:
   - Use asyncio if needed
@@ -45,7 +45,7 @@ SETP_2_IMPLEMENTATION: |
   Output:
   Complete Python code for `runner.py`
 
-SETP_3_MANIFEST: |
+STEP_3_MANIFEST: |
   Task:
   Generate a manifest.json for this MCP tool with fields:
   - class_name
