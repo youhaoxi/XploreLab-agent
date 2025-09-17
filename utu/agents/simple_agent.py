@@ -133,22 +133,24 @@ class SimpleAgent(BaseAgent):
         tools_list += await self.env.get_tools()  # add env tools
         # TODO: handle duplicate tool names
         for _, toolkit_config in self.config.toolkits.items():
-            if toolkit_config.mode == "builtin":
-                toolkit = await self._load_toolkit(toolkit_config)
-                tools_list.extend(await toolkit.get_tools_in_agents())
-            elif toolkit_config.mode == "customized":
-                toolkit = await self._load_customized_toolkit(toolkit_config)
-                tools_list.extend(await toolkit.get_tools_in_agents())
-            elif toolkit_config.mode == "mcp":
-                await self._load_mcp_server(toolkit_config)
-            else:
-                raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
+            toolkit = await self._load_toolkit(toolkit_config)
+            tools_list.extend(await toolkit.get_tools_in_agents())
         tool_names = [tool.name for tool in tools_list]
         logger.info(f"Loaded {len(tool_names)} tools: {tool_names}")
         self.tools = tools_list
-        return tools_list
+        return self.tools
 
     async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
+        if toolkit_config.mode == "builtin":
+            return await self._load_builtin_toolkit(toolkit_config)
+        elif toolkit_config.mode == "customized":
+            return await self._load_customized_toolkit(toolkit_config)
+        elif toolkit_config.mode == "mcp":
+            return await self._load_mcp_server(toolkit_config)
+        else:
+            raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
+
+    async def _load_builtin_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
         toolkit = await self._tools_exit_stack.enter_async_context(TOOLKIT_MAP[toolkit_config.name](toolkit_config))
         self._toolkits.append(toolkit)
