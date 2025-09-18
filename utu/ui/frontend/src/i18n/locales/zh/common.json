@@ -1,4 +1,7 @@
 {
+  "websocket": {
+    "connectionClosed": "WebSocket 连接已断开，正在尝试重新连接..."
+  },
   "sidebar": {
     "newChat": "新对话",
     "agentConfigs": "智能体配置",

@@ -57,7 +57,22 @@ const App: React.FC = () => {
   const [hideExampleQuery, setHideExampleQuery] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [wsUrl, setWsUrl] = useState(localStorage.getItem('wsUrl') || defaultWsUrl);
-  const { sendQuery, sendRequest, lastMessage, readyState } = useChatWebSocket(wsUrl);
+  const { sendQuery, sendRequest, lastMessage, readyState } = useChatWebSocket(wsUrl, {
+    onConnectionChange: (status) => {
+      if (status === 'disconnected' && messages.length > 0) {
+        // Only add error message if we have messages (not initial load)
+        const errorMessage: Message = {
+          id: Date.now(),
+          content: t('websocket.connectionClosed'),
+          sender: 'system',
+          timestamp: new Date(),
+          type: 'error'
+        };
+        setMessages(prev => [...prev, errorMessage]);
+        setIsModelResponding(false);
+      }
+    }
+  });
   const [inputValue, setInputValue] = useState('');
   const [isModelResponding, setIsModelResponding] = useState(false);
   // const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -455,14 +470,15 @@ const App: React.FC = () => {
       const message: Message = {
         id: Date.now() + 1,
         content: t('app.notConnected'),
-        sender: 'assistant',
+        sender: 'system',
         timestamp: new Date(),
         type: 'error',
       };
       setMessages(prev => [...prev, message]);
+      setIsModelResponding(false);
 
       // simulate event
-      simulateEvents(handleEvent);
+      // simulateEvents(handleEvent);
         
       return;
     }
