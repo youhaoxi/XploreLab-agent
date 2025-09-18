@@ -21,9 +21,9 @@ from utu.utils import EnvUtils
 
 from .common import (
     AskContent,
+    ErrorContent,
     Event,
     InitContent,
-    ErrorContent,
     ListAgentsContent,
     SwitchAgentContent,
     SwitchAgentRequest,
@@ -112,7 +112,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     async def send_event(self, event: Event):
         logging.debug(f"Sending event: {event.model_dump()}")
         self.write_message(event.model_dump())
-    
+
     async def _handle_error(self, message: str):
         await self.send_event(Event(type="error", data=ErrorContent(type="error", message=message)))
         await self.send_event(Event(type="finish"))
