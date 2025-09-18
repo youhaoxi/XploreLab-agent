@@ -21,7 +21,8 @@ import type {
   SwitchAgentContent,
   ListAgentsContent,
   AskContent,
-  GeneratedAgentContent
+  GeneratedAgentContent,
+  ErrorContent
 } from './types/events';
 import type {
   UserRequest,
@@ -357,6 +358,22 @@ const App: React.FC = () => {
       setCurrentConfig("generate_agent");
       // collapse config panel
       setChatInputLoadingState("hide");
+    } 
+    // handle error event
+    else if (event.type === 'error') {
+      let data = event.data as ErrorContent;
+      setIsModelResponding(false);
+      const message: Message = {
+        id: Date.now(),
+        content: data.message,
+        sender: 'assistant',
+        timestamp: new Date(),
+        type: 'error',
+        inprogress: false,
+        requireConfirm: false,
+      }
+      console.error('Error:', data.message);
+      setMessages(prev => [...prev, message]);
     } else {
       console.error('Unknown event type:', event.type);
     }

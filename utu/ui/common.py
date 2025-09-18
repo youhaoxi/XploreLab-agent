@@ -89,6 +89,10 @@ class GeneratedAgentContent(BaseModel):
     config_content: str
 
 
+class ErrorContent(BaseModel):
+    type: Literal["error"] = "error"
+    message: str
+
 class Event(BaseModel):
     type: Literal[
         "raw",
@@ -102,6 +106,7 @@ class Event(BaseModel):
         "ask",
         "gen_agent",
         "generated_agent_config",
+        "error",
     ]
     data: (
         TextDeltaContent
@@ -113,6 +118,7 @@ class Event(BaseModel):
         | SwitchAgentContent
         | InitContent
         | AskContent
+        | ErrorContent
         | None
     ) = None
 
