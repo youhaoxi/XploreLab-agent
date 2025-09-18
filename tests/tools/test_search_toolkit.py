@@ -4,9 +4,7 @@ import pytest
 
 from utu.config import ConfigLoader
 from utu.tools import SearchToolkit
-from utu.tools.search.baidu_search import BaiduSearch
 from utu.tools.search.crawl4ai_crawl import Crawl4aiCrawl
-from utu.tools.search.duckduckgo_search import DuckDuckGoSearch
 from utu.tools.search.google_search import GoogleSearch
 from utu.tools.search.jina_crawl import JinaCrawl
 from utu.tools.search.jina_search import JinaSearch
@@ -14,6 +12,8 @@ from utu.tools.search.jina_search import JinaSearch
 
 # ----------------------------------------------------------------------------
 async def test_baidu_search():
+    from utu.tools.search.baidu_search import BaiduSearch
+
     baidu_search = BaiduSearch()
     result = await baidu_search.search_baidu("上海天气")
     print(result)
@@ -32,6 +32,8 @@ async def test_jina_search():
 
 
 async def test_duckduckgo_search():
+    from utu.tools.search.duckduckgo_search import DuckDuckGoSearch
+
     duckduckgo_search = DuckDuckGoSearch()
     result = await duckduckgo_search.search_duckduckgo("明天上海天气")
     print(result)
@@ -63,12 +65,17 @@ async def test_search(search_toolkit: SearchToolkit):
 
 # ----------------------------------------------------------------------------
 TEST_URL = "https://docs.crawl4ai.com/core/simple-crawling/"
+TEST_URL = "https://github.com/TencentCloudADP/youtu-agent"
+TEST_URL = "https://m.weibo.cn/"
 
 
 async def test_jina_crawl():
-    jina_crawl = JinaCrawl()
+    jina_crawl = JinaCrawl(config={"crawl_params": {}})
     result = await jina_crawl.crawl(TEST_URL)
-    print(result)
+    print(f"result: {result}")
+    jina_crawl = JinaCrawl(config={"crawl_params": {"X-With-Generated-Alt": "true", "X-No-Cache": "true"}})
+    result = await jina_crawl.crawl(TEST_URL)
+    print(f"result: {result}")
 
 
 async def test_crawl4ai_crawl():

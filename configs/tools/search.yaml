@@ -12,6 +12,7 @@ config:
   # - `JINA_API_KEY` is required for jina
   # - `crawl4ai` and `playwright` should be installed for crawl4ai. Ref: https://github.com/unclecode/crawl4ai
   crawl_engine: jina  # jina | crawl4ai
+  crawl_params: {}  # https://jina.ai/reader/. e.g. {"X-With-Generated-Alt": "true"}
   # llm config used in web_qa
   summary_token_limit: 10_000
 config_llm:

@@ -15,7 +15,8 @@ class JinaCrawl:
         else:
             # https://jina.ai/api-dashboard/rate-limit
             logger.warning("Jina API key not found! Access rate may be limited.")
-        config = config or {}
+        for k, v in config.get("crawl_params", {}).items():
+            self.jina_header[k] = v
 
     async def crawl(self, url: str) -> str:
         """standard crawl interface."""
@@ -24,8 +25,8 @@ class JinaCrawl:
     @async_file_cache(expire_time=None)
     async def crawl_jina(self, url: str) -> str:
         # Get the content of the url
-        params = {"url": url}
         async with aiohttp.ClientSession() as session:
-            async with session.get(self.jina_url, headers=self.jina_header, params=params) as response:
+            async with session.get(f"{self.jina_url}/{url}", headers=self.jina_header) as response:
+                response.raise_for_status()  # avoid cache error!
                 text = await response.text()
                 return text
