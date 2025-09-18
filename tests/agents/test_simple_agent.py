@@ -31,3 +31,12 @@ async def test_run(agent: SimpleAgent):
     print(f"res.final_output: {res.final_output}")
     res = await agent.run("Please tell me my full name.")
     print(f"res.final_output: {res.final_output}")
+
+
+async def test_init_toolkit():
+    """test init SimpleAgent with toolkits config"""
+    agent = SimpleAgent(toolkits=["user_interaction"])
+    async with agent:
+        tools = await agent.get_tools()
+        print(f"Loaded {len(tools)} tools: {tools}")
+        await agent.chat_streamed("That's the weather in Beijing today?")

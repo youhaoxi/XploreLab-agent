@@ -1,5 +1,8 @@
 """
-by @ianxxu
+- [ ] unified OS environment
+- [ ] support advanecd tools for file viewing & editing
+    https://github.com/Intelligent-Internet/ii-agent/blob/main/src/ii_agent/tools/str_replace_tool.py
+- [ ] context management (for loong files)
 """
 
 import re
@@ -17,58 +20,35 @@ logger = get_logger(__name__)
 class FileEditToolkit(AsyncBaseToolkit):
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        self.work_dir = Path(self.config.config.get("work_dir", "./")).resolve()
-        self.work_dir.mkdir(parents=True, exist_ok=True)
+        workspace_root = self.config.config.get("workspace_root", "/tmp/")
+        self.setup_workspace(workspace_root)
+
         self.default_encoding = self.config.config.get("default_encoding", "utf-8")
-        self.backup_enabled = self.config.config.get("backup_enabled", True)
+        self.backup_enabled = self.config.config.get("backup_enabled", False)
         logger.info(
             f"FileEditToolkit initialized with output directory: {self.work_dir}, encoding: {self.default_encoding}"
         )
 
+    def setup_workspace(self, workspace_root: str):
+        self.work_dir = Path(workspace_root).resolve()
+        self.work_dir.mkdir(parents=True, exist_ok=True)
+
     def _sanitize_filename(self, filename: str) -> str:
-        r"""Sanitize a filename by replacing any character that is not
-        alphanumeric, a dot (.), hyphen (-), or underscore (_) with an
-        underscore (_).
-
-        Args:
-            filename (str): The original filename which may contain spaces or
-                special characters.
-
-        Returns:
-            str: The sanitized filename with disallowed characters replaced by
-                underscores.
-        """
         safe = re.sub(r"[^\w\-.]", "_", filename)
         return safe
 
     def _resolve_filepath(self, file_path: str) -> Path:
-        r"""Convert the given string path to a Path object.
-
-        If the provided path is not absolute, it is made relative to the
-        default output directory. The filename part is sanitized to replace
-        spaces and special characters with underscores, ensuring safe usage
-        in downstream processing.
-
-        Args:
-            file_path (str): The file path to resolve.
-
-        Returns:
-            Path: A fully resolved (absolute) and sanitized Path object.
-        """
         path_obj = Path(file_path)
         if not path_obj.is_absolute():
             path_obj = self.work_dir / path_obj
 
         sanitized_filename = self._sanitize_filename(path_obj.name)
         path_obj = path_obj.parent / sanitized_filename
-        return path_obj.resolve()
+        resolved_path = path_obj.resolve()
+        self._create_backup(resolved_path)
+        return resolved_path
 
     def _create_backup(self, file_path: Path) -> None:
-        r"""Create a backup of the file if it exists and backup is enabled.
-
-        Args:
-            file_path (Path): Path to the file to backup.
-        """
         if not self.backup_enabled or not file_path.exists():
             return
 
@@ -78,7 +58,7 @@ class FileEditToolkit(AsyncBaseToolkit):
         logger.info(f"Created backup at {backup_path}")
 
     @register_tool
-    async def edit_file(self, file_name: str, diff: str) -> None:  # TODO: return edit result!
+    async def edit_file(self, path: str, diff: str) -> str:
         r"""Edit a file by applying the provided diff.
 
         Args:
@@ -92,30 +72,46 @@ class FileEditToolkit(AsyncBaseToolkit):
                 >>>>>>> REPLACE
                 ```
         """
-        resolved_path = self._resolve_filepath(file_name)
-        self._create_backup(resolved_path)
+        resolved_path = self._resolve_filepath(path)
 
-        try:
-            with open(resolved_path, encoding=self.default_encoding) as f:
-                content = f.read()
-            modified_content = content
-            pattern = r"<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE"
-            # Use re.DOTALL to make '.' match newlines as well
-            matches = re.findall(pattern, diff, re.DOTALL)
+        with open(resolved_path, encoding=self.default_encoding) as f:
+            content = f.read()
+        modified_content = content
+        pattern = r"<<<<<<< SEARCH\n(.*?)\n=======\n(.*?)\n>>>>>>> REPLACE"
+        matches = re.findall(pattern, diff, re.DOTALL)
+        if not matches:
+            return "Error! No valid diff blocks found in the provided diff"
 
-            if not matches:
-                logger.warning("No valid diff blocks found in the provided diff")
-                return
+        # Apply each search/replace pair
+        for search_text, replace_text in matches:
+            if search_text in modified_content:
+                modified_content = modified_content.replace(search_text, replace_text)
+            else:
+                logger.warning(f"Search text not found in file: {search_text[:50]}...")
 
-            # Apply each search/replace pair
-            for search_text, replace_text in matches:
-                if search_text in modified_content:
-                    modified_content = modified_content.replace(search_text, replace_text)
-                else:
-                    logger.warning(f"Search text not found in file: {search_text[:50]}...")
+        with open(resolved_path, "w", encoding=self.default_encoding) as f:
+            f.write(modified_content)
+        return f"Successfully edited file: {resolved_path}"
 
-            with open(resolved_path, "w", encoding=self.default_encoding) as f:
-                f.write(modified_content)
-            logger.info(f"Successfully edited file: {resolved_path}")
-        except Exception as e:  # pylint: disable=broad-except
-            logger.error(f"Error editing file {resolved_path}: {str(e)}")
+    @register_tool
+    async def write_file(self, path: str, file_text: str) -> str:
+        """Write text content to a file.
+
+        Args:
+            path (str): The path of the file to write.
+            file_text (str): The full text content to write.
+        """
+        path_obj = self._resolve_filepath(path)
+        path_obj.parent.mkdir(parents=True, exist_ok=True)
+        path_obj.write_text(file_text)
+        return f"Successfully wrote file: {path_obj}"
+
+    @register_tool
+    async def read_file(self, path: str) -> str:
+        """Read and return the contents of a file.
+
+        Args:
+            path (str): The path of the file to read.
+        """
+        path_obj = self._resolve_filepath(path)
+        return path_obj.read_text()

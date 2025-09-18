@@ -1,3 +1,18 @@
+"""
+Experimental feature of tool generation
+
+generation workflow:
+1. query -> requirement (function schema);
+2. schema -> implementation(python code);
+3. schema+code -> manifest
+4. postprocess
+
+- [x] add clarification tool
+- [ ] debug agent
+- [ ] doc for coding-agent integration (e.g. Claude Code)
+- [ ] toolkit hub?
+"""
+
 import asyncio
 import subprocess
 from dataclasses import dataclass, field
@@ -14,17 +29,22 @@ logger = get_logger(__name__)
 
 @dataclass
 class TaskRecorder(DataClassWithStreamEvents):
-    requirements: str = field(default_factory=str)  # structured, but not used for now
+    name: str = field(default_factory=str)
+    description: str = field(default_factory=str)
     implementation: str = field(default_factory=str)
     manifest: dict = field(default_factory=dict)
-    # class_name, requirements, methods
+    # class_name, requirements, methods, etc
     output_file: str = field(default_factory=str)
 
 
 class ToolGenerator:
     def __init__(self):
         self.prompts = FileUtils.load_prompts("meta/tool_generator_mcp.yaml")
-        self.llm = SimpleAgent(name="tool_generator", instructions="You are a Python software engineer assistant.")
+        self.llm = SimpleAgent(
+            name="tool_generator",
+            instructions="You are a Python software engineer assistant.",
+            toolkits=["user_interaction", "search"],
+        )
         self.output_dir = DIR_ROOT / "configs/tools/generated"
         self.output_dir.mkdir(exist_ok=True)
 
@@ -67,27 +87,29 @@ class ToolGenerator:
 
     async def step1(self, task_recorder: TaskRecorder, user_input: str) -> None:
         async with self.llm as agent:
-            query = FileUtils.get_jinja_template_str(self.prompts["SETP_1_REQUIREMENT"]).render(user_request=user_input)
+            query = FileUtils.get_jinja_template_str(self.prompts["STEP_1_REQUIREMENT"]).render(user_request=user_input)
             res = agent.run_streamed(query)
             await self._process_streamed(res, task_recorder)
-            task_recorder.requirements = res.final_output  # DISCUSS: parse requirements
+            parsed_res = LLMOutputParser.extract_code_json(res.final_output)
+            task_recorder.name = parsed_res["name"]
+            task_recorder.description = parsed_res["description"]
 
     async def step2(self, task_recorder: TaskRecorder) -> None:
         async with self.llm as agent:
-            query = FileUtils.get_jinja_template_str(self.prompts["SETP_2_IMPLEMENTATION"]).render()
+            query = FileUtils.get_jinja_template_str(self.prompts["STEP_2_IMPLEMENTATION"]).render()
             res = agent.run_streamed(query)
             await self._process_streamed(res, task_recorder)
             task_recorder.implementation = LLMOutputParser.extract_code_python(res.final_output)
 
     async def step3(self, task_recorder: TaskRecorder) -> None:
         async with self.llm as agent:
-            query = FileUtils.get_jinja_template_str(self.prompts["SETP_3_MANIFEST"]).render()
+            query = FileUtils.get_jinja_template_str(self.prompts["STEP_3_MANIFEST"]).render()
             res = agent.run_streamed(query)
             await self._process_streamed(res, task_recorder)
             task_recorder.manifest = LLMOutputParser.extract_code_json(res.final_output)
 
     def postprocess(self, task_recorder: TaskRecorder) -> None:
-        name = LLMOutputParser.camel_to_snake(task_recorder.manifest["class_name"])
+        name = task_recorder.name
         odir = self.output_dir / name
         odir.mkdir(exist_ok=True)
         with open(odir / "runner.py", "w") as f:
@@ -101,6 +123,7 @@ class ToolGenerator:
                     class_name=task_recorder.manifest["class_name"],
                     requirements=PrintUtils.format_json(task_recorder.manifest["requirements"]),
                     methods=PrintUtils.format_json(task_recorder.manifest["methods"]),
+                    api_keys=PrintUtils.format_json(task_recorder.manifest["api_keys"]),
                 )
             )
         with open(odir / "requirements.txt", "w") as f:

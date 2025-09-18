@@ -1,4 +1,4 @@
-SETP_1_REQUIREMENT: |
+STEP_1_REQUIREMENT: |
   User Requirement:
   "{{ user_request }}"
 
@@ -7,57 +7,73 @@ SETP_1_REQUIREMENT: |
   - name: a concise function name (snake_case)
   - description: a short English description of what the function does
 
+  Requirements:
+  - Language: response in the same language with the user request
+  - Use the `ask_user` tool only if needed
+
   Output ONLY JSON, example format:
   ```json
   {
-      "name": "download_bilibili_video",
-      "description": "Download a video from Bilibili given its URL."
+      "name": "convert_video_to_gif",
+      "description": "Given a video file, convert it to GIF format. The output file will be saved to the same directory as the input file with a .gif extension. Tech stack: ffmpeg"
   }
   ```
 
-SETP_2_IMPLEMENTATION: |
+STEP_2_IMPLEMENTATION: |
   Task:
   Generate a Python class implementing this function. Requirements:
-  - Use asyncio if needed
   - Include minimal error handling
   - Do NOT include extra explanations, only code
+  - Prefer using well-known libraries and command line tools (if available) instead of writing your own. E.g. ffmpeg, ytdlp, etc.
 
   Example:
   ```python
-  import yt_dlp
+  import subprocess
+  from pathlib import Path
 
-  class DownloadBilibiliVideo:
-      def download_video(self, url: str, output_path: str = None) -> str:
-          """Download a Bilibili video
+
+  class ConvertVideoToGif:
+      def convert_video_to_gif(self, input_path: str, output_path: str = None) -> str:
+          """Convert a video file to GIF format
 
           Args:
-              url (str): The URL of the video to download.
-              output_path (str, optional): The path to save the downloaded video. Defaults to None.
+              input_path (str): Path to the input video file
+              output_path (str, optional): Path to save the output GIF. Defaults to None.
           """
-          ydl_opts = {"format": "bestvideo+bestaudio/best"}
-          if output_path:
-              ydl_opts["outtmpl"] = output_path
-          with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-              ydl.download([url])
-          return f"Downloaded video to {output_path}"
+          if not Path(input_path).exists():
+              raise FileNotFoundError(f"Input file not found: {input_path}")
+
+          if output_path is None:
+              output_path = Path(input_path).with_suffix(".gif")
+
+          try:
+              cmd = ["ffmpeg", "-i", input_path, "-vf", "fps=10,scale=320:-1:flags=lanczos", "-c:v", "gif", output_path]
+              subprocess.run(cmd, check=True, capture_output=True)
+              return f"Converted video to GIF: {output_path}"
+          except subprocess.CalledProcessError as e:
+              raise RuntimeError(f"FFmpeg conversion failed: {e.stderr.decode()}") from e
   ```
 
   Output:
   Complete Python code for `runner.py`
 
-SETP_3_MANIFEST: |
+STEP_3_MANIFEST: |
   Task:
   Generate a manifest.json for this MCP tool with fields:
-  - class_name
-  - requirements
-  - methods
+  - class_name: the implemented Python class name
+  - methods: the implemented function names
+  - system_tools: required system tools
+  - requirements: required Python packages for this tool
+  - api_keys: required API keys for this tool (if any)
 
   Output ONLY valid JSON, example:
   ```json
   {
-      "class_name": "DownloadBilibiliVideo",
-      "requirements": ["yt-dlp"],
-      "methods": ["download_video"],
+      "class_name": "ConvertVideoToGif",
+      "methods": ["convert_video_to_gif"],
+      "system_tools": ["ffmpeg"],
+      "requirements": [],
+      "api_keys": []
   }
   ```
 
@@ -92,8 +108,9 @@ TEMPLATE_MANIFEST: |
       "transport": "stdio",
       "impl_fn": "runner.py",
       "impl_class_name": "{{ class_name }}",
+      "impl_methods": {{ methods }},
       "impl_requirements": {{ requirements }},
-      "impl_methods": {{ methods }}
+      "impl_api_keys": {{ api_keys }}
   }
 
 TEMPLATE_CONFIG: |
@@ -103,7 +120,7 @@ TEMPLATE_CONFIG: |
   mode: mcp
   activated_tools: null
   mcp_transport: stdio
-  mcp_client_session_timeout_seconds: 20
+  mcp_client_session_timeout_seconds: 60
   config:
     command: .venv/bin/python
     args: ["main.py"]

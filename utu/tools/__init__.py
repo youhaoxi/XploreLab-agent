@@ -14,7 +14,7 @@ from .python_executor_toolkit import PythonExecutorToolkit
 from .search_toolkit import SearchToolkit
 from .serper_toolkit import SerperToolkit
 from .tabular_data_toolkit import TabularDataToolkit
-from .user_interaction_toolkit import UserInteractionToolkit as UserInteractionToolkit
+from .user_interaction_toolkit import UserInteractionToolkit
 from .utils import get_tools_map as get_tools_map, get_tools_schema as get_tools_schema
 from .video_toolkit import VideoToolkit
 from .wikipedia_toolkit import WikipediaSearchTool
@@ -36,6 +36,7 @@ TOOLKIT_MAP = {
     "serper": SerperToolkit,
     "tabular": TabularDataToolkit,
     "memory_simple": SimpleMemoryToolkit,
+    "user_interaction": UserInteractionToolkit,
 }
 
 

@@ -121,6 +121,7 @@ target-version = "py312"
 exclude = [
     "**/*.pyi",
     ".*",
+    "configs/",
 ]
 
 [tool.ruff.lint]

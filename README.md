@@ -86,7 +86,7 @@ Click on the images to view detailed videos.
       <video src="https://github.com/user-attachments/assets/6fc75814-e565-4f94-9ab5-33e3e7788e92" 
              poster="https://img.youtube.com/vi/v3QQg0WAnPs/sddefault.jpg" 
              controls muted preload="metadata" 
-             width="100%" height=300"
+             width="100%" height="300"
              style="object-fit: cover; border-radius: 8px;"></video>
     </td>
     <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">

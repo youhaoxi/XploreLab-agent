@@ -4,9 +4,13 @@ A key feature of the `Youtu-Agent` framework is its ability to automate the crea
 
 ## Automatic Tool Generation
 
-The framework provides a script to scaffold a new tool, including its configuration file and a dedicated virtual environment.
+### Overview
 
-### 1. Generate the Tool
+- Tool deployment: isolated environment; MCP-based communication.
+- Generation approach: implement the tool's capability atomically, test it, then wrap it as an MCP tool.
+- Integration details: a `manifest.json` specifies how the tool integrates with the `Youtu-Agent` framework.
+
+### 1. Generate & Test the Tool
 
 Run the following command to start the tool generation process:
 
@@ -23,35 +27,34 @@ source .venv/bin/activate
 uv pip install -r requirements.txt
 ```
 
-### 2. Test the Generated Tool
+### 2. Integrate the Tool into Your Agent
 
-After generating a tool, you can test it in two ways:
+For instance, if the generated tool is named `download_bilibili_video`, you can add it to your agent configuration (`cofnigs/agents/bilibili.yaml`) as follows:
 
-**Method 1: Unit Testing**
+```yaml
+# @package _global_
+defaults:
+  - /model/base@model
+  - /tools/generated/download_bilibili_video@toolkits.download_bilibili_video
+  - _self_
 
-You can write a dedicated unit test for your new tool.
-
-!!! note
-    You will need to modify the example test file `tests/meta/test_tool_generator.py` to match the specifics of your generated tool before running the test.
-
-```sh
-pytest tests/meta/test_tool_generator.py
+agent:
+  name: utu-base
+  instructions: "You are a helpful assistant."
 ```
 
-**Method 2: Interactive Chat**
+Then, interact with your agent by running:
 
-You can test the tool by interacting with an agent that has the tool enabled.
-
-!!! note
-    You must first update the agent configuration at `configs/agents/meta/example.yaml` to include and properly configure your new tool.
-
-```sh
-python scripts/cli_chat.py --config meta/example --stream
+```bash
+python scripts/cli_chat.py --stream --config bilibili
 ```
+
 
 ## Automatic Agent Generation
 
 `Youtu-Agent` can also automatically generate a configuration for a `SimpleAgent` based on your requirements. This is handled by an interactive "meta-agent" that asks you questions to define the agent's name, instructions, and desired tools.
+
+<iframe width="100%" aspect-ratio="16/9" src="https://www.youtube.com/embed/JVpHDJtKBo8?si=tM7_PUEdhHZxMWlY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### 1. Generate the Agent Configuration
 

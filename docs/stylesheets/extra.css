@@ -7,3 +7,9 @@
 .md-typeset pre {
   max-width: 100%;
 }
+
+/* Config the width & aspect ratio of the iframe */
+iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}

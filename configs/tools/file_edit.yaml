@@ -3,6 +3,6 @@ mode: builtin
 activated_tools: null
 config: {
   "work_dir": "/tmp/",
-  "backup_enabled": True,
+  "backup_enabled": False,
   "default_encoding": "utf-8",
 }

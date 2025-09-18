@@ -42,10 +42,12 @@ class SimpleAgent(BaseAgent):
         instructions: str | Callable | None = None,
         model: str | Model | None = None,
         model_settings: ModelSettings | None = None,
-        tools: list[Tool] = None,
+        tools: list[Tool] = None,  # config tools
+        toolkits: list[str] | None = None,  # load tools from toolkit configs
         output_type: type[Any] | AgentOutputSchemaBase | None = None,
         tool_use_behavior: Literal["run_llm_again", "stop_on_first_tool"] | StopAtTools = "run_llm_again",
     ):
+        assert not (tools and toolkits), "You can't pass both tools and toolkits."
         self.config = self._get_config(config)
         if name:
             self.config.agent.name = name
@@ -54,6 +56,7 @@ class SimpleAgent(BaseAgent):
         self.model = self._get_model(self.config, model)
         self.model_settings = self._get_model_settings(self.config, model_settings)
         self.tools: list[Tool] = tools or []
+        self.toolkits: list[str] = toolkits or []
         self.output_type: type[Any] | AgentOutputSchemaBase | None = output_type
         self.tool_use_behavior: Literal["run_llm_again", "stop_on_first_tool"] | StopAtTools = tool_use_behavior
         self.context_manager: BaseContextManager = None
@@ -63,7 +66,7 @@ class SimpleAgent(BaseAgent):
 
         self._run_hooks: RunHooks = None
         self._mcp_servers: list[MCPServer] = []
-        self._toolkits: list[AsyncBaseToolkit] = []
+        self._toolkits: dict[str, AsyncBaseToolkit] = {}
         self._mcps_exit_stack = AsyncExitStack()
         self._tools_exit_stack = AsyncExitStack()
         self._initialized = False
@@ -120,7 +123,7 @@ class SimpleAgent(BaseAgent):
         self._mcp_servers = []
         logger.info("Cleaning up tools...")
         await self._tools_exit_stack.aclose()
-        self._toolkits = []
+        self._toolkits = {}
         logger.info("Cleaning up env...")
         await self.env.cleanup()
         self._initialized = False
@@ -129,29 +132,46 @@ class SimpleAgent(BaseAgent):
         if self.tools:
             return self.tools
 
+        if self.toolkits:
+            await self._load_toolkits_config()
+            return self.tools
+
         tools_list: list[Tool] = []
         tools_list += await self.env.get_tools()  # add env tools
         # TODO: handle duplicate tool names
         for _, toolkit_config in self.config.toolkits.items():
-            if toolkit_config.mode == "builtin":
-                toolkit = await self._load_toolkit(toolkit_config)
+            toolkit = await self._load_toolkit(toolkit_config)
+            if toolkit_config.mode in ["customized", "builtin"]:
                 tools_list.extend(await toolkit.get_tools_in_agents())
-            elif toolkit_config.mode == "customized":
-                toolkit = await self._load_customized_toolkit(toolkit_config)
-                tools_list.extend(await toolkit.get_tools_in_agents())
-            elif toolkit_config.mode == "mcp":
-                await self._load_mcp_server(toolkit_config)
-            else:
-                raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
         tool_names = [tool.name for tool in tools_list]
         logger.info(f"Loaded {len(tool_names)} tools: {tool_names}")
         self.tools = tools_list
-        return tools_list
+        return self.tools
+
+    async def _load_toolkits_config(self):
+        assert isinstance(self.toolkits, list) and all(isinstance(tool, str) for tool in self.toolkits)
+        parsed_tools = []
+        for tool_name in self.toolkits:
+            config = ConfigLoader.load_toolkit_config(tool_name)
+            toolkit = await self._load_toolkit(config)
+            if config.mode in ["customized", "builtin"]:
+                parsed_tools.extend(await toolkit.get_tools_in_agents())
+        self.tools = parsed_tools
 
     async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
+        if toolkit_config.mode == "builtin":
+            return await self._load_builtin_toolkit(toolkit_config)
+        elif toolkit_config.mode == "customized":
+            return await self._load_customized_toolkit(toolkit_config)
+        elif toolkit_config.mode == "mcp":
+            return await self._load_mcp_server(toolkit_config)
+        else:
+            raise ValueError(f"Unknown toolkit mode: {toolkit_config.mode}")
+
+    async def _load_builtin_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
         toolkit = await self._tools_exit_stack.enter_async_context(TOOLKIT_MAP[toolkit_config.name](toolkit_config))
-        self._toolkits.append(toolkit)
+        self._toolkits[toolkit_config.name] = toolkit
         return toolkit
 
     async def _load_customized_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
@@ -159,7 +179,7 @@ class SimpleAgent(BaseAgent):
         assert toolkit_config.customized_filepath is not None and toolkit_config.customized_classname is not None
         toolkit_class = load_class_from_file(toolkit_config.customized_filepath, toolkit_config.customized_classname)
         toolkit = await self._tools_exit_stack.enter_async_context(toolkit_class(toolkit_config))
-        self._toolkits.append(toolkit)
+        self._toolkits[toolkit_config.name] = toolkit
         return toolkit
 
     async def _load_mcp_server(self, toolkit_config: ToolkitConfig) -> MCPServer:

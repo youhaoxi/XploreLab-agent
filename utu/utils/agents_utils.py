@@ -177,7 +177,58 @@ class AgentsUtils:
             # print(f"> [DEBUG] event: {event}")
             if isinstance(event, RawResponsesStreamEvent):
                 # event.data -- ResponseStreamEvent
-                if event.data.type == "response.output_text.delta":
+                if event.data.type == "response.output_item.added":
+                    match event.data.item.type:
+                        # computer_call, code_interpreter_call, custom_tool_call, file_search_call, function_call,
+                        # we_search_call, image_generation_call, local_shell_call,
+                        # mcp_call, mcp_list_tools, mcp_approval_request, message, reasoning
+                        case "message":
+                            pass
+                        case "function_call":
+                            PrintUtils.print_bot(
+                                f"<toolcall name={event.data.item.name}>{event.data.item.arguments}", end=""
+                            )
+                        case _:
+                            PrintUtils.print_bot(f"<{event.data.item.type}>", end="")
+                elif event.data.type == "response.output_item.done":
+                    match event.data.item.type:
+                        case "message":
+                            pass
+                            # PrintUtils.print_bot("")  # add a new line?
+                        case "function_call":
+                            PrintUtils.print_bot("</toolcall>")
+                        case _:
+                            # PrintUtils.print_bot(f"</{event.data.item.type}>")
+                            logger.info(f"</{event.data.item.type}>")  # It seems that vllm's output order is wrong
+                elif event.data.type == "response.content_part.added":
+                    match event.data.part.type:
+                        # output_text, refusal
+                        case "output_text":
+                            pass
+                        case "refusal":
+                            PrintUtils.print_bot(f"<refusal>{event.data.part.refusal}", end="")
+                        case _:
+                            logger.warning(f"Unknown part type: {event.data.part.type}! {event}")
+                elif event.data.type == "response.content_part.done":
+                    match event.data.part.type:
+                        case "output_text":
+                            pass
+                        case "refusal":
+                            PrintUtils.print_bot("</refusal>")
+                        case _:
+                            logger.warning(f"Unknown part type: {event.data.part.type}! {event}")
+                elif event.data.type == "response.reasoning_summary_part.added":
+                    PrintUtils.print_info("<reasoning_summary>", end="")
+                elif event.data.type == "response.reasoning_summary_part.done":
+                    # PrintUtils.print_info("</reasoning_summary>", end="")
+                    logger.info("</reasoning_summary>")  # It seems that vllm's output order is wrong
+                elif event.data.type == "response.reasoning_summary_text.delta":
+                    PrintUtils.print_info(f"{event.data.delta}", end="")
+                elif event.data.type == "response.function_call_arguments.delta":
+                    PrintUtils.print_bot(f"{event.data.delta}", end="")
+                elif event.data.type == "response.function_call_arguments.done":
+                    pass
+                elif event.data.type == "response.output_text.delta":
                     PrintUtils.print_bot(f"{event.data.delta}", end="")
                 elif event.data.type == "response.reasoning_text.delta":
                     PrintUtils.print_info(f"{event.data.delta}", end="")
@@ -189,12 +240,6 @@ class AgentsUtils:
                     "response.created",
                     "response.completed",
                     "response.in_progress",
-                    "response.content_part.added",
-                    "response.content_part.done",
-                    "response.output_item.added",
-                    "response.output_item.done",
-                    "response.function_call_arguments.delta",
-                    "response.function_call_arguments.done",
                 ):
                     pass
                 else:
@@ -204,19 +249,18 @@ class AgentsUtils:
                 item: RunItem = event.item
                 if item.type == "message_output_item":
                     pass  # do not print twice to avoid duplicate! (already handled `response.output_text.delta`)
-                    # PrintUtils.print_bot(f"<{item.agent.name}> {ItemHelpers.text_message_output(item).strip()}")
+                    # PrintUtils.print_bot(f"{ItemHelpers.text_message_output(item).strip()}")
+                elif item.type == "reasoning_item":
+                    pass
+                elif item.type == "tool_call_item":
+                    pass
+                    # PrintUtils.print_bot([tool_call] {item.raw_item.name}({item.raw_item.arguments})")
+                elif item.type == "tool_call_output_item":
+                    PrintUtils.print_tool(f"[tool_output] {item.output}")  # item.raw_item
                 elif item.type == "handoff_call_item":  # same as `ToolCallItem`
                     PrintUtils.print_bot(f"[handoff_call] {item.raw_item.name}({item.raw_item.arguments})")
                 elif item.type == "handoff_output_item":
                     PrintUtils.print_info(f">> Handoff from {item.source_agent.name} to {item.target_agent.name}")
-                elif item.type == "tool_call_item":
-                    PrintUtils.print_bot(
-                        f"<{item.agent.name}> [tool_call] {item.raw_item.name}({item.raw_item.arguments})"
-                    )
-                elif item.type == "tool_call_output_item":
-                    PrintUtils.print_tool(f"<{item.agent.name}> [tool_output] {item.output}")  # item.raw_item
-                elif item.type == "reasoning_item":
-                    pass
                 elif event.type in (
                     "mcp_list_tools_item",
                     "mcp_approval_request_item",

@@ -21,7 +21,7 @@ def get_weather(city: str, date: str) -> str:
     return f"The weather in {city} at {date} is sunny."
 
 
-config = ConfigLoader.load_model_config("test")
+config = ConfigLoader.load_model_config("base")
 model = AgentsUtils.get_agents_model(**config.model_provider.model_dump())
 sp = f"You are a helpful assistant. The date of today is {datetime.now().strftime('%Y-%m-%d (%A)')}."
 agent = Agent(

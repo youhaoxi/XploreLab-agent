@@ -30,14 +30,15 @@ class DataClassWithStreamEvents:
                 self._is_complete = True
                 break
 
-            # print(f"self._is_complete: {self._is_complete}, self._event_queue: {self._event_queue}")
             if self._is_complete and self._event_queue.empty():
                 break
+
             try:
                 item = await self._event_queue.get()
             except asyncio.CancelledError:
                 logger.debug("Breaking due to asyncio.CancelledError")
                 break
+
             if isinstance(item, QueueCompleteSentinel):
                 self._event_queue.task_done()
                 # Check for errors, in case the queue was completed due to an exception
@@ -48,6 +49,9 @@ class DataClassWithStreamEvents:
             self._event_queue.task_done()
 
         self._cleanup_tasks()
+
+        if self._stored_exception:
+            raise self._stored_exception
 
     def _cleanup_tasks(self):
         if self._run_impl_task and not self._run_impl_task.done():

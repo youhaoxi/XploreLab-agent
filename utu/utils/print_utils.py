@@ -35,7 +35,7 @@ class PrintUtils:
         return user_input
 
     @staticmethod
-    async def async_print_input(prompt_text: str):
+    async def async_print_input(prompt_text: str) -> str:
         # https://python-prompt-toolkit.readthedocs.io/en/master/pages/asking_for_input.html#prompt-in-an-asyncio-application  # noqa: E501
         session = prompt_toolkit.PromptSession()
         while True:
