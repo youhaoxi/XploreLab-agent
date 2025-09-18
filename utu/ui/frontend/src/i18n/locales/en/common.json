@@ -1,4 +1,7 @@
 {
+  "websocket": {
+    "connectionClosed": "WebSocket connection closed. Attempting to reconnect..."
+  },
   "sidebar": {
     "newChat": "New Chat",
     "agentConfigs": "Agent Configs",

@@ -19,9 +19,15 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
   // Render message sender
   const renderSender = () => {
     if (!showSender) return null;
+    const senderText = {
+      'assistant': 'Assistant',
+      'user': 'You',
+      'system': 'System'
+    }[message.sender] || 'Unknown';
+    
     return (
       <div className="message-sender">
-        {message.sender === 'assistant' ? 'Assistant' : 'You'}
+        {senderText}
       </div>
     );
   };
@@ -454,7 +460,10 @@ const MessageComponent: React.FC<MessageComponentProps> = ({
   return (
     <div
       key={message.id}
-      className={`message ${message.sender === 'user' ? 'message-user' : 'message-bot'}`}
+      className={`message ${
+        message.sender === 'user' ? 'message-user' : 
+        message.sender === 'system' ? 'message-system' : 'message-bot'
+      }`}
     >
       {renderSender()}
       <div className={`message-content ${message.type === 'error' ? 'error-message' : ''} ${showConfirmClass ? 'message-requires-confirm' : ''} ${isConfirmed ? 'message-confirmed' : ''} ${isRejected ? 'message-rejected' : ''}`}>
