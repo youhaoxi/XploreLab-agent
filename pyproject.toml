@@ -85,6 +85,9 @@ python-executor = [
     "scipy>=1.16.1",
     "seaborn>=0.13.2",
 ]
+search = [
+    "crawl4ai>=0.7.4",
+]
 
 
 [build-system]
