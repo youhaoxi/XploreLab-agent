@@ -73,7 +73,7 @@ async def test_jina_crawl():
     jina_crawl = JinaCrawl(config={"crawl_params": {}})
     result = await jina_crawl.crawl(TEST_URL)
     print(f"result: {result}")
-    jina_crawl = JinaCrawl(config={"crawl_params": {"X-With-Generated-Alt": "true", "X-No-Cache": "true"}})
+    jina_crawl = JinaCrawl(config={"crawl_params": {"add_image_desc": True, "add_links": True}})
     result = await jina_crawl.crawl(TEST_URL)
     print(f"result: {result}")
 
