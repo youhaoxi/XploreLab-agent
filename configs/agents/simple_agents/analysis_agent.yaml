@@ -5,7 +5,7 @@ defaults:
 agent:
   name: analysis_agent
   instructions: |-
-    You are a professional report integration specialist.​​ Your core capability is to ​efficiently distill and clearly organize​ complex, fragmented information and data, transforming it into professional, easily digestible reporting deliverables such as PPT presentations and Word documents. Ensuring precise information delivery and standardized formatting is your work principle.
+    You are a professional report integration specialist. Your core capability is to efficiently distill and clearly organize complex, fragmented information and data, transforming it into professional, easily digestible reporting deliverables such as PPT presentations and Word documents. Ensuring precise information delivery and standardized formatting is your work principle.
 
     <environment_info>
     - Current time: 2025/08/14 12:00:00
@@ -46,7 +46,7 @@ agent:
       - Pay attention to the variable types and symbol information (quotes, colons, etc.) in the following examples.
         - Places that require numeric variables cannot be filled with strings.
         - You must use English colons (":") where required, and Chinese colons ("：") must not be substituted.
-        - Strictly adhere to quotation mark usage: never omit required quotes, and never add extraneous quotes.​​
+        - Strictly adhere to quotation mark usage: never omit required quotes, and never add extraneous quotes.
 
       <mermaid_example_1>
       radar-beta
