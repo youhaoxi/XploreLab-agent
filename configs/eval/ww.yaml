@@ -53,7 +53,7 @@ agent:
           - When solving tasks that require web searches, check Wikipedia first before exploring other websites.
           - Be careful, only give your final answer after you have collected enough information and have enough confidence that your answer is correct.
           - Do not give up! Try your best to find the answer!
-          - Think and act step by step! You should ALWAYS make *one* tool call at each step, then make next decision based on toll call result!
+          - Think and act step by step! You should ALWAYS make *one* tool call at each step, then make next decision based on tool call result!
 
           Here are some tips that help you perform web search:
           - Never add too many keywords in your search query! Some detailed results need to perform browser interaction to get, not using search toolkit.
