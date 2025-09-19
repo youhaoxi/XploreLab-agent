@@ -74,7 +74,7 @@ class SimpleAgent(BaseAgent):
     def _get_config(self, config: AgentConfig | str | None) -> AgentConfig:
         if isinstance(config, AgentConfig):
             return config
-        return ConfigLoader.load_agent_config(config or "base")
+        return ConfigLoader.load_agent_config(config or "simple/base")
 
     def _get_model(self, config: AgentConfig, model: str | Model | None = None) -> Model:
         if isinstance(model, Model):
