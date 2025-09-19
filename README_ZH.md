@@ -205,7 +205,7 @@ UTU_LLM_API_KEY=<替换为你的 API Key>
 
 ### 快速开始
 
-Youtu-Agent 内置了配置文件。例如，默认配置文件 (`configs/agents/default.yaml`) 定义了一个带有搜索工具的简单 Agent：
+Youtu-Agent 内置了配置文件。例如，默认配置文件 (`configs/agents/simple/base_search.yaml`) 定义了一个带有搜索工具的简单 Agent：
 
 ```yaml
 defaults:
@@ -222,9 +222,9 @@ agent:
 
 ```bash
 # NOTE: 你需要在 .env 中配置 `SERPER_API_KEY` 和 `JINA_API_KEY` (我们计划在未来替换为免费工具)
-python scripts/cli_chat.py --stream --config default
+python scripts/cli_chat.py --stream --config simple/base_search
 # 如果你不想使用搜索工具，可以运行
-python scripts/cli_chat.py --stream --config base
+python scripts/cli_chat.py --stream --config simple/base
 ```
 
 📖 更多内容请参考：[快速开始文档](https://tencentcloudadp.github.io/youtu-agent/quickstart)

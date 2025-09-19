@@ -5,11 +5,7 @@ defaults:
   - /agents/simple/search_agent@workers.SearchAgent
   - _self_
 
-
 type: orchestra
-
-planner_config:
-  examples_path: planner_examples_data.json
 
 workers_info:
   - name: SearchAgent

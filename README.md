@@ -238,7 +238,7 @@ Please refer to [`docker/README.md`](./docker/README.md) for a streamlined Docke
 
 ### Quick Start
 
-Youtu-agent ships with built-in configurations. For example, the default config (`configs/agents/default.yaml`) defines a simple agent equipped with a search tool:
+Youtu-agent ships with built-in configurations. For example, the config `configs/agents/simple/base_search.yaml` defines a simple agent equipped with a search tool:
 
 ```yaml
 defaults:
@@ -256,9 +256,9 @@ You can launch an interactive CLI chatbot with this agent by running:
 ```bash
 # NOTE: You need to set `SERPER_API_KEY` and `JINA_API_KEY` in `.env` for web search access.
 # (We plan to replace these with free alternatives in the future)
-python scripts/cli_chat.py --stream --config default
+python scripts/cli_chat.py --stream --config simple/base_search
 # To avoid using the search toolkit, you can run:
-python scripts/cli_chat.py --stream --config base
+python scripts/cli_chat.py --stream --config simple/base
 ```
 
 📖 More details: [Quickstart Documentation](https://tencentcloudadp.github.io/youtu-agent/quickstart)

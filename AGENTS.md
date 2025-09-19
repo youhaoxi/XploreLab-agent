@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 - `utu/` — core Python package: agents (`utu/agents`), tools (`utu/tools`), config loaders (`utu/config`), env, tracing, ui, utils.
-- `configs/` — YAML configs for models, toolkits, and agents (e.g., `configs/agents/default.yaml`).
+- `configs/` — YAML configs for models, toolkits, and agents (e.g., `configs/agents/simple/base.yaml`).
 - `tests/` — pytest suite mirroring package layout (e.g., `tests/tools/...`, `tests/agents/...`).
 - `scripts/` — runnable utilities (CLI chat, eval, tool generation).
 - `examples/` — ready-to-run samples; some require API keys.
