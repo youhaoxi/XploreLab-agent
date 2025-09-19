@@ -8,6 +8,7 @@
 import asyncio
 import json
 from collections import defaultdict
+from dataclasses import dataclass, field
 from typing import Literal
 
 from agents import RunResultStreaming, StopAtTools, trace
@@ -15,9 +16,9 @@ from agents._run_impl import QueueCompleteSentinel
 from pydantic import BaseModel
 
 from ..agents import SimpleAgent
+from ..agents.common import DataClassWithStreamEvents
 from ..tools import TOOLKIT_MAP, UserInteractionToolkit, get_tools_schema
 from ..utils import DIR_ROOT, FileUtils, get_logger
-from .common import GeneratorTaskRecorder
 
 logger = get_logger(__name__)
 
@@ -43,6 +44,14 @@ agent:
   instructions: |
 {instructions}
 """
+
+
+@dataclass
+class GeneratorTaskRecorder(DataClassWithStreamEvents):
+    requirements: str = field(default=None)
+    selected_tools: dict[str, list[str]] = field(default=None)
+    instructions: str = field(default=None)
+    name: str = field(default=None)
 
 
 class SimpleAgentGeneratedEvent(BaseModel):
@@ -95,20 +104,20 @@ class SimpleAgentGenerator:
         )
         self._initialized = True
 
-    async def run(self, user_input: str):
-        await self.build()
-        with trace("simple_agent_generator"):
-            task_recorder = GeneratorTaskRecorder()
-            # step 1: generate requirements
-            await self.step1(task_recorder, user_input)
-            # step 2: select tools
-            await self.step2(task_recorder)
-            # step 3: generate instructions
-            await self.step3(task_recorder)
-            # step 4: generate name
-            await self.step4(task_recorder)
-            ofn, _ = self.format_config(task_recorder)
-            print(f"Config saved to {ofn}")
+    # async def run(self, user_input: str):
+    #     await self.build()
+    #     with trace("simple_agent_generator"):
+    #         task_recorder = GeneratorTaskRecorder()
+    #         # step 1: generate requirements
+    #         await self.step1(task_recorder, user_input)
+    #         # step 2: select tools
+    #         await self.step2(task_recorder)
+    #         # step 3: generate instructions
+    #         await self.step3(task_recorder)
+    #         # step 4: generate name
+    #         await self.step4(task_recorder)
+    #         ofn, _ = self.format_config(task_recorder)
+    #         print(f"Config saved to {ofn}")
 
     def run_streamed(self, user_input: str) -> GeneratorTaskRecorder:
         with trace("simple_agent_generator"):
@@ -117,15 +126,19 @@ class SimpleAgentGenerator:
         return task_recorder
 
     async def _start_streaming(self, task_recorder: GeneratorTaskRecorder, user_input: str):
-        await self.build()
-        await self.step1(task_recorder, user_input)
-        await self.step2(task_recorder)
-        await self.step3(task_recorder)
-        await self.step4(task_recorder)
-        ofn, config = self.format_config(task_recorder)
-        logger.info(f"Generated config saved to {ofn}")
-        event = SimpleAgentGeneratedEvent(filename=str(ofn), config_content=config)
-        task_recorder._event_queue.put_nowait(event)
+        try:
+            await self.build()
+            await self.step1(task_recorder, user_input)
+            await self.step2(task_recorder)
+            await self.step3(task_recorder)
+            await self.step4(task_recorder)
+            ofn, config = self.format_config(task_recorder)
+            logger.info(f"Generated config saved to {ofn}")
+            event = SimpleAgentGeneratedEvent(filename=str(ofn), config_content=config)
+            task_recorder._event_queue.put_nowait(event)
+        except Exception as e:
+            task_recorder._is_complete = True
+            raise e
 
         task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
         task_recorder._is_complete = True

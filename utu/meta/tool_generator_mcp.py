@@ -8,7 +8,7 @@ generation workflow:
 4. postprocess
 
 - [x] add clarification tool
-- [ ] debug agent
+- [x] debugger agent
 - [ ] doc for coding-agent integration (e.g. Claude Code)
 - [ ] toolkit hub?
 """
@@ -48,14 +48,7 @@ class ToolGenerator:
         self.output_dir = DIR_ROOT / "configs/tools/generated"
         self.output_dir.mkdir(exist_ok=True)
 
-        self._initialized = False
-
-    async def build(self):
-        if self._initialized:
-            return
-
     async def run(self, user_input: str):
-        await self.build()
         self.llm.clear_input_items()
         with trace("tool_generator"):
             task_recorder = TaskRecorder()
@@ -75,12 +68,15 @@ class ToolGenerator:
         return task_recorder
 
     async def _start_streaming(self, task_recorder: TaskRecorder, user_input: str):
-        await self.build()
         with trace("tool_generator"):
-            await self.step1(task_recorder, user_input)
-            await self.step2(task_recorder)
-            await self.step3(task_recorder)
-            self.postprocess(task_recorder)
+            try:
+                await self.step1(task_recorder, user_input)
+                await self.step2(task_recorder)
+                await self.step3(task_recorder)
+                self.postprocess(task_recorder)
+            except Exception as e:
+                task_recorder._is_complete = True
+                raise e
 
         task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
         task_recorder._is_complete = True
