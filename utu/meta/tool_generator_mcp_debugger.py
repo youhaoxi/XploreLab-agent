@@ -27,11 +27,11 @@ class ToolGeneratorDebugger:
     def __init__(self):
         self.llm = SimpleAgent(config="meta/tool_generator_mcp_debugger")
 
-    async def run(self):
-        self.llm.clear_input_items()
-        with trace("tool_debugger"):
-            task_recorder = TaskRecorder()
-            await self.test(task_recorder)
+    # async def run(self):
+    #     self.llm.clear_input_items()
+    #     with trace("tool_debugger"):
+    #         task_recorder = TaskRecorder()
+    #         await self.test(task_recorder)
 
     def run_streamed(self, workspace_dir: str) -> TaskRecorder:
         task_recorder = TaskRecorder()
@@ -40,7 +40,12 @@ class ToolGeneratorDebugger:
 
     async def _start_streaming(self, task_recorder: TaskRecorder, workspace_dir: str):
         with trace("tool_debugger"):
-            await self.test(task_recorder=task_recorder, workspace_dir=workspace_dir)
+            try:
+                await self.test(task_recorder=task_recorder, workspace_dir=workspace_dir)
+            except Exception as e:
+                task_recorder._is_complete = True
+                raise e
+
         task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
         task_recorder._is_complete = True
 
