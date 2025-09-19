@@ -188,7 +188,7 @@ cp.env.example.env  # NOTE: 関連する環境変数を設定する必要があ�
 
 ### すぐに始める
 
-Youtu-Agent には設定ファイルが内蔵されています。例えば、デフォルトの設定ファイル (`configs/agents/default.yaml`) では、検索ツールを備えたシンプルなエージェントが定義されています：
+Youtu-Agent には設定ファイルが内蔵されています。例えば、デフォルトの設定ファイル (`configs/agents/simple/base_search.yaml`) では、検索ツールを備えたシンプルなエージェントが定義されています：
 
 ```yaml
 defaults:
@@ -205,9 +205,9 @@ agent:
 
 ```bash
 # NOTE: `.env` に `SERPER_API_KEY` と `JINA_API_KEY` を設定する必要があります（将来的には無料のツールに置き換える予定です）
-python scripts/cli_chat.py --stream --config default
+python scripts/cli_chat.py --stream --config simple/base_search
 # 検索ツールを使用しない場合は、以下のコマンドを実行できます
-python scripts/cli_chat.py --stream --config base
+python scripts/cli_chat.py --stream --config simple/base
 ```
 
 📖 詳細については：[クイックスタートドキュメント](https://tencentcloudadp.github.io/youtu-agent/quickstart) を参照してください。

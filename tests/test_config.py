@@ -22,16 +22,17 @@ def test_load_toolkit_config():
 
 
 def test_load_agent_config():
-    config = ConfigLoader.load_agent_config("simple_agents/search_agent")
-    config = ConfigLoader.load_agent_config("simple_agents/gaia_reasoning_coding")
-    config = ConfigLoader.load_agent_config("simple_agents/gaia_document_processing")
-    config = ConfigLoader.load_agent_config("simple_agents/gaia_web_search")
-    config = ConfigLoader.load_agent_config("default")
+    config = ConfigLoader.load_agent_config("simple/search_agent")
+    config = ConfigLoader.load_agent_config("simple/gaia_reasoning_coding")
+    config = ConfigLoader.load_agent_config("simple/gaia_document_processing")
+    config = ConfigLoader.load_agent_config("simple/gaia_web_search")
+    config = ConfigLoader.load_agent_config("simple/base_search")
+    config = ConfigLoader.load_agent_config("orchestra/deep_research")
+    config = ConfigLoader.load_agent_config("workforce/base")
     config = ConfigLoader.load_agent_config("examples/data_analysis")
     config = ConfigLoader.load_agent_config("examples/file_manager")
     config = ConfigLoader.load_agent_config("examples/svg_generator")
     config = ConfigLoader.load_agent_config("examples/paper_collector")
-    config = ConfigLoader.load_agent_config("orchestra")
     print(config)
     # print(json.dumps(config.model_dump(), indent=2))
 

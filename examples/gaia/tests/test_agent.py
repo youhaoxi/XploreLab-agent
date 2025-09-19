@@ -7,7 +7,7 @@ from utu.config import ConfigLoader
 
 
 async def test_reasoning_coding_agent():
-    agent = SimpleAgent(config=ConfigLoader.load_agent_config("simple_agents/gaia_reasoning_coding.yaml"))
+    agent = SimpleAgent(config=ConfigLoader.load_agent_config("simple/gaia_reasoning_coding.yaml"))
     await agent.build()
     print(f"agent with tools: {agent.tools}")
     # await agent.chat_streamed("What tools do you have?")
@@ -17,7 +17,7 @@ async def test_reasoning_coding_agent():
 
 
 async def test_web_search_agent():
-    agent = SimpleAgent(config=ConfigLoader.load_agent_config("simple_agents/gaia_web_search.yaml"))
+    agent = SimpleAgent(config=ConfigLoader.load_agent_config("simple/gaia_web_search.yaml"))
     await agent.build()
     print(f"agent with tools: {agent.tools}")
     await agent.chat_streamed("What tools do you have?")

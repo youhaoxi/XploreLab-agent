@@ -4,7 +4,7 @@ defaults:
   - /model/base@workforce_planner_model
   - /model/base@workforce_assigner_model
   - /model/base@workforce_answerer_model
-  - /agents/simple_agents/search_agent@workforce_executor_agents.SearchAgent
+  - /agents/simple/search_agent@workforce_executor_agents.SearchAgent
   - _self_
 
 type: workforce
