@@ -11,13 +11,13 @@ from .base_config import ConfigBaseModel
 class ModelProviderConfig(ConfigBaseModel):
     """config for model provider"""
 
-    type: Literal["chat.completions", "responses"] = "chat.completions"
+    type: Literal["chat.completions", "responses", "litellm"] = "chat.completions"
     """model type, supported types: chat.completions, responses"""
     model: str = EnvUtils.get_env("UTU_LLM_MODEL")
     """model name"""
-    base_url: str | None = EnvUtils.get_env("UTU_LLM_BASE_URL")
+    base_url: str | None = None
     """model provider base url"""
-    api_key: str | None = EnvUtils.get_env("UTU_LLM_API_KEY")
+    api_key: str | None = None
     """model provider api key"""
 
 

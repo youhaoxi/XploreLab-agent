@@ -19,7 +19,7 @@ async def main():
     PrintUtils.print_info(USAGE_MSG, color="yellow")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_name", type=str, default="default", help="Configuration name")
+    parser.add_argument("--config_name", type=str, default="workforce/base", help="Configuration name")
     parser.add_argument("--stream", action="store_true", help="Stream the output.")
     args = parser.parse_args()
 

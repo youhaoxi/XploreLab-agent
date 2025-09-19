@@ -19,7 +19,7 @@ async def main():
     PrintUtils.print_info(USAGE_MSG, color="yellow")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_name", type=str, default="default", help="Configuration name")
+    parser.add_argument("--config_name", type=str, default="simple/base", help="Configuration name")
     parser.add_argument("--agent_model", type=str, default=None, help="Agent model.")
     parser.add_argument("--tools", type=str, nargs="*", help="List of tool names to load")
     parser.add_argument("--stream", action="store_true", help="Stream the output.")

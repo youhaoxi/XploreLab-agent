@@ -8,7 +8,7 @@ from utu.config import ConfigLoader
 
 @pytest.fixture
 async def agent():
-    agent = SimpleAgent(config=ConfigLoader.load_agent_config("default"))
+    agent = SimpleAgent(config=ConfigLoader.load_agent_config("simple/base_search"))
     await agent.build()
     yield agent
     await agent.cleanup()
