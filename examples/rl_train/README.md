@@ -23,6 +23,10 @@ python scripts/cli_chat.py --config examples/rl_train/qa_python
 
 ## Case 2: multi-hop QA with retrieval tool (wiki)
 
+- config: `configs/agents/examples/rl_train/qa_wiki.yaml`
+- retrieval API: serving the `Wikipedia 2018` dataset. You can use this [script](https://github.com/inclusionAI/ASearcher/blob/main/scripts/launch_local_server.sh) from ASearcher to launch a local wikipedia retrieval service. 
+- tools: [wiki_tool.py](./wiki_tool.py). Note to set the correct retrieval API URL in the code.
+
 ```sh
 python scripts/cli_chat.py --config examples/rl_train/qa_wiki
 ```
