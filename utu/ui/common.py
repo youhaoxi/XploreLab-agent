@@ -93,6 +93,7 @@ class ErrorContent(BaseModel):
     type: Literal["error"] = "error"
     message: str
 
+
 class Event(BaseModel):
     type: Literal[
         "raw",
