@@ -1,3 +1,7 @@
+"""
+- [ ] support streaming for planner
+"""
+
 import asyncio
 import json
 
@@ -88,10 +92,6 @@ class OrchestraAgent(BaseAgent):
             task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan", item=plan))
             for task in task_recorder.plan.todo:
                 # print(f"> processing {task}")
-                # DONOT send this event because Runner will send it
-                # task_recorder._event_queue.put_nowait(
-                #     AgentUpdatedStreamEvent(new_agent=self.worker_agents[task.agent_name])
-                # )
                 worker_agent = self.worker_agents[task.agent_name]
                 result_streaming = worker_agent.work_streamed(task_recorder, task)
                 async for event in result_streaming.stream.stream_events():
