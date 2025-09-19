@@ -14,7 +14,7 @@ class AnswererAgent:
 
     def __init__(self, config: AgentConfig):
         self.config = config
-        self.llm = LLMAgent(config.workforce_answerer_model)
+        self.llm = LLMAgent(model_config=config.workforce_answerer_model)
 
     async def extract_final_answer(self, recorder: WorkspaceTaskRecorder) -> str:
         """Extract the final answer from formatted task execution results."""

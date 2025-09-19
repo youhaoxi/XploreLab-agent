@@ -19,7 +19,7 @@ class PlannerAgent:
 
     def __init__(self, config: AgentConfig):
         self.config = config
-        self.llm = LLMAgent(config.workforce_planner_model)
+        self.llm = LLMAgent(model_config=config.workforce_planner_model)
 
     async def plan_task(self, recorder: WorkspaceTaskRecorder) -> None:
         """Plan tasks based on the overall task and available agents."""

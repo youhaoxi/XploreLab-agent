@@ -9,7 +9,7 @@ from utu.utils import AgentsUtils
 
 @pytest.fixture
 async def agent():
-    agent = LLMAgent(config=ConfigLoader.load_model_config("base"))
+    agent = LLMAgent(model_config=ConfigLoader.load_model_config("base"))
     return agent
 
 
