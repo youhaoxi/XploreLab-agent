@@ -21,6 +21,7 @@ from utu.utils import EnvUtils
 
 from .common import (
     AskContent,
+    ErrorContent,
     Event,
     InitContent,
     ListAgentsContent,
@@ -111,6 +112,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     async def send_event(self, event: Event):
         logging.debug(f"Sending event: {event.model_dump()}")
         self.write_message(event.model_dump())
+
+    async def _handle_error(self, message: str):
+        await self.send_event(Event(type="error", data=ErrorContent(type="error", message=message)))
+        await self.send_event(Event(type="finish"))
 
     async def _handle_query_noexcept(self, query: UserQuery):
         if query.query.strip() == "":
@@ -208,6 +213,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             await self._handle_query_noexcept(query)
         except Exception as e:
             logging.error(f"Error processing query: {str(e)}")
+            await self._handle_error(f"Error processing query: {str(e)}")
             logging.debug(traceback.format_exc())
 
     async def _handle_list_agents(self):
@@ -215,6 +221,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             await self._handle_list_agents_noexcept()
         except Exception as e:
             logging.error(f"Error processing list agents: {str(e)}")
+            await self._handle_error(f"Error processing list agents: {str(e)}")
             logging.debug(traceback.format_exc())
 
     async def _handle_switch_agent(self, switch_agent_request: SwitchAgentRequest):
@@ -238,6 +245,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             await self._handle_answer_noexcept(answer)
         except Exception as e:
             logging.error(f"Error processing answer: {str(e)}")
+            await self._handle_error(f"Error processing answer: {str(e)}")
             logging.debug(traceback.format_exc())
 
     async def _handle_gen_agent_noexcept(self):
@@ -251,6 +259,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             await self._handle_gen_agent_noexcept()
         except Exception as e:
             logging.error(f"Error processing gen agent: {str(e)}")
+            await self._handle_error(f"Error processing gen agent: {str(e)}")
             logging.debug(traceback.format_exc())
 
     async def handle_query_worker(self):
@@ -278,13 +287,14 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 logging.error(f"Unhandled message type: {data.get('type')}")
         except json.JSONDecodeError:
             logging.error(f"Invalid JSON received: {message}")
+            await self._handle_error(f"Invalid JSON received: {message}")
         except Exception as e:
             logging.error(f"Error processing message: {str(e)}")
+            await self._handle_error(f"Error processing message: {str(e)}")
             logging.debug(traceback.format_exc())
 
     def on_close(self):
         logging.debug("WebSocket closed")
-        pass
 
 
 class WebUIAgents:

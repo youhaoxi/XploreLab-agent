@@ -10,7 +10,7 @@ export interface ToolCallMessage {
 export interface Message {
   id: number;
   content: string | ToolCallMessage | PlanItem;
-  sender: 'user' | 'assistant';
+  sender: 'user' | 'assistant' | 'system';
   type?: 'text' | 'reason' | 'tool_call' | 'worker' | 'report' | 'error' | 'plan' | 'new_agent';
   inprogress?: boolean;
   timestamp: Date;

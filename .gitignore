@@ -66,3 +66,5 @@ test.yaml
 # generated configs
 /configs/tools/generated
 /configs/agents/generated
+pgs
+*.whl
