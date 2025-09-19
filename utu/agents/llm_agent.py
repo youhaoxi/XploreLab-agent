@@ -1,4 +1,6 @@
-from agents import Agent, Runner, RunResultStreaming, TResponseInputItem, trace
+from typing import Any
+
+from agents import Agent, AgentOutputSchemaBase, Runner, RunResultStreaming, TResponseInputItem, trace
 
 from ..config import ModelConfigs
 from ..utils import AgentsUtils, get_logger
@@ -11,17 +13,24 @@ logger = get_logger(__name__)
 class LLMAgent(BaseAgent):
     """Minimal agent that wraps a model."""
 
-    def __init__(self, config: ModelConfigs):
-        self.config = config
+    def __init__(
+        self,
+        model_config: ModelConfigs,
+        name: str = None,
+        instructions: str = None,
+        output_type: type[Any] | AgentOutputSchemaBase | None = None,
+    ):
+        self.config = model_config
         self.agent = Agent(
-            name="LLMAgent",
-            model=AgentsUtils.get_agents_model(**config.model_provider.model_dump()),
-            model_settings=config.model_settings,
-            # tools=config.tools,
-            # output_type=config.output_type,
+            name=name or "LLMAgent",
+            instructions=instructions,
+            model=AgentsUtils.get_agents_model(**model_config.model_provider.model_dump()),
+            model_settings=model_config.model_settings,
+            output_type=output_type,
         )
 
     def set_instructions(self, instructions: str):
+        logger.info(f"Set instructions for LLMAgent: {instructions[:50]}...")
         self.agent.instructions = instructions
 
     async def run(self, input: str | list[TResponseInputItem], trace_id: str = None) -> TaskRecorder:
