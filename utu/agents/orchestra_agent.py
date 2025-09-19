@@ -4,7 +4,7 @@
 
 import asyncio
 
-from agents import AgentUpdatedStreamEvent, trace
+from agents import trace
 from agents._run_impl import QueueCompleteSentinel
 
 from ..config import AgentConfig, ConfigLoader
@@ -70,7 +70,7 @@ class OrchestraAgent(BaseAgent):
     async def _start_streaming(self, task_recorder: OrchestraTaskRecorder):
         with trace(workflow_name="orchestra_agent", trace_id=task_recorder.trace_id):
             try:
-                task_recorder._event_queue.put_nowait(AgentUpdatedStreamEvent(new_agent=self.planner_agent))
+                task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="input"))
                 plan = await self.plan(task_recorder)
                 task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan", item=plan))
 
@@ -85,7 +85,7 @@ class OrchestraAgent(BaseAgent):
                     task_recorder.add_worker_result(result_streaming)
                     # print(f"< processed {task}")
 
-                task_recorder._event_queue.put_nowait(AgentUpdatedStreamEvent(new_agent=self.reporter_agent))
+                task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="report_start"))
                 result = await self.report(task_recorder)
                 task_recorder.set_final_output(result.output)
                 task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="report", item=result))
