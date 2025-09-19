@@ -39,6 +39,8 @@ class OutputParser:
         for agent_name, task_desc, completed_str in task_matches:
             completed = completed_str.lower() == "true"
             tasks.append(Subtask(agent_name=agent_name, task=task_desc, completed=completed))
+        # check validity
+        assert len(tasks) > 0, "No tasks parsed from plan"
         return tasks
 
 
