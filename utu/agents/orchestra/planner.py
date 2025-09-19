@@ -2,6 +2,8 @@ import json
 import pathlib
 import re
 
+from agents import RunResultStreaming
+
 from ...agents.llm_agent import LLMAgent
 from ...config import AgentConfig
 from ...utils import FileUtils
@@ -48,7 +50,6 @@ class PlannerAgent:
         self.output_parser = OutputParser()
         self._load_planner_examples()
         self._load_available_agents()
-        self._build_llm()
 
     def _load_planner_examples(self) -> None:
         examples_path = self.config.planner_config.get("examples_path", "")
@@ -65,7 +66,11 @@ class PlannerAgent:
             available_agents.append(AgentInfo(**info))
         self.available_agents = available_agents
 
-    def _build_llm(self) -> None:
+    @property
+    def name(self) -> str:
+        return self.config.planner_config.get("name", "planner")
+
+    async def create_plan(self, task_recorder: OrchestraTaskRecorder) -> CreatePlanResult:
         # format examples to string. example: {question, available_agents, analysis, plan}
         examples_str = []
         for example in self.planner_examples:
@@ -76,30 +81,20 @@ class PlannerAgent:
                 f"<plan>{json.dumps(example['plan'], ensure_ascii=False)}</plan>\n"
             )
         examples_str = "\n".join(examples_str)
-
-        # build llm
         sp = FileUtils.get_jinja_template_str(self.prompts["PLANNER_SP"]).render(planning_examples=examples_str)
-        self.llm = LLMAgent(
+        llm = LLMAgent(
             name="planner",
             instructions=sp,
             model_config=self.config.workforce_planner_model,
         )
-
-    @property
-    def name(self) -> str:
-        return self.config.planner_config.get("name", "planner")
-
-    async def build(self):
-        pass
-
-    async def create_plan(self, task_recorder: OrchestraTaskRecorder) -> CreatePlanResult:
         up = FileUtils.get_jinja_template_str(self.prompts["PLANNER_UP"]).render(
             available_agents=self._format_available_agents(self.available_agents),
             question=task_recorder.task,
             background_info=await self._get_background_info(task_recorder),
         )
-        response = await self.llm.run(up)
-        return self.output_parser.parse(response.final_output)
+        res = llm.run_streamed(up)
+        await self._process_streamed(res, task_recorder)
+        return self.output_parser.parse(res.final_output)
 
     def _format_available_agents(self, agents: list[AgentInfo]) -> str:
         agents_str = []
@@ -116,3 +111,7 @@ class PlannerAgent:
     async def _get_background_info(self, task_recorder: OrchestraTaskRecorder) -> str:
         """Get background information for the query. Leave empty by default."""
         return ""
+
+    async def _process_streamed(self, run_result_streaming: RunResultStreaming, task_recorder: OrchestraTaskRecorder):
+        async for event in run_result_streaming.stream_events():
+            task_recorder._event_queue.put_nowait(event)
