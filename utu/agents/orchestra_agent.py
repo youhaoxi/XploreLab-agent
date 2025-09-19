@@ -1,5 +1,5 @@
 """
-- [ ] support streaming for planner
+- [x] support streaming for planner & reporter
 """
 
 import asyncio
@@ -50,33 +50,17 @@ class OrchestraAgent(BaseAgent):
         return workers
 
     async def build(self):
-        await self.planner_agent.build()
         for worker_agent in self.worker_agents.values():
             await worker_agent.build()
-        await self.reporter_agent.build()
 
     async def run(self, input: str, trace_id: str = None) -> OrchestraTaskRecorder:
-        """Run the orchestra agent
-
-        1. plan
-        2. sequentially execute subtasks
-        3. report
-        """
-        # setup
-        trace_id = trace_id or AgentsUtils.gen_trace_id()
-        logger.info(f"> trace_id: {trace_id}")
-
-        # TODO: error_tracing
-        task_recorder = OrchestraTaskRecorder(task=input, trace_id=trace_id)
-        with trace(workflow_name="orchestra_agent", trace_id=trace_id):
-            await self.plan(task_recorder)
-            for task in task_recorder.plan.todo:
-                await self.work(task_recorder, task)
-            result = await self.report(task_recorder)
-            task_recorder.set_final_output(result.output)
+        task_recorder = self.run_streamed(input, trace_id)
+        async for _ in task_recorder.stream_events():
+            pass
         return task_recorder
 
     def run_streamed(self, input: str, trace_id: str = None) -> OrchestraTaskRecorder:
+        # TODO: error_tracing
         trace_id = trace_id or AgentsUtils.gen_trace_id()
         logger.info(f"> trace_id: {trace_id}")
 
