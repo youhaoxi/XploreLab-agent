@@ -9,9 +9,7 @@ wheels/
 # Virtual environments
 .venv
 
-# Misc
-.DS_Store
-.vscode
+# File types to ignore
 *.log
 *.db
 *.jsonl
@@ -35,36 +33,39 @@ wheels/
 *.publish
 *.html
 *.pkl
-_*
-!__init__.py
-_SESSION_DATA
-.cache/
-/data/
-/examples/paper_collector/data
-/examples/data_analysis/data
-/examples/data_analysis/output
-/examples/gui_agent_datamaker/data
-!/examples/gui_agent_datamaker/data/Dublin_Zoo_Intro.docx
-# /docs/examples_output
-/output/
-/workspace/
-site/
-mytools/
-logs/
+*.whl
 
+# Python related
 .pytest_cache/
 .mypy_cache/
-# uv.lock
-.env
-test.yaml
-# requirements.txt
+!__init__.py
 
-.gemini
-.claude
-.codex
+# Data directories
+/.cache/
+/data/
+/site/
+/logs/
 
 # generated configs
 /configs/tools/generated
 /configs/agents/generated
+
+# IDEs and editors
+.idea/
+.vscode/
+.gemini/
+.claude/
+.codex/
+
+# OS files
+.DS_Store
+
+# Environment Variables
+.env
+
+# Misc
+# temp files
+_*
+# temp config
+test.yaml
 pgs
-*.whl
