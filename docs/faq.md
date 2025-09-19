@@ -34,3 +34,33 @@ model:
     extra_args:
       timeout: 1200 # Sets the timeout to 1200 seconds
 ```
+
+### How to use LiteLLM (or Azure) model?
+
+**Method 1**: If the LiteLLM service is compatible with the openai chat.completions API, you can simply set basic environment variables in your `.env` file:
+
+```bash
+UTU_LLM_TYPE=chat.completions  # use the default llm calling method
+# basic openai configs, see `.env.full` if you're not familiar with these configs
+UTU_LLM_MODEL=
+UTU_LLM_BASE_URL=
+UTU_LLM_API_KEY=
+```
+
+**Method 2**: If the service need to be used by the `litellm` package, you should install the additional package and config the following environment variables:
+
+```bash
+UTU_LLM_TYPE=litellm  # set the llm type as litellm
+# set the litellm model name. e.g. azure/gpt-5
+UTU_LLM_MODEL=
+# add other necessary litellm configs bellow, see https://docs.litellm.ai/docs/providers/
+```
+
+e.g. for Azure support, you need to set:
+
+```bash
+AZURE_API_BASE=https://<YOUR-RESOURCE-NAME>.azure.com/
+AZURE_API_KEY=<AZURE_OPENAI_API_KEY>
+```
+
+> For more context, ref [this issue](https://github.com/TencentCloudADP/youtu-agent/issues/85)
