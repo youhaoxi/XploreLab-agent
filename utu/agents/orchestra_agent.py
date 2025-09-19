@@ -12,7 +12,6 @@ from ..utils import AgentsUtils, get_logger
 from .base_agent import BaseAgent
 from .orchestra import (
     AnalysisResult,
-    BaseWorkerAgent,
     CreatePlanResult,
     OrchestraStreamEvent,
     OrchestraTaskRecorder,
@@ -40,16 +39,12 @@ class OrchestraAgent(BaseAgent):
     def set_planner(self, planner: PlannerAgent):
         self.planner_agent = planner
 
-    def _setup_workers(self) -> dict[str, BaseWorkerAgent]:
+    def _setup_workers(self) -> dict[str, SimpleWorkerAgent]:
         workers = {}
         for name, config in self.config.workers.items():
             assert config.type == "simple", f"Only support SimpleAgent as worker in orchestra agent, get {config}"
             workers[name] = SimpleWorkerAgent(config=config)
         return workers
-
-    async def build(self):
-        for worker_agent in self.worker_agents.values():
-            await worker_agent.build()
 
     async def run(self, input: str, trace_id: str = None) -> OrchestraTaskRecorder:
         task_recorder = self.run_streamed(input, trace_id)
@@ -77,6 +72,7 @@ class OrchestraAgent(BaseAgent):
                 for task in task_recorder.plan.todo:
                     # print(f"> processing {task}")
                     worker_agent = self.worker_agents[task.agent_name]
+                    await worker_agent.build()
                     result_streaming = worker_agent.work_streamed(task_recorder, task)
                     async for event in result_streaming.stream.stream_events():
                         task_recorder._event_queue.put_nowait(event)
@@ -102,6 +98,7 @@ class OrchestraAgent(BaseAgent):
         assert all(t.agent_name in self.worker_agents for t in plan.todo), (
             f"agent_name in plan.todo must be in worker_agents, get {plan.todo}"
         )
+        logger.info(f"plan: {plan}")
         task_recorder.set_plan(plan)
         return plan
 
