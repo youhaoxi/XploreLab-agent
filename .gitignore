@@ -48,7 +48,6 @@ _SESSION_DATA
 # /docs/examples_output
 /output/
 /workspace/
-/configs/agents/generated
 site/
 mytools/
 logs/
@@ -63,3 +62,7 @@ test.yaml
 .gemini
 .claude
 .codex
+
+# generated configs
+/configs/tools/generated
+/configs/agents/generated
