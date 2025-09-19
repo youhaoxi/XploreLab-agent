@@ -11,7 +11,7 @@ from .common import AnalysisResult, OrchestraTaskRecorder
 class ReporterAgent:
     def __init__(self, config: AgentConfig):
         self.config = config
-        self.llm = LLMAgent(model_config=config.reporter_model)
+        self.llm = LLMAgent(model_config=config.reporter_model, name="reporter")
         self.template = self._get_template()
 
     @property
