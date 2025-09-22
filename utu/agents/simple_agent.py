@@ -25,13 +25,12 @@ from ..context import BaseContextManager, build_context_manager
 from ..env import BaseEnv, get_env
 from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
 from ..utils import AgentsUtils, get_logger, load_class_from_file
-from .base_agent import BaseAgent
 from .common import TaskRecorder
 
 logger = get_logger(__name__)
 
 
-class SimpleAgent(BaseAgent):
+class SimpleAgent:
     """A simple agent with env, tools, mcps, and context manager, wrapped on openai-agents."""
 
     def __init__(
