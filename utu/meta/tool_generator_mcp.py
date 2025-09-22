@@ -18,10 +18,9 @@ import subprocess
 from dataclasses import dataclass, field
 
 from agents import RunResultStreaming, trace
-from agents._run_impl import QueueCompleteSentinel
 
 from ..agents import SimpleAgent
-from ..agents.common import DataClassWithStreamEvents
+from ..agents.common import DataClassWithStreamEvents, QueueCompleteSentinel
 from ..utils import DIR_ROOT, FileUtils, LLMOutputParser, PrintUtils, get_logger
 
 logger = get_logger(__name__)

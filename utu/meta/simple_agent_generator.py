@@ -12,11 +12,10 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 from agents import RunResultStreaming, StopAtTools, trace
-from agents._run_impl import QueueCompleteSentinel
 from pydantic import BaseModel
 
 from ..agents import SimpleAgent
-from ..agents.common import DataClassWithStreamEvents
+from ..agents.common import DataClassWithStreamEvents, QueueCompleteSentinel
 from ..tools import TOOLKIT_MAP, UserInteractionToolkit, get_tools_schema
 from ..utils import DIR_ROOT, FileUtils, get_logger
 

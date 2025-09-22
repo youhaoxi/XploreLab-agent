@@ -5,11 +5,11 @@
 import asyncio
 
 from agents import trace
-from agents._run_impl import QueueCompleteSentinel
 
 from ..config import AgentConfig, ConfigLoader
 from ..utils import AgentsUtils, get_logger
 from .base_agent import BaseAgent
+from .common import QueueCompleteSentinel
 from .orchestra import (
     AnalysisResult,
     CreatePlanResult,

@@ -9,10 +9,9 @@ import pathlib
 from dataclasses import dataclass
 
 from agents import RunResultStreaming, trace
-from agents._run_impl import QueueCompleteSentinel
 
 from ..agents import SimpleAgent
-from ..agents.common import DataClassWithStreamEvents
+from ..agents.common import DataClassWithStreamEvents, QueueCompleteSentinel
 from ..utils import DIR_ROOT, get_logger
 
 logger = get_logger(__name__)

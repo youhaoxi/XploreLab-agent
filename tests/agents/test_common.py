@@ -1,8 +1,6 @@
 import asyncio
 
-from agents._run_impl import QueueCompleteSentinel
-
-from utu.agents.common import DataClassWithStreamEvents
+from utu.agents.common import DataClassWithStreamEvents, QueueCompleteSentinel
 
 
 async def test_stream_events():
