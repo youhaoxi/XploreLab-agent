@@ -5,7 +5,7 @@ import MessageComponent from './components/MessageComponent';
 import ChatInput from './components/ChatInput';
 import SideBar from './components/SideBar';
 import HamburgerButton from './components/HamburgerButton';
-import { simulateEvents } from './placeholderData';
+// import { simulateEvents } from './placeholderData';
 import logoUrl from './assets/pic.png';
 import logoSquareUrl from './assets/logo-square.png';
 import { useTranslation } from 'react-i18next';
@@ -91,6 +91,10 @@ const App: React.FC = () => {
   const [showNewChatButton, setShowNewChatButton] = useState(false);
   const [showAgentConfigs, setShowAgentConfigs] = useState(false);
 
+  const [isInPlan, setIsInPlan] = useState(false);
+  const [currentPlanReportId, setCurrentPlanReportId] = useState<number | null>(null);
+  const [isInReport, setIsInReport] = useState(false);
+
   const getConfigList = () => {
     let request: UserRequest = {
       type: 'list_agents',
@@ -98,6 +102,19 @@ const App: React.FC = () => {
     }
     setChatInputLoadingState("loading");
     sendRequest(request);
+  }
+
+  const _updateMessageById = (id: number, prevMessages: Message[], update_function: (message: Message) => Message) => {
+    const updatedMessagesList = [...prevMessages];
+    const message = updatedMessagesList.find((message) => message.id === id);
+    if (message) {
+      const updatedMessage = update_function(message);
+      const messageIndex = updatedMessagesList.findIndex(message => message.id === id);
+      if (messageIndex !== -1) {
+        updatedMessagesList[messageIndex] = updatedMessage;
+      }
+    }
+    return updatedMessagesList;
   }
 
   const handleEvent = (event: Event) => {
@@ -165,6 +182,21 @@ const App: React.FC = () => {
           }
         }
 
+        if (isInPlan || isInReport) {
+          const currentId = currentPlanReportId;
+          if (currentId) {
+            return _updateMessageById(currentId, prev, (message) => {
+              const updatedMessage: Message = {
+                ...message,
+                content: message.content + data.delta,
+                inprogress: data.inprogress,
+                requireConfirm: event.requireConfirm,
+              };
+              return updatedMessage;
+            })
+          }
+        }
+
         // If last message is in progress and has the same type, update it
         if (lastMessage?.inprogress && (lastMessage.type == data.type)) {
           const updatedMessage: Message = {
@@ -226,6 +258,7 @@ const App: React.FC = () => {
     else if (event.type === 'orchestra') {
       const data = event.data as OrchestraContent;
       if (data.type === 'plan') {
+        setIsInPlan(false);
         const item = data.item as PlanItem;
         // setPinnedPlan(item);
         const message: Message = {
@@ -249,7 +282,8 @@ const App: React.FC = () => {
         };
         setMessages(prev => [...prev, message]);
       } else if (data.type === 'report') {
-        const item = data.item as ReportItem;
+        setIsInReport(false);
+        const item = data.item as ReportItem; 
         const message: Message = {
           id: Date.now() + 1,
           content: "report: \n" + item.output,
@@ -258,6 +292,32 @@ const App: React.FC = () => {
           type: 'report',
           requireConfirm: event.requireConfirm,
         };
+        setMessages(prev => [...prev, message]);
+      } else if (data.type === 'plan_start') {
+        setIsInPlan(true);
+        const id = Date.now() + 1;
+        const message: Message = {
+          id: id,
+          content: "",
+          sender: 'assistant',
+          timestamp: new Date(),
+          type: 'plan',
+          requireConfirm: event.requireConfirm,
+        }
+        setCurrentPlanReportId(id);
+        setMessages(prev => [...prev, message]);
+      } else if (data.type === 'report_start') {
+        setIsInReport(true);
+        const id = Date.now() + 1;
+        const message: Message = {
+          id: id,
+          content: "",
+          sender: 'assistant',
+          timestamp: new Date(),
+          type: 'report',
+          requireConfirm: event.requireConfirm,
+        }
+        setCurrentPlanReportId(id);
         setMessages(prev => [...prev, message]);
       }
     } 
