@@ -138,6 +138,7 @@ class SimpleAgentGenerator:
             task_recorder._event_queue.put_nowait(event)
         except Exception as e:
             task_recorder._is_complete = True
+            task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
             raise e
 
         task_recorder._event_queue.put_nowait(QueueCompleteSentinel())

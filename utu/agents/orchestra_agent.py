@@ -84,6 +84,7 @@ class OrchestraAgent(BaseAgent):
                 task_recorder._is_complete = True
             except Exception as e:
                 task_recorder._is_complete = True
+                task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
                 raise e
 
     async def plan(self, task_recorder: OrchestraTaskRecorder) -> CreatePlanResult:

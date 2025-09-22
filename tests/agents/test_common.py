@@ -1,5 +1,7 @@
 import asyncio
 
+from agents._run_impl import QueueCompleteSentinel
+
 from utu.agents.common import DataClassWithStreamEvents
 
 
@@ -13,9 +15,10 @@ async def test_stream_events():
                 await data_with_stream._event_queue.put(f"event-{i}")
             raise Exception("Test exception")
             data_with_stream._is_complete = True
-        # NOTE: should set _is_complete to True to stop the stream
+        # NOTE: should 1) set _is_complete to True; 2) put QueueCompleteSentinel to stop the stream
         except Exception as e:
             data_with_stream._is_complete = True
+            data_with_stream._event_queue.put_nowait(QueueCompleteSentinel())
             raise e
 
     data_with_stream._run_impl_task = asyncio.create_task(producer())

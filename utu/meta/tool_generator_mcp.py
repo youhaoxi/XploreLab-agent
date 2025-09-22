@@ -76,6 +76,7 @@ class ToolGenerator:
                 self.postprocess(task_recorder)
             except Exception as e:
                 task_recorder._is_complete = True
+                task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
                 raise e
 
         task_recorder._event_queue.put_nowait(QueueCompleteSentinel())

@@ -40,6 +40,7 @@ class OutputParser:
             completed = completed_str.lower() == "true"
             tasks.append(Subtask(agent_name=agent_name, task=task_desc, completed=completed))
         # check validity
+        raise Exception("Not implemented")
         assert len(tasks) > 0, "No tasks parsed from plan"
         return tasks
 

@@ -44,6 +44,7 @@ class ToolGeneratorDebugger:
                 await self.test(task_recorder=task_recorder, workspace_dir=workspace_dir)
             except Exception as e:
                 task_recorder._is_complete = True
+                task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
                 raise e
 
         task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
