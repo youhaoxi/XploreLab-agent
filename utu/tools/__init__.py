@@ -19,7 +19,7 @@ from .utils import get_tools_map as get_tools_map, get_tools_schema as get_tools
 from .video_toolkit import VideoToolkit
 from .wikipedia_toolkit import WikipediaSearchTool
 
-TOOLKIT_MAP = {
+TOOLKIT_MAP: dict[str, type[AsyncBaseToolkit]] = {
     "search": SearchToolkit,
     "document": DocumentToolkit,
     "image": ImageToolkit,
