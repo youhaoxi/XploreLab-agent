@@ -3,7 +3,7 @@ import uuid
 import httpx
 
 from ..config import ToolkitConfig
-from ..utils import get_logger
+from ..utils import EnvUtils, get_logger
 from .base import AsyncBaseToolkit, register_tool
 
 logger = get_logger(__name__)
@@ -12,12 +12,14 @@ logger = get_logger(__name__)
 class BashRemoteToolkit(AsyncBaseToolkit):
     """Wrap the built-in remote shell service.
     Usage of API: /api/create_terminal; /api/execute; /api/close_server
+
+    - API key: `REMOTE_SHELL_KEY, REMOTE_SHELL_URL`
     """
 
     def __init__(self, config: ToolkitConfig = None) -> None:
         super().__init__(config)
-        self.server_url = self.config.config.get("server_url")
-        self.headers = {"X-API-Key": self.config.config.get("server_key")}
+        self.server_url = EnvUtils.get_env("REMOTE_SHELL_URL", "http://127.0.0.1:8000")
+        self.headers = {"X-API-Key": EnvUtils.get_env("REMOTE_SHELL_KEY", "xxx")}
         # NOTE: you should manually manage your session_id, non-duplicate!
         self.session_info = None
         self.session_id = f"utu-{uuid.uuid4()}"
