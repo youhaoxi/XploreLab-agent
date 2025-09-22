@@ -28,3 +28,28 @@ Here is a summary of some key toolkits available in the framework:
 | **[ArxivToolkit][utu.tools.arxiv_toolkit.ArxivToolkit]** | `search_papers`, `download_papers` | A wrapper around the `arxiv.py` library to search for and download academic papers from arXiv.org. |
 | **[GitHubToolkit][utu.tools.github_toolkit.GitHubToolkit]** | `get_repo_info` | Fetches repository metadata (stars, forks, language, etc.) from the GitHub REST API. |
 -->
+
+## How to Inspect Toolkits
+
+We provide two useful scripts to inspect and test toolkits:
+
+### Dump Tool Schemas
+
+This script dumps add tools registered in `TOOLKIT_MAP` into a `.xlsx` file. The default output file is `tools.xlsx`.
+
+```sh
+python scripts/utils/dump_tool_schemas.py
+```
+
+### Inspect & Test Tools
+
+You can start a local MCP server that exposes the tools via HTTP. This allows you to interactively test the tools using an MCP client. E.g. [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector).
+
+```sh
+# start the MCP server
+python scripts/utils/start_tools_mcp.py --toolkits search image github
+
+# start the MCP inspector
+npx @modelcontextprotocol/inspector
+# ... connect to the MCP server with Streamable HTTP transport URL http://localhost:3005/mcp
+```
