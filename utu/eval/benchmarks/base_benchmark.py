@@ -4,7 +4,7 @@ import time
 
 from tqdm import tqdm
 
-from ...agents import BaseAgent, get_agent
+from ...agents import get_agent
 from ...config import ConfigLoader, EvalConfig
 from ...utils import AgentsUtils, get_logger
 from ..data import DBDataManager, EvaluationSample
@@ -25,7 +25,6 @@ class BaseBenchmark:
 
     dataset: DBDataManager
     _source_to_processer: dict[str, BaseProcesser] = {}
-    _source_to_agent: dict[str, BaseAgent] = {}
 
     def __init__(self, config: EvalConfig | str) -> None:
         # config
@@ -182,5 +181,4 @@ class BaseBenchmark:
         return data_by_benchmark
 
     async def cleanup(self):
-        for agent in self._source_to_agent.values():
-            await agent.cleanup()
+        pass
