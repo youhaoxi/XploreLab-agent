@@ -38,7 +38,9 @@ export interface InitContent {
 export type OrchestraContent =
   | { type: 'plan'; item: PlanItem }
   | { type: 'worker'; item: WorkerItem }
-  | { type: 'report'; item: ReportItem };
+  | { type: 'report'; item: ReportItem }
+  | { type: 'plan_start'; item: null }
+  | { type: 'report_start'; item: null };
 
 export interface ListAgentsContent {
   type: 'list_agents';

@@ -5,7 +5,7 @@ import MessageComponent from './components/MessageComponent';
 import ChatInput from './components/ChatInput';
 import SideBar from './components/SideBar';
 import HamburgerButton from './components/HamburgerButton';
-import { simulateEvents } from './placeholderData';
+// import { simulateEvents } from './placeholderData';
 import logoUrl from './assets/pic.png';
 import logoSquareUrl from './assets/logo-square.png';
 import { useTranslation } from 'react-i18next';
@@ -91,6 +91,14 @@ const App: React.FC = () => {
   const [showNewChatButton, setShowNewChatButton] = useState(false);
   const [showAgentConfigs, setShowAgentConfigs] = useState(false);
 
+  const [isInPlan, setIsInPlan] = useState(false);
+  const [currentPlanReportId, setCurrentPlanReportId] = useState<number | null>(null);
+  const [isInReport, setIsInReport] = useState(false);
+
+  // hack
+  const [isPlanNewAgentDisplayed, setIsPlanNewAgentDisplayed] = useState(false);
+  const [isReportNewAgentDisplayed, setIsReportNewAgentDisplayed] = useState(false);
+
   const getConfigList = () => {
     let request: UserRequest = {
       type: 'list_agents',
@@ -98,6 +106,47 @@ const App: React.FC = () => {
     }
     setChatInputLoadingState("loading");
     sendRequest(request);
+  }
+
+  const _updateMessageById = (id: number, prevMessages: Message[], update_function: (message: Message) => Message) => {
+    const updatedMessagesList = [...prevMessages];
+    const message = updatedMessagesList.find((message) => message.id === id);
+    if (message) {
+      const updatedMessage = update_function(message);
+      const messageIndex = updatedMessagesList.findIndex(message => message.id === id);
+      if (messageIndex !== -1) {
+        updatedMessagesList[messageIndex] = updatedMessage;
+      }
+    }
+    return updatedMessagesList;
+  }
+
+  const _addNewAgentMessage = (agentName: string) => {
+    const message: Message = {
+      id: Date.now() + 1,
+      content: agentName,
+      sender: 'assistant',
+      timestamp: new Date(),
+      type: 'new_agent',
+      inprogress: true,
+      requireConfirm: false,
+    };
+    setMessages(prev => [...prev, message]);
+    
+    // Simulate agent initialization
+    setTimeout(() => {
+      setMessages(prev => {
+        const updatedMessages = [...prev];
+        const agentMessageIndex = updatedMessages.findIndex(m => m.id === message.id);
+        if (agentMessageIndex !== -1) {
+          updatedMessages[agentMessageIndex] = {
+            ...updatedMessages[agentMessageIndex],
+            inprogress: false,
+          };
+        }
+        return updatedMessages;
+      });
+    }, 1500);
   }
 
   const handleEvent = (event: Event) => {
@@ -165,6 +214,21 @@ const App: React.FC = () => {
           }
         }
 
+        if (isInPlan || isInReport) {
+          const currentId = currentPlanReportId;
+          if (currentId) {
+            return _updateMessageById(currentId, prev, (message) => {
+              const updatedMessage: Message = {
+                ...message,
+                content: message.content + data.delta,
+                inprogress: data.inprogress,
+                requireConfirm: event.requireConfirm,
+              };
+              return updatedMessage;
+            })
+          }
+        }
+
         // If last message is in progress and has the same type, update it
         if (lastMessage?.inprogress && (lastMessage.type == data.type)) {
           const updatedMessage: Message = {
@@ -196,47 +260,57 @@ const App: React.FC = () => {
     // handle new agent event
     else if (event.type === 'new') {
       const data = event.data as { name: string };
-      const message: Message = {
-        id: Date.now() + 1,
-        content: data.name,
-        sender: 'assistant',
-        timestamp: new Date(),
-        type: 'new_agent',
-        inprogress: true,
-        requireConfirm: event.requireConfirm,
-      };
-      setMessages(prev => [...prev, message]);
-      
-      // Simulate agent initialization
-      setTimeout(() => {
-        setMessages(prev => {
-          const updatedMessages = [...prev];
-          const agentMessageIndex = updatedMessages.findIndex(m => m.id === message.id);
-          if (agentMessageIndex !== -1) {
-            updatedMessages[agentMessageIndex] = {
-              ...updatedMessages[agentMessageIndex],
-              inprogress: false,
-            };
-          }
-          return updatedMessages;
-        });
-      }, 1500);
+
+      const agentName = data.name;
+
+      // hack
+      if (agentName === "planner" && isInPlan) {
+        return;
+      } else if (agentName === "reporter" && isInReport) {
+        return;
+      }
+      if (agentName === "planner") {
+        setIsPlanNewAgentDisplayed(true);
+      } else if (agentName === "reporter") {
+        setIsReportNewAgentDisplayed(true);
+      }
+
+      _addNewAgentMessage(agentName);
     } 
     // handle orchestra event
     else if (event.type === 'orchestra') {
       const data = event.data as OrchestraContent;
       if (data.type === 'plan') {
+        
         const item = data.item as PlanItem;
         // setPinnedPlan(item);
-        const message: Message = {
-          id: Date.now() + 1,
-          content: item,
-          sender: 'assistant',
-          timestamp: new Date(),
-          type: 'plan',
-          requireConfirm: event.requireConfirm,
+        setIsInPlan(false);
+        setIsPlanNewAgentDisplayed(false);
+
+        if (!isPlanNewAgentDisplayed) {
+          setIsPlanNewAgentDisplayed(false);
+          const message: Message = {
+            id: Date.now() + 1,
+            content: item,
+            sender: 'assistant',
+            timestamp: new Date(),
+            type: 'plan',
+            requireConfirm: event.requireConfirm,
+          }
+          setMessages(prev => [...prev, message]);
+        } else {
+          // update plan message by id
+          setMessages(prev => _updateMessageById(currentPlanReportId as number, prev, (message) => {
+            const updatedMessage: Message = {
+              ...message,
+              content: item,
+              inprogress: false,
+              requireConfirm: event.requireConfirm,
+            };
+            return updatedMessage;
+          }));
         }
-        setMessages(prev => [...prev, message]);
+        
       } else if (data.type === 'worker') {
         const item = data.item as WorkerItem;
         const message: Message = {
@@ -249,15 +323,89 @@ const App: React.FC = () => {
         };
         setMessages(prev => [...prev, message]);
       } else if (data.type === 'report') {
+        
+        setIsReportNewAgentDisplayed(false);
         const item = data.item as ReportItem;
+
+        if (isInReport && currentPlanReportId) {
+          setMessages(prev => _updateMessageById(currentPlanReportId as number, prev, (message) => {
+            const updatedMessage: Message = {
+              ...message,
+              content: item.output,
+              inprogress: false,
+              requireConfirm: event.requireConfirm,
+            };
+            return updatedMessage;
+          }));
+        } else {
+          const message: Message = {
+            id: Date.now() + 1,
+            content: item.output,
+            sender: 'assistant',
+            timestamp: new Date(),
+            type: 'report',
+            requireConfirm: event.requireConfirm,
+          };
+          setMessages(prev => [...prev, message]);
+        }
+        setIsInReport(false);
+      } else if (data.type === 'plan_start') {
+        setIsInPlan(true);
+
+        if (!isPlanNewAgentDisplayed) {
+          setIsPlanNewAgentDisplayed(true);
+          _addNewAgentMessage("planner");
+        }
+
+        const id = Date.now() + 2;
         const message: Message = {
-          id: Date.now() + 1,
-          content: "report: \n" + item.output,
+          id: id,
+          content: "",
+          sender: 'assistant',
+          timestamp: new Date(),
+          type: 'plan',
+          inprogress: true,
+          requireConfirm: event.requireConfirm,
+        }
+        setCurrentPlanReportId(id);
+        setMessages(prev => [...prev, message]);
+      } else if (data.type === 'report_start') {
+        setIsInReport(true);
+
+        if (!isReportNewAgentDisplayed) {
+          setIsReportNewAgentDisplayed(true);
+          _addNewAgentMessage("reporter");
+          
+          // delay for 500ms
+          setTimeout(() => {
+            setIsReportNewAgentDisplayed(false);
+            const id = Date.now() + 2;
+            const message: Message = {
+              id: id,
+              content: "",
+              sender: 'assistant',
+              timestamp: new Date(),
+              type: 'report',
+              inprogress: true,
+              requireConfirm: event.requireConfirm,
+            }
+            setCurrentPlanReportId(id);
+            setMessages(prev => [...prev, message]);
+          }, 500);
+
+          return;
+        }
+        
+        const id = Date.now() + 2;
+        const message: Message = {
+          id: id,
+          content: "",
           sender: 'assistant',
           timestamp: new Date(),
           type: 'report',
           requireConfirm: event.requireConfirm,
-        };
+        }
+        setCurrentPlanReportId(id);
         setMessages(prev => [...prev, message]);
       }
     } 
@@ -323,7 +471,7 @@ const App: React.FC = () => {
       if (chatInputLoadingState === 'loading') {
         setChatInputLoadingState('ready');
       }
-    } 
+    }
     // handle ask event
     else if (event.type === 'ask') {
       let data = event.data as AskContent;
@@ -441,7 +589,15 @@ const App: React.FC = () => {
     }
   }, [lastMessage]);
 
+  const resetNewAgentDisplayed = () => {
+    setIsPlanNewAgentDisplayed(false);
+    setIsReportNewAgentDisplayed(false);
+  };
+
   const handleSendMessage = () => {
+    // hack
+    resetNewAgentDisplayed();
+
     if (!inputValue.trim() || isModelResponding) return;
 
     // Mark that user has sent their first message

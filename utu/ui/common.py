@@ -5,6 +5,12 @@ from pydantic import BaseModel
 
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent
+from utu.utils.log import get_logger
+
+
+class UnknowEventError(Exception):
+    def __init__(self, event_name: str, event_type: str):
+        super().__init__(f"Unknown event name: {event_name}, event type: {event_type}")
 
 
 class WorkerDescription(BaseModel):
@@ -43,8 +49,8 @@ class ReportItem(BaseModel):
 
 
 class OrchestraContent(BaseModel):
-    type: Literal["plan", "worker", "report"]
-    item: PlanItem | WorkerItem | ReportItem
+    type: Literal["plan", "worker", "report", "plan_start", "report_start"]
+    item: PlanItem | WorkerItem | ReportItem | None = None
 
 
 class ExampleContent(BaseModel):
@@ -223,8 +229,19 @@ async def handle_orchestra_events(event: OrchestraStreamEvent) -> Event | None:
     elif event.name == "report":
         report_item = ReportItem(output=item.output)
         event_to_send = Event(type="orchestra", data=OrchestraContent(type="report", item=report_item))
+    elif event.name == "plan_start":
+        event_to_send = Event(
+            type="orchestra",
+            data=OrchestraContent(type="plan_start", item=None),
+        )
+    elif event.name == "report_start":
+        event_to_send = Event(
+            type="orchestra",
+            data=OrchestraContent(type="report_start", item=None),
+        )
     else:
-        pass
+        get_logger(__name__).error(f"Unknown orchestra event name: {event.name}")
+        event_to_send = None
     return event_to_send
 
 
