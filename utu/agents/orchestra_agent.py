@@ -13,7 +13,6 @@ from .base_agent import BaseAgent
 from .orchestra import (
     AnalysisResult,
     CreatePlanResult,
-    OrchestraStreamEvent,
     OrchestraTaskRecorder,
     PlannerAgent,
     ReporterAgent,
@@ -65,9 +64,7 @@ class OrchestraAgent(BaseAgent):
     async def _start_streaming(self, task_recorder: OrchestraTaskRecorder):
         with trace(workflow_name="orchestra_agent", trace_id=task_recorder.trace_id):
             try:
-                task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="input"))
-                plan = await self.plan(task_recorder)
-                task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan", item=plan))
+                await self.plan(task_recorder)
 
                 for task in task_recorder.plan.todo:
                     # print(f"> processing {task}")
@@ -81,10 +78,7 @@ class OrchestraAgent(BaseAgent):
                     task_recorder.add_worker_result(result_streaming)
                     # print(f"< processed {task}")
 
-                task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="report_start"))
-                result = await self.report(task_recorder)
-                task_recorder.set_final_output(result.output)
-                task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="report", item=result))
+                await self.report(task_recorder)
 
                 task_recorder._event_queue.put_nowait(QueueCompleteSentinel())
                 task_recorder._is_complete = True
@@ -113,4 +107,5 @@ class OrchestraAgent(BaseAgent):
         """Step3: Report"""
         analysis_result = await self.reporter_agent.report(task_recorder)
         task_recorder.add_reporter_result(analysis_result)
+        task_recorder.set_final_output(analysis_result.output)
         return analysis_result

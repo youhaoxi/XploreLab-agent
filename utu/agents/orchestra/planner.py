@@ -7,7 +7,7 @@ from agents import RunResultStreaming
 from ...agents.llm_agent import LLMAgent
 from ...config import AgentConfig
 from ...utils import FileUtils
-from .common import AgentInfo, CreatePlanResult, OrchestraTaskRecorder, Subtask
+from .common import AgentInfo, CreatePlanResult, OrchestraStreamEvent, OrchestraTaskRecorder, Subtask
 
 
 class OutputParser:
@@ -94,9 +94,12 @@ class PlannerAgent:
             question=task_recorder.task,
             background_info=await self._get_background_info(task_recorder),
         )
+        task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan_start"))
         res = llm.run_streamed(up)
         await self._process_streamed(res, task_recorder)
-        return self.output_parser.parse(res.final_output)
+        plan = self.output_parser.parse(res.final_output)
+        task_recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan", item=plan))
+        return plan
 
     def _format_available_agents(self, agents: list[AgentInfo]) -> str:
         agents_str = []
