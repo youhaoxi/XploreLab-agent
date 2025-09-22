@@ -95,6 +95,10 @@ const App: React.FC = () => {
   const [currentPlanReportId, setCurrentPlanReportId] = useState<number | null>(null);
   const [isInReport, setIsInReport] = useState(false);
 
+  // hack
+  const [isPlanNewAgentDisplayed, setIsPlanNewAgentDisplayed] = useState(false);
+  const [isReportNewAgentDisplayed, setIsReportNewAgentDisplayed] = useState(false);
+
   const getConfigList = () => {
     let request: UserRequest = {
       type: 'list_agents',
@@ -115,6 +119,34 @@ const App: React.FC = () => {
       }
     }
     return updatedMessagesList;
+  }
+
+  const _addNewAgentMessage = (agentName: string) => {
+    const message: Message = {
+      id: Date.now() + 1,
+      content: agentName,
+      sender: 'assistant',
+      timestamp: new Date(),
+      type: 'new_agent',
+      inprogress: true,
+      requireConfirm: false,
+    };
+    setMessages(prev => [...prev, message]);
+    
+    // Simulate agent initialization
+    setTimeout(() => {
+      setMessages(prev => {
+        const updatedMessages = [...prev];
+        const agentMessageIndex = updatedMessages.findIndex(m => m.id === message.id);
+        if (agentMessageIndex !== -1) {
+          updatedMessages[agentMessageIndex] = {
+            ...updatedMessages[agentMessageIndex],
+            inprogress: false,
+          };
+        }
+        return updatedMessages;
+      });
+    }, 1500);
   }
 
   const handleEvent = (event: Event) => {
@@ -228,48 +260,57 @@ const App: React.FC = () => {
     // handle new agent event
     else if (event.type === 'new') {
       const data = event.data as { name: string };
-      const message: Message = {
-        id: Date.now() + 1,
-        content: data.name,
-        sender: 'assistant',
-        timestamp: new Date(),
-        type: 'new_agent',
-        inprogress: true,
-        requireConfirm: event.requireConfirm,
-      };
-      setMessages(prev => [...prev, message]);
-      
-      // Simulate agent initialization
-      setTimeout(() => {
-        setMessages(prev => {
-          const updatedMessages = [...prev];
-          const agentMessageIndex = updatedMessages.findIndex(m => m.id === message.id);
-          if (agentMessageIndex !== -1) {
-            updatedMessages[agentMessageIndex] = {
-              ...updatedMessages[agentMessageIndex],
-              inprogress: false,
-            };
-          }
-          return updatedMessages;
-        });
-      }, 1500);
+
+      const agentName = data.name;
+
+      // hack
+      if (agentName === "planner" && isInPlan) {
+        return;
+      } else if (agentName === "reporter" && isInReport) {
+        return;
+      }
+      if (agentName === "planner") {
+        setIsPlanNewAgentDisplayed(true);
+      } else if (agentName === "reporter") {
+        setIsReportNewAgentDisplayed(true);
+      }
+
+      _addNewAgentMessage(agentName);
     } 
     // handle orchestra event
     else if (event.type === 'orchestra') {
       const data = event.data as OrchestraContent;
       if (data.type === 'plan') {
-        setIsInPlan(false);
+        
         const item = data.item as PlanItem;
         // setPinnedPlan(item);
-        const message: Message = {
-          id: Date.now() + 1,
-          content: item,
-          sender: 'assistant',
-          timestamp: new Date(),
-          type: 'plan',
-          requireConfirm: event.requireConfirm,
+        setIsInPlan(false);
+        setIsPlanNewAgentDisplayed(false);
+
+        if (!isPlanNewAgentDisplayed) {
+          setIsPlanNewAgentDisplayed(false);
+          const message: Message = {
+            id: Date.now() + 1,
+            content: item,
+            sender: 'assistant',
+            timestamp: new Date(),
+            type: 'plan',
+            requireConfirm: event.requireConfirm,
+          }
+          setMessages(prev => [...prev, message]);
+        } else {
+          // update plan message by id
+          setMessages(prev => _updateMessageById(currentPlanReportId as number, prev, (message) => {
+            const updatedMessage: Message = {
+              ...message,
+              content: item,
+              inprogress: false,
+              requireConfirm: event.requireConfirm,
+            };
+            return updatedMessage;
+          }));
         }
-        setMessages(prev => [...prev, message]);
+        
       } else if (data.type === 'worker') {
         const item = data.item as WorkerItem;
         const message: Message = {
@@ -282,33 +323,80 @@ const App: React.FC = () => {
         };
         setMessages(prev => [...prev, message]);
       } else if (data.type === 'report') {
+        
+        setIsReportNewAgentDisplayed(false);
+        const item = data.item as ReportItem;
+
+        if (isInReport && currentPlanReportId) {
+          setMessages(prev => _updateMessageById(currentPlanReportId as number, prev, (message) => {
+            const updatedMessage: Message = {
+              ...message,
+              content: item.output,
+              inprogress: false,
+              requireConfirm: event.requireConfirm,
+            };
+            return updatedMessage;
+          }));
+        } else {
+          const message: Message = {
+            id: Date.now() + 1,
+            content: item.output,
+            sender: 'assistant',
+            timestamp: new Date(),
+            type: 'report',
+            requireConfirm: event.requireConfirm,
+          };
+          setMessages(prev => [...prev, message]);
+        }
         setIsInReport(false);
-        const item = data.item as ReportItem; 
-        const message: Message = {
-          id: Date.now() + 1,
-          content: "report: \n" + item.output,
-          sender: 'assistant',
-          timestamp: new Date(),
-          type: 'report',
-          requireConfirm: event.requireConfirm,
-        };
-        setMessages(prev => [...prev, message]);
       } else if (data.type === 'plan_start') {
         setIsInPlan(true);
-        const id = Date.now() + 1;
+
+        if (!isPlanNewAgentDisplayed) {
+          setIsPlanNewAgentDisplayed(true);
+          _addNewAgentMessage("planner");
+        }
+
+        const id = Date.now() + 2;
         const message: Message = {
           id: id,
           content: "",
           sender: 'assistant',
           timestamp: new Date(),
           type: 'plan',
+          inprogress: true,
           requireConfirm: event.requireConfirm,
         }
         setCurrentPlanReportId(id);
         setMessages(prev => [...prev, message]);
       } else if (data.type === 'report_start') {
         setIsInReport(true);
-        const id = Date.now() + 1;
+
+        if (!isReportNewAgentDisplayed) {
+          setIsReportNewAgentDisplayed(true);
+          _addNewAgentMessage("reporter");
+          
+          // delay for 500ms
+          setTimeout(() => {
+            setIsReportNewAgentDisplayed(false);
+            const id = Date.now() + 2;
+            const message: Message = {
+              id: id,
+              content: "",
+              sender: 'assistant',
+              timestamp: new Date(),
+              type: 'report',
+              inprogress: true,
+              requireConfirm: event.requireConfirm,
+            }
+            setCurrentPlanReportId(id);
+            setMessages(prev => [...prev, message]);
+          }, 500);
+
+          return;
+        }
+        
+        const id = Date.now() + 2;
         const message: Message = {
           id: id,
           content: "",
@@ -383,7 +471,7 @@ const App: React.FC = () => {
       if (chatInputLoadingState === 'loading') {
         setChatInputLoadingState('ready');
       }
-    } 
+    }
     // handle ask event
     else if (event.type === 'ask') {
       let data = event.data as AskContent;
@@ -501,7 +589,15 @@ const App: React.FC = () => {
     }
   }, [lastMessage]);
 
+  const resetNewAgentDisplayed = () => {
+    setIsPlanNewAgentDisplayed(false);
+    setIsReportNewAgentDisplayed(false);
+  };
+
   const handleSendMessage = () => {
+    // hack
+    resetNewAgentDisplayed();
+
     if (!inputValue.trim() || isModelResponding) return;
 
     // Mark that user has sent their first message
