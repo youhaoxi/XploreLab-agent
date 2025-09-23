@@ -23,7 +23,8 @@ from agents.mcp import MCPServer
 from ..config import AgentConfig, ConfigLoader, ToolkitConfig
 from ..context import BaseContextManager, build_context_manager
 from ..env import BaseEnv, get_env
-from ..tools import TOOLKIT_MAP, AsyncBaseToolkit, get_mcp_server
+from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
+from ..tools.utils import get_mcp_server
 from ..utils import AgentsUtils, get_logger, load_class_from_file
 from .common import TaskRecorder
 
