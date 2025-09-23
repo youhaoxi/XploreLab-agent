@@ -10,7 +10,6 @@ async def main():
     config = ConfigLoader.load_agent_config("examples/paper_collector")
     config.planner_config["examples_path"] = pathlib.Path(__file__).parent / "planner_examples_data.json"
     runner = OrchestraAgent(config)
-    await runner.build()
 
     data_dir = pathlib.Path(__file__).parent / "data"
     data_dir.mkdir(exist_ok=True)

@@ -146,7 +146,8 @@ class WebUIChatbot:
         )
 
     async def __launch(self, port: int = 8848, ip: str = "127.0.0.1", autoload: bool | None = None):
-        await self.agent.build()
+        if hasattr(self.agent, "build"):
+            await self.agent.build()
         app = self.make_app()
         app.listen(port, address=ip)
         print(f"Server started at http://{ip}:{port}/")
