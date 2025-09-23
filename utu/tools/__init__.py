@@ -2,7 +2,6 @@ from ..config import ConfigLoader
 from .arxiv_toolkit import ArxivToolkit
 from .audio_toolkit import AudioToolkit
 from .base import AsyncBaseToolkit as AsyncBaseToolkit, register_tool as register_tool
-from .bash_remote_tool import BashRemoteToolkit
 from .bash_toolkit import BashToolkit
 from .codesnip_toolkit import CodesnipToolkit
 from .document_toolkit import DocumentToolkit
@@ -29,7 +28,6 @@ TOOLKIT_MAP: dict[str, type[AsyncBaseToolkit]] = {
     "wikipedia": WikipediaSearchTool,
     "codesnip": CodesnipToolkit,
     "bash": BashToolkit,
-    "bash_remote": BashRemoteToolkit,
     "python_executor": PythonExecutorToolkit,
     "video": VideoToolkit,
     "audio": AudioToolkit,
