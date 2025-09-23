@@ -115,6 +115,7 @@ The framework also supports any tracing service compatible with the `openai-agen
 ## Customizing the Agent
 
 ### Create a config file
+
 ```yaml
 # configs/agents/sample_tool.yaml
 defaults:

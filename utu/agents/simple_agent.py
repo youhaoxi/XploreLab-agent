@@ -18,12 +18,13 @@ from agents import (
     TResponseInputItem,
     trace,
 )
-from agents.mcp import MCPServer, MCPServerSse, MCPServerStdio, MCPServerStreamableHttp
+from agents.mcp import MCPServer
 
 from ..config import AgentConfig, ConfigLoader, ToolkitConfig
 from ..context import BaseContextManager, build_context_manager
 from ..env import BaseEnv, get_env
 from ..tools import TOOLKIT_MAP, AsyncBaseToolkit
+from ..tools.utils import get_mcp_server
 from ..utils import AgentsUtils, get_logger, load_class_from_file
 from .common import TaskRecorder
 
@@ -157,7 +158,7 @@ class SimpleAgent:
                 parsed_tools.extend(await toolkit.get_tools_in_agents())
         self.tools = parsed_tools
 
-    async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
+    async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit | MCPServer:
         if toolkit_config.mode == "builtin":
             return await self._load_builtin_toolkit(toolkit_config)
         elif toolkit_config.mode == "customized":
@@ -183,33 +184,8 @@ class SimpleAgent:
 
     async def _load_mcp_server(self, toolkit_config: ToolkitConfig) -> MCPServer:
         logger.info(f"Loading MCP server `{toolkit_config.name}` with params {toolkit_config.config}")
-        match toolkit_config.mcp_transport:
-            case "stdio":
-                server = await self._mcps_exit_stack.enter_async_context(
-                    MCPServerStdio(
-                        name=toolkit_config.name,
-                        params=toolkit_config.config,
-                        client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
-                    )
-                )
-            case "sse":
-                server = await self._mcps_exit_stack.enter_async_context(
-                    MCPServerSse(
-                        name=toolkit_config.name,
-                        params=toolkit_config.config,
-                        client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
-                    )
-                )
-            case "streamable_http":
-                server = await self._mcps_exit_stack.enter_async_context(
-                    MCPServerStreamableHttp(
-                        name=toolkit_config.name,
-                        params=toolkit_config.config,
-                        client_session_timeout_seconds=toolkit_config.mcp_client_session_timeout_seconds,
-                    )
-                )
-            case _:
-                raise ValueError(f"Unknown MCP transport: {toolkit_config.mcp_transport}")
+        mcp_server = get_mcp_server(toolkit_config)
+        server = await self._mcps_exit_stack.enter_async_context(mcp_server)
         self._mcp_servers.append(server)
         return server
 

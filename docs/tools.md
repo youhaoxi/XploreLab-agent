@@ -2,15 +2,14 @@
 
 Toolkits are collections of related tools that an agent can use to perform actions. They are the primary way to extend an agent's capabilities.
 
-## `AsyncBaseToolkit`
+There are three main types of toolkits:
+- **builtin**: The toolkits provided by default in the framework.
+- **mcp**: The toolkits accessible via the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP).
+- **customized**: The toolkits created by users.
 
-All toolkits inherit from the `AsyncBaseToolkit` abstract base class. This class provides a standardized interface for creating and managing tools. The core requirement for any toolkit is to implement the `get_tools_map()` method, which returns a dictionary mapping tool names to their corresponding Python functions.
+## Builtin Toolkits
 
-The base class automatically handles the conversion of these functions into `FunctionTool` objects that the agent runner can understand and execute.
-
-All available toolkits are registered in the `TOOLKIT_MAP` dictionary within `utu/tools/__init__.py`.
-
-## Summary of Core Toolkits
+All builtin toolkits inherit from the `AsyncBaseToolkit` abstract base class. This class provides a standardized interface for creating and managing tools.
 
 Here is a summary of some key toolkits available in the framework:
 
@@ -28,6 +27,18 @@ Here is a summary of some key toolkits available in the framework:
 | **[ArxivToolkit][utu.tools.arxiv_toolkit.ArxivToolkit]** | `search_papers`, `download_papers` | A wrapper around the `arxiv.py` library to search for and download academic papers from arXiv.org. |
 | **[GitHubToolkit][utu.tools.github_toolkit.GitHubToolkit]** | `get_repo_info` | Fetches repository metadata (stars, forks, language, etc.) from the GitHub REST API. |
 -->
+
+
+## MCP Toolkits
+
+We provide examples of MCP toolkits in the `examples/mcp` directory, including transports of `stdio`, `sse` and `streamable_http`. You should easily run them. E.g., for the stdio example:
+
+```sh
+python examples/mcp/stdio_example/main.py
+```
+
+If you are not familiar with MCP, please refer to the [MCP documentation](https://modelcontextprotocol.io/docs/getting-started/intro).
+
 
 ## How to Inspect Toolkits
 
