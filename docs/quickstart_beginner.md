@@ -10,9 +10,9 @@ Before getting started, please ensure your system meets the following requiremen
 - **[Git tool](https://git-scm.com/downloads)**.
 - **`UV`** Package Manager: an extremely fast Python package and project manager. We'll install this in the setup steps below.
 - **API Keys**: You'll need to obtain API keys for the underlying LLM that your agent will use (e.g., `DeepSeek`, `OpenAI`, etc.) - this is required. Optionally, you can also get API keys for `Serper` and `Jina` for enhanced features.
-  - **`DeepSeek API Key`**: Visit [DeepSeek](https://platform.deepseek.com/) or [Tencent Cloud](https://cloud.tencent.com/document/product/1772/115969) and register an account to get an API key.
-  - **`Serper API Key`** (optional): Visit [Serper](https://serper.dev/) and get API key.
-  - **`Jina API Key`** (optional): Visit [Jina](https://jina.ai/reader/) and get API key.
+    - **`DeepSeek API Key`**: Visit [DeepSeek](https://platform.deepseek.com/) or [Tencent Cloud](https://cloud.tencent.com/document/product/1772/115969) and register an account to get an API key.
+    - **`Serper API Key`** (optional): Visit [Serper](https://serper.dev/) and get API key.
+    - **`Jina API Key`** (optional): Visit [Jina](https://jina.ai/reader/) and get API key.
 
 ---
 
@@ -58,9 +58,11 @@ pipx install uv
 ```
 
 **Verify Installation:**
+
 ```bash
 uv --version
 ```
+
 If a version number is displayed, the installation was successful.
 
 ### Step 3: Create and Activate Virtual Environment
@@ -78,6 +80,7 @@ source .venv/bin/activate
 ```
 
 **Beginner Tip:** After activating the virtual environment, you'll see `(Youtu-agent)` identifier before your command line prompt as follow:
+
 ```sh
 # Linux/macOS
 (Youtu-agent) your-username:~/path/to/youtu-agent$
@@ -149,6 +152,7 @@ python scripts/cli_chat.py --config_name simple/search_agent.yaml
 ```
 
 If everything is working correctly, you should see:
+
 ```
 __   __            _                                      _   
 \ \ / / ___  _  _ | |_  _  _  ___  __ _  __ _  ___  _ _  | |_ 
@@ -164,6 +168,7 @@ Quit: exit, quit, q
 ```
 
 Now you can try asking some questions:
+
 ```
 > What can you do?
 ```
@@ -200,6 +205,7 @@ The framework includes a powerful evaluation harness to benchmark agent performa
 ### Run a Full Experiment
 
 This command runs a complete evaluation, from agent rollout to judging.
+
 ```sh
 python scripts/run_eval.py --config_name <your_eval_config> --exp_id <your_exp_id> --dataset WebWalkerQA --concurrency 5
 ```
