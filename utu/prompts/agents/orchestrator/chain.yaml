@@ -9,7 +9,7 @@ orchestrator_sp: |-
   <output_format_rules>
   - Output format:
   - Output analysis in <analysis></analysis> tags to analyze the current problem and initial thinking
-  - Output complete plan in <plan></plan> tags with format: {"agent_name": "agent_name", "task": task_description, "completed": false}
+  - Output complete plan in <plan></plan> tags with format: {"name": "agent_name", "task": "task_description"}
   - Task descriptions should be specific, actionable, and clearly defined with complete information (no pronouns or references)
   - All task descriptions should be in the same language as the user's question/input
   </output_format_rules>
@@ -18,20 +18,14 @@ orchestrator_sp: |-
   {{ planning_examples }}
   </planning_examples>
 orchestrator_up: |-
-  <available_agents>
-  Your plans must be designed to utilize these agents effectively:
-  {{ available_agents }}
+  {% if additional_instructions -%}
+  <additional_instructions>
+  {{ additional_instructions }}
+  </additional_instructions>
+  {% endif -%}
 
-  **Planning Constraint**: All tasks in your plans must be executable by above agents. Focus on concrete actions that align with each agent's capabilities.
-  </available_agents>
-
-  <question>
-  {{ question }}
-  </question>
-
-  <background_info>
-  {{ background_info }}
-  </background_info>
+  <question>{{ question }}</question>
+  <available_agents>{{ available_agents }}</available_agents>
 
 worker: |-
   Your are working as a worker in a multi-step task. The original problem was divided into multiple subtasks, and you are currently executing one of those subtasks.

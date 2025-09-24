@@ -1,5 +1,8 @@
 """
-- [ ] support multi-turn chat
+- [ ] feat: support multi-turn chat
+- [ ] feat: add reporter
+- [ ] feat: replan
+- [ ] add name & description for all agent types
 """
 
 import asyncio

@@ -8,6 +8,7 @@ type: orchestrator
 
 orchestrator_config:
   name: BaseOrchestratorAgent
+  additional_instructions: ""
   examples_path: plan_examples/chain.json  # default examples for task-decomposition. (in /utu/data/)
   add_chitchat_subagent: true  # add chitchat subagent
 

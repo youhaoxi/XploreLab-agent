@@ -16,7 +16,6 @@ class Task:
     agent_name: str
     task: str
     result: str | None = None
-    completed: bool | None = None
 
 
 @dataclass
@@ -58,7 +57,7 @@ class Orchestrator:
 
         examples_path = self.config.orchestrator_config.get("examples_path", "plan_examples/chain.json")
         self.planner_examples = FileUtils.load_json_data(examples_path)
-        # route to a chitchat agent
+        self.additional_instructions = self.config.orchestrator_config.get("additional_instructions", "")
 
     async def create_plan(self, recorder: Recorder) -> None:
         """Plan tasks based on the overall task and available agents."""
@@ -66,10 +65,10 @@ class Orchestrator:
         examples_str = []
         for example in self.planner_examples:
             examples_str.append(
-                f"Question: {example['question']}\n"
-                f"Available Agents: {example['available_agents']}\n\n"
+                f"<question>{example['question']}</question>\n"
+                f"<available_agents>{example['available_agents']}</available_agents>\n"
                 f"<analysis>{example['analysis']}</analysis>\n"
-                f"<plan>{json.dumps(example['plan'], ensure_ascii=False)}</plan>\n"
+                f"<plan>{json.dumps(example['plan'], ensure_ascii=False)}</plan>"
             )
         examples_str = "\n".join(examples_str)
         sp = FileUtils.get_jinja_template_str(self.prompts["orchestrator_sp"]).render(planning_examples=examples_str)
@@ -79,8 +78,9 @@ class Orchestrator:
             model_config=self.config.orchestrator_model,
         )
         up = FileUtils.get_jinja_template_str(self.prompts["orchestrator_up"]).render(
-            available_agents=self.config.orchestrator_workers_info,
+            additional_instructions=self.additional_instructions,
             question=recorder.input,
+            available_agents=self.config.orchestrator_workers_info,
             # background_info=await self._get_background_info(recorder),
         )
         recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="plan.start"))
@@ -101,11 +101,10 @@ class Orchestrator:
             return []
         plan_content = match.group(1).strip()
         tasks = []
-        task_pattern = r'\{"agent_name":\s*"([^"]+)",\s*"task":\s*"([^"]+)",\s*"completed":\s*(true|false)\s*\}'
+        task_pattern = r'\{"name":\s*"([^"]+)",\s*"task":\s*"([^"]+)"\s*\}'
         task_matches = re.findall(task_pattern, plan_content, re.IGNORECASE)
-        for agent_name, task_desc, completed_str in task_matches:
-            completed = completed_str.lower() == "true"
-            tasks.append(Task(agent_name=agent_name, task=task_desc, completed=completed))
+        for agent_name, task_desc in task_matches:
+            tasks.append(Task(agent_name=agent_name, task=task_desc))
         # check validity
         assert len(tasks) > 0, "No tasks parsed from plan"
         return tasks
