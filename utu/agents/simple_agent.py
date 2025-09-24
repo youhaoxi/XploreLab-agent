@@ -142,7 +142,7 @@ class SimpleAgent:
         for _, toolkit_config in self.config.toolkits.items():
             toolkit = await self._load_toolkit(toolkit_config)
             if toolkit_config.mode in ["customized", "builtin"]:
-                tools_list.extend(await toolkit.get_tools_in_agents())
+                tools_list.extend(toolkit.get_tools_in_agents())
         tool_names = [tool.name for tool in tools_list]
         logger.info(f"Loaded {len(tool_names)} tools: {tool_names}")
         self.tools = tools_list
@@ -155,7 +155,7 @@ class SimpleAgent:
             config = ConfigLoader.load_toolkit_config(tool_name)
             toolkit = await self._load_toolkit(config)
             if config.mode in ["customized", "builtin"]:
-                parsed_tools.extend(await toolkit.get_tools_in_agents())
+                parsed_tools.extend(toolkit.get_tools_in_agents())
         self.tools = parsed_tools
 
     async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit | MCPServer:

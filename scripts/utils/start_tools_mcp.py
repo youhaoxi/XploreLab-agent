@@ -3,7 +3,6 @@
 """
 
 import argparse
-import asyncio
 
 from mcp.server.fastmcp import FastMCP
 
@@ -11,12 +10,12 @@ from utu.config import ConfigLoader
 from utu.tools import TOOLKIT_MAP
 
 
-async def add_tools(toolkit_names: list[str], mcp: FastMCP) -> None:
+def add_tools(toolkit_names: list[str], mcp: FastMCP) -> None:
     for name in toolkit_names:
         print(f"Loading toolkit: {name}")
         config = ConfigLoader.load_toolkit_config(name)
         toolkit = TOOLKIT_MAP[name](config=config)
-        for tool_name, tool in (await toolkit.get_tools_map_func()).items():
+        for tool_name, tool in (toolkit.get_tools_map_func()).items():
             mcp.add_tool(tool)
             print(f"Added tool: {tool_name}")
 
@@ -27,7 +26,7 @@ def main(toolkit_names: list[str]) -> None:
         host="0.0.0.0",
         port=3005,
     )
-    asyncio.run(add_tools(toolkit_names, mcp))
+    add_tools(toolkit_names, mcp)
     mcp.run(transport="streamable-http")
 
 
