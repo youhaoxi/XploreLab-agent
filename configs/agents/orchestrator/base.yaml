@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   - /model/base@planner_model
-  - /agents/simple/search_agent@workers.SearchAgent
+  - /agents/simple/search_agent@orchestrator_workers.SearchAgent
   - _self_
 
 type: orchestrator
@@ -12,8 +12,6 @@ orchestrator_config:
   examples_path: plan_examples/chain.json  # default examples for task-decomposition. (in /utu/data/)
   add_chitchat_subagent: true  # add chitchat subagent
 
-workers_info:
+orchestrator_workers_info:
   - name: SearchAgent
-    desc: information retrieval and data collection.
-    strengths: Web search, information retrieval, research material collection, API data fetching
-    weaknesses: No access to private databases, retrieval only (no content creation/modification)
+    desciption: Performs focused, in-depth information retrieval. Excels at locating reliable sources, synthesizing knowledge from multiple references, and answering research-oriented queries.
