@@ -16,7 +16,6 @@ async def main():
     data_dir.mkdir(exist_ok=True)
     question = "deepseek-v3.1有哪些亮点更新?"
 
-    await runner.build()
     res = runner.run_streamed(question)
     await AgentsUtils.print_stream_events(res.stream_events())
     print(f"Final output: {res.final_output}")

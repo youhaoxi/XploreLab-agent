@@ -1,6 +1,6 @@
 [project]
 name = "Youtu-agent"
-version = "0.1.0"
+version = "0.1.1"
 description = "Youtu-Agent is a simple but powerful framework for building, running, and evaluating agents."
 readme = "README.md"
 requires-python = ">=3.12"

@@ -12,11 +12,14 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 from agents import RunResultStreaming, StopAtTools, trace
+from agents.function_schema import FuncSchema
 from pydantic import BaseModel
 
 from ..agents import SimpleAgent
 from ..agents.common import DataClassWithStreamEvents, QueueCompleteSentinel
-from ..tools import TOOLKIT_MAP, UserInteractionToolkit, get_tools_schema
+from ..config import ConfigLoader
+from ..tools import TOOLKIT_MAP, UserInteractionToolkit
+from ..tools.utils import get_mcp_tools_schema, get_tools_schema
 from ..utils import DIR_ROOT, FileUtils, get_logger
 
 logger = get_logger(__name__)
@@ -168,12 +171,31 @@ class SimpleAgentGenerator:
 
     async def step2(self, task_recorder: GeneratorTaskRecorder) -> None:
         """Select useful tools from available toolkits. Return: {toolkit_name: [tool_name, ...]}"""
-        available_toolkits = ["search", "document", "image", "audio", "bash", "python_executor"]
-        tools_descs = []
-        tool_to_toolkit_name = {}
+        # NOTE: set available tools here
+        available_toolkits = [
+            "search",
+            "document",
+            "image",
+            "audio",
+            "bash",
+            "python_executor",  # builtin
+            "mcp/memory",  # mcp
+        ]
+        tools_schema_by_toolkit: dict[str, dict[str, FuncSchema]] = {}
         for toolkit_name in available_toolkits:
-            assert toolkit_name in TOOLKIT_MAP, f"Unknown toolkit: {toolkit_name}"
-            tools_schema = get_tools_schema(TOOLKIT_MAP[toolkit_name])
+            config = ConfigLoader.load_toolkit_config(toolkit_name)
+            match config.mode:
+                case "builtin":
+                    tools_schema = get_tools_schema(TOOLKIT_MAP[toolkit_name])
+                case "mcp":
+                    tools_schema = await get_mcp_tools_schema(config)
+                case _:
+                    raise ValueError(f"Unsupported toolkit mode: {config.mode}")
+            tools_schema_by_toolkit[toolkit_name] = tools_schema
+        tools_descs = []
+        tool_to_toolkit_name = {}  # NOTE: toolkit_name should be sanitized, e.g. mcp/memory -> mcp_memory
+        for toolkit_name, tools_schema in tools_schema_by_toolkit.items():
+            toolkit_name = toolkit_name.replace("/", "_")
             tools_descs.extend(f"- {tool.name}: {tool.description}" for tool in tools_schema.values())
             tool_to_toolkit_name.update({tool.name: toolkit_name for tool in tools_schema.values()})
         logger.info(f"Available tools: {tool_to_toolkit_name}")

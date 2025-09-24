@@ -8,7 +8,6 @@ from agents import trace
 
 from ..config import AgentConfig, ConfigLoader
 from ..utils import AgentsUtils, get_logger
-from .base_agent import BaseAgent
 from .common import QueueCompleteSentinel
 from .orchestra import (
     AnalysisResult,
@@ -24,7 +23,7 @@ from .orchestra import (
 logger = get_logger(__name__)
 
 
-class OrchestraAgent(BaseAgent):
+class OrchestraAgent:
     def __init__(self, config: AgentConfig | str):
         """Initialize the orchestra agent"""
         if isinstance(config, str):

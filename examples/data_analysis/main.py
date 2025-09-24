@@ -14,7 +14,6 @@ async def main():
     config.reporter_config["template_path"] = pathlib.Path(__file__).parent / "web_reporter_sp.j2"
     runner = OrchestraAgent(config)
     planner = DAPlannerAgent(config)
-    await runner.build()
     runner.set_planner(planner)
 
     # Run the agent with a sample question

@@ -26,17 +26,17 @@ async def main():
 
     config: AgentConfig = ConfigLoader.load_agent_config(args.config_name)
 
-    agent = SimpleAgent(config=config)
-    while True:
-        user_input = await PrintUtils.async_print_input("> ")
-        if user_input.strip().lower() in ["exit", "quit", "q"]:
-            break
-        if not user_input.strip():
-            continue
-        if hasattr(agent, "build"):
-            await agent.build()
-        # TODO: use a unified .run_streamed interface
-        await agent.chat_streamed(user_input)
+    async with SimpleAgent(config=config) as agent:
+        while True:
+            user_input = await PrintUtils.async_print_input("> ")
+            if user_input.strip().lower() in ["exit", "quit", "q"]:
+                break
+            if not user_input.strip():
+                continue
+            if hasattr(agent, "build"):
+                await agent.build()
+            # TODO: use a unified .run_streamed interface
+            await agent.chat_streamed(user_input)
 
 
 if __name__ == "__main__":
