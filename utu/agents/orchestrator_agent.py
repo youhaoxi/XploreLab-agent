@@ -1,6 +1,7 @@
 """
 - [ ] feat: support multi-turn chat
 - [ ] feat: add reporter
+    additional instructions for the last agent! (as the reporter)
 - [ ] feat: replan
 - [ ] add name & description for all agent types
 """

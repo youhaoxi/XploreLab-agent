@@ -1,15 +1,18 @@
+"""
+CLI usage: python scripts/cli_chat.py --config examples/paper_collector
+"""
+
 import asyncio
 import json
 import pathlib
 
-from utu.agents import OrchestraAgent
+from utu.agents import OrchestratorAgent
 from utu.config import ConfigLoader
 
 
 async def main():
     config = ConfigLoader.load_agent_config("examples/paper_collector")
-    config.planner_config["examples_path"] = pathlib.Path(__file__).parent / "planner_examples_data.json"
-    runner = OrchestraAgent(config)
+    runner = OrchestratorAgent(config)
 
     data_dir = pathlib.Path(__file__).parent / "data"
     data_dir.mkdir(exist_ok=True)
