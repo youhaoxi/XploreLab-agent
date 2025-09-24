@@ -50,4 +50,3 @@ def codesnip_toolkit() -> CodesnipToolkit:
 async def test_run_code(codesnip_toolkit: CodesnipToolkit):
     result = await codesnip_toolkit.run_code("print('hello world')", "python")
     print(result)
-

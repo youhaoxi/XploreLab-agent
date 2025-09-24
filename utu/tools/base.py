@@ -6,42 +6,7 @@ from agents import FunctionTool, function_tool
 
 from ..config import ToolkitConfig
 from ..utils import ChatCompletionConverter, FileUtils, get_event_loop
-
-
-class MCPConverter:
-    @classmethod
-    def function_tool_to_mcp(cls, tool: FunctionTool) -> types.Tool:
-        return types.Tool(
-            name=tool.name,
-            description=tool.description,
-            inputSchema=tool.params_json_schema,
-        )
-
-
-def register_tool(name: str = None):
-    """Decorator to register a method as a tool.
-
-    Usage:
-        @register_tool  # uses method name
-        @register_tool()  # uses method name
-        @register_tool("custom_name")  # uses custom name
-
-    Args:
-        name (str, optional): The name of the tool. (Also support passing the function)
-    """
-
-    def decorator(func: Callable):
-        if isinstance(name, str):
-            tool_name = name
-        else:
-            tool_name = func.__name__
-        func._is_tool = True
-        func._tool_name = tool_name
-        return func
-
-    if callable(name):
-        return decorator(name)
-    return decorator
+from .utils import MCPConverter
 
 
 class AsyncBaseToolkit(abc.ABC):
