@@ -91,27 +91,5 @@ class AsyncBaseToolkit(abc.ABC):
         tool = tools_map[name]
         return await tool(**arguments)
 
-    # -------------------------------------------------------------------------------------------------------------
-    # Sync methods [WIP]
-    def get_tools_map_sync(self) -> dict[str, Callable]:
-        if self.tools_map is None:
-            loop = get_event_loop()
-            if not self._built:
-                loop.run_until_complete(self.build())
-            self.tools_map = loop.run_until_complete(self.get_tools_map_func())
-        return self.tools_map
-
-    def get_tools_in_agents_sync(self) -> list[FunctionTool]:
-        tools_map = self.get_tools_map_sync()
-        tools = []
-        for _, tool in tools_map.items():
-            tools.append(
-                function_tool(
-                    tool,
-                    strict_mode=False,  # turn off strict mode
-                )
-            )
-        return tools
-
 
 TOOL_PROMPTS: dict[str, str] = FileUtils.load_prompts("tools/tools_prompts.yaml")
