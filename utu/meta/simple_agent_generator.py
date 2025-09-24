@@ -89,7 +89,7 @@ class SimpleAgentGenerator:
         self.agent_1 = SimpleAgent(
             name="clarification_agent",
             instructions=self.jinja_env.get_template("requirements_clarification.j2").render(),
-            tools=await self.interaction_toolkit.get_tools_in_agents(),
+            tools=self.interaction_toolkit.get_tools_in_agents(),
             tool_use_behavior=StopAtTools(stop_at_tool_names=["final_answer"]),
         )
         self.agent_2 = SimpleAgent(
