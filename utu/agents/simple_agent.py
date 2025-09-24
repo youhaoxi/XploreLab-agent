@@ -68,7 +68,6 @@ class SimpleAgent:
         self._mcp_servers: list[MCPServer] = []
         self._toolkits: dict[str, AsyncBaseToolkit] = {}
         self._mcps_exit_stack = AsyncExitStack()
-        self._tools_exit_stack = AsyncExitStack()
         self._initialized = False
 
     def _get_config(self, config: AgentConfig | str | None) -> AgentConfig:
@@ -122,7 +121,6 @@ class SimpleAgent:
         await self._mcps_exit_stack.aclose()
         self._mcp_servers = []
         logger.info("Cleaning up tools...")
-        await self._tools_exit_stack.aclose()
         self._toolkits = {}
         logger.info("Cleaning up env...")
         await self.env.cleanup()
@@ -142,7 +140,7 @@ class SimpleAgent:
         for _, toolkit_config in self.config.toolkits.items():
             toolkit = await self._load_toolkit(toolkit_config)
             if toolkit_config.mode in ["customized", "builtin"]:
-                tools_list.extend(await toolkit.get_tools_in_agents())
+                tools_list.extend(toolkit.get_tools_in_agents())
         tool_names = [tool.name for tool in tools_list]
         logger.info(f"Loaded {len(tool_names)} tools: {tool_names}")
         self.tools = tools_list
@@ -155,7 +153,7 @@ class SimpleAgent:
             config = ConfigLoader.load_toolkit_config(tool_name)
             toolkit = await self._load_toolkit(config)
             if config.mode in ["customized", "builtin"]:
-                parsed_tools.extend(await toolkit.get_tools_in_agents())
+                parsed_tools.extend(toolkit.get_tools_in_agents())
         self.tools = parsed_tools
 
     async def _load_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit | MCPServer:
@@ -170,7 +168,7 @@ class SimpleAgent:
 
     async def _load_builtin_toolkit(self, toolkit_config: ToolkitConfig) -> AsyncBaseToolkit:
         logger.info(f"Loading builtin toolkit `{toolkit_config.name}` with config {toolkit_config}")
-        toolkit = await self._tools_exit_stack.enter_async_context(TOOLKIT_MAP[toolkit_config.name](toolkit_config))
+        toolkit = TOOLKIT_MAP[toolkit_config.name](toolkit_config)
         self._toolkits[toolkit_config.name] = toolkit
         return toolkit
 
@@ -178,7 +176,7 @@ class SimpleAgent:
         logger.info(f"Loading customized toolkit `{toolkit_config.name}` with config {toolkit_config}")
         assert toolkit_config.customized_filepath is not None and toolkit_config.customized_classname is not None
         toolkit_class = load_class_from_file(toolkit_config.customized_filepath, toolkit_config.customized_classname)
-        toolkit = await self._tools_exit_stack.enter_async_context(toolkit_class(toolkit_config))
+        toolkit = toolkit_class(toolkit_config)
         self._toolkits[toolkit_config.name] = toolkit
         return toolkit
 
