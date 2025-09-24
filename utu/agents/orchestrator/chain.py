@@ -1,0 +1,118 @@
+import json
+import re
+from dataclasses import dataclass, field
+
+from ...config import AgentConfig
+from ...utils import AgentsUtils, FileUtils, get_logger
+from ..common import DataClassWithStreamEvents
+from ..llm_agent import LLMAgent
+from ..orchestra.common import OrchestraStreamEvent
+
+logger = get_logger(__name__)
+
+
+@dataclass
+class Task:
+    agent_name: str
+    task: str
+    result: str | None = None
+    completed: bool | None = None
+
+
+@dataclass
+class Recorder(DataClassWithStreamEvents):
+    input: str = ""
+    trace_id: str = ""
+
+    tasks: list[Task] = None
+    current_task_id: int = 0
+    final_output: str = None
+
+    trajectories: list = field(default_factory=list)
+
+    def get_plan_str(self) -> str:
+        return "\n".join([f"{i}. {t.task}" for i, t in enumerate(self.tasks, 1)])
+
+    def get_trajectory_str(self) -> str:
+        traj = []
+        for t in self.tasks:
+            if t.result is None:
+                break
+            traj.append(f"<task>{t.task}</task>\n<output>{t.result}</output>")
+        return "\n".join(traj)
+
+
+class Orchestrator:
+    """Task planner that handles task decomposition."""
+
+    def __init__(self, config: AgentConfig):
+        self.config = config
+        self.prompts = FileUtils.load_prompts("agents/orchestrator/chain.yaml")
+
+        examples_path = self.config.orchestrator_config.get("examples_path", "plan_examples/chain.json")
+        self.planner_examples = FileUtils.load_json_data(examples_path)
+        # route to a chitchat agent
+
+    async def create_plan(self, recorder: Recorder) -> None:
+        """Plan tasks based on the overall task and available agents."""
+        # format examples to string. example: {question, available_agents, analysis, plan}
+        examples_str = []
+        for example in self.planner_examples:
+            examples_str.append(
+                f"Question: {example['question']}\n"
+                f"Available Agents: {example['available_agents']}\n\n"
+                f"<analysis>{example['analysis']}</analysis>\n"
+                f"<plan>{json.dumps(example['plan'], ensure_ascii=False)}</plan>\n"
+            )
+        examples_str = "\n".join(examples_str)
+        sp = FileUtils.get_jinja_template_str(self.prompts["orchestrator_sp"]).render(planning_examples=examples_str)
+        llm = LLMAgent(
+            name="orchestrator",
+            instructions=sp,
+            model_config=self.config.orchestrator_model,
+        )
+        up = FileUtils.get_jinja_template_str(self.prompts["orchestrator_up"]).render(
+            available_agents=self.config.orchestrator_workers_info,
+            question=recorder.input,
+            # background_info=await self._get_background_info(recorder),
+        )
+        recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan_start"))
+        res = llm.run_streamed(up)
+        await self._process_streamed(res, recorder)
+        tasks = self._parse(res.final_output)
+        recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan", item=tasks))
+        # set tasks & record trajectories
+        recorder.tasks = tasks
+        recorder.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(res, "orchestrator"))
+
+    def _parse(self, text: str) -> list[Task]:
+        # match = re.search(r"<analysis>(.*?)</analysis>", text, re.DOTALL)
+        # analysis = match.group(1).strip() if match else ""
+
+        match = re.search(r"<plan>\s*\[(.*?)\]\s*</plan>", text, re.DOTALL)
+        if not match:
+            return []
+        plan_content = match.group(1).strip()
+        tasks = []
+        task_pattern = r'\{"agent_name":\s*"([^"]+)",\s*"task":\s*"([^"]+)",\s*"completed":\s*(true|false)\s*\}'
+        task_matches = re.findall(task_pattern, plan_content, re.IGNORECASE)
+        for agent_name, task_desc, completed_str in task_matches:
+            completed = completed_str.lower() == "true"
+            tasks.append(Task(agent_name=agent_name, task=task_desc, completed=completed))
+        # check validity
+        assert len(tasks) > 0, "No tasks parsed from plan"
+        return tasks
+
+    async def get_next_task(self, recorder: Recorder) -> Task:
+        """Get the next task to be executed."""
+        if not recorder.tasks:
+            raise ValueError("No tasks available. Please create a plan first.")
+        if recorder.current_task_id >= len(recorder.tasks):
+            return None
+        task = recorder.tasks[recorder.current_task_id]
+        recorder.current_task_id += 1
+        return task
+
+    async def _process_streamed(self, res: DataClassWithStreamEvents, recorder: Recorder):
+        async for event in res.stream_events():
+            recorder._event_queue.put_nowait(event)
