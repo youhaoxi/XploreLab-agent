@@ -5,7 +5,7 @@ import art
 
 from utu.agents import SimpleAgent, get_agent
 from utu.config import AgentConfig, ConfigLoader
-from utu.utils import PrintUtils, AgentsUtils
+from utu.utils import AgentsUtils, PrintUtils
 
 USAGE_MSG = f"""{"-" * 100}
 Usage: `python cli_chat.py --config_name <config_name>`

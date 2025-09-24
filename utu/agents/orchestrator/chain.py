@@ -1,12 +1,12 @@
 import json
 import re
 from dataclasses import dataclass, field
+from typing import Literal
 
 from ...config import AgentConfig
 from ...utils import AgentsUtils, FileUtils, get_logger
 from ..common import DataClassWithStreamEvents
 from ..llm_agent import LLMAgent
-from ..orchestra.common import OrchestraStreamEvent
 
 logger = get_logger(__name__)
 
@@ -40,6 +40,13 @@ class Recorder(DataClassWithStreamEvents):
                 break
             traj.append(f"<task>{t.task}</task>\n<output>{t.result}</output>")
         return "\n".join(traj)
+
+
+@dataclass
+class OrchestratorStreamEvent:
+    name: Literal["plan.start", "plan.done"]
+    item: dict | list | str | None = None
+    type: Literal["orchestrator_stream_event"] = "orchestrator_stream_event"
 
 
 class Orchestrator:
@@ -76,11 +83,11 @@ class Orchestrator:
             question=recorder.input,
             # background_info=await self._get_background_info(recorder),
         )
-        recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan_start"))
+        recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="plan.start"))
         res = llm.run_streamed(up)
         await self._process_streamed(res, recorder)
         tasks = self._parse(res.final_output)
-        recorder._event_queue.put_nowait(OrchestraStreamEvent(name="plan", item=tasks))
+        recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="plan.done", item=tasks))
         # set tasks & record trajectories
         recorder.tasks = tasks
         recorder.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(res, "orchestrator"))
