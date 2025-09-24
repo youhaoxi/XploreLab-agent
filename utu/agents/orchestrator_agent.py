@@ -23,6 +23,10 @@ class OrchestratorAgent:
         self.orchestrator = Orchestrator(self.config)
         self.workers = self._setup_workers()
 
+    @property
+    def name(self) -> str:
+        return self.config.orchestrator_config.get("name", "BaseOrchestratorAgent")
+
     def _handle_config(self, config: AgentConfig) -> None:
         add_chitchat_subagent = config.orchestrator_config.get("add_chitchat_subagent", True)
         if add_chitchat_subagent:
@@ -55,7 +59,7 @@ class OrchestratorAgent:
         return recorder
 
     async def _start_streaming(self, recorder: Recorder):
-        with trace(workflow_name="orchestra_agent") as tracer:
+        with trace(workflow_name=self.name) as tracer:
             recorder.trace_id = tracer.trace_id  # record trace_id
             try:
                 await self.orchestrator.create_plan(recorder)

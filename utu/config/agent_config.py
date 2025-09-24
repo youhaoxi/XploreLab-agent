@@ -110,8 +110,9 @@ class AgentConfig(ConfigBaseModel):
     # orchestrator agent config
     orchestrator_config: dict = Field(default_factory=dict)
     """Orchestrator config (dict)\n
-    - `examples_path`: path to orchestrator examples json file
-    - `add_chitchat_subagent`: whether to add chitchat subagent default True"""
+    - `name`: name of the orchestrator-workers system
+    - `examples_path`: path to orchestrator examples json file. default utu/data/plan_examples/chain.json
+    - `add_chitchat_subagent`: whether to add chitchat subagent. default True"""
     orchestrator_model: ModelConfigs = Field(default_factory=ModelConfigs)
     """Planner model config"""
     orchestrator_workers: dict[str, "AgentConfig"] = Field(default_factory=dict)
