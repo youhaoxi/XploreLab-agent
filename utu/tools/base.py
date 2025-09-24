@@ -1,4 +1,3 @@
-import abc
 from collections.abc import Callable
 
 import mcp.types as types
@@ -9,22 +8,22 @@ from ..utils import ChatCompletionConverter, FileUtils
 from .utils import MCPConverter, register_tool as register_tool
 
 
-class AsyncBaseToolkit(abc.ABC):
+class AsyncBaseToolkit:
     """Base class for toolkits."""
-
-    config: ToolkitConfig
-    _tools_map: dict[str, Callable] = None
 
     def __init__(self, config: ToolkitConfig | dict | None = None):
         if not isinstance(config, ToolkitConfig):
             config = config or {}
             config = ToolkitConfig(config=config, name=self.__class__.__name__)
-        self.config = config
-        self._built = False
+
+        self.config: ToolkitConfig = config
+        self._tools_map: dict[str, Callable] = None
 
     @property
     def tools_map(self) -> dict[str, Callable]:
-        """Lazy loading of tools map."""
+        """Lazy loading of tools map.
+        - collect tools registered by @register_tool
+        """
         if self._tools_map is None:
             self._tools_map = {}
             # Iterate through all methods of the class and register @tool
@@ -33,21 +32,6 @@ class AsyncBaseToolkit(abc.ABC):
                 if callable(attr) and getattr(attr, "_is_tool", False):
                     self._tools_map[attr._tool_name] = attr
         return self._tools_map
-
-    async def __aenter__(self):
-        await self.build()
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.cleanup()
-
-    async def build(self):
-        if self._built:
-            return
-        self._built = True
-
-    async def cleanup(self):
-        self._built = False
 
     def get_tools_map_func(self) -> dict[str, Callable]:
         """Get tools map. It will filter tools by config.activated_tools if it is not None."""
