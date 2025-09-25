@@ -121,3 +121,10 @@ class FileUtils:
         if isinstance(file_path, str) and not os.path.exists(file_path):
             file_path = DIR_ROOT / "utu" / "data" / file_path
         return FileUtils.load_json(file_path)
+
+    @staticmethod
+    def save_json(file_path: str | pathlib.Path, data: dict[str, Any]) -> None:
+        if isinstance(file_path, str):
+            file_path = pathlib.Path(file_path)
+        with file_path.open("w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
