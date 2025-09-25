@@ -23,7 +23,7 @@ async def main():
     await AgentsUtils.print_stream_events(result.stream_events())
 
     print(f"Run completed with result: {result}")
-    FileUtils.save_json(result.to_dict(), data_dir / "result.json")
+    FileUtils.save_json(result.trajectories, data_dir / "trajectories.json")
     with open(data_dir / "final_output.txt", "w", encoding="utf-8") as f:
         f.write(result.final_output)
 

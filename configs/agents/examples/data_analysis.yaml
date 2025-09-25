@@ -11,7 +11,7 @@ type: orchestrator
 
 orchestrator_config:
   # examples_path: planner_examples_data.json
-  name: HTMLGeneratorAgent
+  name: DataAnalysisAgent
   additional_instructions: |-
     Your main object is generating HTML according to user's request. So,
     - If user's request is not clear enough, use the ChitchatAgent to help clarify user's request. (If available)
