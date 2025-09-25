@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - /model/base@orchestrator_planner_model
+  - /model/base@orchestrator_model
   - /agents/simple/search_agent@orchestrator_workers.SearchAgent
   - /agents/simple/data_analysis_agent@orchestrator_workers.DataAnalysisAgent
   - /agents/simple/html_generator@orchestrator_workers.HTMLGenerator

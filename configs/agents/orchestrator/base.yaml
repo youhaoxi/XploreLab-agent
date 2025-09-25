@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - /model/base@planner_model
+  - /model/base@orchestrator_model
   - /agents/simple/search_agent@orchestrator_workers.SearchAgent
   - _self_
 
