@@ -18,6 +18,7 @@ class Task:
     agent_name: str
     task: str
     result: str | None = None
+    is_last_task: bool = False  # whether this task is the last task of the plan
 
 
 @dataclass
@@ -48,6 +49,7 @@ class Recorder(DataClassWithStreamEvents):
 
     # history
     history_plan: list[EasyInputMessageParam] = field(default_factory=list)
+    history_messages: list[EasyInputMessageParam] = field(default_factory=list)
 
     def get_plan_str(self) -> str:
         return "\n".join([f"{i}. {t.task}" for i, t in enumerate(self.tasks, 1)])
@@ -60,7 +62,7 @@ class Recorder(DataClassWithStreamEvents):
             traj.append(f"<task>{t.task}</task>\n<output>{t.result}</output>")
         return "\n".join(traj)
 
-    def add_plan(self, plan: Plan):
+    def add_plan(self, plan: Plan) -> None:
         self.tasks = plan.tasks
         self.history_plan.extend(
             [
@@ -69,7 +71,17 @@ class Recorder(DataClassWithStreamEvents):
             ]
         )
 
+    def add_final_output(self, final_output: str) -> None:
+        self.final_output = final_output
+        self.history_messages.extend(
+            [
+                {"role": "user", "content": "self.input"},
+                {"role": "assistant", "content": final_output},
+            ]
+        )
+
     def new(self, input: str = None, trace_id: str = None) -> "Recorder":
+        """Create a new recorder with the same history -- for multi-turn chat."""
         new_recorder = Recorder(input=input, trace_id=trace_id)
         new_recorder.history_plan = self.history_plan.copy()
         return new_recorder
@@ -135,19 +147,18 @@ class Orchestrator:
         analysis = match.group(1).strip() if match else ""
 
         match = re.search(r"<plan>\s*\[(.*?)\]\s*</plan>", text, re.DOTALL)
-        if not match:
-            return []
         plan_content = match.group(1).strip()
-        tasks = []
+        tasks: list[Task] = []
         task_pattern = r'\{"name":\s*"([^"]+)",\s*"task":\s*"([^"]+)"\s*\}'
         task_matches = re.findall(task_pattern, plan_content, re.IGNORECASE)
         for agent_name, task_desc in task_matches:
             tasks.append(Task(agent_name=agent_name, task=task_desc))
         # check validity
         assert len(tasks) > 0, "No tasks parsed from plan"
+        tasks[-1].is_last_task = True  # FIXME: polish this
         return Plan(input=recorder.input, analysis=analysis, tasks=tasks)
 
-    async def get_next_task(self, recorder: Recorder) -> Task:
+    async def get_next_task(self, recorder: Recorder) -> Task | None:
         """Get the next task to be executed."""
         if not recorder.tasks:
             raise ValueError("No tasks available. Please create a plan first.")

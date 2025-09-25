@@ -72,10 +72,13 @@ class OrchestratorAgent:
                 await self.orchestrator.create_plan(recorder)
                 while True:
                     task = await self.orchestrator.get_next_task(recorder)
-                    if not task:
-                        recorder.final_output = recorder.tasks[-1].result
+                    if task is None:
+                        logger.error("No task available! This should not happen, please check the planner!")
                         break
                     await self._run_task(recorder, task)
+                    if task.is_last_task:
+                        recorder.add_final_output(task.result)
+                        break
             except Exception as e:
                 logger.error(f"Error processing task: {str(e)}")
                 recorder._event_queue.put_nowait(QueueCompleteSentinel())
@@ -93,7 +96,7 @@ class OrchestratorAgent:
             problem=recorder.input,
             plan=recorder.get_plan_str(),
             trajectory=recorder.get_trajectory_str(),
-            task=task.task,
+            task=task,
         )
         # run the task
         result = worker.run_streamed(task_with_context)

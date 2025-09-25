@@ -30,8 +30,7 @@ orchestrator_up: |-
 worker: |-
   Your are working as a worker in a multi-step task. The original problem was divided into multiple subtasks, and you are currently executing one of those subtasks.
 
-  Original Problem:
-  {{ problem }}
+  Original Problem: {{ problem }}
 
   Plan:
   {{ plan }}
@@ -39,7 +38,10 @@ worker: |-
   Previous Trajectory:
   {{ trajectory }}
 
-  Current Task:
-  {{ task }}
-
-  Now, please execute the task and provide the result. DO NOT try to solve the other tasks! ONLY solve the current task.
+  {% if task.is_last_task -%}
+  NOTE that you are the last worker! It means that your response will be the final result. 
+  Thus, keep in mind that your core task is the original task: {{ problem }}.
+  {% else -%}
+  Current Task: {{ task.task }}
+  Now, please execute the task and provide the result. DO NOT try to solve the other tasks! ONLY handle the current task.
+  {% endif -%}
