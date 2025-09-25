@@ -1,5 +1,5 @@
 """
-- [ ] feat: support multi-turn chat
+- [x] feat: support multi-turn chat
 - [ ] feat: add reporter
     additional instructions for the last agent! (as the reporter)
 - [ ] feat: replan
@@ -51,14 +51,17 @@ class OrchestratorAgent:
             workers[name] = SimpleAgent(config=config)
         return workers
 
-    async def run(self, input: str) -> Recorder:
-        recorder = self.run_streamed(input)
+    async def run(self, input: str, history: Recorder = None) -> Recorder:
+        recorder = self.run_streamed(input, history)
         async for _ in recorder.stream_events():
             pass
         return recorder
 
-    def run_streamed(self, input: str) -> Recorder:
-        recorder = Recorder(input=input)
+    def run_streamed(self, input: str, history: Recorder = None) -> Recorder:
+        if history:
+            recorder = history.new(input=input)
+        else:
+            recorder = Recorder(input=input)
         recorder._run_impl_task = asyncio.create_task(self._start_streaming(recorder))
         return recorder
 

@@ -3,13 +3,12 @@ import asyncio
 
 import art
 
-from utu.agents import SimpleAgent, get_agent
+from utu.agents import OrchestratorAgent, SimpleAgent, get_agent
 from utu.config import AgentConfig, ConfigLoader
 from utu.utils import AgentsUtils, PrintUtils
 
 USAGE_MSG = f"""{"-" * 100}
 Usage: `python cli_chat.py --config_name <config_name>`
-Note: Multi-turn chat is only supported by SimpleAgent for now. We are working on this feature!
 Quit: exit, quit, q
 {"-" * 100}""".strip()
 
@@ -34,6 +33,7 @@ async def main():
         return
 
     agent = get_agent(config=config)
+    history = None
     while True:
         user_input = await PrintUtils.async_print_input("> ")
         if user_input.strip().lower() in ["exit", "quit", "q"]:
@@ -41,14 +41,15 @@ async def main():
         if not user_input.strip():
             continue
 
-        # if hasattr(agent, "build"):
-        #     await agent.build()
         if isinstance(agent, SimpleAgent):
             async with agent:
                 await agent.chat_streamed(user_input)
+        elif isinstance(agent, OrchestratorAgent):
+            history = agent.run_streamed(user_input, history)
+            await AgentsUtils.print_stream_events(history.stream_events())
         else:
-            res = agent.run_streamed(user_input)
-            await AgentsUtils.print_stream_events(res.stream_events())
+            PrintUtils.print_error(f"Unsupported agent type: {type(agent)}")
+            return
 
 
 if __name__ == "__main__":

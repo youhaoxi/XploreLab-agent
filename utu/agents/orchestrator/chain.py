@@ -3,6 +3,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Literal
 
+from openai.types.responses import EasyInputMessageParam
+
 from ...config import AgentConfig
 from ...utils import AgentsUtils, FileUtils, get_logger
 from ..common import DataClassWithStreamEvents
@@ -19,15 +21,33 @@ class Task:
 
 
 @dataclass
-class Recorder(DataClassWithStreamEvents):
+class Plan:
     input: str = ""
+    analysis: str = ""
+    tasks: list[Task] = field(default_factory=list)
+
+    def format_tasks(self) -> str:
+        tasks = [{"name": t.agent_name, "task": t.task} for t in self.tasks]
+        return json.dumps(tasks, ensure_ascii=False)
+
+    def format_plan(self) -> str:
+        return f"<analysis>{self.analysis}</analysis>\n<plan>{self.format_tasks()}</plan>"
+
+
+@dataclass
+class Recorder(DataClassWithStreamEvents):
+    # current main task
+    input: str = ""  # current user input
+    final_output: str = None  # final output to `input`. Naming consistent with @agents.RunResult
+    trajectories: list = field(default_factory=list)  # trajs corresponding to `input`
     trace_id: str = ""
 
+    # planning
     tasks: list[Task] = None
     current_task_id: int = 0
-    final_output: str = None
 
-    trajectories: list = field(default_factory=list)
+    # history
+    history_plan: list[EasyInputMessageParam] = field(default_factory=list)
 
     def get_plan_str(self) -> str:
         return "\n".join([f"{i}. {t.task}" for i, t in enumerate(self.tasks, 1)])
@@ -39,6 +59,20 @@ class Recorder(DataClassWithStreamEvents):
                 break
             traj.append(f"<task>{t.task}</task>\n<output>{t.result}</output>")
         return "\n".join(traj)
+
+    def add_plan(self, plan: Plan):
+        self.tasks = plan.tasks
+        self.history_plan.extend(
+            [
+                {"role": "user", "content": f"<question>{plan.input}</question>"},
+                {"role": "assistant", "content": plan.format_plan()},
+            ]
+        )
+
+    def new(self, input: str = None, trace_id: str = None) -> "Recorder":
+        new_recorder = Recorder(input=input, trace_id=trace_id)
+        new_recorder.history_plan = self.history_plan.copy()
+        return new_recorder
 
 
 @dataclass
@@ -83,18 +117,22 @@ class Orchestrator:
             available_agents=self.config.orchestrator_workers_info,
             # background_info=await self._get_background_info(recorder),
         )
+        if recorder.history_plan:
+            input = recorder.history_plan + [{"role": "user", "content": up}]
+        else:
+            input = up
         recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="plan.start"))
-        res = llm.run_streamed(up)
+        res = llm.run_streamed(input)
         await self._process_streamed(res, recorder)
-        tasks = self._parse(res.final_output)
-        recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="plan.done", item=tasks))
+        plan = self._parse(res.final_output, recorder)
+        recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="plan.done", item=plan))
         # set tasks & record trajectories
-        recorder.tasks = tasks
+        recorder.add_plan(plan)
         recorder.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(res, "orchestrator"))
 
-    def _parse(self, text: str) -> list[Task]:
-        # match = re.search(r"<analysis>(.*?)</analysis>", text, re.DOTALL)
-        # analysis = match.group(1).strip() if match else ""
+    def _parse(self, text: str, recorder: Recorder) -> Plan:
+        match = re.search(r"<analysis>(.*?)</analysis>", text, re.DOTALL)
+        analysis = match.group(1).strip() if match else ""
 
         match = re.search(r"<plan>\s*\[(.*?)\]\s*</plan>", text, re.DOTALL)
         if not match:
@@ -107,7 +145,7 @@ class Orchestrator:
             tasks.append(Task(agent_name=agent_name, task=task_desc))
         # check validity
         assert len(tasks) > 0, "No tasks parsed from plan"
-        return tasks
+        return Plan(input=recorder.input, analysis=analysis, tasks=tasks)
 
     async def get_next_task(self, recorder: Recorder) -> Task:
         """Get the next task to be executed."""
