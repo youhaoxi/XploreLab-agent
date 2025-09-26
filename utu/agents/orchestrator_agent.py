@@ -13,7 +13,7 @@ from agents import trace
 from ..config import AgentConfig, ConfigLoader
 from ..utils import AgentsUtils, FileUtils, get_logger
 from .common import QueueCompleteSentinel
-from .orchestrator.chain import Orchestrator, Recorder, Task
+from .orchestrator import ChainPlanner, Recorder, Task
 from .simple_agent import SimpleAgent
 
 logger = get_logger(__name__)
@@ -24,7 +24,7 @@ class OrchestratorAgent:
     def __init__(self, config: AgentConfig):
         self._handle_config(config)
 
-        self.orchestrator = Orchestrator(self.config)
+        self.orchestrator = ChainPlanner(self.config)
         self.workers = self._setup_workers()
 
     @property
@@ -69,16 +69,17 @@ class OrchestratorAgent:
         with trace(workflow_name=self.name) as tracer:
             recorder.trace_id = tracer.trace_id  # record trace_id
             try:
-                await self.orchestrator.create_plan(recorder)
-                while True:
-                    task = await self.orchestrator.get_next_task(recorder)
-                    if task is None:
-                        logger.error("No task available! This should not happen, please check the planner!")
-                        break
-                    await self._run_task(recorder, task)
-                    if task.is_last_task:
-                        recorder.add_final_output(task.result)
-                        break
+                planner = await self.orchestrator.handle_input(recorder)
+                if planner:  # has a plan
+                    while True:
+                        task = await self.orchestrator.get_next_task(recorder)
+                        if task is None:
+                            logger.error("No task available! This should not happen, please check the planner!")
+                            break
+                        await self._run_task(recorder, task)
+                        if task.is_last_task:
+                            recorder.add_final_output(task.result)
+                            break
             except Exception as e:
                 logger.error(f"Error processing task: {str(e)}")
                 recorder._event_queue.put_nowait(QueueCompleteSentinel())

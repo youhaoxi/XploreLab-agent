@@ -1,111 +1,41 @@
 import json
 import re
-from dataclasses import dataclass, field
-from typing import Literal
-
-from openai.types.responses import EasyInputMessageParam
 
 from ...config import AgentConfig
 from ...utils import AgentsUtils, FileUtils, get_logger
 from ..common import DataClassWithStreamEvents
 from ..llm_agent import LLMAgent
+from ..simple_agent import SimpleAgent
+from .common import OrchestratorStreamEvent, Plan, Recorder, Task
 
 logger = get_logger(__name__)
 
 
-@dataclass
-class Task:
-    agent_name: str
-    task: str
-    result: str | None = None
-    is_last_task: bool = False  # whether this task is the last task of the plan
-
-
-@dataclass
-class Plan:
-    input: str = ""
-    analysis: str = ""
-    tasks: list[Task] = field(default_factory=list)
-
-    def format_tasks(self) -> str:
-        tasks = [{"name": t.agent_name, "task": t.task} for t in self.tasks]
-        return json.dumps(tasks, ensure_ascii=False)
-
-    def format_plan(self) -> str:
-        return f"<analysis>{self.analysis}</analysis>\n<plan>{self.format_tasks()}</plan>"
-
-
-@dataclass
-class Recorder(DataClassWithStreamEvents):
-    # current main task
-    input: str = ""  # current user input
-    final_output: str = None  # final output to `input`. Naming consistent with @agents.RunResult
-    trajectories: list = field(default_factory=list)  # trajs corresponding to `input`
-    trace_id: str = ""
-
-    # planning
-    tasks: list[Task] = None
-    current_task_id: int = 0
-
-    # history
-    history_plan: list[EasyInputMessageParam] = field(default_factory=list)
-    history_messages: list[EasyInputMessageParam] = field(default_factory=list)
-
-    def get_plan_str(self) -> str:
-        return "\n".join([f"{i}. {t.task}" for i, t in enumerate(self.tasks, 1)])
-
-    def get_trajectory_str(self) -> str:
-        traj = []
-        for t in self.tasks:
-            if t.result is None:
-                break
-            traj.append(f"<task>{t.task}</task>\n<output>{t.result}</output>")
-        return "\n".join(traj)
-
-    def add_plan(self, plan: Plan) -> None:
-        self.tasks = plan.tasks
-        self.history_plan.extend(
-            [
-                {"role": "user", "content": f"<question>{plan.input}</question>"},
-                {"role": "assistant", "content": plan.format_plan()},
-            ]
-        )
-
-    def add_final_output(self, final_output: str) -> None:
-        self.final_output = final_output
-        self.history_messages.extend(
-            [
-                {"role": "user", "content": "self.input"},
-                {"role": "assistant", "content": final_output},
-            ]
-        )
-
-    def new(self, input: str = None, trace_id: str = None) -> "Recorder":
-        """Create a new recorder with the same history -- for multi-turn chat."""
-        new_recorder = Recorder(input=input, trace_id=trace_id)
-        new_recorder.history_plan = self.history_plan.copy()
-        return new_recorder
-
-
-@dataclass
-class OrchestratorStreamEvent:
-    name: Literal["plan.start", "plan.done"]
-    item: dict | list | str | None = None
-    type: Literal["orchestrator_stream_event"] = "orchestrator_stream_event"
-
-
-class Orchestrator:
+class ChainPlanner:
     """Task planner that handles task decomposition."""
 
     def __init__(self, config: AgentConfig):
         self.config = config
         self.prompts = FileUtils.load_prompts("agents/orchestrator/chain.yaml")
 
+        self.router = SimpleAgent(config=config.orchestrator_router)
+
         examples_path = self.config.orchestrator_config.get("examples_path", "plan_examples/chain.json")
         self.planner_examples = FileUtils.load_json_data(examples_path)
         self.additional_instructions = self.config.orchestrator_config.get("additional_instructions", "")
 
-    async def create_plan(self, recorder: Recorder) -> None:
+    async def handle_input(self, recorder: Recorder) -> None | Plan:
+        # handle input. return a plan
+        async with self.router as router:
+            input = recorder.history_messages + [{"role": "user", "content": recorder.input}]
+            res = router.run_streamed(input)
+            await self._process_streamed(res, recorder)
+            recorder.history_messages = res.to_input_list()  # update chat history
+        need_plan = res.final_output.strip().endswith("<plan>")  # special token!
+        if need_plan:
+            return await self.create_plan(recorder)
+
+    async def create_plan(self, recorder: Recorder) -> Plan:
         """Plan tasks based on the overall task and available agents."""
         # format examples to string. example: {question, available_agents, analysis, plan}
         examples_str = []
@@ -141,6 +71,7 @@ class Orchestrator:
         # set tasks & record trajectories
         recorder.add_plan(plan)
         recorder.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(res, "orchestrator"))
+        return plan
 
     def _parse(self, text: str, recorder: Recorder) -> Plan:
         match = re.search(r"<analysis>(.*?)</analysis>", text, re.DOTALL)

@@ -108,6 +108,8 @@ class AgentConfig(ConfigBaseModel):
     """Workforce executor infos, list of {name, desc, strengths, weaknesses}"""
 
     # orchestrator agent config
+    orchestrator_router: "AgentConfig" = None
+    """Orchestrator router agent config"""
     orchestrator_config: dict = Field(default_factory=dict)
     """Orchestrator config (dict)\n
     - `name`: name of the orchestrator-workers system
