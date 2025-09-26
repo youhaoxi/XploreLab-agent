@@ -98,8 +98,10 @@ class OrchestratorAgent:
             trajectory=recorder.get_trajectory_str(),
             task=task,
         )
+        # add history
+        input = recorder.history_messages + [{"role": "user", "content": task_with_context}]
         # run the task
-        result = worker.run_streamed(task_with_context)
+        result = worker.run_streamed(input)
         async for event in result.stream_events():
             recorder._event_queue.put_nowait(event)
         # set result & record trajectory
