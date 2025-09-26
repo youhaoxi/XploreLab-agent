@@ -1,11 +1,10 @@
-import argparse
 import asyncio
 
 import art
 
 from utu.agents import OrchestratorAgent, SimpleAgent, get_agent
-from utu.config import AgentConfig, ConfigLoader
 from utu.utils import AgentsUtils, PrintUtils
+from utu.utils.script_utils import parse_cli_args
 
 USAGE_MSG = f"""{"-" * 100}
 Usage: `python cli_chat.py --config_name <config_name>`
@@ -18,20 +17,7 @@ async def main():
     PrintUtils.print_info(text, color="blue")
     PrintUtils.print_info(USAGE_MSG, color="yellow")
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--config_name", type=str, default="simple/base", help="Configuration name")
-    parser.add_argument("--agent_model", type=str, default=None, help="Agent model.")
-    args = parser.parse_args()
-
-    config: AgentConfig = ConfigLoader.load_agent_config(args.config_name)
-    # Override basic configs
-    if args.agent_model:
-        assert config.type == "simple", f"--agent_model only support SimpleAgent, get {config.type}"
-        config.model.model_provider.model = args.agent_model
-    if config.type == "workforce":
-        PrintUtils.print_info("Error: Workforce agent is not supported in CLI mode yet.")
-        return
-
+    config = parse_cli_args()
     agent = get_agent(config=config)
     history = None
     while True:

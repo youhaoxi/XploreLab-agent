@@ -7,9 +7,9 @@ import agents as ag
 import tornado.web
 import tornado.websocket
 
+from utu.agents import OrchestratorAgent, SimpleAgent
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.agents.orchestra_agent import OrchestraAgent
-from utu.agents.simple_agent import SimpleAgent
 from utu.utils import EnvUtils
 
 from .common import (
@@ -24,8 +24,9 @@ from .common import (
 
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
-    def initialize(self, agent: SimpleAgent | OrchestraAgent, example_query: str = ""):
-        self.agent: SimpleAgent | OrchestraAgent = agent
+    def initialize(self, agent: SimpleAgent | OrchestraAgent | OrchestratorAgent, example_query: str = ""):
+        self.agent: SimpleAgent | OrchestraAgent | OrchestratorAgent = agent
+        self.history = None  # recorder for multi-turn chat. Now only used for OrchestraAgent
         self.example_query = example_query
 
     def check_origin(self, origin):
@@ -64,6 +65,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                         # print in red color
                         print(f"\033[91mInput items: {self.agent.input_items}\033[0m")
                         stream = self.agent.run_streamed(self.agent.input_items)
+                    elif isinstance(self.agent, OrchestratorAgent):
+                        stream = self.agent.run_streamed(content.query, self.history)
+                        self.history = stream
                     else:
                         raise ValueError(f"Unsupported agent type: {type(self.agent).__name__}")
 
