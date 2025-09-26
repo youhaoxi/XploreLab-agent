@@ -13,7 +13,7 @@ from agents import trace
 from ..config import AgentConfig, ConfigLoader
 from ..utils import AgentsUtils, FileUtils, get_logger
 from .common import QueueCompleteSentinel
-from .orchestrator import ChainPlanner, Recorder, Task
+from .orchestrator import ChainPlanner, OrchestratorStreamEvent, Recorder, Task
 from .simple_agent import SimpleAgent
 
 logger = get_logger(__name__)
@@ -102,9 +102,11 @@ class OrchestratorAgent:
         # add history
         input = recorder.history_messages + [{"role": "user", "content": task_with_context}]
         # run the task
+        recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="task.start", item=task))
         result = worker.run_streamed(input)
         async for event in result.stream_events():
             recorder._event_queue.put_nowait(event)
+        recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="task.done"))
         # set result & record trajectory
         task.result = result.final_output
         recorder.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(result))

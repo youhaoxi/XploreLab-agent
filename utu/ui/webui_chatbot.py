@@ -10,6 +10,7 @@ import tornado.websocket
 from utu.agents import OrchestratorAgent, SimpleAgent
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.agents.orchestra_agent import OrchestraAgent
+from utu.agents.orchestrator import OrchestratorStreamEvent
 from utu.utils import EnvUtils
 
 from .common import (
@@ -42,7 +43,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     async def send_event(self, event: Event):
         # print in green color
-        print(f"\033[92mSending event: {event.model_dump()}\033[0m")
+        # print(f"\033[92mSending event: {event.model_dump()}\033[0m")
         self.write_message(event.model_dump())
 
     async def on_message(self, message: str):
@@ -73,7 +74,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
                     async for event in stream.stream_events():
                         event_to_send = None
-                        print(f"--------------------\n{event}")
+                        # print(f"--------------------\n{event}")
                         if isinstance(event, ag.RawResponsesStreamEvent):
                             event_to_send = await handle_raw_stream_events(event)
                         elif isinstance(event, ag.RunItemStreamEvent):
@@ -82,6 +83,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                             event_to_send = await handle_new_agent(event)
                         elif isinstance(event, OrchestraStreamEvent):
                             event_to_send = await handle_orchestra_events(event)
+                        elif isinstance(event, OrchestratorStreamEvent):
+                            print(f"> {event}")
                         else:
                             pass
                         if event_to_send:

@@ -9,13 +9,6 @@ from ..common import DataClassWithStreamEvents
 
 
 @dataclass
-class OrchestratorStreamEvent:
-    name: Literal["plan.start", "plan.done"]
-    item: dict | list | str | None = None
-    type: Literal["orchestrator_stream_event"] = "orchestrator_stream_event"
-
-
-@dataclass
 class Task:
     agent_name: str
     task: str
@@ -35,6 +28,18 @@ class Plan:
 
     def format_plan(self) -> str:
         return f"<analysis>{self.analysis}</analysis>\n<plan>{self.format_tasks()}</plan>"
+
+
+@dataclass
+class OrchestratorStreamEvent:
+    name: Literal[
+        "plan.start",
+        "plan.done",
+        "task.start",
+        "task.done",
+    ]
+    item: Plan | Task | None = None
+    type: Literal["orchestrator_stream_event"] = "orchestrator_stream_event"
 
 
 @dataclass
