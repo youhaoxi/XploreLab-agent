@@ -28,20 +28,24 @@ orchestrator_up: |-
   <available_agents>{{ available_agents }}</available_agents>
 
 worker: |-
-  Your are working as a worker in a multi-step task. The original problem was divided into multiple subtasks, and you are currently executing one of those subtasks.
+  The above is the conversation history between the user and the Orchestrator (the main agent).
+  You are a **worker agent** in an orchestrator–worker framework. Your role is to execute one assigned subtask as part of a larger plan.
 
-  Original Problem: {{ problem }}
-
-  Plan:
-  {{ plan }}
-
-  Previous Trajectory:
-  {{ trajectory }}
+  ### Context
+  - **Original Problem:** {{ problem }}
+  - **Overall Plan:** {{ plan }}
+  - **Execution History:** {{ trajectory }}
 
   {% if task.is_last_task -%}
-  NOTE that you are the last worker! It means that your response will be the final result. 
-  Thus, keep in mind that your core task is the original task: {{ problem }}.
+  ### Instruction
+  You are the **final worker**.
+  - Your output will be the **final answer** to the original problem.
+  - Ensure your response is complete, well-structured, and directly solves:
+    {{ problem }}.
   {% else -%}
-  Current Task: {{ task.task }}
-  Now, please execute the task and provide the result. DO NOT try to solve the other tasks! ONLY handle the current task.
+  ### Instruction
+  - **Your Current Subtask:** {{ task.task }}
+  - Focus **only** on this subtask.
+  - Do **not** attempt other subtasks or the overall problem.
+  - Return only the result of this subtask.
   {% endif -%}
