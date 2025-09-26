@@ -1,7 +1,7 @@
 import json
 import re
 
-from ...config import AgentConfig
+from ...config import AgentConfig, ConfigLoader
 from ...utils import AgentsUtils, FileUtils, get_logger
 from ..common import DataClassWithStreamEvents
 from ..llm_agent import LLMAgent
@@ -18,6 +18,8 @@ class ChainPlanner:
         self.config = config
         self.prompts = FileUtils.load_prompts("agents/orchestrator/chain.yaml")
 
+        if config.orchestrator_router is None:  # set default
+            config.orchestrator_router = ConfigLoader.load_agent_config("orchestrator/router")
         self.router = SimpleAgent(config=config.orchestrator_router)
 
         examples_path = self.config.orchestrator_config.get("examples_path", "plan_examples/chain.json")

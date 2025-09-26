@@ -1,9 +1,9 @@
 from ..config import AgentConfig
 from .llm_agent import LLMAgent
 from .orchestra_agent import OrchestraAgent
+from .orchestrator_agent import OrchestratorAgent
 from .simple_agent import SimpleAgent
 from .workforce_agent import WorkforceAgent
-from .orchestrator_agent import OrchestratorAgent
 
 
 def get_agent(config: AgentConfig) -> SimpleAgent | OrchestraAgent | OrchestratorAgent | WorkforceAgent:
