@@ -1,10 +1,9 @@
-import pptx
 import copy
-import matplotlib
-from matplotlib import pyplot
-import random
-from pptx.enum.shapes import MSO_SHAPE_TYPE
 import logging
+import random
+
+import matplotlib
+from pptx.enum.shapes import MSO_SHAPE_TYPE
 
 # rgb colors from a color scheme
 _color_palette = [
@@ -38,7 +37,7 @@ def inspect_slide(slide):
     _inspect_shape_list(slide.shapes)
 
 def to_svg(slide, prs, svg_filename="test.svg"):
-    
+
     def _to_svg_box(shapes, svg_box):
         for shape in shapes:
             svg_box.append({
@@ -50,7 +49,7 @@ def to_svg(slide, prs, svg_filename="test.svg"):
             })
             if shape.shape_type == MSO_SHAPE_TYPE.GROUP:
                 _to_svg_box(shape.shapes, svg_box)
-    
+
     def render_svg(svg_box):
         width = prs.slide_width.inches
         height = prs.slide_height.inches
@@ -68,11 +67,11 @@ def to_svg(slide, prs, svg_filename="test.svg"):
         ax.set_xmargin(0)  # x轴边距
         ax.set_ymargin(0)  # y轴边距
         fig.savefig(svg_filename, bbox_inches='tight', pad_inches=0)
-    
+
     svg_box = []
     _to_svg_box(slide.shapes, svg_box)
     render_svg(svg_box)
-    
+
     return svg_box
 
 def delete_shape(shape):
@@ -115,28 +114,26 @@ def find_shape_with_name_except(shapes, name, depth=0):
 def duplicate_slide(prs, slide):
     """
     Copy the given slide to the end of the presentation.
-    
+
     Args:
         prs: Presentation object
         slide: Slide object to be copied
-    
     Returns:
         New created Slide object
     """
     # Create new slide, use the same layout
     slide_layout = slide.slide_layout
     new_slide = prs.slides.add_slide(slide_layout)
-    
+
     # Copy all shapes
     for shape in slide.shapes:
         new_shape_element = copy.deepcopy(shape.element)
         new_slide.shapes._spTree.insert_element_before(new_shape_element, 'p:extLst')
-    
+
     return new_slide
 
 def delete_slide_range(prs, index_range):
     """delete slides in the given index range
-    
     Args:
         prs: Presentation object
         index_range: range of slide indices (0-based)
@@ -146,27 +143,26 @@ def delete_slide_range(prs, index_range):
 
 def delete_slide(prs, index):
     """delete slide at the given index
-    
     Args:
         prs: Presentation object
         index: slide index (0-based)
-    
+
     Raises:
         IndexError: when index out of range
     """
     if index < 0 or index >= len(prs.slides):
         raise IndexError(f"Slide index {index} out of range (0-{len(prs.slides)-1})")
-    
+
     xml_slides = prs.slides._sldIdLst
     xml_slides.remove(xml_slides[index])
 
 def move_slide(prs, old_index, new_index):
-    """移动幻灯片位置"""
+    """move slide from old_index to new_index"""
     xml_slides = prs.slides._sldIdLst
-    # 获取要移动的元素
+    # get the element to move
     slide_element = xml_slides[old_index]
-    # 先删除原位置
+    # remove the element from old position
     xml_slides.remove(slide_element)
-    # 插入到新位置
+    # insert to new position
     xml_slides.insert(new_index, slide_element)
     return prs

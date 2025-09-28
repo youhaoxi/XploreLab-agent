@@ -1,8 +1,10 @@
 import json
 import logging
 
-from ppt_template_model import *
-from utils import *
+from ppt_template_model import TYPE_MAP, parse_json
+from pptx import Presentation
+from utils import delete_slide, delete_slide_range, duplicate_slide, move_slide
+
 
 def fill_template(template_path, output_path, json_data):
     prs = Presentation(template_path)
@@ -18,7 +20,7 @@ def fill_template(template_path, output_path, json_data):
         else:
             new_slide = duplicate_slide(prs, prs.slides[TYPE_MAP[slide.type]])
             slide.render(new_slide)
-    
+
     delete_slide_range(prs, range(2, 12))
     delete_slide(prs, 0)
     move_slide(prs, 1, len(prs.slides)-1)
@@ -31,12 +33,12 @@ def extract_json(content):
 
 if __name__ == '__main__':
     import datetime
-    
+
     logging.basicConfig(level=logging.INFO)
     template = "template/template_ori.pptx"
     output = f"output-{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.pptx"
     input_json = "output.json"
-    with open(input_json, "r") as f:
+    with open(input_json) as f:
         content = f.read()
     json_data = extract_json(content)
     fill_template(template, output, json_data)
