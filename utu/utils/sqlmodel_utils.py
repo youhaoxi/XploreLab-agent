@@ -13,7 +13,7 @@ class SQLModelUtils:
     def get_engine(cls):
         if cls._engine is None:
             cls._engine = create_engine(
-                EnvUtils.get_env("DB_URL"),
+                EnvUtils.get_env("UTU_DB_URL"),
                 pool_size=300,
                 max_overflow=500,
                 pool_timeout=30,
@@ -32,8 +32,8 @@ class SQLModelUtils:
 
     @staticmethod
     def check_db_available():
-        if not EnvUtils.get_env("DB_URL"):
-            # logger.error("DB_URL is not set")
+        if not EnvUtils.get_env("UTU_DB_URL"):
+            # logger.error("UTU_DB_URL is not set")
             return False
         try:
             engine = SQLModelUtils.get_engine()

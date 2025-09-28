@@ -236,17 +236,17 @@ Once you're comfortable with the basics, you might want to customize your setup 
 
 The evaluation framework uses a SQL database (defaulting to SQLite) to store datasets and experiment results. The default SQLite database (`sqlite:///test.db`) is perfect for getting started, but you can use other databases for production use.
 
-To use a different database (e.g., PostgreSQL), set the `DB_URL` environment variable in your `.env` file:
+To use a different database (e.g., PostgreSQL), set the `UTU_DB_URL` environment variable in your `.env` file:
 
 ```sh
 # For PostgreSQL
-DB_URL="postgresql://user:password@host:port/database"
+UTU_DB_URL="postgresql://user:password@host:port/database"
 
 # For MySQL
-DB_URL="mysql://user:password@host:port/database"
+UTU_DB_URL="mysql://user:password@host:port/database"
 
 # Default SQLite (recommended for beginners)
-DB_URL="sqlite:///test.db"
+UTU_DB_URL="sqlite:///test.db"
 ```
 
 **Beginner Tip:** Stick with SQLite unless you have specific requirements for a different database system.

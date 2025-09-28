@@ -94,10 +94,10 @@ python scripts/db/dump_db.py --exp_id "<your_exp_id>"
 
 ### Database Configuration
 
-The evaluation framework uses a SQL database (defaulting to SQLite) to store datasets and experiment results. To use a different database (e.g., PostgreSQL), set the `DB_URL` environment variable:
+The evaluation framework uses a SQL database (defaulting to SQLite) to store datasets and experiment results. To use a different database (e.g., PostgreSQL), set the `UTU_DB_URL` environment variable:
 
 ```sh
-DB_URL="postgresql://user:password@host:port/database"
+UTU_DB_URL="postgresql://user:password@host:port/database"
 ```
 
 ### Tracing
