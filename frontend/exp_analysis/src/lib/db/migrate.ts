@@ -5,12 +5,12 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ path: ".env" });
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is not set");
+if (!process.env.UTU_DB_URL) {
+  throw new Error("UTU_DB_URL is not set");
 }
 
 const main = async () => {
-  const connection = postgres(process.env.DATABASE_URL!, { max: 1 });
+  const connection = postgres(process.env.UTU_DB_URL!, { max: 1 });
   const db = drizzle(connection);
   await migrate(db, { migrationsFolder: "drizzle" });
   console.log("Migrations applied successfully");
