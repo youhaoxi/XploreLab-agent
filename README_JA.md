@@ -29,6 +29,7 @@
 
 ## 🗞️ ニュース
 
+- 🛠️ [2025-09-28] エージェント自動生成に加えて、要件を一度伝えるだけで`Youtu-Agent`がツールを構築してくれる自動ツール生成機能をリリースしました。[詳細](https://tencentcloudadp.github.io/youtu-agent/auto_generation/)。
 - 📺 [2025-09-09] 「Youtu-Agent」の設計思想と基本的な使い方についてライブ配信を行いました。[[動画](https://www.bilibili.com/video/BV1mypqz4EvS)] [[資料](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNLgt3CbnxRWaYWnW4)]。
 - 🎁 [2025-09-02] [テンセントクラウド国際サイト](https://www.tencentcloud.com/)では、DeepSeek APIの新規ユーザーに対して**300万枚の無料トークン**を提供しています（**2025年9月1日から2025年10月31日まで**）。`Youtu-Agent`でDeepSeekモデルを使用したい場合は、[無料トライアルをクリック](https://www.tencentcloud.com/document/product/1255/70381)してください！企業向けのエージェントソリューションについては、[エージェント開発プラットフォームADP](https://adp.tencentcloud.com)もご覧ください。
 - 📺 [2025-08-28] 新しくリリースされたDeepSeek-V3.1モデルについてライブ配信を行い、`Youtu-Agent`フレームワークでの使用方法を紹介しました。[[動画](https://www.bilibili.com/video/BV1XwayzrETi/)] [[資料](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF)]。
@@ -78,9 +79,9 @@
 > [!NOTE]
 > 詳細については、[`examples`](./examples)ディレクトリと[ドキュメント](https://tencentcloudadp.github.io/youtu-agent/examples/)を参照してください。
 
-### 🤖 自動エージェント生成
+### 🤖 自動ツール＆エージェント生成
 
-`Youtu-Agent`の顕著な利点は、**エージェントとその設定を自動生成**する機能にあります。他のフレームワークでは、特定のタスクを実行するエージェントを定義するために通常コードを記述するかプロンプトを慎重に設計する必要がありますが、Youtu-AgentはYAMLベースのシンプルな設定方式を採用しており、効率的な自動化を実現します。内蔵のメタエージェントがユーザーと対話して要望を把握すると、自動的にエージェント設定を生成して保存します。
+`Youtu-Agent`の大きな特長は、**エージェント設定だけでなくツールも自動生成**できる点です。他のフレームワークでは、エージェントを動かす前に関数を実装したりプロンプトを細かく設計したりする必要がありますが、Youtu-Agentではタスクを説明するだけで済みます。内蔵のメタエージェントが対話を通じて要件を整理し、必要なツールを組み立て、YAML設定を生成して保存するので、そのまま実行に移せます。
 
 ```bash
 # インタラクティブに要件を明確にし、設定を自動生成します
@@ -97,6 +98,14 @@ python scripts/cli_chat.py --config generated/xxx
         <img src="https://img.youtube.com/vi/JVpHDJtKBo8/0.jpg" alt="自動エージェント生成" width="420" height="236">
       </a>
       <br><strong>自動エージェント生成</strong><br>インタラクティブな対話によって要件を捉え、エージェントの設定を自動生成し、すぐに実行します。
+    </td>
+    <td style="border: 1px solid black; width:420px; padding:10px; vertical-align:top;">
+      <video src="https://github.com/user-attachments/assets/37878544-cfda-4a8a-9b42-a7361782c750" 
+             poster="https://img.youtube.com/vi/zjGooBuqdSE/maxresdefault.jpg" 
+             controls muted preload="metadata" 
+             width="100%" height="auto" 
+             style="object-fit: cover; border-radius: 8px;"></video>
+      <br><strong>自動ツール生成</strong><br>必要な動作を伝えるだけで、メタエージェントがツールのコードとスキーマを作成し、そのままワークフローに組み込めます。
     </td>
   </tr>
 </table>

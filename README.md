@@ -31,6 +31,7 @@ Key highlights:
 
 ## 🗞️ News
 
+- 🛠️ [2025-09-28] Agent auto-generation now ships with companion tooling: describe a capability once and let `Youtu-Agent` build the tool for you. [Details](https://tencentcloudadp.github.io/youtu-agent/auto_generation/).
 - 📺 [2025-09-09] We hosted a live sharing the design philosophy and basic usage of `Youtu-Agent`. [[video](https://www.bilibili.com/video/BV1mypqz4EvS)] [[documentation](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNLgt3CbnxRWaYWnW4)].
 - 🎁 [2025-09-02] [Tencent Cloud International](https://www.tencentcloud.com/) offers new users of the DeepSeek API **3 million free tokens** (**Sep 1 – Oct 31, 2025**). [Try it out](https://www.tencentcloud.com/document/product/1255/70381) for free if you want to use DeepSeek models in `Youtu-Agent`! For enterprise agent solutions, also check out [Agent Development Platform](https://adp.tencentcloud.com) (ADP).
 - 📺 [2025-08-28] We hosted a live sharing updates about DeepSeek-V3.1 and how to use it in the `Youtu-Agent` framework. [[video](https://www.bilibili.com/video/BV1XwayzrETi/)] [[documentation](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF)].
@@ -102,9 +103,9 @@ Click on the images to view detailed videos.
 > [!NOTE]
 > See the [`examples`](./examples) directory and [documentation](https://tencentcloudadp.github.io/youtu-agent/examples/) for more details.
 
-### 🤖 Automatic Agent Generation
+### 🤖 Automatic Tool and Agent Generation
 
-A standout feature of `Youtu-Agent` is its ability to **automatically generate agent configurations**. In other frameworks, defining a task-specific agent often requires writing code or carefully crafting prompts. In contrast, `Youtu-Agent` uses simple YAML-based configs, which enables streamlined automation: a built-in "meta-agent" chats with you to capture requirements, then generates and saves the config automatically.
+A standout feature of `Youtu-Agent` is its ability to **automatically generate tools alongside agent configurations**. Other frameworks often make you hand-code functions or hand-craft prompts before an agent can even run. Here, you simply describe the task: the built-in meta-agent interviews you, assembles the necessary tools, produces YAML configs, and saves everything so you can execute it immediately.
 
 ```bash
 # Interactively clarify your requirements and auto-generate a config
@@ -119,11 +120,21 @@ python scripts/cli_chat.py --config generated/xxx
     <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
       <strong>Automatic Agent Generation</strong><br>Interactively clarify your requirements, automatically generate the agent configuration, and run it right away.
     </td>
+    <td style="border: 1px solid black; padding: 10px; width: 50%; vertical-align: top;">
+      <strong>Automatic Tool Generation</strong><br>Describe the behaviors you need, let the meta-agent draft tool code and schemas, then drop them straight into your workflow.
+    </td>
   </tr>
   <tr>
     <td style="border: 1px solid black; padding:10px; vertical-align:top; width: 400px;">
       <video src="https://github.com/user-attachments/assets/0c2ee833-507e-4141-8de4-148ff3d9f9ef" 
              poster="https://img.youtube.com/vi/JVpHDJtKBo8/maxresdefault.jpg" 
+             controls muted preload="metadata" 
+             width="100%" height="auto" 
+             style="object-fit: cover; border-radius: 8px;"></video>
+    </td>
+    <td style="border: 1px solid black; padding:10px; vertical-align:top; width: 400px;">
+      <video src="https://github.com/user-attachments/assets/37878544-cfda-4a8a-9b42-a7361782c750" 
+             poster="https://img.youtube.com/vi/zjGooBuqdSE/maxresdefault.jpg" 
              controls muted preload="metadata" 
              width="100%" height="auto" 
              style="object-fit: cover; border-radius: 8px;"></video>

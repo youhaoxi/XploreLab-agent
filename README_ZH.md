@@ -30,6 +30,7 @@
 
 ## 🗞️ 新闻
 
+- 🛠️ [2025-09-28] 自动智能体功能现已配套上线自动工具生成：描述所需能力，`Youtu-Agent` 即可完成工具构建。[详情](https://tencentcloudadp.github.io/youtu-agent/auto_generation/)。
 - 📺 [2025-09-09] 我们举办了一场直播，分享了 `Youtu-Agent` 的设计理念与基础用法。[[视频](https://www.bilibili.com/video/BV1mypqz4EvS)] [[文档](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNLgt3CbnxRWaYWnW4)]。
 - 🎁 [2025-09-02] [腾讯云国际站](https://www.tencentcloud.com/) 为 DeepSeek API 新用户提供 **300 万免费令牌**（**2025年9月1日 – 2025年10月31日**）。如果想在 `Youtu-Agent` 中使用 DeepSeek 模型，[点击免费试用](https://www.tencentcloud.com/document/product/1255/70381)！如需企业级智能体解决方案，也可查看 [智能体开发平台 ADP](https://adp.tencentcloud.com)。
 - 📺 [2025-08-28] 我们围绕新发布的 DeepSeek-V3.1 模型进行了直播分享，并介绍了如何在 `Youtu-Agent` 框架中使用该模型。[[视频](https://www.bilibili.com/video/BV1XwayzrETi/)] [[文档](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF)]。
@@ -79,9 +80,9 @@
 > [!NOTE]
 > 更多详情请参见 [`examples`](./examples) 目录和[文档](https://tencentcloudadp.github.io/youtu-agent/examples/)。
 
-### 🤖 自动智能体生成
+### 🤖 自动工具与智能体生成
 
-`Youtu-Agent`的突出优势在于其**自动化生成智能体及其配置**的能力。在其他框架中，定义特定任务的智能体通常需要编写代码或是精心设计提示词，而`Youtu-Agent`采用基于 YAML 的简洁配置方案，实现了高效自动化：内置的“元智能体”与用户对话并捕获需求，然后自动生成并保存配置。
+`Youtu-Agent` 的核心亮点之一，是它可以**同时自动生成工具与智能体配置**。在其他框架里，想让智能体落地通常得先手写函数或精心编写提示词；在这里只需描述任务。内置的元智能体会与用户对话梳理需求，自动拼装所需工具、产出 YAML 配置，并保存好后即可直接运行。
 
 ```bash
 # Interactively clarify your requirements and auto-generate a config
@@ -97,7 +98,15 @@ python scripts/cli_chat.py --config generated/xxx
       <a href="https://www.youtube.com/watch?v=JVpHDJtKBo8">
         <img src="https://img.youtube.com/vi/JVpHDJtKBo8/0.jpg" alt="Automatic Agent Generation" width="420" height="236">
       </a>
-      <br><strong>自动智能体生成</strong><br>交互式对话的方式捕获需求，自动生成agent配置，并立即运行。
+      <br><strong>自动智能体生成</strong><br>交互式对话的方式捕获需求，自动生成 agent 配置，并立即运行。
+    </td>
+    <td style="border: 1px solid black; width:420px; padding:10px; vertical-align:top;">
+      <video src="https://github.com/user-attachments/assets/37878544-cfda-4a8a-9b42-a7361782c750" 
+             poster="https://img.youtube.com/vi/zjGooBuqdSE/maxresdefault.jpg" 
+             controls muted preload="metadata" 
+             width="100%" height="auto" 
+             style="object-fit: cover; border-radius: 8px;"></video>
+      <br><strong>自动工具生成</strong><br>描述所需的能力，由元智能体生成工具代码与 schema，并直接接入你的工作流。
     </td>
   </tr>
 </table>
