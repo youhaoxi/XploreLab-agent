@@ -3,7 +3,7 @@ defaults:
   # planner model
   - /model/base@orchestrator_model
   # router agent
-  - /agents/orchestrator/router@orchestrator_router
+  - /agents/router/base@orchestrator_router
   # workers
   - /agents/simple/search_agent@orchestrator_workers.SearchAgent
   - _self_
