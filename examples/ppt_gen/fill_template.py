@@ -32,12 +32,25 @@ def extract_json(content):
     return json_data
 
 if __name__ == '__main__':
+    import argparse
     import datetime
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--template", type=str, default="template/template_ori.pptx")
+    default_output_filename = f"output-{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.pptx"
+    parser.add_argument("-o", "--output", type=str, default=default_output_filename)
+    parser.add_argument("-i", "--input", type=str, required=True)
+    parser.add_argument("--cache_dir", type=str, default=".temp")
+    args = parser.parse_args()
+
+    # set env var UTU_PPT_CACHE_DIR
+    import os
+    os.environ["UTU_PPT_CACHE_DIR"] = args.cache_dir
+
     logging.basicConfig(level=logging.INFO)
-    template = "template/template_ori.pptx"
-    output = f"output-{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.pptx"
-    input_json = "output.json"
+    template = args.template
+    output = args.output
+    input_json = args.input
     with open(input_json) as f:
         content = f.read()
     json_data = extract_json(content)

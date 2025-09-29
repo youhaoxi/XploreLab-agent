@@ -166,3 +166,53 @@ def move_slide(prs, old_index, new_index):
     # insert to new position
     xml_slides.insert(new_index, slide_element)
     return prs
+
+def replace_picture_keep_format(slide, old_picture_index, new_image_path):
+    """
+    Replace the picture at the given index with a new image while keeping all format attributes.
+    """
+    target_shape = slide.shapes[old_picture_index]
+
+    # Save all properties
+    properties = {
+        'left': target_shape.left,
+        'top': target_shape.top,
+        'width': target_shape.width,
+        'height': target_shape.height,
+        'rotation': target_shape.rotation if hasattr(target_shape, 'rotation') else 0
+    }
+
+    # Save shadow, border, etc. effects (if exist)
+    _shadow = None
+    if hasattr(target_shape, 'shadow'):
+        _shadow = target_shape.shadow
+
+    # Get the position in shapes collection
+    _shape_index = None
+    for i, shape in enumerate(slide.shapes):
+        if shape == target_shape:
+            _shape_index = i
+            break
+
+    # Remove the original picture
+    sp = target_shape._element
+    sp.getparent().remove(sp)
+
+    # Insert the new picture
+    new_picture = slide.shapes.add_picture(
+        new_image_path,
+        properties['left'],
+        properties['top'],
+        properties['width'],
+        properties['height']
+    )
+
+    # Restore rotation
+    if properties['rotation'] != 0:
+        new_picture.rotation = properties['rotation']
+
+    # Restore shadow, border, etc. effects
+    if _shadow:
+        new_picture.shadow = _shadow
+
+    return new_picture

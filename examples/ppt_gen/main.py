@@ -25,10 +25,14 @@ async def main():
         html = "https://arxiv.org/html/2509.20234v1"
 
     query = f"""
-    把这个网页做成18页左右的PPT。如果是论文，要求按照学术报告的风格来做PPT：
+    把这个网页做成18页左右的PPT。如果是论文，要求按照学术报告的风格来做PPT；如果不是论文，就按照普通PPT的方式来做：
 
     {html}
     """
+
+    # query = """
+    # 收集有关夜鹭的信息，整理成演讲PPT。
+    # """
 
     result = await agent.run(query)
     final_result = result.final_output

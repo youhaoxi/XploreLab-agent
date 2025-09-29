@@ -8,7 +8,7 @@ import requests
 from PIL import Image
 from pptx import Presentation
 from pydantic import BaseModel
-from utils import delete_shape, duplicate_slide, find_shape_with_name_except
+from utils import delete_shape, duplicate_slide, find_shape_with_name_except, replace_picture_keep_format
 
 TYPE_MAP = {
     "content": 0,
@@ -228,6 +228,13 @@ class ItemsPage4KeyPoint(Slide):
             logging.info(f"item {ind}: {item}")
             handle_item(item, ind, slide)
 
+        if self.label:
+            logging.info(f"label: {self.label}")
+            for ind, label in enumerate(self.label):
+                logging.info(f"label {ind}: {label}")
+                target_shape = find_shape_with_name_except(slide.shapes, f"label{ind+1}")
+                handle_pure_text(label, target_shape, slide)
+
 class ItemsPage4Img(Slide):
     """
     A process or framework centered around data/analysis,
@@ -237,6 +244,7 @@ class ItemsPage4Img(Slide):
     type: Literal["items_page_4_img"] = "items_page_4_img"
     title: str = "" # be very concise within 7 words
     items: list[Item] # exactly 4 items
+    image_url: str | None = None
 
     def render(self, slide):
         logging.info(f"===Rendering items page 4 img: {self.title}===")
@@ -248,6 +256,11 @@ class ItemsPage4Img(Slide):
         for ind, item in enumerate(self.items):
             logging.info(f"item {ind}: {item}")
             handle_item(item, ind, slide)
+
+        if self.image_url:
+            logging.info(f"image_url: {self.image_url}")
+            image_shape = find_shape_with_name_except(slide.shapes, "image")
+            handle_image(self.image_url, image_shape, slide)
 
 class ItemPage4Growth(Slide):
     """
@@ -459,6 +472,16 @@ def handle_image(image_url: str, target_shape, slide):
 
     # remove the placeholder
     delete_shape(target_shape)
+
+def handle_replace_image(image_url: str, target_shape, slide):
+    # download image
+    try:
+        image_url, image_width, image_height = download_image(image_url)
+    except Exception as e:
+        logging.warning(f"Failed to download image: {image_url} {e}")
+        traceback.print_exc()
+        return
+    replace_picture_keep_format(slide, target_shape, image_url)
 
 def handle_table(table_content: TableContent, target_shape, slide):
     left, top, width, height = target_shape.left, target_shape.top, target_shape.width, target_shape.height
