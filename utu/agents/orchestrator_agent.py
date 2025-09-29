@@ -106,7 +106,7 @@ class OrchestratorAgent:
         result = worker.run_streamed(input)
         async for event in result.stream_events():
             recorder._event_queue.put_nowait(event)
-        recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="task.done"))
-        # set result & record trajectory
-        task.result = result.final_output
+        task.result = result.final_output  # set result
+        recorder._event_queue.put_nowait(OrchestratorStreamEvent(name="task.done", item=task))
+        # record trajectory
         recorder.trajectories.append(AgentsUtils.get_trajectory_from_agent_result(result))
