@@ -25,12 +25,12 @@ The following describes two common methods for installing and using the database
 
 SQLite is a C-language library that implements a small, fast, self-contained, high-reliability, full-featured SQL database engine. It is the most used database engine in the world. SQLite is built into all mobile phones and most computers and comes bundled inside countless other applications that people use every day.
 
-**Key Characteristics:**
-- **Serverless**: No separate server process to install or configure.
-- **Self-Contained**: Requires minimal external support from the operating system or libraries.
-- **Zero-Configuration**: No setup or administration needed.
-- **Transactional**: Fully ACID-compliant, even in the event of system crashes or power failures.
-- **Single File Database**: An entire database is stored in a single cross-platform disk file.
+***Key Characteristics:***
+- ***Serverless***: No separate server process to install or configure.
+- ***Self-Contained***: Requires minimal external support from the operating system or libraries.
+- ***Zero-Configuration***: No setup or administration needed.
+- ***Transactional***: Fully ACID-compliant, even in the event of system crashes or power failures.
+- ***Single File Database***: An entire database is stored in a single cross-platform disk file.
 
 ##### Installation & Usage
 
@@ -81,11 +81,11 @@ UTU_DB_URL=sqlite:///your_db_file
 
 PostgreSQL, often simply called "Postgres", is a powerful, open-source object-relational database system with over 35 years of active development. It has earned a strong reputation for its proven architecture, reliability, data integrity, robust feature set, and performance.
 
-**Key Characteristics:**
-- **Client-Server Model**: Requires a running server process (`postmaster`) that manages database files and accepts connections from client applications.
-- **Highly Extensible**: Supports custom functions, data types, operators, and more.
-- **Standards-Compliant**: Highly compliant with SQL standards.
-- **Advanced Features**: Supports complex queries, foreign keys, triggers, updatable views, transactional integrity, and multi-version concurrency control (MVCC).
+***Key Characteristics:***
+- ***Client-Server Model***: Requires a running server process (`postmaster`) that manages database files and accepts connections from client applications.
+- ***Highly Extensible***: Supports custom functions, data types, operators, and more.
+- ***Standards-Compliant***: Highly compliant with SQL standards.
+- ***Advanced Features***: Supports complex queries, foreign keys, triggers, updatable views, transactional integrity, and multi-version concurrency control (MVCC).
 
 ##### Installation & Usage
 
@@ -114,29 +114,28 @@ sudo systemctl start postgresql.service # Start the service
     ```bash
     sudo -u postgres psql
     ```
-
-*On Windows, `psql` is available in the installed directory and you can connect directly.*
+    *On Windows, `psql` is available in the installed directory and you can connect directly.*
 
 2.  **Basic `psql` Commands**:
-```bash
-# -- List all databases
-l
+    ```bash
+    # -- List all databases
+    l
 
-# -- Connect to a specific database
-c database_name
+    # -- Connect to a specific database
+    c database_name
 
-# -- List all tables in the current database
-dt
+    # -- List all tables in the current database
+    dt
 
-# -- Describe a table's structure
-d table_name
+    # -- Describe a table's structure
+    d table_name
 
-# -- List all users/roles
-du
+    # -- List all users/roles
+    du
 
-# -- Quit psql
-q
-```
+    # -- Quit psql
+    q
+    ```
 
 ##### PostgreSQL Configuration Guide
 
@@ -157,19 +156,18 @@ sudo -u postgres psql -c "ALTER USER your_username WITH PASSWORD 'your_secure_pa
 
 ###### Configuring the Port
 
-PostgreSQL runs on port **5432** by default. You may need to change this if the port is already in use or for security reasons.
+PostgreSQL runs on port `5432` by default. You may need to change this if the port is already in use or for security reasons.
 
 **Steps to Change the Default Port**
 
 1. **Locate the Configuration File**  
    The main configuration file is `postgresql.conf`. Find it using:
-```bash
-sudo find / -name postgresql.conf
-```
-
-Common locations include:
-- **Ubuntu/Debian**: `/etc/postgresql/<version>/main/postgresql.conf`
-- **CentOS/RHEL**: `/var/lib/pgsql/<version>/data/postgresql.conf`
+    ```bash
+    sudo find / -name postgresql.conf
+    ```
+    Common locations include:
+   - ***Ubuntu/Debian***: `/etc/postgresql/<version>/main/postgresql.conf`
+   - ***CentOS/RHEL***: `/var/lib/pgsql/<version>/data/postgresql.conf`
 
 2. **Modify the Port Setting**  
    Open the file with a text editor and find the line:
