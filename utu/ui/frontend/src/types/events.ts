@@ -35,12 +35,32 @@ export interface InitContent {
   sub_agents: string[] | null;
 }
 
+export interface PlanItemOrchestrator {
+  type: 'plan';
+  analysis: string;
+  tasks: string[];
+}
+
+export interface TaskItemOrchestrator {
+  type: 'task';
+  agent_name: string;
+  task: string;
+  is_reporter: boolean;
+  report: string | null;
+}
+
 export type OrchestraContent =
   | { type: 'plan'; item: PlanItem }
   | { type: 'worker'; item: WorkerItem }
   | { type: 'report'; item: ReportItem }
   | { type: 'plan_start'; item: null }
   | { type: 'report_start'; item: null };
+
+export type OrchestratorContent =
+  | { type: 'orchestrator'; sub_type: 'plan.start'; item: null }
+  | { type: 'orchestrator'; sub_type: 'plan.done'; item: PlanItemOrchestrator }
+  | { type: 'orchestrator'; sub_type: 'task.start'; item: TaskItemOrchestrator }
+  | { type: 'orchestrator'; sub_type: 'task.done'; item: TaskItemOrchestrator }
 
 export interface ListAgentsContent {
   type: 'list_agents';
@@ -73,7 +93,7 @@ export interface ErrorContent {
 }
 
 export interface Event {
-  type: 'raw' | 'orchestra' | 'finish' | 'example' | 'new' | 'init' | 'list_agents' | 'switch_agent' | 'gen_agent' | 'ask' | 'generated_agent_config' | 'error';
-  data: TextDeltaContent | OrchestraContent | ExampleContent | NewAgentContent | InitContent | ListAgentsContent | SwitchAgentContent | AskContent | GeneratedAgentContent | ErrorContent | null;
+  type: 'raw' | 'orchestra' | 'orchestrator' | 'finish' | 'example' | 'new' | 'init' | 'list_agents' | 'switch_agent' | 'gen_agent' | 'ask' | 'generated_agent_config' | 'error';
+  data: TextDeltaContent | OrchestraContent | OrchestratorContent | ExampleContent | NewAgentContent | InitContent | ListAgentsContent | SwitchAgentContent | AskContent | GeneratedAgentContent | ErrorContent | null;
   requireConfirm?: boolean;
 }

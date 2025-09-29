@@ -13,6 +13,8 @@ import tornado.websocket
 
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.agents.orchestra_agent import OrchestraAgent
+from utu.agents import OrchestratorAgent
+from utu.agents.orchestrator import OrchestratorStreamEvent
 from utu.agents.simple_agent import SimpleAgent
 from utu.config import AgentConfig
 from utu.config.loader import ConfigLoader
@@ -35,6 +37,7 @@ from .common import (
     handle_orchestra_events,
     handle_raw_stream_events,
     handle_tool_call_output,
+    handle_orchestrator_events,
 )
 
 CONFIG_PATH = "configs/agents"
@@ -44,7 +47,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def initialize(self, default_config_filename: str):
         self.default_config_filename = default_config_filename
         logging.info(f"initialize websocket, default config: {default_config_filename}")
-        self.agent: SimpleAgent | OrchestraAgent | None = None
+        self.agent: SimpleAgent | OrchestraAgent | OrchestratorAgent | None = None
         self.default_config = None
 
     async def prepare(self):
@@ -83,6 +86,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             sub_agents = list(self.agent.config.workers.keys())
             sub_agents.append("PlannerAgent")
             sub_agents.append("ReporterAgent")
+        elif isinstance(self.agent, OrchestratorAgent):
+            agent_type = "orchestrator"
+            sub_agents = [w["name"] for w in self.agent.config.orchestrator_workers_info]
         elif isinstance(self.agent, SimpleAgent):
             agent_type = "simple"
         else:
@@ -133,6 +139,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             stream = self.agent.run_streamed(self.agent.input_items)
         elif isinstance(self.agent, SimpleAgentGenerator):
             stream = self.agent.run_streamed(query.query)
+        elif isinstance(self.agent, OrchestratorAgent):
+            stream = self.agent.run_streamed(query.query)
         else:
             raise ValueError(f"Unsupported agent type: {type(self.agent).__name__}")
 
@@ -149,6 +157,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 event_to_send = await handle_orchestra_events(event)
             elif isinstance(event, SimpleAgentGeneratedEvent):
                 event_to_send = await handle_generated_agent(event)
+            elif isinstance(event, OrchestratorStreamEvent):
+                event_to_send = await handle_orchestrator_events(event)
             else:
                 pass
             if event_to_send:
@@ -185,9 +195,12 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         if config.type == "simple":
             self.agent = SimpleAgent(config=config)
             await self.agent.build()
+        elif config.type == "orchestrator":
+            self.agent = OrchestratorAgent(config=config)
         elif config.type == "orchestra":
+            # WARN: deprecated
             self.agent = OrchestraAgent(config=config)
-            await self.agent.build()
+            # await self.agent.build()
         else:
             raise ValueError(f"Unsupported agent type: {config.type}")
 

@@ -22,7 +22,10 @@ import type {
   ListAgentsContent,
   AskContent,
   GeneratedAgentContent,
-  ErrorContent
+  ErrorContent,
+  OrchestratorContent,
+  PlanItemOrchestrator,
+  TaskItemOrchestrator,
 } from './types/events';
 import type {
   UserRequest,
@@ -276,7 +279,67 @@ const App: React.FC = () => {
       }
 
       _addNewAgentMessage(agentName);
-    } 
+    }
+    // handle orchestrator event
+    else if (event.type === 'orchestrator') {
+      const data = event.data as OrchestratorContent;
+      if (data.sub_type === 'plan.start') {
+        // do nothing
+      } else if (data.sub_type === 'plan.done') {
+        const item = data.item as PlanItemOrchestrator;
+        // prepend task with number
+        const tasks = item.tasks.map((task, index) => `${index + 1}. ${task}`);
+        const plan: string = item.analysis + '\n' + tasks.join('\n');
+        const message: Message = {
+          id: Date.now() + 1,
+          content: plan,
+          sender: 'assistant',
+          timestamp: new Date(),
+          type: 'plan',
+          inprogress: false,
+          requireConfirm: false,
+        }
+        setMessages(prev => [...prev, message]);
+      } else if (data.sub_type === 'task.start') {
+        const item = data.item as TaskItemOrchestrator;
+        if (item.is_reporter) {
+          setIsInReport(true);
+          const id = Date.now() + 1;
+          setCurrentPlanReportId(id);
+          const message: Message = {
+            id,
+            content: item.task,
+            sender: 'assistant',
+            timestamp: new Date(),
+            type: 'report',
+            inprogress: true,
+            requireConfirm: false,
+          }
+          setMessages(prev => [...prev, message]);
+        }
+      } else if (data.sub_type === 'task.done') {
+        const item = data.item as TaskItemOrchestrator;
+        if (item.is_reporter && item.report) {
+          const report = item.report;
+          let id = currentPlanReportId;
+          if (!isInReport && !currentPlanReportId) {
+            id = Date.now() + 1;
+          }
+          const message: Message = {
+            id: id!,
+            content: report,
+            sender: 'assistant',
+            timestamp: new Date(),
+            type: 'report',
+            inprogress: false,
+            requireConfirm: false,
+          }
+          setMessages(prev => [...prev, message]);
+          setCurrentPlanReportId(null);
+          setIsInReport(false);
+        }
+      }
+    }
     // handle orchestra event
     else if (event.type === 'orchestra') {
       const data = event.data as OrchestraContent;
