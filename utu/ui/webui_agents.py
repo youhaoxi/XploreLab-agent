@@ -176,11 +176,13 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         example_config_files = config_path.glob("examples/*.yaml")
         simple_agent_config_files = config_path.glob("simple/*.yaml")
         orchestra_agent_config_files = config_path.glob("orchestra/*.yaml")
+        orchestrator_agent_config_files = config_path.glob("orchestrator/*.yaml")
         generated_agent_config_files = config_path.glob("generated/*.yaml")
         config_files = (
             list(example_config_files)
             + list(simple_agent_config_files)
             + list(orchestra_agent_config_files)
+            + list(orchestrator_agent_config_files)
             + list(generated_agent_config_files)
         )
         agents = [str(file.relative_to(config_path)) for file in config_files]
