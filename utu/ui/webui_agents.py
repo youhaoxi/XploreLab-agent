@@ -227,7 +227,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         except Exception as e:
             logging.error(f"Error processing query: {str(e)}")
             await self._handle_error(f"Error processing query: {str(e)}")
-            logging.debug(traceback.format_exc())
+            logging.error(traceback.format_exc())
 
     async def _handle_list_agents(self):
         try:
@@ -235,14 +235,14 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         except Exception as e:
             logging.error(f"Error processing list agents: {str(e)}")
             await self._handle_error(f"Error processing list agents: {str(e)}")
-            logging.debug(traceback.format_exc())
+            logging.error(traceback.format_exc())
 
     async def _handle_switch_agent(self, switch_agent_request: SwitchAgentRequest):
         try:
             await self._handle_switch_agent_noexcept(switch_agent_request)
         except Exception as e:
             logging.error(f"Error processing switch agent: {str(e)}")
-            logging.debug(traceback.format_exc())
+            logging.error(traceback.format_exc())
             await self.send_event(
                 Event(
                     type="switch_agent",
@@ -259,7 +259,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         except Exception as e:
             logging.error(f"Error processing answer: {str(e)}")
             await self._handle_error(f"Error processing answer: {str(e)}")
-            logging.debug(traceback.format_exc())
+            logging.error(traceback.format_exc())
 
     async def _handle_gen_agent_noexcept(self):
         #!TODO (fpg2012) switch self.agent to SimpleAgentGenerator workflow
@@ -273,7 +273,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         except Exception as e:
             logging.error(f"Error processing gen agent: {str(e)}")
             await self._handle_error(f"Error processing gen agent: {str(e)}")
-            logging.debug(traceback.format_exc())
+            logging.error(traceback.format_exc())
 
     async def handle_query_worker(self):
         while True:
@@ -304,10 +304,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         except Exception as e:
             logging.error(f"Error processing message: {str(e)}")
             await self._handle_error(f"Error processing message: {str(e)}")
-            logging.debug(traceback.format_exc())
+            logging.error(traceback.format_exc())
 
     def on_close(self):
-        logging.debug("WebSocket closed")
+        logging.error("WebSocket closed")
 
 
 class WebUIAgents:

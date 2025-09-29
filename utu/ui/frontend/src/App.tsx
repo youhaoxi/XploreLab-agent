@@ -301,8 +301,8 @@ const App: React.FC = () => {
         }
         setMessages(prev => [...prev, message]);
       } else if (data.sub_type === 'task.start') {
-        const item = data.item as TaskItemOrchestrator;
-        if (item.is_reporter) {
+        const item = data.item as TaskItemOrchestrator | null;
+        if (item && item.is_reporter) {
           setIsInReport(true);
           const id = Date.now() + 1;
           setCurrentPlanReportId(id);
@@ -318,8 +318,8 @@ const App: React.FC = () => {
           setMessages(prev => [...prev, message]);
         }
       } else if (data.sub_type === 'task.done') {
-        const item = data.item as TaskItemOrchestrator;
-        if (item.is_reporter && item.report) {
+        const item = data.item as TaskItemOrchestrator | null;
+        if (item && item.is_reporter && item.report) {
           const report = item.report;
           let id = currentPlanReportId;
           if (!isInReport && !currentPlanReportId) {

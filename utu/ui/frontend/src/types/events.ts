@@ -59,8 +59,8 @@ export type OrchestraContent =
 export type OrchestratorContent =
   | { type: 'orchestrator'; sub_type: 'plan.start'; item: null }
   | { type: 'orchestrator'; sub_type: 'plan.done'; item: PlanItemOrchestrator }
-  | { type: 'orchestrator'; sub_type: 'task.start'; item: TaskItemOrchestrator }
-  | { type: 'orchestrator'; sub_type: 'task.done'; item: TaskItemOrchestrator }
+  | { type: 'orchestrator'; sub_type: 'task.start'; item: TaskItemOrchestrator | null }
+  | { type: 'orchestrator'; sub_type: 'task.done'; item: TaskItemOrchestrator | null}
 
 export interface ListAgentsContent {
   type: 'list_agents';

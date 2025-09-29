@@ -142,6 +142,7 @@ class Event(BaseModel):
     data: (
         TextDeltaContent
         | OrchestraContent
+        | OrchestratorContent
         | GeneratedAgentContent
         | ExampleContent
         | NewAgentContent
@@ -320,19 +321,23 @@ async def handle_orchestrator_events(event: OrchestratorStreamEvent) -> Event | 
         )
         event_to_send = Event(type="orchestrator", data=OrchestratorContent(type="orchestrator", sub_type="plan.done", item=item))
     elif event.name == "task.start":
-        item = TaskItemOrchestrator(
-            agent_name=event.item.agent_name,
-            task=event.item.task,
-            is_reporter=event.item.is_last_task,
-        )
-        event_to_send = Event(type="orchestrator", data=OrchestratorContent(type="orchestrator", sub_type="task.start", item=item))
+        # item = TaskItemOrchestrator(
+        #     agent_name=event.item.agent_name,
+        #     task=event.item.task,
+        #     is_reporter=event.item.is_last_task,
+        # )
+        # event_to_send = Event(type="orchestrator", data=OrchestratorContent(type="orchestrator", sub_type="task.start", item=item))
+        pass
     elif event.name == "task.done":
-        item = TaskItemOrchestrator(
-            agent_name=event.item.agent_name,
-            task=event.item.task,
-            is_reporter=event.item.is_last_task,
-            report=event.item.result
-        )
+        if event.item:
+            item = TaskItemOrchestrator(
+                agent_name=event.item.agent_name,
+                task=event.item.task,
+                is_reporter=event.item.is_last_task,
+                report=event.item.result
+            )
+        else:
+            item = None
         event_to_send = Event(type="orchestrator", data=OrchestratorContent(type="orchestrator", sub_type="task.done", item=item))
     else:
         get_logger(__name__).error(f"Unknown orchestrator event name: {event.name}")
