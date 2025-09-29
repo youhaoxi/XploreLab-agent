@@ -333,7 +333,17 @@ async def handle_orchestrator_events(event: OrchestratorStreamEvent) -> Event | 
                 item=item)
             )
     elif event.name == "task.start":
-        pass
+        if event.item:
+            item = TaskItemOrchestrator(
+                agent_name=event.item.agent_name,
+                task=event.item.task,
+                is_reporter=event.item.is_last_task,
+                report=""
+            )
+            event_to_send = Event(
+                type="orchestrator",
+                data=OrchestratorContent(type="orchestrator", sub_type="task.start", item=item)
+            )
     elif event.name == "task.done":
         if event.item:
             item = TaskItemOrchestrator(
