@@ -11,9 +11,9 @@ import agents as ag
 import tornado.web
 import tornado.websocket
 
+from utu.agents import OrchestratorAgent
 from utu.agents.orchestra import OrchestraStreamEvent
 from utu.agents.orchestra_agent import OrchestraAgent
-from utu.agents import OrchestratorAgent
 from utu.agents.orchestrator import OrchestratorStreamEvent
 from utu.agents.simple_agent import SimpleAgent
 from utu.config import AgentConfig
@@ -35,9 +35,9 @@ from .common import (
     handle_generated_agent,
     handle_new_agent,
     handle_orchestra_events,
+    handle_orchestrator_events,
     handle_raw_stream_events,
     handle_tool_call_output,
-    handle_orchestrator_events,
 )
 
 CONFIG_PATH = "configs/agents"

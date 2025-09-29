@@ -4,8 +4,8 @@ import agents as ag
 from pydantic import BaseModel
 
 from utu.agents.orchestra import OrchestraStreamEvent
-from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent
 from utu.agents.orchestrator import OrchestratorStreamEvent
+from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent
 from utu.utils.log import get_logger
 
 
@@ -313,20 +313,26 @@ async def handle_generated_agent(event: SimpleAgentGeneratedEvent) -> Event | No
 async def handle_orchestrator_events(event: OrchestratorStreamEvent) -> Event | None:
     event_to_send = None
     if event.name == "plan.start":
-        event_to_send = Event(type="orchestrator", data=OrchestratorContent(type="orchestrator", sub_type="plan.start", item=None))
+        event_to_send = Event(
+            type="orchestrator",
+            data=OrchestratorContent(
+                type="orchestrator",
+                sub_type="plan.start",
+                item=None)
+            )
     elif event.name == "plan.done":
         item = PlanItemOrchestrator(
             analysis=event.item.analysis,
             tasks=[f"{task.task} ({task.agent_name})" for task in event.item.tasks]
         )
-        event_to_send = Event(type="orchestrator", data=OrchestratorContent(type="orchestrator", sub_type="plan.done", item=item))
+        event_to_send = Event(
+            type="orchestrator",
+            data=OrchestratorContent(
+                type="orchestrator",
+                sub_type="plan.done",
+                item=item)
+            )
     elif event.name == "task.start":
-        # item = TaskItemOrchestrator(
-        #     agent_name=event.item.agent_name,
-        #     task=event.item.task,
-        #     is_reporter=event.item.is_last_task,
-        # )
-        # event_to_send = Event(type="orchestrator", data=OrchestratorContent(type="orchestrator", sub_type="task.start", item=item))
         pass
     elif event.name == "task.done":
         if event.item:
@@ -338,7 +344,13 @@ async def handle_orchestrator_events(event: OrchestratorStreamEvent) -> Event | 
             )
         else:
             item = None
-        event_to_send = Event(type="orchestrator", data=OrchestratorContent(type="orchestrator", sub_type="task.done", item=item))
+        event_to_send = Event(
+            type="orchestrator",
+            data=OrchestratorContent(
+            type="orchestrator",
+            sub_type="task.done",
+            item=item)
+        )
     else:
         get_logger(__name__).error(f"Unknown orchestrator event name: {event.name}")
     return event_to_send
