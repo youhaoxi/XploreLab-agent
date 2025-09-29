@@ -17,6 +17,6 @@ orchestrator_config:
 
 orchestrator_workers_info:
   - name: SearchAgent
-    desciption: Performs focused, in-depth information retrieval. Excels at locating reliable sources, synthesizing knowledge from multiple references, and answering research-oriented queries.
+    description: Performs focused, in-depth information retrieval. Excels at locating reliable sources, synthesizing knowledge from multiple references, and answering research-oriented queries.
   - name: SVGGenerator
     description: Creates an exquisite SVG card.
