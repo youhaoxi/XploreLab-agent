@@ -73,7 +73,7 @@ def setup_db_tracing() -> None:
         return
 
     if not SQLModelUtils.check_db_available():
-        logger.warning("DB_URL not set or database connection failed! Tracing will not be stored into database!")
+        logger.warning("UTU_DB_URL not set or database connection failed! Tracing will not be stored into database!")
         return
     logger.info("Setting up DB tracing")
     DB_TRACING_PROCESSOR = DBTracingProcessor()
