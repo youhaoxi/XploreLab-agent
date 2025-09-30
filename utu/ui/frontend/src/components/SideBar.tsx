@@ -9,7 +9,7 @@ interface SideBarProps {
   messages?: Message[];
   onNavigate?: (id: number) => void;
   currentConfig?: string;
-  agentType?: 'simple' | 'orchestra' | 'other';
+  agentType?: 'simple' | 'orchestra' | 'orchestrator' | 'other';
   subAgents?: string[] | null;
   onConfigSelect?: (config: string) => void;
   handleAddConfig?: () => void;
@@ -207,7 +207,7 @@ const SideBar: React.FC<SideBarProps> = ({
               <div className="current-config-path">
               {currentConfig}
             </div>
-            {agentType === 'orchestra' && subAgents && subAgents.length > 0 && (
+            {(agentType === 'orchestra' || agentType === 'orchestrator') && subAgents && subAgents.length > 0 && (
               <div className="sub-agents-section">
                 <div className="sub-agents-title">{t('sidebar.subAgentsTitle')}</div>
                 <div className="sub-agents-list">

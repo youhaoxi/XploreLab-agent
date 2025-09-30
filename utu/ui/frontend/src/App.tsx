@@ -22,7 +22,10 @@ import type {
   ListAgentsContent,
   AskContent,
   GeneratedAgentContent,
-  ErrorContent
+  ErrorContent,
+  OrchestratorContent,
+  PlanItemOrchestrator,
+  TaskItemOrchestrator,
 } from './types/events';
 import type {
   UserRequest,
@@ -121,6 +124,21 @@ const App: React.FC = () => {
     return updatedMessagesList;
   }
 
+  const _removeMessageById = (id: number, prevMessages: Message[]) => {
+    const updatedMessagesList = [...prevMessages];
+    const messageIndex = updatedMessagesList.findIndex(message => message.id === id);
+    if (messageIndex !== -1) {
+      updatedMessagesList.splice(messageIndex, 1);
+    }
+    return updatedMessagesList;
+  }
+
+  const _checkIfMessageIsLastMessage = (id: number, prevMessages: Message[]) => {
+    const updatedMessagesList = [...prevMessages];
+    const messageIndex = updatedMessagesList.findIndex(message => message.id === id);
+    return messageIndex === updatedMessagesList.length - 1;
+  }
+
   const _addNewAgentMessage = (agentName: string) => {
     const message: Message = {
       id: Date.now() + 1,
@@ -217,15 +235,31 @@ const App: React.FC = () => {
         if (isInPlan || isInReport) {
           const currentId = currentPlanReportId;
           if (currentId) {
-            return _updateMessageById(currentId, prev, (message) => {
-              const updatedMessage: Message = {
-                ...message,
-                content: message.content + data.delta,
-                inprogress: data.inprogress,
-                requireConfirm: event.requireConfirm,
-              };
-              return updatedMessage;
-            })
+            if (_checkIfMessageIsLastMessage(currentId, prev)) {
+              return _updateMessageById(currentId, prev, (message) => {
+                const updatedMessage: Message = {
+                  ...message,
+                  content: message.content + data.delta,
+                  inprogress: data.inprogress,
+                  requireConfirm: event.requireConfirm,
+                };
+                return updatedMessage;
+              })
+            } else {
+              const old_message = prev.find((message) => message.id === currentId);
+              if (old_message) {
+                const new_message: Message = {
+                  ...old_message,
+                  content: old_message.content + data.delta,
+                  inprogress: data.inprogress,
+                  requireConfirm: event.requireConfirm,
+                }
+                const updatedMessages = _removeMessageById(currentId, prev);
+                return [...updatedMessages, new_message];
+              }
+              console.error("currentId not found");
+              return prev;
+            }
           }
         }
 
@@ -276,7 +310,77 @@ const App: React.FC = () => {
       }
 
       _addNewAgentMessage(agentName);
-    } 
+    }
+    // handle orchestrator event
+    else if (event.type === 'orchestrator') {
+      const data = event.data as OrchestratorContent;
+      if (data.sub_type === 'plan.start') {
+        // do nothing
+      } else if (data.sub_type === 'plan.done') {
+        const item = data.item as PlanItemOrchestrator;
+        // prepend task with number
+        const tasks = item.tasks.map((task, index) => `${index + 1}. ${task}`);
+        const plan: string = item.analysis + '\n' + tasks.join('\n');
+        const message: Message = {
+          id: Date.now() + 1,
+          content: plan,
+          sender: 'assistant',
+          timestamp: new Date(),
+          type: 'plan',
+          inprogress: false,
+          requireConfirm: false,
+        }
+        setMessages(prev => [...prev, message]);
+      } else if (data.sub_type === 'task.start') {
+        const item = data.item as TaskItemOrchestrator | null;
+        if (item && item.is_reporter) {
+          setIsInReport(true);
+          const id = Date.now() + 1;
+          setCurrentPlanReportId(id);
+          const message: Message = {
+            id,
+            content: item.task,
+            sender: 'assistant',
+            timestamp: new Date(),
+            type: 'report',
+            inprogress: true,
+            requireConfirm: false,
+          }
+          setMessages(prev => [...prev, message]);
+        }
+      } else if (data.sub_type === 'task.done') {
+        const item = data.item as TaskItemOrchestrator | null;
+        if (item && item.is_reporter && item.report) {
+          const report = item.report;
+          if (isInReport && currentPlanReportId) {
+            const updatedMessage = _updateMessageById(currentPlanReportId, messages, (message) => {
+              const updatedMessage: Message = {
+                ...message,
+                content: report,
+                inprogress: false,
+                requireConfirm: false,
+              }
+              return updatedMessage;
+            });
+            setMessages(updatedMessage);
+          } else {
+            const id = Date.now() + 1;
+            const message: Message = {
+              id,
+              content: report,
+              sender: 'assistant',
+              timestamp: new Date(),
+              type: 'report',
+              inprogress: false,
+              requireConfirm: false,
+            }
+            setMessages(prev => [...prev, message]);
+            setCurrentPlanReportId(null);
+            setIsInReport(false);
+          }
+        }
+      }
+    }
     // handle orchestra event
     else if (event.type === 'orchestra') {
       const data = event.data as OrchestraContent;
