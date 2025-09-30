@@ -19,7 +19,7 @@ from utu.agents.simple_agent import SimpleAgent
 from utu.config import AgentConfig
 from utu.config.loader import ConfigLoader
 from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent, SimpleAgentGenerator
-from utu.utils import EnvUtils, DIR_ROOT
+from utu.utils import DIR_ROOT, EnvUtils
 
 from .common import (
     AskContent,
