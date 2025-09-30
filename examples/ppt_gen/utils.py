@@ -7,26 +7,28 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE
 
 # rgb colors from a color scheme
 _color_palette = [
-    (178, 34, 34),    # 砖红
-    (46, 139, 87),    # 海绿
-    (70, 130, 180),   # 钢蓝
+    (178, 34, 34),  # 砖红
+    (46, 139, 87),  # 海绿
+    (70, 130, 180),  # 钢蓝
     (210, 180, 140),  # 棕褐
     (147, 112, 219),  # 中紫
-    (255, 165, 0),    # 橙色（降饱和）
-    (72, 209, 204),   # 青绿
-    (205, 92, 92),    # 印度红
-    (106, 90, 205),   # 板岩蓝
+    (255, 165, 0),  # 橙色（降饱和）
+    (72, 209, 204),  # 青绿
+    (205, 92, 92),  # 印度红
+    (106, 90, 205),  # 板岩蓝
     (238, 130, 238),  # 紫罗兰
-    (60, 179, 113),   # 中绿
+    (60, 179, 113),  # 中绿
     (100, 149, 237),  # 矢车菊蓝
-    (218, 165, 32),   # 金
-    (199, 21, 133),   # 深粉
-    (65, 105, 225)    # 皇家蓝
+    (218, 165, 32),  # 金
+    (199, 21, 133),  # 深粉
+    (65, 105, 225),  # 皇家蓝
 ]
+
 
 def inspect_ppt(prs):
     for slide in prs.slides:
         inspect_slide(slide)
+
 
 def inspect_slide(slide):
     def _inspect_shape_list(shapes, indent=0):
@@ -34,19 +36,22 @@ def inspect_slide(slide):
             print(" " * indent + shape.name)
             if shape.shape_type == MSO_SHAPE_TYPE.GROUP:
                 _inspect_shape_list(shape.shapes, indent + 2)
+
     _inspect_shape_list(slide.shapes)
 
-def to_svg(slide, prs, svg_filename="test.svg"):
 
+def to_svg(slide, prs, svg_filename="test.svg"):
     def _to_svg_box(shapes, svg_box):
         for shape in shapes:
-            svg_box.append({
-                "left": shape.left,
-                "top": shape.top,
-                "width": shape.width,
-                "height": shape.height,
-                "shape_type": shape.shape_type
-            })
+            svg_box.append(
+                {
+                    "left": shape.left,
+                    "top": shape.top,
+                    "width": shape.width,
+                    "height": shape.height,
+                    "shape_type": shape.shape_type,
+                }
+            )
             if shape.shape_type == MSO_SHAPE_TYPE.GROUP:
                 _to_svg_box(shape.shapes, svg_box)
 
@@ -66,7 +71,7 @@ def to_svg(slide, prs, svg_filename="test.svg"):
         matplotlib.pyplot.margins(0)  # 数据边距设为0
         ax.set_xmargin(0)  # x轴边距
         ax.set_ymargin(0)  # y轴边距
-        fig.savefig(svg_filename, bbox_inches='tight', pad_inches=0)
+        fig.savefig(svg_filename, bbox_inches="tight", pad_inches=0)
 
     svg_box = []
     _to_svg_box(slide.shapes, svg_box)
@@ -74,12 +79,14 @@ def to_svg(slide, prs, svg_filename="test.svg"):
 
     return svg_box
 
+
 def delete_shape(shape):
     """
     Delete the given shape.
     """
     parent = shape.element.getparent()
     parent.remove(shape.element)
+
 
 def find_shape_with_name(shapes, name, depth=0):
     """
@@ -96,6 +103,7 @@ def find_shape_with_name(shapes, name, depth=0):
                 return found
     return None
 
+
 def find_shape_with_name_except(shapes, name, depth=0):
     """
     Find the shape with the given name in the given shapes, except the shape with the given name.
@@ -110,6 +118,7 @@ def find_shape_with_name_except(shapes, name, depth=0):
             if found:
                 return found
     raise Exception(f"Shape with name {name} not found")
+
 
 def duplicate_slide(prs, slide):
     """
@@ -128,9 +137,10 @@ def duplicate_slide(prs, slide):
     # Copy all shapes
     for shape in slide.shapes:
         new_shape_element = copy.deepcopy(shape.element)
-        new_slide.shapes._spTree.insert_element_before(new_shape_element, 'p:extLst')
+        new_slide.shapes._spTree.insert_element_before(new_shape_element, "p:extLst")
 
     return new_slide
+
 
 def delete_slide_range(prs, index_range):
     """delete slides in the given index range
@@ -140,6 +150,7 @@ def delete_slide_range(prs, index_range):
     """
     for index in reversed(index_range):
         delete_slide(prs, index)
+
 
 def delete_slide(prs, index):
     """delete slide at the given index
@@ -151,10 +162,11 @@ def delete_slide(prs, index):
         IndexError: when index out of range
     """
     if index < 0 or index >= len(prs.slides):
-        raise IndexError(f"Slide index {index} out of range (0-{len(prs.slides)-1})")
+        raise IndexError(f"Slide index {index} out of range (0-{len(prs.slides) - 1})")
 
     xml_slides = prs.slides._sldIdLst
     xml_slides.remove(xml_slides[index])
+
 
 def move_slide(prs, old_index, new_index):
     """move slide from old_index to new_index"""
@@ -167,6 +179,7 @@ def move_slide(prs, old_index, new_index):
     xml_slides.insert(new_index, slide_element)
     return prs
 
+
 def replace_picture_keep_format(slide, old_picture_index, new_image_path):
     """
     Replace the picture at the given index with a new image while keeping all format attributes.
@@ -175,16 +188,16 @@ def replace_picture_keep_format(slide, old_picture_index, new_image_path):
 
     # Save all properties
     properties = {
-        'left': target_shape.left,
-        'top': target_shape.top,
-        'width': target_shape.width,
-        'height': target_shape.height,
-        'rotation': target_shape.rotation if hasattr(target_shape, 'rotation') else 0
+        "left": target_shape.left,
+        "top": target_shape.top,
+        "width": target_shape.width,
+        "height": target_shape.height,
+        "rotation": target_shape.rotation if hasattr(target_shape, "rotation") else 0,
     }
 
     # Save shadow, border, etc. effects (if exist)
     _shadow = None
-    if hasattr(target_shape, 'shadow'):
+    if hasattr(target_shape, "shadow"):
         _shadow = target_shape.shadow
 
     # Get the position in shapes collection
@@ -200,16 +213,12 @@ def replace_picture_keep_format(slide, old_picture_index, new_image_path):
 
     # Insert the new picture
     new_picture = slide.shapes.add_picture(
-        new_image_path,
-        properties['left'],
-        properties['top'],
-        properties['width'],
-        properties['height']
+        new_image_path, properties["left"], properties["top"], properties["width"], properties["height"]
     )
 
     # Restore rotation
-    if properties['rotation'] != 0:
-        new_picture.rotation = properties['rotation']
+    if properties["rotation"] != 0:
+        new_picture.rotation = properties["rotation"]
 
     # Restore shadow, border, etc. effects
     if _shadow:

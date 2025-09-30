@@ -23,15 +23,17 @@ def fill_template(template_path, output_path, json_data):
 
     delete_slide_range(prs, range(2, 12))
     delete_slide(prs, 0)
-    move_slide(prs, 1, len(prs.slides)-1)
+    move_slide(prs, 1, len(prs.slides) - 1)
     prs.save(output_path)
+
 
 def extract_json(content):
     # extract content within "```json" and "```"
     json_data = content.split("```json")[1].split("```")[0]
     return json_data
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import argparse
     import datetime
 
@@ -45,6 +47,7 @@ if __name__ == '__main__':
 
     # set env var UTU_PPT_CACHE_DIR
     import os
+
     os.environ["UTU_PPT_CACHE_DIR"] = args.cache_dir
 
     logging.basicConfig(level=logging.INFO)
