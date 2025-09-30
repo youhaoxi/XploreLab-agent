@@ -19,7 +19,7 @@ from utu.agents.simple_agent import SimpleAgent
 from utu.config import AgentConfig
 from utu.config.loader import ConfigLoader
 from utu.meta.simple_agent_generator import SimpleAgentGeneratedEvent, SimpleAgentGenerator
-from utu.utils import EnvUtils
+from utu.utils import EnvUtils, DIR_ROOT
 
 from .common import (
     AskContent,
@@ -40,7 +40,7 @@ from .common import (
     handle_tool_call_output,
 )
 
-CONFIG_PATH = "configs/agents"
+CONFIG_PATH = DIR_ROOT / "configs" / "agents"
 
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
