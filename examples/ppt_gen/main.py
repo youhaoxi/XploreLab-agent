@@ -34,7 +34,7 @@ async def main():
     # 收集有关夜鹭的信息，整理成演讲PPT。
     # """
 
-    result = await agent.run(query)
+    result = await agent.chat_streamed(query)
     final_result = result.final_output
     print(final_result)
 
@@ -45,8 +45,9 @@ async def main():
     fill_template(
         template_path="template/template_ori.pptx",
         output_path=f"output-{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.pptx",
-        json_data=json_data
+        json_data=json_data,
     )
+
 
 if __name__ == "__main__":
     asyncio.run(main())
