@@ -27,7 +27,7 @@ class EvalConfig(ConfigBaseModel):
     """Experiment ID"""
 
     # data
-    db_url: str = EnvUtils.get_env("DB_URL", "sqlite:///test.db")
+    db_url: str = EnvUtils.get_env("UTU_DB_URL", "sqlite:///test.db")
     """Database URL"""
     data: DataConfig = None
     """Data config"""

@@ -96,7 +96,8 @@ class BaseBenchmark:
 
     async def rollout_one(self, sample: EvaluationSample) -> EvaluationSample:
         agent = get_agent(self.config.agent)
-        await agent.build()
+        if hasattr(agent, "build"):  # hack, should be removed!
+            await agent.build()
         trace_id = AgentsUtils.gen_trace_id()
         start_time = time.time()
         result = await agent.run(sample.augmented_question, trace_id=trace_id)
