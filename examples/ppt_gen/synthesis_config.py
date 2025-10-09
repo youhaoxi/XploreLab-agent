@@ -40,8 +40,10 @@ agent:
 max_turns: 100
 """
 
+
 def prepend_indent(text, indent=2):
     return "\n".join(["  " * indent + line for line in text.split("\n")])
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -18,44 +18,49 @@ TYPE_MAP = {
     "items_page_3": 4,
     "items_page_4": 5,
     "items_page_4_alt": 6,
-
     "item_page_4_growth": 7,
     "items_page_4_key_point": 8,
-
     "item_page_6_sequence": 9,
     "items_page_4_img": 10,
     "item_page_5_sequence": 11,
-    "acknowledgement": 12
+    "acknowledgement": 12,
 }
+
 
 class BaseContent(BaseModel):
     content_type: Literal["text", "image", "table"]
+
 
 class Paragraph(BaseModel):
     text: str
     bullet: bool = False
     level: int = 0
 
+
 class Item(BaseModel):
-    title: str # be very concise within 3 words, or 4 characters
-    content: str # be very concise within 10 words
+    title: str  # be very concise within 3 words, or 4 characters
+    content: str  # be very concise within 10 words
+
 
 class TextContent(BaseContent):
     content_type: Literal["text"] = "text"
     paragraph: list[Paragraph] | str
 
+
 class ImageContent(BaseContent):
     content_type: Literal["image"] = "image"
-    image_url: str # absolute url
-    caption: str | None = None # be very concise within 20 words
+    image_url: str  # absolute url
+    caption: str | None = None  # be very concise within 20 words
+
 
 class TableContent(BaseContent):
     content_type: Literal["table"] = "table"
     header: list[str]
     rows: list[list[str]]
-    caption: str | None = None # be very concise within 20 words
-    n_rows: int # no more than 7
-    n_cols: int # no more than 10
+    caption: str | None = None  # be very concise within 20 words
+    n_rows: int  # no more than 7
+    n_cols: int  # no more than 10
+
 
 class Slide(BaseModel):
     type: Literal[
@@ -70,8 +75,9 @@ class Slide(BaseModel):
         "item_page_4_growth",
         "item_page_6_sequence",
         "item_page_5_sequence",
-        "acknowledgement"
+        "acknowledgement",
     ]
+
 
 class TitlePage(Slide):
     """
@@ -79,12 +85,13 @@ class TitlePage(Slide):
 
     note: should be the first page
     """
+
     type: Literal["title"] = "title"
-    title: str = "" # be very concise within 7 words
-    subtitle: str = "" # be very concise within 10 words
+    title: str = ""  # be very concise within 7 words
+    subtitle: str = ""  # be very concise within 10 words
     author: str = ""
     date: str = ""
-    ppt_type: str = "" # describe the type of the ppt, e.g., "work report"
+    ppt_type: str = ""  # describe the type of the ppt, e.g., "work report"
 
     def render(self, slide):
         logging.info(f"===Rendering title page: {self.title}===")
@@ -105,16 +112,18 @@ class TitlePage(Slide):
         logging.info(f"ppt_type: {self.ppt_type}")
         handle_pure_text(self.ppt_type, ppt_type_shape, slide)
 
+
 class SectionTitlePage(Slide):
     """
     Section Title Page
 
     note: should not follow the title page immediately
     """
+
     type: Literal["section_title"] = "section_title"
-    title: str = "" # be very concise within 7 words
-    subtitle: str = "" # be very concise within 10 words
-    section_no: int # section number
+    title: str = ""  # be very concise within 7 words
+    subtitle: str = ""  # be very concise within 10 words
+    section_no: int  # section number
 
     def render(self, slide):
         logging.info(f"===Rendering section title page: {self.title}===")
@@ -128,12 +137,14 @@ class SectionTitlePage(Slide):
         handle_pure_text(self.subtitle, subtitle_shape, slide)
         handle_pure_text(f"{self.section_no:02d}", section_no_shape, slide)
 
+
 class ContentPage(Slide):
     """
     Single column content page, with the most basic layout.
     """
+
     type: Literal["content"] = "content"
-    title: str = "" # be very concise within 7 words
+    title: str = ""  # be very concise within 7 words
     content: BaseContent
 
     def render(self, slide):
@@ -146,12 +157,14 @@ class ContentPage(Slide):
         logging.info(f"content: {self.content}")
         handle_content(self.content, content_shape, slide)
 
+
 class TwoColumnContentPage(Slide):
     """
     Two column content pages
     """
+
     type: Literal["two_column_content"] = "two_column_content"
-    title: str = "" # be very concise within 7 words
+    title: str = ""  # be very concise within 7 words
     content: list[BaseContent]
 
     def render(self, slide):
@@ -167,13 +180,15 @@ class TwoColumnContentPage(Slide):
         logging.info(f"content2: {self.content[1]}")
         handle_content(self.content[1], content2_shape, slide)
 
+
 class ItemsPage3(Slide):
     """
     Page with three logically parallel items
     """
+
     type: Literal["items_page_3"] = "items_page_3"
-    title: str = "" # be very concise within 7 words
-    items: list[Item] # exactly 3 items
+    title: str = ""  # be very concise within 7 words
+    items: list[Item]  # exactly 3 items
 
     def render(self, slide):
         logging.info(f"===Rendering items page 3: {self.title}===")
@@ -186,13 +201,15 @@ class ItemsPage3(Slide):
             logging.info(f"item {ind}: {item}")
             handle_item(item, ind, slide)
 
+
 class ItemsPage4(Slide):
     """
     Page with four logically parallel items
     """
+
     type: Literal["items_page_4"] = "items_page_4"
-    title: str = "" # be very concise within 7 words
-    items: list[Item] # exactly 4 items
+    title: str = ""  # be very concise within 7 words
+    items: list[Item]  # exactly 4 items
 
     def render(self, slide):
         logging.info(f"===Rendering items page 4: {self.title}===")
@@ -205,6 +222,7 @@ class ItemsPage4(Slide):
             logging.info(f"item {ind}: {item}")
             handle_item(item, ind, slide)
 
+
 class ItemsPage4KeyPoint(Slide):
     """
     This slide is designed to present four key elements, stages, or pillars in a clean, balanced layout.
@@ -212,10 +230,11 @@ class ItemsPage4KeyPoint(Slide):
     A letter (e.g., S-W-O-T)
     A Chinese character (e.g., 增 / 删 / 改 / 查)
     """
+
     type: Literal["items_page_4_key_point"] = "items_page_4_key_point"
-    title: str = "" # be very concise within 7 words
-    label: list[str] | None = None # be exactly one character/letter/digit
-    items: list[Item] # exactly 4 items
+    title: str = ""  # be very concise within 7 words
+    label: list[str] | None = None  # be exactly one character/letter/digit
+    items: list[Item]  # exactly 4 items
 
     def render(self, slide):
         logging.info(f"===Rendering items page 4 key point: {self.title}===")
@@ -232,8 +251,9 @@ class ItemsPage4KeyPoint(Slide):
             logging.info(f"label: {self.label}")
             for ind, label in enumerate(self.label):
                 logging.info(f"label {ind}: {label}")
-                target_shape = find_shape_with_name_except(slide.shapes, f"label{ind+1}")
+                target_shape = find_shape_with_name_except(slide.shapes, f"label{ind + 1}")
                 handle_pure_text(label, target_shape, slide)
+
 
 class ItemsPage4Img(Slide):
     """
@@ -241,9 +261,10 @@ class ItemsPage4Img(Slide):
     with 4 connected stages represented by icons,
     useful for explaining systems, strategies, or operations.
     """
+
     type: Literal["items_page_4_img"] = "items_page_4_img"
-    title: str = "" # be very concise within 7 words
-    items: list[Item] # exactly 4 items
+    title: str = ""  # be very concise within 7 words
+    items: list[Item]  # exactly 4 items
     image_url: str | None = None
 
     def render(self, slide):
@@ -262,6 +283,7 @@ class ItemsPage4Img(Slide):
             image_shape = find_shape_with_name_except(slide.shapes, "image")
             handle_image(self.image_url, image_shape, slide)
 
+
 class ItemPage4Growth(Slide):
     """
     This slide visually represents growth over time, using an upward-sloping bar chart.
@@ -270,8 +292,9 @@ class ItemPage4Growth(Slide):
     The design suggests that these factors contribute progressively to overall growth,
     making it ideal for showing business expansion, performance metrics, or KPIs.
     """
+
     type: Literal["item_page_4_growth"] = "item_page_4_growth"
-    title: str = "" # be very concise within 7 words
+    title: str = ""  # be very concise within 7 words
     # Exactly 4 items.
     # The first item (index 0) corresponds to the topmost / highest point on the growth curve;
     # subsequent items map downward in order along the ascending bar chart.
@@ -287,6 +310,7 @@ class ItemPage4Growth(Slide):
             logging.info(f"item {ind}: {item}")
             handle_item(item, ind, slide)
 
+
 class ItemPage6Sequence(Slide):
     """
     This slide illustrates a step-by-step process or timeline.
@@ -294,9 +318,10 @@ class ItemPage6Sequence(Slide):
     Each stage has an icon (database, fork/merge, gears, lightbulb, pen, etc.) and placeholder text.
     It is perfect for explaining workflows, project phases, or a logical progression of ideas or actions.
     """
+
     type: Literal["item_page_6_sequence"] = "item_page_6_sequence"
-    title: str = "" # be very concise within 7 words
-    items: list[Item] # exactly 6 items
+    title: str = ""  # be very concise within 7 words
+    items: list[Item]  # exactly 6 items
 
     def render(self, slide):
         logging.info(f"===Rendering item page 6 sequence: {self.title}===")
@@ -309,6 +334,7 @@ class ItemPage6Sequence(Slide):
             logging.info(f"item {ind}: {item}")
             handle_item(item, ind, slide)
 
+
 class ItemPage5Sequence(Slide):
     """
     This slide illustrates a step-by-step process or timeline.
@@ -316,9 +342,10 @@ class ItemPage5Sequence(Slide):
     Each stage has an icon (database, fork/merge, gears, lightbulb, pen, etc.) and placeholder text.
     It is perfect for explaining workflows, project phases, or a logical progression of ideas or actions.
     """
+
     type: Literal["item_page_5_sequence"] = "item_page_5_sequence"
-    title: str = "" # be very concise within 7 words
-    items: list[Item] # exactly 5 items
+    title: str = ""  # be very concise within 7 words
+    items: list[Item]  # exactly 5 items
 
     def render(self, slide):
         logging.info(f"===Rendering item page 5 sequence: {self.title}===")
@@ -331,18 +358,20 @@ class ItemPage5Sequence(Slide):
             logging.info(f"item {ind}: {item}")
             handle_item(item, ind, slide)
 
+
 class AcknowledgementPage(Slide):
     """
     Acknowledgement page
 
     note: should be the last page
     """
+
     type: Literal["acknowledgement"] = "acknowledgement"
-    title: str = "" # just place "Thank you"/"谢谢"/"END"/"FIN" here
-    subtitle: str = "" # be very concise within 10 words
+    title: str = ""  # just place "Thank you"/"谢谢"/"END"/"FIN" here
+    subtitle: str = ""  # be very concise within 10 words
     author: str = ""
     date: str = ""
-    ppt_type: str = "" # describe the type of the ppt, e.g., "work report"
+    ppt_type: str = ""  # describe the type of the ppt, e.g., "work report"
 
     def render(self, slide):
         logging.info(f"===Rendering acknowledgement page: {self.title}===")
@@ -363,69 +392,69 @@ class AcknowledgementPage(Slide):
         logging.info(f"ppt_type: {self.ppt_type}")
         handle_pure_text(self.ppt_type, ppt_type_shape, slide)
 
+
 def parse_json(json_data: dict[str, Any]) -> list[Slide]:
     slides = []
-    for slide_data in json_data['slides']:
-        slide_type = slide_data['type']
+    for slide_data in json_data["slides"]:
+        slide_type = slide_data["type"]
 
-        if slide_type == 'title':
+        if slide_type == "title":
             slides.append(TitlePage(**slide_data))
-        elif slide_type == 'section_title':
+        elif slide_type == "section_title":
             slides.append(SectionTitlePage(**slide_data))
-        elif slide_type == 'content':
+        elif slide_type == "content":
             content_page = ContentPage(**slide_data)
-            content_data = slide_data['content']
-            if content_data['content_type'] == 'text':
+            content_data = slide_data["content"]
+            if content_data["content_type"] == "text":
                 content_page.content = TextContent(**content_data)
-            elif content_data['content_type'] == 'image':
+            elif content_data["content_type"] == "image":
                 content_page.content = ImageContent(**content_data)
-            elif content_data['content_type'] == 'table':
+            elif content_data["content_type"] == "table":
                 content_page.content = TableContent(**content_data)
             else:
                 raise ValueError(f"Unsupported content type: {content_data['content_type']}")
             slides.append(content_page)
-        elif slide_type == 'two_column_content':
+        elif slide_type == "two_column_content":
             content_page = TwoColumnContentPage(**slide_data)
-            content_data = slide_data['content']
+            content_data = slide_data["content"]
             for i in range(2):
-                if content_data[i]['content_type'] == 'text':
+                if content_data[i]["content_type"] == "text":
                     content_page.content[i] = TextContent(**content_data[i])
-                elif content_data[i]['content_type'] == 'image':
+                elif content_data[i]["content_type"] == "image":
                     content_page.content[i] = ImageContent(**content_data[i])
-                elif content_data[i]['content_type'] == 'table':
+                elif content_data[i]["content_type"] == "table":
                     content_page.content[i] = TableContent(**content_data[i])
                 else:
                     raise ValueError(f"Unsupported content type: {content_data['content_type']}")
             slides.append(content_page)
-        elif slide_type == 'items_page_3':
+        elif slide_type == "items_page_3":
             slides.append(ItemsPage3(**slide_data))
-        elif slide_type == 'items_page_4':
+        elif slide_type == "items_page_4":
             slides.append(ItemsPage4(**slide_data))
-        elif slide_type == 'items_page_4_key_point':
+        elif slide_type == "items_page_4_key_point":
             slides.append(ItemsPage4KeyPoint(**slide_data))
-        elif slide_type == 'items_page_4_img':
+        elif slide_type == "items_page_4_img":
             slides.append(ItemsPage4Img(**slide_data))
-        elif slide_type == 'item_page_4_growth' or slide_type == 'items_page_4_growth':
-            slide_data['type'] = 'item_page_4_growth'
+        elif slide_type == "item_page_4_growth" or slide_type == "items_page_4_growth":
+            slide_data["type"] = "item_page_4_growth"
             slides.append(ItemPage4Growth(**slide_data))
-        elif slide_type == 'item_page_6_sequence' or slide_type == 'items_page_6_sequence':
-            slide_data['type'] = 'item_page_6_sequence'
+        elif slide_type == "item_page_6_sequence" or slide_type == "items_page_6_sequence":
+            slide_data["type"] = "item_page_6_sequence"
             slides.append(ItemPage6Sequence(**slide_data))
-        elif slide_type == 'acknowledgement':
+        elif slide_type == "acknowledgement":
             slides.append(AcknowledgementPage(**slide_data))
-        elif slide_type == 'item_page_5_sequence' or slide_type == 'items_page_5_sequence':
-            slide_data['type'] = 'item_page_5_sequence'
+        elif slide_type == "item_page_5_sequence" or slide_type == "items_page_5_sequence":
+            slide_data["type"] = "item_page_5_sequence"
             slides.append(ItemPage5Sequence(**slide_data))
         else:
             raise ValueError(f"Unsupported slide type: {slide_type}")
     return slides
 
+
 def download_image(url, base_dir="."):
     if url.startswith("http"):
         # download the image
-        headers = {
-            'Accept': 'image/*, */*'
-        }
+        headers = {"Accept": "image/*, */*"}
         response = requests.get(url, headers=headers)
         extension_name = url.split(".")[-1]
         if extension_name not in ["png", "jpg", "jpeg", "gif", "bmp", "webp"]:
@@ -442,6 +471,7 @@ def download_image(url, base_dir="."):
             raise Exception(f"Failed to download image: {url} {response.status_code}")
     raise Exception(f"Failed to download image: {url}")
 
+
 def handle_pure_text(text: str, target_shape, slide):
     try:
         text_frame = target_shape.text_frame
@@ -451,6 +481,7 @@ def handle_pure_text(text: str, target_shape, slide):
     except Exception as e:
         logging.error(f"Failed to set text: {text} {e}")
         traceback.print_exc()
+
 
 def handle_image(image_url: str, target_shape, slide):
     left, top, width, height = target_shape.left, target_shape.top, target_shape.width, target_shape.height
@@ -473,6 +504,7 @@ def handle_image(image_url: str, target_shape, slide):
     # remove the placeholder
     delete_shape(target_shape)
 
+
 def handle_replace_image(image_url: str, target_shape, slide):
     # download image
     try:
@@ -483,6 +515,7 @@ def handle_replace_image(image_url: str, target_shape, slide):
         return
     replace_picture_keep_format(slide, target_shape, image_url)
 
+
 def handle_table(table_content: TableContent, target_shape, slide):
     left, top, width, height = target_shape.left, target_shape.top, target_shape.width, target_shape.height
     table = slide.shapes.add_table(table_content.n_rows + 1, table_content.n_cols, left, top, width, height).table
@@ -490,11 +523,12 @@ def handle_table(table_content: TableContent, target_shape, slide):
         table.cell(0, i).text = header_text
     for i, row in enumerate(table_content.rows):
         for j, cell_text in enumerate(row):
-            table.cell(i+1, j).text = cell_text
+            table.cell(i + 1, j).text = cell_text
     table.auto_fit = True
 
     # remove the placeholder
     delete_shape(target_shape)
+
 
 def handle_text_content(text_content: TextContent, target_shape, slide):
     if isinstance(text_content.paragraph, list):
@@ -524,6 +558,7 @@ def handle_text_content(text_content: TextContent, target_shape, slide):
     else:
         handle_pure_text(text_content.paragraph, target_shape, slide)
 
+
 def handle_content(content: BaseContent, target_shape, slide):
     if content.content_type == "text":
         handle_text_content(content, target_shape, slide)
@@ -531,6 +566,7 @@ def handle_content(content: BaseContent, target_shape, slide):
         handle_image(content.image_url, target_shape, slide)
     elif content.content_type == "table":
         handle_table(content, target_shape, slide)
+
 
 def handle_item(item: Item, item_index: int, slide, index_start_from_one=True):
     if index_start_from_one:
@@ -544,7 +580,8 @@ def handle_item(item: Item, item_index: int, slide, index_start_from_one=True):
     handle_pure_text(item.title, item_title_shape, slide)
     handle_pure_text(item.content, item_content_shape, slide)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # logging level
     logging.basicConfig(level=logging.INFO)
 
