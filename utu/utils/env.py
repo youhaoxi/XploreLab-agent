@@ -11,8 +11,6 @@ class EnvUtils:
     def get_env(key: str, default: str | None = None) -> str | None:
         if default is None:
             res = os.getenv(key)
-            if not res:
-                raise ValueError(f"Environment variable {key} is not set")
             return res
         return os.getenv(key, default)
 
