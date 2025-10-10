@@ -19,6 +19,8 @@ async def main():
 
     config = parse_cli_args()
     agent = get_agent(config=config)
+    if isinstance(agent, SimpleAgent):
+        await agent.build()
     history = None
     while True:
         user_input = await PrintUtils.async_print_input("> ")
@@ -28,14 +30,15 @@ async def main():
             continue
 
         if isinstance(agent, SimpleAgent):
-            async with agent:
-                await agent.chat_streamed(user_input)
+            await agent.chat_streamed(user_input)
         elif isinstance(agent, OrchestratorAgent):
             history = agent.run_streamed(user_input, history)
             await AgentsUtils.print_stream_events(history.stream_events())
         else:
             PrintUtils.print_error(f"Unsupported agent type: {type(agent)}")
             return
+    if isinstance(agent, SimpleAgent):
+        await agent.cleanup()
 
 
 if __name__ == "__main__":

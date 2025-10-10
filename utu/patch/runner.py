@@ -12,8 +12,14 @@ from agents import (
     Tool,
     TResponseInputItem,
 )
-from agents.run import AgentRunner, AgentToolUseTracker, SingleStepResult
+from agents._run_impl import RunImpl, get_model_tracing_impl
+from agents.exceptions import ModelBehaviorError
+from agents.items import ModelResponse
+from agents.run import AgentRunner, AgentToolUseTracker, RunResultStreaming, SingleStepResult
+from agents.stream_events import RawResponsesStreamEvent
+from agents.usage import Usage
 from agents.util import _coro
+from openai.types.responses import ResponseCompletedEvent
 
 from ..context import BaseContextManager
 
@@ -21,7 +27,6 @@ logger = logging.getLogger(__name__)
 
 
 class UTUAgentRunner(AgentRunner):
-    # TODO: also add context_manager to _run_single_turn_streamed for .run_streamed
     @classmethod
     async def _run_single_turn(
         cls,
@@ -56,10 +61,8 @@ class UTUAgentRunner(AgentRunner):
 
         # FIXME: set context manage as a hook?
         # ADD: context manager
-        context_manager: BaseContextManager | None = None
         if context_wrapper.context:
-            context_manager = context_wrapper.context.get("context_manager", None)
-        if context_manager:
+            context_manager: BaseContextManager = context_wrapper.context.get("context_manager", None)
             input = context_manager.preprocess(input, context_wrapper)
         # print(f"< [DEBUG] input: {input}")
         new_response = await cls._get_new_response(
@@ -79,7 +82,7 @@ class UTUAgentRunner(AgentRunner):
         # ADD: response logging
         # print(json.dumps([item.model_dump() for item in new_response.output], ensure_ascii=False))
 
-        single_turn_result = await cls._get_single_step_result_from_response(
+        return await cls._get_single_step_result_from_response(
             agent=agent,
             original_input=original_input,
             pre_step_items=generated_items,
@@ -92,7 +95,107 @@ class UTUAgentRunner(AgentRunner):
             run_config=run_config,
             tool_use_tracker=tool_use_tracker,
         )
-        # ADD: postprocess
-        if context_manager:
-            single_turn_result = context_manager.process(single_turn_result)
-        return single_turn_result
+
+    @classmethod
+    async def _run_single_turn_streamed(
+        cls,
+        streamed_result: RunResultStreaming,
+        agent: Agent[TContext],
+        hooks: RunHooks[TContext],
+        context_wrapper: RunContextWrapper[TContext],
+        run_config: RunConfig,
+        should_run_agent_start_hooks: bool,
+        tool_use_tracker: AgentToolUseTracker,
+        all_tools: list[Tool],
+        previous_response_id: str | None,
+    ) -> SingleStepResult:
+        if should_run_agent_start_hooks:
+            await asyncio.gather(
+                hooks.on_agent_start(context_wrapper, agent),
+                (agent.hooks.on_start(context_wrapper, agent) if agent.hooks else _coro.noop_coroutine()),
+            )
+
+        output_schema = cls._get_output_schema(agent)
+
+        streamed_result.current_agent = agent
+        streamed_result._current_agent_output_schema = output_schema
+
+        system_prompt, prompt_config = await asyncio.gather(
+            agent.get_system_prompt(context_wrapper),
+            agent.get_prompt(context_wrapper),
+        )
+
+        handoffs = await cls._get_handoffs(agent, context_wrapper)
+        model = cls._get_model(agent, run_config)
+        model_settings = agent.model_settings.resolve(run_config.model_settings)
+        model_settings = RunImpl.maybe_reset_tool_choice(agent, tool_use_tracker, model_settings)
+
+        final_response: ModelResponse | None = None
+
+        input = ItemHelpers.input_to_new_input_list(streamed_result.input)
+        input.extend([item.to_input_item() for item in streamed_result.new_items])
+
+        # ADD: context manager
+        if context_wrapper.context:
+            context_manager: BaseContextManager = context_wrapper.context.get("context_manager", None)
+            input = context_manager.preprocess(input, context_wrapper)
+
+        filtered = await cls._maybe_filter_model_input(
+            agent=agent,
+            run_config=run_config,
+            context_wrapper=context_wrapper,
+            input_items=input,
+            system_instructions=system_prompt,
+        )
+
+        # 1. Stream the output events
+        async for event in model.stream_response(
+            filtered.instructions,
+            filtered.input,
+            model_settings,
+            all_tools,
+            output_schema,
+            handoffs,
+            get_model_tracing_impl(run_config.tracing_disabled, run_config.trace_include_sensitive_data),
+            previous_response_id=previous_response_id,
+            prompt=prompt_config,
+        ):
+            if isinstance(event, ResponseCompletedEvent):
+                usage = (
+                    Usage(
+                        requests=1,
+                        input_tokens=event.response.usage.input_tokens,
+                        output_tokens=event.response.usage.output_tokens,
+                        total_tokens=event.response.usage.total_tokens,
+                        input_tokens_details=event.response.usage.input_tokens_details,
+                        output_tokens_details=event.response.usage.output_tokens_details,
+                    )
+                    if event.response.usage
+                    else Usage()
+                )
+                final_response = ModelResponse(
+                    output=event.response.output,
+                    usage=usage,
+                    response_id=event.response.id,
+                )
+                context_wrapper.usage.add(usage)
+
+            streamed_result._event_queue.put_nowait(RawResponsesStreamEvent(data=event))
+
+        # 2. At this point, the streaming is complete for this turn of the agent loop.
+        if not final_response:
+            raise ModelBehaviorError("Model did not produce a final response!")
+
+        # 3. Now, we can process the turn as we do in the non-streaming case
+        return await cls._get_single_step_result_from_streamed_response(
+            agent=agent,
+            streamed_result=streamed_result,
+            new_response=final_response,
+            output_schema=output_schema,
+            all_tools=all_tools,
+            handoffs=handoffs,
+            hooks=hooks,
+            context_wrapper=context_wrapper,
+            run_config=run_config,
+            tool_use_tracker=tool_use_tracker,
+        )

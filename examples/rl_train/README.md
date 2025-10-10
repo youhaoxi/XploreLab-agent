@@ -30,3 +30,13 @@ python scripts/cli_chat.py --config examples/rl_train/qa_python
 ```sh
 python scripts/cli_chat.py --config examples/rl_train/qa_wiki
 ```
+
+## Case 3: browser use
+
+- config: `configs/agents/examples/rl_train/browser.yaml`
+- environment: [BrowserTioneEnv](../../utu/env/browser_tione_env.py). Note that you should config the remote tione environment service first, see [iwiki](https://iwiki.woa.com/p/4015475657) and [TioneEnvManager](../../utu/env/utils/tione_manager.py).
+
+```sh
+python scripts/cli_chat.py --config_name examples/rl_train/browser
+```
+
