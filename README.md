@@ -377,6 +377,3 @@ If you find this work useful, please consider citing:
 }
 ```
 
-## ⭐ Star History
-
-![Star History Chart](https://api.star-history.com/svg?repos=TencentCloudADP/youtu-agent&type=Date)

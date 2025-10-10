@@ -294,7 +294,3 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
   howpublished = {\url{https://github.com/TencentCloudADP/youtu-agent}},
 }
 ```
-
-## ⭐ Star History
-
-![Star History Chart](https://api.star-history.com/svg?repos=TencentCloudADP/youtu-agent&type=Date)
