@@ -18,7 +18,7 @@ All environments inherit from the abstract base class `Env`, which defines the c
 
 Here are the currently available environment implementations.
 
-### `BaseEnv`
+### `BasicEnv`
 
 This is the simplest and default environment. It can be considered a "null" environment.
 

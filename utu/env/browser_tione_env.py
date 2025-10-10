@@ -4,14 +4,14 @@ from contextlib import AsyncExitStack
 from agents import FunctionTool, RunContextWrapper, TContext, Tool
 
 from ..utils import get_logger
-from .base_env import Env
+from .base_env import BaseEnv
 from .utils import MCPClient
 from .utils.tione_manager import TioneEnvManager
 
 logger = get_logger(__name__)
 
 
-class BrowserTioneEnv(Env):
+class BrowserTioneEnv(BaseEnv):
     def __init__(self):
         self.browser_state: str = None
         self._stack = AsyncExitStack()
