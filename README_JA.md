@@ -5,6 +5,7 @@
 <!-- <a href=https://arxiv.org/abs/2502.14345><img src=https://img.shields.io/badge/arXiv-2502.14345-b31b1b.svg></a> -->
 <a href=https://github.com/TencentCloudADP/youtu-agent><img src=https://img.shields.io/badge/GitHub-腾讯-blue.svg></a>
 <a href=https://deepwiki.com/TencentCloudADP/youtu-agent><img src=https://img.shields.io/badge/DeepWiki-Tencent-blue.svg></a>
+<a href=https://arxiv.org/abs/2510.08191><img src=https://img.shields.io/badge/arXiv-2510.08191-b31b1b.svg></a>
 </div>
 
 <p align="center">
@@ -29,7 +30,8 @@
 
 ## 🗞️ ニュース
 
-- 🛠️ [2025-09-28] エージェント自動生成に加えて、要件を一度伝えるだけで`Youtu-Agent`がツールを構築してくれる自動ツール生成機能をリリースしました。[詳細](https://tencentcloudadp.github.io/youtu-agent/auto_generation/)。
+- 🚀 [2025-10-10] [**Training-Free Group Relative Policy Optimization**](https://arxiv.org/abs/2510.08191)。DeepSeek-V3.2 のRLが8ドルで？本当に実現しました！トレーニング不要の GRPO が DeepSeek-V3.2 を凍結したまま約100件のサンプルからトークン事前分布を学習し、RL のコストをおよそ8ドルまで抑えつつ数学とウェブ検索タスクで改善を確認しました！コードブランチ [training_free_GRPO](https://github.com/TencentCloudADP/youtu-agent/tree/training_free_GRPO) [[X ポスト](https://x.com/cai_cecilia47/status/1976558824640393559)]。
+- 🛠️ [2025-09-28] エージェント自動生成に加えて、要件を一度伝えるだけで`Youtu-Agent`がツールを構築してくれる自動ツール生成機能をリリースしました。[[詳細](https://tencentcloudadp.github.io/youtu-agent/auto_generation/)]。
 - 📺 [2025-09-09] 「Youtu-Agent」の設計思想と基本的な使い方についてライブ配信を行いました。[[動画](https://www.bilibili.com/video/BV1mypqz4EvS)] [[資料](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNLgt3CbnxRWaYWnW4)]。
 - 🎁 [2025-09-02] [テンセントクラウド国際サイト](https://www.tencentcloud.com/)では、DeepSeek APIの新規ユーザーに対して**300万枚の無料トークン**を提供しています（**2025年9月1日から2025年10月31日まで**）。`Youtu-Agent`でDeepSeekモデルを使用したい場合は、[無料トライアルをクリック](https://www.tencentcloud.com/document/product/1255/70381)してください！企業向けのエージェントソリューションについては、[エージェント開発プラットフォームADP](https://adp.tencentcloud.com)もご覧ください。
 - 📺 [2025-08-28] 新しくリリースされたDeepSeek-V3.1モデルについてライブ配信を行い、`Youtu-Agent`フレームワークでの使用方法を紹介しました。[[動画](https://www.bilibili.com/video/BV1XwayzrETi/)] [[資料](https://doc.weixin.qq.com/doc/w3_AcMATAZtAPICNvcLaY5FvTOuo7MwF)]。
@@ -285,6 +287,16 @@ python scripts/run_eval.py --config_name ww --exp_id <your_exp_id> --dataset Web
 この研究が役立つと思われる場合は、引用を検討してください：
 
 ```bibtex
+@misc{training_free_grpo,
+  title={Training-Free Group Relative Policy Optimization},
+  author={Tencent Youtu Lab},
+  year={2025},
+  eprint={2510.08191},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL},
+  url={https://arxiv.org/abs/2510.08191},
+}
+
 @misc{youtu-agent-2025,
   title={Youtu-agent: A Simple yet Powerful Agent Framework},
   author={Tencent Youtu Lab},
