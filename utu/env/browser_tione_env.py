@@ -19,24 +19,28 @@ class BrowserTioneEnv(BaseEnv):
     async def build(self):
         """Build the environment. We use docker to run a browser container."""
         tione_manager = TioneEnvManager(type="BROWSER_CHROMIUM")
+        logger.info(">> entering browser context")
         env_info = await tione_manager.create_env()
         self.mcp_url = f"http://{env_info['Endpoint']}/mcp/"
+        logger.debug(">> entering browser context")
+        self.client = await self._stack.enter_async_context(MCPClient.get_mcp_client(self.mcp_url))
 
     async def cleanup(self):
+        logger.debug(">> exiting browser context")
         await self._stack.aclose()
 
     def get_state(self) -> str:
         """Get the current state of the environment."""
+        logger.debug(f">> injected state {str(self.browser_state)[:100]}")
         return self.browser_state
 
     async def get_tools(self) -> list[Tool]:
         """Get the tools available in the environment."""
-        client = await self._stack.enter_async_context(MCPClient.get_mcp_client(self.mcp_url))
 
         def create_on_invoke_tool(tool_name: str):
             async def on_invoke_tool(ctx: RunContextWrapper[TContext], input_json: str) -> str:
                 try:
-                    res = await client.call_tool(tool_name, json.loads(input_json))
+                    res = await self.client.call_tool(tool_name, json.loads(input_json))
                     if res.isError:
                         return f"Error: {res.content[0].text}"
                     self.browser_state = res.content[1].text  # DISCUSS: record the web actions?
@@ -48,7 +52,7 @@ class BrowserTioneEnv(BaseEnv):
             return on_invoke_tool
 
         # NOTE: check `MCPUtil` in @agents
-        res = await client.list_tools()
+        res = await self.client.list_tools()
         assert res.nextCursor is None
         tools = []
         for tool in res.tools:
