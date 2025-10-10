@@ -1,5 +1,4 @@
 from agents import RunContextWrapper, TContext, TResponseInputItem
-from agents.run import SingleStepResult
 
 from ..utils import get_logger
 
@@ -11,11 +10,6 @@ class BaseContextManager:
         self, input: str | list[TResponseInputItem], run_context: RunContextWrapper[TContext] = None
     ) -> str | list[TResponseInputItem]:
         return input
-
-    def process(
-        self, single_step_result: SingleStepResult, run_context: RunContextWrapper[TContext] = None
-    ) -> SingleStepResult:
-        return single_step_result
 
 
 class DummyContextManager(BaseContextManager):
