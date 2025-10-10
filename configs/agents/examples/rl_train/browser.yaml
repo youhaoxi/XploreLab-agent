@@ -10,3 +10,6 @@ agent:
 
 env:
   name: browser_tione
+
+context_manager:
+  name: env
