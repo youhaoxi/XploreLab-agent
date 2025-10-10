@@ -37,6 +37,8 @@ async def main():
         else:
             PrintUtils.print_error(f"Unsupported agent type: {type(agent)}")
             return
+    if isinstance(agent, SimpleAgent):
+        await agent.cleanup()
 
 
 if __name__ == "__main__":
