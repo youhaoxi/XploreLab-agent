@@ -6,7 +6,7 @@ export type ChatInputLoadingState = "loading" | "ready" | "hide";
 interface ChatInputProps {
   inputValue: string;
   onInputChange: (value: string) => void;
-  onSendMessage: () => void;
+  onSendMessage: (message: string) => void;
   isModelResponding: boolean;
   inputRef: React.RefObject<HTMLInputElement | null>;
   currentConfig?: string;
@@ -16,6 +16,7 @@ interface ChatInputProps {
   chatInputLoadingState: ChatInputLoadingState;
   setChatInputLoadingState: (state: ChatInputLoadingState) => void;
   availableConfigs: string[];
+  uploadEndpoint?: string;
 }
 
 type FileStatus = 'uploading' | 'uploaded';
@@ -25,6 +26,7 @@ interface SelectedFileItem {
   file: File;
   status: FileStatus;
   hovering: boolean;
+  serverFilename?: string;
 }
 
 // Mock config options - replace with actual config fetching logic if needed
@@ -49,12 +51,26 @@ const ChatInput: FC<ChatInputProps> = ({
   chatInputLoadingState,
   setChatInputLoadingState,
   availableConfigs,
+  uploadEndpoint,
 }) => {
   const { t } = useTranslation();
+  const sendWithRelated = () => {
+    // Collect uploaded files' server filenames
+    const uploaded = selectedFiles.filter((f) => f.status === 'uploaded' && !!f.serverFilename);
+    if (uploaded.length === 0) {
+      onSendMessage(inputValue);
+      return;
+    }
+    const names = uploaded.map((f) => f.serverFilename).join(', ');
+    const prefix = `${t('app.relatedFiles', 'Related Files')}: ${names}`;
+    const composed = inputValue ? `${prefix}\n\n${inputValue}` : prefix;
+    onSendMessage(composed);
+  };
+
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !isModelResponding) {
       e.preventDefault();
-      onSendMessage();
+      sendWithRelated();
     }
   };
 
@@ -91,6 +107,32 @@ const ChatInput: FC<ChatInputProps> = ({
     fileInputRef.current?.click();
   };
 
+  const uploadFile = async (item: SelectedFileItem) => {
+    try {
+      const form = new FormData();
+      form.append('file', item.file);
+      const uploadUrl = uploadEndpoint ?? `${window.location.origin}/upload`;
+      const res = await fetch(uploadUrl, {
+        method: 'POST',
+        body: form,
+      });
+      if (!res.ok) {
+        throw new Error(`Upload failed: ${res.status}`);
+      }
+      const data = await res.json();
+      const serverFilename = data?.filename as string | undefined;
+      setSelectedFiles((prev) =>
+        prev.map((it) =>
+          it.id === item.id ? { ...it, status: 'uploaded', serverFilename } : it
+        )
+      );
+    } catch (err) {
+      console.error('Upload error:', err);
+      // Remove the failed item from the list
+      setSelectedFiles((prev) => prev.filter((it) => it.id !== item.id));
+    }
+  };
+
   const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -105,11 +147,9 @@ const ChatInput: FC<ChatInputProps> = ({
 
     setSelectedFiles((prev) => [...prev, ...newItems]);
 
-    // Simulate upload completion to demonstrate UI state change
+    // Start real uploads
     newItems.forEach((item) => {
-      setTimeout(() => {
-        setSelectedFiles((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: 'uploaded' } : it)));
-      }, 800);
+      void uploadFile(item);
     });
 
     // Reset input so selecting the same file again still triggers change
@@ -231,7 +271,7 @@ const ChatInput: FC<ChatInputProps> = ({
           />
           <button
             className="send-button"
-            onClick={onSendMessage}
+            onClick={sendWithRelated}
             disabled={isModelResponding}
             title={isModelResponding ? t('app.aiThinking') : t('app.sendMessage')}
           >

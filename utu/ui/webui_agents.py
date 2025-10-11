@@ -4,6 +4,7 @@ import logging
 import os
 import traceback
 import uuid
+import time
 from importlib import resources
 from pathlib import Path
 from typing import Dict
@@ -356,6 +357,17 @@ class FileUploadHandler(tornado.web.RequestHandler):
     def initialize(self, workspace: str):
         self.workspace = workspace
     
+    def set_default_headers(self):
+        # Allow CORS from any origin
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.set_header("Access-Control-Allow-Headers", "*")
+
+    def options(self):
+        # CORS preflight
+        self.set_status(204)
+        self.finish()
+
     def post(self):
         file = self.request.files["file"][0]
         timestamp = time.time()

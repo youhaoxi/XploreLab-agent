@@ -102,6 +102,16 @@ const App: React.FC = () => {
   const [isPlanNewAgentDisplayed, setIsPlanNewAgentDisplayed] = useState(false);
   const [isReportNewAgentDisplayed, setIsReportNewAgentDisplayed] = useState(false);
 
+  const uploadEndpoint = (() => {
+    try {
+      const u = new URL(wsUrl);
+      const httpProtocol = u.protocol === 'wss:' ? 'https:' : 'http:';
+      return `${httpProtocol}//${u.host}/upload`;
+    } catch {
+      return `${window.location.origin}/upload`;
+    }
+  })();
+
   const getConfigList = () => {
     let request: UserRequest = {
       type: 'list_agents',
@@ -698,12 +708,11 @@ const App: React.FC = () => {
     setIsReportNewAgentDisplayed(false);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (message: string) => {
     // hack
     resetNewAgentDisplayed();
 
-    if (!inputValue.trim() || isModelResponding) return;
-
+    if (!message.trim() || isModelResponding) return;
     // Mark that user has sent their first message
     if (!hasUserSentMessage) {
       setHasUserSentMessage(true);
@@ -716,7 +725,7 @@ const App: React.FC = () => {
     // Add user message to chat
     const userMessage: Message = {
       id: Date.now(),
-      content: inputValue,
+      content: message,
       sender: 'user',
       timestamp: new Date()
     };
@@ -747,13 +756,13 @@ const App: React.FC = () => {
       sendRequest({
         type: 'answer',
         content: {
-          answer: inputValue,
+          answer: message,
           ask_id: askId,
         },
       });
       setAskId(null);
     } else {
-      sendQuery(inputValue);
+      sendQuery(message);
     }
   };
 
@@ -1027,6 +1036,7 @@ const App: React.FC = () => {
             setChatInputLoadingState={setChatInputLoadingState}
             availableConfigs={availableConfigs}
             getConfigList={getConfigList}
+            uploadEndpoint={uploadEndpoint}
           />
 
           {/* Footer with pic.png */}
