@@ -2,12 +2,11 @@ import asyncio
 import json
 import logging
 import os
+import time
 import traceback
 import uuid
-import time
 from importlib import resources
 from pathlib import Path
-from typing import Dict
 
 import agents as ag
 import tornado.web
@@ -46,21 +45,21 @@ CONFIG_PATH = DIR_ROOT / "configs" / "agents"
 WORKSPACE_ROOT = "/tmp/utu_webui_workspace"
 
 class Session:
-    
+
     def __init__(self, session_id: str = None):
         if session_id is None:
             session_id = Session.gen_session_id()
         self.session_id = session_id
         self.workspace = WORKSPACE_ROOT + "/" + self.session_id
         self.init_workspace()
-    
+
     @staticmethod
     def gen_session_id():
         return str(uuid.uuid4())
 
     def init_workspace(self):
         os.makedirs(self.workspace, exist_ok=True)
-    
+
     def clean_up_workspace(self):
         os.rmdir(self.workspace)
 
@@ -84,11 +83,11 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         session = Session()
         self.session = session
         return session
-    
+
     def delete_session(self):
         session = self.session
         session.clean_up_workspace()
-    
+
     def check_origin(self, origin):
         # Allow all origins to connect
         return True
@@ -142,7 +141,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         # start query worker
         self.query_worker_task = asyncio.create_task(self.handle_query_worker())
         self.answer_queue = asyncio.Queue()
-        
+
         self.create_session()
 
         content = self._get_current_agent_content()
@@ -203,7 +202,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
             input_list = stream.to_input_list()
             self.agent.input_items = input_list
             self.agent.current_agent = stream.last_agent
-    
+
     async def _handle_list_agents_noexcept(self):
         config_path = Path(CONFIG_PATH).resolve()
         example_config_files = config_path.glob("examples/*.yaml")
@@ -211,7 +210,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         orchestra_agent_config_files = config_path.glob("orchestra/*.yaml")
         orchestrator_agent_config_files = config_path.glob("orchestrator/*.yaml")
         generated_agent_config_files = config_path.glob("generated/*.yaml")
-        
+
         config_files = (
             list(example_config_files)
             + list(simple_agent_config_files)
@@ -243,12 +242,12 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     async def _handle_switch_agent_noexcept(self, switch_agent_request: SwitchAgentRequest):
         config = ConfigLoader.load_agent_config(switch_agent_request.config_file)
-        
+
         # set workdir for bash tool
         for key, value in config.toolkits.items():
             if key == "BashTool":
                 value.config['workspace_root'] = self.session.workspace
-        
+
         await self.instantiate_agent(config)
         content = self._get_current_agent_content()
         await self.send_event(
@@ -356,7 +355,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 class FileUploadHandler(tornado.web.RequestHandler):
     def initialize(self, workspace: str):
         self.workspace = workspace
-    
+
     def set_default_headers(self):
         # Allow CORS from any origin
         self.set_header("Access-Control-Allow-Origin", "*")
