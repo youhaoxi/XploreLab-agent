@@ -76,6 +76,15 @@ wheels = [
 ]
 
 [[package]]
+name = "aiolimiter"
+version = "1.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f1/23/b52debf471f7a1e42e362d959a3982bdcb4fe13a5d46e63d28868807a79c/aiolimiter-1.2.1.tar.gz", hash = "sha256:e02a37ea1a855d9e832252a105420ad4d15011505512a1a1d814647451b5cca9", size = 7185, upload-time = "2024-12-08T15:31:51.496Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f3/ba/df6e8e1045aebc4778d19b8a3a9bc1808adb1619ba94ca354d9ba17d86c3/aiolimiter-1.2.1-py3-none-any.whl", hash = "sha256:d3f249e9059a20badcb56b61601a83556133655c11d1eb3dd3e04ff069e5f3c7", size = 6711, upload-time = "2024-12-08T15:31:49.874Z" },
+]
+
+[[package]]
 name = "aiosignal"
 version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4002,6 +4011,18 @@ wheels = [
 ]
 
 [[package]]
+name = "tencentcloud-sdk-python"
+version = "3.0.1474"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/dc/c9/7a8d034e2a83a260f6ebb27a21d50603d7375dc5e5cdecdc328477ac7067/tencentcloud-sdk-python-3.0.1474.tar.gz", hash = "sha256:b6d85b34bd4555185dbdab8172ec4e84aaa7d55da77a5fd496e51635c7617b3e", size = 12216090, upload-time = "2025-10-11T07:35:16.015Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6a/3c/d9c3db02573638a04e28accca1a6ce8d0e0323d5e023320a94240175c4d0/tencentcloud_sdk_python-3.0.1474-py2.py3-none-any.whl", hash = "sha256:65e20017b689fe04843d72d5a92752c08c00201c924d71bac691192615ed37dd", size = 12901932, upload-time = "2025-10-11T07:16:25.136Z" },
+]
+
+[[package]]
 name = "tf-playwright-stealth"
 version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4680,6 +4701,10 @@ python-executor = [
     { name = "scipy" },
     { name = "seaborn" },
 ]
+rl = [
+    { name = "aiolimiter" },
+    { name = "tencentcloud-sdk-python" },
+]
 search = [
     { name = "crawl4ai" },
 ]
@@ -4756,6 +4781,10 @@ python-executor = [
     { name = "pandas", specifier = ">=2.3.1" },
     { name = "scipy", specifier = ">=1.16.1" },
     { name = "seaborn", specifier = ">=0.13.2" },
+]
+rl = [
+    { name = "aiolimiter", specifier = ">=1.2.1" },
+    { name = "tencentcloud-sdk-python", specifier = ">=3.0.1474" },
 ]
 search = [{ name = "crawl4ai", specifier = ">=0.7.4" }]
 
