@@ -14,6 +14,13 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--file", type=str)
     parser.add_argument("--extra_prompt", type=str, default="")
+    parser.add_argument("--pages", type=int, default=15)
+    parser.add_argument("--url", type=str, default=None)
+    parser.add_argument("--template_path", type=str, default="template/template_ori.pptx")
+    parser.add_argument("--output_path",
+                        type=str, default=f"output-{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.pptx")
+    parser.add_argument("--output_json",
+                        type=str, default=f"output-{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.json")
     args = parser.parse_args()
 
     agent = SimpleAgent(config=config)
@@ -21,31 +28,33 @@ async def main():
 
     if args.file:
         with open(args.file) as f:
-            html = f.read()
+            input_file = f.read()
+        query = f"""
+        把这个网页做成{args.pages}页左右的演讲PPT。{args.extra_prompt}
+
+        {input_file}
+        """
+    elif args.url:
+        url = args.url
+        query = f"""
+        把这个网页做成{args.pages}页左右的演讲PPT。{args.extra_prompt}
+
+        {url}
+        """
     else:
-        html = "https://arxiv.org/html/2509.20234v1"
-
-    query = f"""
-    把这个网页做成15页左右的演讲PPT。{args.extra_prompt}
-
-    {html}
-    """
-
-    # query = """
-    # 收集有关夜鹭的信息，整理成演讲PPT。
-    # """
+        raise ValueError("Please provide either --file or --url")
 
     result = await agent.chat_streamed(query)
     final_result = result.final_output
     print(final_result)
 
-    with open("output.json", "w") as f:
+    with open(args.output_json, "w") as f:
         f.write(final_result)
 
     json_data = extract_json(final_result)
     fill_template(
-        template_path="template/template_ori.pptx",
-        output_path=f"output-{datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.pptx",
+        template_path=args.template_path,
+        output_path=args.output_path,
         json_data=json_data,
     )
 

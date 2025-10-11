@@ -7,6 +7,9 @@ from utils import delete_slide, delete_slide_range, duplicate_slide, move_slide
 
 
 def fill_template(template_path, output_path, json_data):
+    """
+    Fill the template with the given json data.
+    """
     prs = Presentation(template_path)
     data = json.loads(json_data)
     slides = parse_json(data)
@@ -28,6 +31,9 @@ def fill_template(template_path, output_path, json_data):
 
 
 def extract_json(content):
+    """
+    Extract the json data from the given content.
+    """
     # extract content within "```json" and "```"
     json_data = content.split("```json")[1].split("```")[0]
     return json_data

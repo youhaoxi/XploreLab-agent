@@ -7,30 +7,37 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE
 
 # rgb colors from a color scheme
 _color_palette = [
-    (178, 34, 34),  # 砖红
-    (46, 139, 87),  # 海绿
-    (70, 130, 180),  # 钢蓝
-    (210, 180, 140),  # 棕褐
-    (147, 112, 219),  # 中紫
-    (255, 165, 0),  # 橙色（降饱和）
-    (72, 209, 204),  # 青绿
-    (205, 92, 92),  # 印度红
-    (106, 90, 205),  # 板岩蓝
-    (238, 130, 238),  # 紫罗兰
-    (60, 179, 113),  # 中绿
-    (100, 149, 237),  # 矢车菊蓝
-    (218, 165, 32),  # 金
-    (199, 21, 133),  # 深粉
-    (65, 105, 225),  # 皇家蓝
+    (178, 34, 34),  # Brick Red
+    (46, 139, 87),  # Sea Green
+    (70, 130, 180),  # Steel Blue
+    (210, 180, 140),  # Tan
+    (147, 112, 219),  # Medium Purple
+    (255, 165, 0),  # Orange (desaturated)
+    (72, 209, 204),  # Medium Turquoise
+    (205, 92, 92),  # Indian Red
+    (106, 90, 205),  # Slate Blue
+    (238, 130, 238),  # Violet
+    (60, 179, 113),  # Medium Sea Green
+    (100, 149, 237),  # Cornflower Blue
+    (218, 165, 32),  # Goldenrod
+    (199, 21, 133),  # Medium Violet Red
+    (65, 105, 225),  # Royal Blue
 ]
 
 
 def inspect_ppt(prs):
+    """
+    Inspect the given presentation.
+    """
     for slide in prs.slides:
         inspect_slide(slide)
 
 
 def inspect_slide(slide):
+    """
+    Inspect the given slide layout.
+    """
+
     def _inspect_shape_list(shapes, indent=0):
         for shape in shapes:
             print(" " * indent + shape.name)
@@ -41,6 +48,10 @@ def inspect_slide(slide):
 
 
 def to_svg(slide, prs, svg_filename="test.svg"):
+    """
+    Convert the given slide layout to an SVG file.
+    """
+
     def _to_svg_box(shapes, svg_box):
         for shape in shapes:
             svg_box.append(
@@ -67,10 +78,10 @@ def to_svg(slide, prs, svg_filename="test.svg"):
             color = (picked_color[0] / 255, picked_color[1] / 255, picked_color[2] / 255, 0.3)
             ax.add_patch(matplotlib.patches.Rectangle((left, top), width, height, color=color))
         ax.set_axis_off()
-        matplotlib.pyplot.subplots_adjust(left=0, right=1, top=1, bottom=0)  # 边距设为0
-        matplotlib.pyplot.margins(0)  # 数据边距设为0
-        ax.set_xmargin(0)  # x轴边距
-        ax.set_ymargin(0)  # y轴边距
+        matplotlib.pyplot.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        matplotlib.pyplot.margins(0)
+        ax.set_xmargin(0)
+        ax.set_ymargin(0)
         fig.savefig(svg_filename, bbox_inches="tight", pad_inches=0)
 
     svg_box = []

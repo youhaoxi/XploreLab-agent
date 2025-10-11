@@ -1,3 +1,6 @@
+"""
+This script is used to generate a config file from given json schema for PPTGeneratorAgent.
+"""
 import argparse
 
 TEMPLATE = """
@@ -16,9 +19,9 @@ agent:
     2. Arrange the content in a logical and coherent manner. Divide the content into slides formatted by the json schema
     3. Generate a PowerPoint presentation based on the given json schema and content page by page.
 
-    Don't dive too deep into the content, just extract the key points and arrange them in a logical and coherent manner.
+    Extract the key points and arrange them in a logical and coherent manner.
 
-    If there are any images in the document, you are encouraged to use them in the presentation (with url and caption).
+    For images in the document, it is encouraged to use them in the presentation (with url and caption).
 
     Remember you can insert table into the content page.
 
@@ -27,6 +30,11 @@ agent:
     ```json
     {schema_content}
     ```
+
+    ## Output Format Requirement
+
+    Wrap the JSON content in a markdown code block with language `json`.
+    Ensure the JSON content is valid and follows the given schema.
 
     ## Example Arragenment
 
@@ -48,10 +56,12 @@ def prepend_indent(text, indent=2):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output", type=str, required=True)
+    parser.add_argument("-s", "--schema", type=str, required=True)
     args = parser.parse_args()
     output_file = args.output
+    schema_file = args.schema
 
-    with open("schema/template.schema.json") as f:
+    with open(schema_file) as f:
         schema_content = f.read()
 
     schema_content = prepend_indent(schema_content, indent=2)
