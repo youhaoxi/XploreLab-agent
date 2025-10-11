@@ -290,7 +290,7 @@ const App: React.FC = () => {
 
         return prev
       });
-    } 
+    }
     // handle new agent event
     else if (event.type === 'new') {
       const data = event.data as { name: string };

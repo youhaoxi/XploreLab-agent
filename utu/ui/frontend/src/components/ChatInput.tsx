@@ -1,4 +1,4 @@
-import React, { type FC, type KeyboardEvent, useRef, useEffect } from 'react';
+import React, { type FC, type KeyboardEvent, useRef, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type ChatInputLoadingState = "loading" | "ready" | "hide";
@@ -16,6 +16,15 @@ interface ChatInputProps {
   chatInputLoadingState: ChatInputLoadingState;
   setChatInputLoadingState: (state: ChatInputLoadingState) => void;
   availableConfigs: string[];
+}
+
+type FileStatus = 'uploading' | 'uploaded';
+interface SelectedFileItem {
+  id: string;
+  name: string;
+  file: File;
+  status: FileStatus;
+  hovering: boolean;
 }
 
 // Mock config options - replace with actual config fetching logic if needed
@@ -50,6 +59,8 @@ const ChatInput: FC<ChatInputProps> = ({
   };
 
   const configRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFiles, setSelectedFiles] = useState<SelectedFileItem[]>([]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -75,6 +86,68 @@ const ChatInput: FC<ChatInputProps> = ({
     onConfigSelect?.(config);
     setChatInputLoadingState("hide");
   };
+
+  const handleAttachClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const newItems: SelectedFileItem[] = Array.from(files).map((f, idx) => ({
+      id: `${Date.now()}_${idx}_${f.name}`,
+      name: f.name,
+      file: f,
+      status: 'uploading',
+      hovering: false,
+    }));
+
+    setSelectedFiles((prev) => [...prev, ...newItems]);
+
+    // Simulate upload completion to demonstrate UI state change
+    newItems.forEach((item) => {
+      setTimeout(() => {
+        setSelectedFiles((prev) => prev.map((it) => (it.id === item.id ? { ...it, status: 'uploaded' } : it)));
+      }, 800);
+    });
+
+    // Reset input so selecting the same file again still triggers change
+    e.currentTarget.value = '';
+  };
+
+  const handleHoverChange = (id: string, hovering: boolean) => {
+    setSelectedFiles((prev) => prev.map((it) => (it.id === id ? { ...it, hovering } : it)));
+  };
+
+  const handleRemoveFile = (id: string) => {
+    setSelectedFiles((prev) => prev.filter((it) => it.id !== id));
+  };
+
+  const FileStatusComponent: FC<{
+    item: SelectedFileItem;
+    onHover: (id: string, hovering: boolean) => void;
+    onRemove: (id: string) => void;
+  }> = ({ item, onHover, onRemove }) => (
+    <div className="file-chip">
+      <span
+        className={`file-chip-icon ${item.hovering ? 'is-hovering' : ''}`}
+        onMouseEnter={() => onHover(item.id, true)}
+        onMouseLeave={() => onHover(item.id, false)}
+        onClick={() => item.hovering && onRemove(item.id)}
+        title={item.hovering ? t('app.delete', '删除') : ''}
+      >
+        {item.hovering ? (
+          <i className="fas fa-times"></i>
+        ) : item.status === 'uploading' ? (
+          <i className="breathing-circle fa fa-circle"></i>
+        ) : (
+          <i className="fas fa-file"></i>
+        )}
+      </span>
+      <span className="file-chip-name">{item.name}</span>
+    </div>
+  );
 
   return (
     <div className="chat-input-container">
@@ -115,8 +188,37 @@ const ChatInput: FC<ChatInputProps> = ({
           )}
         </div>
       )}
+      {/* File status area */}
+      {selectedFiles.length > 0 && (
+        <div className="file-area">
+          {selectedFiles.map((item) => (
+            <FileStatusComponent
+              key={item.id}
+              item={item}
+              onHover={handleHoverChange}
+              onRemove={handleRemoveFile}
+            />
+          ))}
+        </div>
+      )}
+
       <div className="chat-input-wrapper">
         <div className="input-group">
+          <button
+            className="send-button attach-button"
+            onClick={handleAttachClick}
+            disabled={isModelResponding}
+            title={isModelResponding ? t('app.aiThinking') : t('app.attachFile', 'Attach file')}
+          >
+            <i className="fas fa-paperclip"></i>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden-file-input"
+            multiple
+            onChange={handleFileChange}
+          />
           <input
             ref={inputRef}
             type="text"
