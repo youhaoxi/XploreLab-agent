@@ -5,13 +5,14 @@ cecret key: https://cloud.tencent.com/document/product/1278/85305
 
 import asyncio
 import os
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
-from aiolimiter import AsyncLimiter
-from tencentcloud.common import credential
-from tencentcloud.common.common_client import CommonClient
-from tencentcloud.common.profile.client_profile import ClientProfile
-from tencentcloud.common.profile.http_profile import HttpProfile
+if TYPE_CHECKING:
+    from aiolimiter import AsyncLimiter
+    from tencentcloud.common import credential
+    from tencentcloud.common.common_client import CommonClient
+    from tencentcloud.common.profile.client_profile import ClientProfile
+    from tencentcloud.common.profile.http_profile import HttpProfile
 
 
 class TioneEnvManager:
