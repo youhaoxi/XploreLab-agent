@@ -3,6 +3,7 @@
   --color-text: #213547;
   --color-bg: #ffffff;
   --color-input-bg: #ffffff;
+  --chip-bg: #ffffff;
   
   /* Agent Component Colors */
   --agent-bg: #f8fbff;
@@ -54,6 +55,15 @@
   --config-display-color: rgb(222, 222, 222);
 
   --side-bar-width: 250px;
+}
+
+/* Attach button aligns with send-button visuals */
+.attach-button {
+  color: var(--color-text);
+}
+
+.attach-button:hover:not(:disabled) {
+  background-color: transparent; /* keep same as current send-button behavior */
 }
 
 body {
@@ -452,6 +462,50 @@ body {
   overflow: hidden;
   border-radius: 1000px;
   margin-top: 0.5rem;
+}
+
+/* File selection area and chips */
+.file-area {
+  display: flex;
+  gap: 8px;
+  padding: 6px 8px;
+  overflow-x: auto;
+  margin-bottom: 6px;
+}
+
+.file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 16px;
+  border: 1px solid var(--color-border, #e5e7eb);
+  background: var(--chip-bg, #fff);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  white-space: nowrap;
+}
+
+.file-chip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1rem;
+  border-radius: 50%;
+}
+
+.file-chip-icon.is-hovering {
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+}
+
+.file-chip-name {
+  font-size: 0.75em;
+}
+
+.hidden-file-input {
+  display: none !important;
 }
 
 .chat-input {
@@ -924,6 +978,7 @@ details[open] > .message-detail-content:has(.report-content) {
   --action-button-primary-border: rgba(102, 187, 106, 0.4);
   --action-button-primary-hover: rgba(102, 187, 106, 0.3);
   --config-display-color: rgba(13, 13, 13);
+  --chip-bg: #2d2d2d;
 }
 
 /* Modal variables for manual dark theme */
