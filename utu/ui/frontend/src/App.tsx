@@ -976,7 +976,7 @@ const App: React.FC = () => {
           <div className="header-container">
             <h1 className="chat-title">
               <img className="title-logo" src={logoSquareUrl} alt="logo" />
-              Youtu Agent
+              XploreLab Agent
             </h1>
           </div>
 
